@@ -49,7 +49,7 @@ chmod 600 ~/.ssh/cft-idam
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
 
-ssh devops@idam-bastion.platform.hmcts.net -J bastion.reform.hmcts.net
+ssh devops@10.106.79.4 -J bastion.reform.hmcts.net
 ```
 
 You can also configure some ssh config to make this easier:

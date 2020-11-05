@@ -57,17 +57,18 @@ You can also configure some ssh config to make this easier:
 open the `~/.ssh/config` file (create if it doesn't already exist)
 
 ```text
-Host idam-bastion.platform.hmcts.net
-   User devops
-   ProxyJump bastion.reform.hmcts.net
-   IdentityFile ~/.ssh/cft-idam
-   IdentitiesOnly yes
+Host idam-bastion
+  Hostname 10.106.79.4
+  User devops
+  ProxyJump bastion.reform.hmcts.net
 ```
 
 Connect with:
 ```command
-ssh idam-bastion.platform.hmcts.net
+ssh idam-bastion
 ```
+
+_note: there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it_
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.

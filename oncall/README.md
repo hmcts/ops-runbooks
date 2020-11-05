@@ -31,3 +31,50 @@ kubectl get pods -n admin
 # after your login verify you can restart a pod, e.g. fluxcloud (admin notifying service, downtime doesn't matter)
 kubectl delete pod -n admin -l app=fluxcloud
 ```
+
+The default configuration for an application is two pods on each cluster, but teams may have more.
+
+### IDAM access
+
+Idam is accessed via a bastion server, also known as the idam jump box.
+
+It is accessed via a shared private key stored in vault.
+
+You need to be connected to the HMCTS VPN for this.
+
+```bash
+az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
+chmod 600 ~/.ssh/cft-idam
+
+az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
+ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
+
+ssh devops@10.106.79.4 -J bastion.reform.hmcts.net
+```
+
+You can also configure some ssh config to make this easier:
+
+open the `~/.ssh/config` file (create if it doesn't already exist)
+
+```text
+Host idam-bastion
+  Hostname 10.106.79.4
+  User devops
+  ProxyJump bastion.reform.hmcts.net
+```
+
+Connect with:
+```command
+ssh idam-bastion
+```
+
+_note: there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it_
+
+The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
+There's useful scripts there.
+
+You can also jump from this server to the other ones, you will need to provide the SSH key passphrase each time you log in.
+
+```command
+ssh idam@forgerock-idm-1
+```

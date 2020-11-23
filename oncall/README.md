@@ -40,7 +40,7 @@ Idam is accessed via a bastion server, also known as the idam jump box.
 
 It is accessed via a shared private key stored in vault.
 
-You need to be connected to the HMCTS VPN for this.
+You need to be connected to the HMCTS VPN for this and have an account on bastion.reform.hmcts.net server.
 
 ```bash
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey

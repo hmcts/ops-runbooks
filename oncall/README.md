@@ -31,44 +31,54 @@ kubectl get pods -n admin
 # after your login verify you can restart a pod, e.g. fluxcloud (admin notifying service, downtime doesn't matter)
 kubectl delete pod -n admin -l app=fluxcloud
 ```
-
 The default configuration for an application is two pods on each cluster, but teams may have more.
+
 
 ### IDAM access
 
-Idam is accessed via a bastion server, also known as the idam jump box.
+Idam is accessed via a bastion server, also known as the idam jump box. Follow the below steps for access instructions.
 
-It is accessed via a shared private key stored in vault.
-
-You need to be connected to the HMCTS VPN for this and have an account on bastion.reform.hmcts.net server.
-
+1. Download devops-sshkey-privatekey and set permissions
 ```bash
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
 chmod 600 ~/.ssh/cft-idam
-
+```
+2. Display devops-sshkey-passphrase and add RSA identity. 
+```bash
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
-
-ssh devops@10.106.79.4 -J bastion.reform.hmcts.net
 ```
-
-You can also configure some ssh config to make this easier:
-
-open the `~/.ssh/config` file (create if it doesn't already exist)
-
-```text
-Host idam-bastion
-  Hostname 10.106.79.4
-  User devops
-  ProxyJump bastion.reform.hmcts.net
+3. Open the ~/.ssh/config file (create if it doesn't already exist) and add the below:
+```bash
+# Bastion - DevOps production access
+Host prodbastion
+HostName bastion-devops-prod.platform.hmcts.net
+User {AD USERNAME HERE}@hmcts.net
+DynamicForward 10825
+ForwardAgent yes
+KeepAlive yes
+ServerAliveInterval 60
 ```
-
+4. Request time based acces (Automatically approved)
+```bash
+Navigate to: https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages
+Select: DevOps Bastion Server Access followed by "Request Access"
+Select: On-Call policy, no business justification is required.
+Request for specific period: Enter your on-call shift.
+Submit (A green notification will confirm this was successful)
+```
+5. Connect to HMCTS VPN here: https://portal.platform.hmcts.net/
 Connect with:
-```command
-ssh idam-bastion
+```bash
+ssh prodbastion
+```
+6. Connect to IDAM Jump server
+```bash
+ssh devops@idam-bastion.platform.hmcts.net
 ```
 
-_note: there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it_
+
+_note: there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: 10.106.79.4
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.

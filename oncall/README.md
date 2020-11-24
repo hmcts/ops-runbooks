@@ -36,7 +36,7 @@ The default configuration for an application is two pods on each cluster, but te
 
 ### IDAM access
 
-Idam is accessed via a bastion server, also known as the idam jump box. Follow the below steps for access instructions.
+Idam is accessed via a bastion server of it's own, also known as the idam jump box. Follow the below steps for access via the new production bastion server.
 
 1. Request time based acces (Automatically approved)
 
@@ -77,11 +77,15 @@ Connect with:
 ```bash
 ssh prodbastion
 ```
+
+Follow the on-screen instructions to authenticate with yout HMCTS credentials.
+
 6. Connect to IDAM Jump server
 ```bash
 ssh devops@idam-bastion.platform.hmcts.net
 ```
 
+**Note:** In the event of an emergency, ou can bypass the first bastion server from Step 5 by adding your home IP addess to the NSG (core-infra-idam-prod2-jumpbox-nsg). You will find the public IP attached to idam-prod2-jumpbox VM in Azure.
 **Note:** there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: 10.106.79.4
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.

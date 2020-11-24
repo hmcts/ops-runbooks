@@ -58,6 +58,7 @@ az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphra
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
 ```
 4. Open the ~/.ssh/config file (create if it doesn't already exist) and add the below:
+
 **add your own username to line 3**
 ```bash
 # Bastion - DevOps production access
@@ -70,6 +71,7 @@ KeepAlive yes
 ServerAliveInterval 60
 ```
 5. Connect to HMCTS VPN here: https://portal.platform.hmcts.net/
+
 Connect with:
 ```bash
 ssh prodbastion

@@ -40,7 +40,7 @@ Idam is accessed via a bastion server of it's own, also known as the idam jump b
 
 1. Request time based access (Automatically approved)
 
-Navigate to Navigate to: https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages
+Navigate to: https://myaccess.microsoft.com/
 ```bash
 Select: DevOps Bastion Server Access followed by "+ Request Access"
 Select: On-Call policy, no business justification is required.

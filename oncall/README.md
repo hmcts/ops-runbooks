@@ -1,6 +1,8 @@
 # On call
 
-This folder describes access requirements and how to do common tasks when a person is on-call
+This folder describes access requirements and how to do common tasks when a person is on-call.
+
+It is required that you go through this document before going on-call, and verify you have access to all components. 
 
 ## Azure Active Directory Groups
 
@@ -31,44 +33,61 @@ kubectl get pods -n admin
 # after your login verify you can restart a pod, e.g. fluxcloud (admin notifying service, downtime doesn't matter)
 kubectl delete pod -n admin -l app=fluxcloud
 ```
-
 The default configuration for an application is two pods on each cluster, but teams may have more.
+
 
 ### IDAM access
 
-Idam is accessed via a bastion server, also known as the idam jump box.
+Idam is accessed via a bastion server of its own, also known as the idam jump box. Follow the below steps for access via the production bastion server.
 
-It is accessed via a shared private key stored in vault.
+1. Request time based access (Automatically approved)
 
-You need to be connected to the HMCTS VPN for this and have an account on bastion.reform.hmcts.net server.
+Navigate to https://myaccess.microsoft.com/
+1. Select: DevOps Bastion Server Access followed by "+ Request Access"
+2. Select: On-Call policy, no business justification is required.
+3. Request: For specific period: Enter the period you are on-call for.
+4. Submit (A green notification will confirm this was successful).
 
+2. Download `devops-sshkey-privatekey` and set permissions
 ```bash
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
 chmod 600 ~/.ssh/cft-idam
-
+```
+3. Retrieve passphrase for IDAM SSH key and add RSA identity. 
+```bash
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
-
-ssh devops@10.106.79.4 -J bastion.reform.hmcts.net
 ```
+4. Open the `~/.ssh/config` file (create if it doesn't already exist) and add the below:
 
-You can also configure some ssh config to make this easier:
-
-open the `~/.ssh/config` file (create if it doesn't already exist)
-
-```text
-Host idam-bastion
-  Hostname 10.106.79.4
-  User devops
-  ProxyJump bastion.reform.hmcts.net
+**Add your own username to line 3**
+```bash
+# Bastion - DevOps production access
+Host prodbastion
+HostName bastion-devops-prod.platform.hmcts.net
+User {AD USERNAME HERE}@hmcts.net # Must match AAD capitalisation, i.e. Jordan.Hoey
+DynamicForward 10825
+ForwardAgent yes
+KeepAlive yes
+ServerAliveInterval 60
 ```
+5. Connect to HMCTS [VPN](https://portal.platform.hmcts.net/)
 
 Connect with:
-```command
-ssh idam-bastion
+```bash
+ssh prodbastion
 ```
 
-_note: there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it_
+Follow the on-screen instructions to authenticate with yout HMCTS credentials.
+
+6. Connect to IDAM Jump server
+```bash
+ssh devops@idam-bastion.platform.hmcts.net
+```
+
+**Note:** In the event of an emergency, you can bypass the first bastion server from Step 5 by adding your home IP address to the NSG [core-infra-idam-prod2-jumpbox-nsg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/core-infra-idam-prod2/providers/Microsoft.Network/networkSecurityGroups/core-infra-idam-prod2-jumpbox-nsg/inboundSecurityRules). You will find the public IP attached to idam-prod2-jumpbox VM in Azure.
+
+**Note:** there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: `10.106.79.4`.
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.
@@ -77,4 +96,6 @@ You can also jump from this server to the other ones, you will need to provide t
 
 ```command
 ssh idam@forgerock-idm-1
+ssh idam@forgerock-idm-2
+ssh idam@forgerock-idm-3
 ```

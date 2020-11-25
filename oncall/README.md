@@ -38,7 +38,7 @@ The default configuration for an application is two pods on each cluster, but te
 
 ### IDAM access
 
-Idam is accessed via a bastion server of it's own, also known as the idam jump box. Follow the below steps for access via the new production bastion server.
+Idam is accessed via a bastion server of its own, also known as the idam jump box. Follow the below steps for access via the production bastion server.
 
 1. Request time based access (Automatically approved)
 

@@ -2,7 +2,7 @@
 
 This folder describes access requirements and how to do common tasks when a person is on-call.
 
-It is recommended that you request and setup your IDAM access in advance of going on-call, Step 1 of IDAM access section.
+It is required that you go through this document before going on-call, and verify you have access to all components. 
 
 ## Azure Active Directory Groups
 

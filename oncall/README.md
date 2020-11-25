@@ -60,7 +60,7 @@ ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passp
 ```
 4. Open the `~/.ssh/config` file (create if it doesn't already exist) and add the below:
 
-**add your own username to line 3**
+**Add your own username to line 3**
 ```bash
 # Bastion - DevOps production access
 Host prodbastion

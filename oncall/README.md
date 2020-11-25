@@ -92,8 +92,10 @@ ssh devops@idam-bastion.platform.hmcts.net
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.
 
-You can also jump from this server to the other ones, you will need to provide the SSH key passphrase each time you log in.
+You can also jump from this server to the other ones, you will need to provide the SSH key passphrase from **Step 3** each time you log in.
 
 ```command
 ssh idam@forgerock-idm-1
+ssh idam@forgerock-idm-2
+ssh idam@forgerock-idm-3
 ```

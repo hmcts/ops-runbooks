@@ -58,7 +58,7 @@ chmod 600 ~/.ssh/cft-idam
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
 ```
-4. Open the ~/.ssh/config file (create if it doesn't already exist) and add the below:
+4. Open the `~/.ssh/config` file (create if it doesn't already exist) and add the below:
 
 **add your own username to line 3**
 ```bash

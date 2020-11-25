@@ -71,7 +71,7 @@ ForwardAgent yes
 KeepAlive yes
 ServerAliveInterval 60
 ```
-5. Connect to HMCTS VPN here: https://portal.platform.hmcts.net/
+5. Connect to HMCTS [VPN](https://portal.platform.hmcts.net/)
 
 Connect with:
 ```bash

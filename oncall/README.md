@@ -53,7 +53,7 @@ Submit (A green notification will confirm this was successful).
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
 chmod 600 ~/.ssh/cft-idam
 ```
-3. Display devops-sshkey-passphrase and add RSA identity. 
+3. Retrieve passphrase for IDAM SSH key and add RSA identity. 
 ```bash
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase

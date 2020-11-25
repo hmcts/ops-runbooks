@@ -48,7 +48,7 @@ Request: For specific period: Enter the period you are on-call for.
 ```
 Submit (A green notification will confirm this was successful).
 
-2. Download devops-sshkey-privatekey and set permissions
+2. Download `devops-sshkey-privatekey` and set permissions
 ```bash
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
 chmod 600 ~/.ssh/cft-idam

@@ -87,7 +87,7 @@ ssh devops@idam-bastion.platform.hmcts.net
 
 **Note:** In the event of an emergency, you can bypass the first bastion server from Step 5 by adding your home IP address to the NSG [core-infra-idam-prod2-jumpbox-nsg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/core-infra-idam-prod2/providers/Microsoft.Network/networkSecurityGroups/core-infra-idam-prod2-jumpbox-nsg/inboundSecurityRules). You will find the public IP attached to idam-prod2-jumpbox VM in Azure.
 
-**Note:** there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: 10.106.79.4
+**Note:** there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: `10.106.79.4`.
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.

@@ -65,7 +65,7 @@ ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passp
 # Bastion - DevOps production access
 Host prodbastion
 HostName bastion-devops-prod.platform.hmcts.net
-User {AD USERNAME HERE}@hmcts.net # Must match AAD capitalisation, i.e. Jordan.Hoey
+User {AD USERNAME HERE}@hmcts.net # this must be all in lowercase.
 DynamicForward 10825
 ForwardAgent yes
 KeepAlive yes

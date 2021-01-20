@@ -2,13 +2,13 @@
 
 This wiki page documents some tasks that we have to perform when deploying any of the AKS Clusters
 
-# To create a cluster:
+## To create a cluster:
 
 Go to the release pipeline
 Create a new release, updating the Clusters variable for the environment you want to redeploy, to include either 00, or 01 whichever one you want to build
 Click 'Deploy' for the **required stage** stage
 
-# Deployment Order
+## Deployment Order
 
 This order can change; created to give a brief overview of the environments.
 
@@ -24,44 +24,44 @@ Redeploying in order:-
 - Perftest
 - Demo
 
-# Dashboards
+## Dashboards
 A good indication along with reviewing the environments themselves, reviewing Grafana
 [Grafana Sandbox](grafana.sandbox.platform.hmcts.net)
 [Grafana](https://grafana-ptl.platform.hmcts.net/)
 
-#  Environment specifics
+##  Environment specifics
 
 Some environments do have some additional requirements/checks that need to confirmed prior to deploying any of its clusters.
 
-**Sandbox**
+## Sandbox
 
 N/A
 
-**Management Sandbox**
+## Management Sandbox
 
 N/A
 
-**ITHC**
+## ITHC
 
-#### Before deployment of a cluster
+### Before deployment of a cluster
 - Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/546)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 
-#### After deployment of a cluster
+### After deployment of a cluster
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/560)
 
 
-**Preview**
+## Preview
 
 We have the ability to create another preview cluster on demand. We don't run with two at a time as they're 75 node clusters and that would be quite expensive.
 
-#### When the build has finished
+### When the build has finished
 
 - Check the system helm releases and pods are up: flux, flux-helm-operator, tunnelfront, coredns, nodelocaldns, - aad-pod-identity, traefik
 - Check an external IP has been assigned: kubectl get service -n admin |awk '$4 ~ /^[0-9]/'
 - Check OSBA is running, kubectl get pods -n osba, kubectl get pods -n catalog
 
-#### After deployment of a cluster
+### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#4348](https://github.com/hmcts/cnp-flux-config/pull/4348) .
   - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
@@ -95,19 +95,20 @@ Once swap over is fully complete then delete the older cluster,
 * Create a new release in the release pipeline, setting Delete.Cluster to true and 
 updating the Clusters variable to contain just the cluster you want deleted.
 
-**AAT**
+## AAT
 
-#### Before deployment of a cluster
+### Before deployment of a cluster
 - Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/580)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 - Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7138/files) .
   - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
-#### After deployment of a cluster
+### After deployment of a cluster
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/582)
 
-**Production**
-#### Before deployment of a cluster
+## Production
+
+### Before deployment of a cluster
 - Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/594)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 
@@ -125,18 +126,19 @@ Scaling to happen just before a cluster has been removed from AGW.
 - Check cluster that won't be removed to confirm pods have scaled
 - Merge PR to remove a cluster from AGW
 
-#### After deployment of a cluster
+### After deployment of a cluster
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595)
 - Revert merge for scaling pods & merge [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7245)
 - Confirm pods are back to correct numbers after revert
 
-**Management (cftptl-intsvc)**
+## Management (cftptl-intsvc)
 - Make an announcement that Jenkins will be unavailable
 
-**Perftest**
+## Perftest
+
 TBC
 
-**Demo**
+## Demo
 
 Demo runs only one cluster at a time due to some limitations in the current setup. 
 

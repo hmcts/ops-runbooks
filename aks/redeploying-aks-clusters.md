@@ -156,6 +156,6 @@ Demo runs only one cluster at a time due to some limitations in the current setu
    - Check events and status of neuvector helm release. 
    - Delete Neuvector Helm release to see if it comes back fine.
 2. Neuvector fails to install.
-   - Check if all enforcers come up in time , they could fail to come if nodes are full.
+   - Check if all enforcers come up in time, they could fail to come if nodes are full.
    - If they keep failing with race conditions, it could be due to backups being corrupt.
    - Usually `policy.backup` and `admission_control.backup` are the ones you need to delete from Azure file share if they are corrupt.

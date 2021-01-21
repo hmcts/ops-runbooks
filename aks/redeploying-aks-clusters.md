@@ -151,7 +151,7 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 
 ### Neuvector
 
-1. `admission webhook "neuvector-validating-admission-webhook.neuvector.svc" denied the request:` these alerts can be seen on `aks-neuvector-<env>` slack channels
+1. `admission webhook "neuvector-validating-admission-webhook.neuvector.svc" denied the request:`, these alerts can be seen on `aks-neuvector-<env>` slack channels
    - This happens when neuvector is broken. 
    - Check events and status of neuvector helm release. 
    - Delete Neuvector Helm release to see if it comes back fine.

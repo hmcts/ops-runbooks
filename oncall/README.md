@@ -89,7 +89,7 @@ ssh devops@idam-bastion.platform.hmcts.net
 
 **Note:** there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: `10.106.79.4`.
 
-There is some information [here](https://tools.hmcts.net/confluence/display/RD/How+to+IDAM) about restarting IDAM services and the preferable order to do it in. 
+There is further information [here](https://tools.hmcts.net/confluence/display/RD/How+to+IDAM) about IDAM, including how to restart services and the preferable order to do it in. 
 
 The [idam-tools](https://github.com/hmcts/idam-tools) repository is checked out in the home directory of the `devops` user.
 There's useful scripts there.

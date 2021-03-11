@@ -15,7 +15,7 @@ You can add yourself to any groups via the [devops-azure-aad GitHub repo](https:
 
 ## Connecting to services
 
-1. Connect to the HCTS VPN.
+1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net).
 
 2. Download BAIS Bastion Private Key from KeyVault:
 

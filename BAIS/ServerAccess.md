@@ -31,8 +31,6 @@ chmod 600 ~/.ssh/bais-bastion-key
 
 4. SSH Config:
 ```ssh-config
-NLE
-
     #BAIS NLE
     Host bais-nle
     Hostname 10.225.251.10

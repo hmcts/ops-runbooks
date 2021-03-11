@@ -6,7 +6,7 @@ This document describes how to get access to the BAIS servers for operational su
 
 You must be in the following groups:
 
-* HMCTS Account
+* HMCTS email account
 * VPN Access
 * Member of 'DTS Platform Operations' Azure AD group
 * SSH Config for HMCTS Bastions

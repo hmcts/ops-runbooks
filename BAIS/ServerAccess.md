@@ -41,7 +41,6 @@ chmod 600 ~/.ssh/bais-bastion-key
     IdentityFile ~/.ssh/bais-bastion-key
 ```
 ```ssh-config
-Production
 
     #BAIS Prod
     Host bais-prod

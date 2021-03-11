@@ -20,7 +20,8 @@ You can add yourself to any groups via the [devops-azure-aad GitHub repo](https:
 2. Download BAIS Bastion Private Key from KeyVault:
 
 ```bash
-az keyvault secret download -f ~/.ssh/bais-bastion-key --vault-name ss-vault-prod --name bau-bais-prod-ssh-private-key chmod 600 ~/.ssh/bais-bastion-key
+az keyvault secret download -f ~/.ssh/bais-bastion-key --vault-name ss-vault-prod --name bau-bais-prod-ssh-private-key 
+chmod 600 ~/.ssh/bais-bastion-key
 ```
 
 3. Request JIT access to HMCTS Bastion Server - https://myaccess.microsoft.com/

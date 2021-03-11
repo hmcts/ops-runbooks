@@ -8,7 +8,7 @@ You must be in the following groups:
 
 * HMCTS Account
 * VPN Access
-* Member of DTS Platform Operations Azure AD group
+* Member of 'DTS Platform Operations' Azure AD group
 * SSH Config for HMCTS Bastions
 
 You can add yourself to any groups via the [devops-azure-aad GitHub repo](https://github.com/hmcts/devops-azure-ad/blob/master/users/prod_users.yml).

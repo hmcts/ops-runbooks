@@ -23,12 +23,12 @@ You can add yourself to any groups via the [devops-azure-aad GitHub repo](https:
 ```
 4. Start an SSH tunnel through the HMCTS Bastion to BAIS EFT01
 ```bash
-ssh -L33390:10.225.251.135:3389 nonprodbastion
+ssh -L33390:10.225.251.135:3389 bastion-dev-nonprod.platform.hmcts.net
 # OR 
-ssh -L33391:10.224.251.135:3389 prodbastion
+ssh -L33391:10.224.251.135:3389 bastion-devops-prod.platform.hmcts.net
 ```
-**Follow command line instructions**
+**Follow the instructions output from the SSH command**
 
 5. Open an RDP window and remote to localhost:33390 for NLE or localhost:33391 for Production. An HMCTS account will work here as these machines have been domain joined.
 
-**Note:** You may need to rest your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of HMCTS accounts.
+_Note: You may need to reset your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of HMCTS accounts._

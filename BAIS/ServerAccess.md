@@ -34,7 +34,7 @@ chmod 600 ~/.ssh/bais-bastion-key
     #BAIS NLE
     Host bais-nle
     Hostname 10.225.251.10
-    ProxyJump REPLACE with host entry of HMCTS bastion.
+    ProxyJump bastion-devops-prod.platform.hmcts.net
     User ubuntu
     ForwardAgent yes
     IdentitiesOnly yes

@@ -30,7 +30,7 @@ chmod 600 ~/.ssh/bais-bastion-key
 ```
 
 4. SSH Config:
-```bash
+```ssh-config
 NLE
 
     #BAIS NLE

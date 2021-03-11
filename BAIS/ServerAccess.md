@@ -25,7 +25,7 @@ chmod 600 ~/.ssh/bais-bastion-key
 ```
 
 3. Request JIT access to HMCTS Bastion Server - https://myaccess.microsoft.com/
-```bash
+```text
  Production Bastion Server Access OR Non-Production Bastion Server
 ```
 

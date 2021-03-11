@@ -33,7 +33,7 @@ chmod 600 ~/.ssh/bais-bastion-key
 ```ssh-config
     #BAIS NLE
     Host bais-nle
-    Hostname 10.225.251.10
+    Hostname prod-bastion
     ProxyJump bastion-devops-prod.platform.hmcts.net
     User ubuntu
     ForwardAgent yes
@@ -44,7 +44,7 @@ chmod 600 ~/.ssh/bais-bastion-key
 
     #BAIS Prod
     Host bais-prod
-    Hostname 10.224.251.10
+    Hostname stg-bastion
     ProxyJump REPLACE with host entry of HMCTS bastion.
     User ubuntu
     ForwardAgent yes
@@ -56,7 +56,9 @@ chmod 600 ~/.ssh/bais-bastion-key
 ```bash
 ssh -L33390:10.225.251.135:3389 bais-nle
 # OR 
-ssh -L33391:10.225.251.135:3389 bais-prod
+ssh -L33391:10.224.251.135:3389 bais-prod
 ```
 
 6. Open an RDP window and remote to localhost:33390 for NLE or localhost:33391 for Production. An HMCTS account will work here as these machines have been domain joined.
+
+**Note:** You may need to rest your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of our accounts.

@@ -4,8 +4,6 @@ This document describes how to get access to the BAIS servers for operational su
 
 ## Prerequisites
 
-You must be in the following groups:
-
 * HMCTS email account
 * Connected to the VPN
 * Member of 'DTS Platform Operations' Azure AD group

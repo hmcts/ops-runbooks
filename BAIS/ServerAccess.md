@@ -35,7 +35,7 @@ NLE
     #BAIS NLE
     Host bais-nle
     Hostname 10.225.251.10
-    ProxyJump repleace with host entry for HMCTS bastion.
+    ProxyJump REPLACE with host entry of HMCTS bastion.
     User ubuntu
     ForwardAgent yes
     IdentitiesOnly yes
@@ -47,7 +47,7 @@ Production
     #BAIS Prod
     Host bais-prod
     Hostname 10.224.251.10
-    ProxyJump repleace with host entry for HMCTS bastion.
+    ProxyJump REPLACE with host entry of HMCTS bastion.
     User ubuntu
     ForwardAgent yes
     IdentitiesOnly yes

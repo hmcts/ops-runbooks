@@ -31,4 +31,4 @@ ssh -L33391:10.224.251.135:3389 prodbastion
 
 5. Open an RDP window and remote to localhost:33390 for NLE or localhost:33391 for Production. An HMCTS account will work here as these machines have been domain joined.
 
-**Note:** You may need to rest your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of our accounts.
+**Note:** You may need to rest your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of HMCTS accounts.

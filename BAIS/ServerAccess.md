@@ -56,7 +56,9 @@ Production
 
 5. Create an SSH tunnel to BAIS EFT01
 ```bash
-ssh -L33390:10.225.251.135:3389 bais-nle OR ssh -L33391:10.225.251.135:3389 bais-prod
+ssh -L33390:10.225.251.135:3389 bais-nle
+# OR 
+ssh -L33391:10.225.251.135:3389 bais-prod
 ```
 
 6. Open an RDP window and remote to localhost:33390 for NLE or localhost:33391 for Production. An HMCTS account will work here as these machines have been domain joined.

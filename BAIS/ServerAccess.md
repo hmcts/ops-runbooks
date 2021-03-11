@@ -40,7 +40,7 @@ chmod 600 ~/.ssh/bais-bastion-key
     IdentitiesOnly yes
     IdentityFile ~/.ssh/bais-bastion-key
 ```
-```bash
+```ssh-config
 Production
 
     #BAIS Prod

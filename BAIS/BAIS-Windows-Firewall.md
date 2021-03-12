@@ -43,16 +43,7 @@ git push --set-upstream origin BRANCH-NAME
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
-8. In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
-* 'Run Pipeline'
-* Branch/tag: Your new branch name
-* Commit: Blank
-* Stage to Run: CI
-* Location: UK South
-* Enviornment: Set as required.
-* Advanded Options: Leave as default.
-
-Click **Run**
+8. CI will run automatically across STG after PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 
 9. Review pipeline for errors and begin troubleshooting if present.
 10. If terraform Plan is successful:
@@ -64,6 +55,8 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Location: UK South
 * Enviornment: Set as required.
 * Advanded Options: Leave as default.
+
+Click **Run**
 
 Troubleshoot any pipeline errors.
 

@@ -31,7 +31,7 @@ git push --set-upstream origin BRANCH-NAME
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
-7. In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+8. In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
 * Commit: Blank
@@ -42,8 +42,8 @@ git push --set-upstream origin BRANCH-NAME
 
 Click **Run**
 
-8. Review pipeline for errors and begin troubleshooting if present.
-9. If terraform Plan is successful:
+9. Review pipeline for errors and begin troubleshooting if present.
+10. If terraform Plan is successful:
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
@@ -55,4 +55,4 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 Troubleshoot any pipeline errors.
 
-10. Verify NSG accuratly reflects chnages in CSV file. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group
+11. Verify NSG accuratly reflects chnages in CSV file. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group

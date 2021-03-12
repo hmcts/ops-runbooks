@@ -35,7 +35,7 @@ resource "null_resource" "ansible-runs" {
 ```
 * On the last line remove end of block comment Eg. */
 
-6. Push your new branch
+6. Commit your chnages and push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```

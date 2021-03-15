@@ -35,11 +35,11 @@ resource "null_resource" "ansible-runs" {
 ```
 * On the last line remove end of block comment Eg. */
 
-6. Commit your chnages and push your new branch
+6. Commit your changes and push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
-7. Create Pull Request and review chnages compared with master.
+7. Create Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
@@ -53,11 +53,11 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Commit: Blank
 * Stage to Run: BAIS_Servers
 * Location: UK South
-* Enviornment: Set as required.
-* Advanded Options: Leave as default.
+* Environment: Set as required.
+* Advanced Options: Leave as default.
 
 Click **Run**
 
 Troubleshoot any pipeline errors.
 
-11. Verify NSG accuratly reflects chnages in CSV file. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group
+11. Verify NSG accurately reflects changes in CSV file. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group

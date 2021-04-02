@@ -1,6 +1,6 @@
 # BAIS NSG Rules
 
-This document describes how to add/remove/edit NSG rules for the BAIS enviornments. All rules are managed through automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
+This document describes how to add/remove/edit NSG rules for the BAIS environments. All rules are managed through automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ This document describes how to add/remove/edit NSG rules for the BAIS enviornmen
 
 ## Process
 
-A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, follwed by executing the pipeline on behalf of the requester.
+A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester.
 See steps 1 to 7 for details on raising a PR.
 
 ## Self-Service Steps
@@ -23,15 +23,15 @@ git clone https://github.com/hmcts/globalscape-azure-infrastructure
 ```bash
 git checkout -b BRANCH-NAME
 ```
-3. Naviagte to terraform/infrastructure/application/stack/02-servers where you will see 4 CSV files containing NSG rules. (2 NLE and 2 Prod)
-4. Modify the CSV file for the required environment looking to exisitng rules for formatting guidance. Note: removing rules from the CSV will remove them from Azure.
+3. Navigate to terraform/infrastructure/application/stack/02-servers where you will see 4 CSV files containing NSG rules. (2 NLE and 2 Prod)
+4. Modify the CSV file for the required environment looking to existing rules for formatting guidance. Note: removing rules from the CSV will remove them from Azure.
 5. Push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
 6. Create Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
-* Specifically the '-' in port ranges can often need deleted and retyped depending on how rules have been exported from a CSV.
+* Specifically, the '-' in port ranges can often need deleted and retyped depending on how rules have been exported from a CSV.
 
 ## Platform Operations Steps
 
@@ -45,8 +45,8 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Commit: Blank
 * Stage to Run: BAIS_Servers
 * Location: UK South
-* Enviornment: Set as required.
-* Advanded Options: Leave as default.
+* Environment: Set as required.
+* Advanced Options: Leave as default.
 
 Click **Run**
 

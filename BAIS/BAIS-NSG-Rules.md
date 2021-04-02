@@ -52,4 +52,6 @@ Click **Run**
 
 9. Review pipeline for errors and begin troubleshooting if present.
 
-10. Verify NSG accuratly reflects CSV file change in from PR. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group
+10. Verify NSG accuratly reflects CSV file change in from PR. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group.
+
+11. Merger branch with Master.

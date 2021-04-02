@@ -54,4 +54,4 @@ Click **Run**
 
 10. Verify NSG accurately reflects CSV file change in from PR. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group.
 
-11. Merger branch with Master.
+11. Merge branch with Master.

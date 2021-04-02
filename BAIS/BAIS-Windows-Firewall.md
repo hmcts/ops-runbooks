@@ -1,4 +1,4 @@
-# BAIS NSG Rules
+# BAIS NWindows Firewall Rules
 
 This document describes how to add/remove/edit Windows Firewall rules for the BAIS servers. All rules are managed through Ansible automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
 
@@ -21,7 +21,7 @@ git clone https://github.com/hmcts/globalscape-azure-infrastructure
 ```bash
 git checkout -b BRANCH-NAME
 ```
-4. Naviagte to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)
+4. Navigate to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)
 5. Replace the entire contents of the relevant CSV file with the contents from the DTSPO ticket.
 6. Uncomment the Ansible steps which execute the code in: terraform/infrastructure/application/stack/02-servers/30-dmz.tf
 Find the following line and remove the starting block comment
@@ -59,5 +59,3 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 Click **Run**
 
 Troubleshoot any pipeline errors.
-
-11. Verify NSG accurately reflects changes in CSV file. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group

@@ -80,14 +80,14 @@ az aks get-credentials --resource-group preview-00-rg --name preview-00-aks --su
 * Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:
 
 ```command
-$ kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
+kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
 ```
 
 * Delete any orphan records that external-dns might have missed:
 
 _Replace 10.12.79.250 with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup_
 ```command
-$ az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.12.79.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.12.79.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 ```
 
 Once swap over is fully complete then delete the older cluster,
@@ -154,6 +154,13 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 - Swap active external dns deployments to route traffic to new cluster [Example PR](https://github.com/hmcts/cnp-flux-config/pull/7522/files)
 - Delete inactive cluster using Release pipeline pipeline.
 
+#### After Deployment of Cluster
+
+* Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:
+
+```command
+kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
+```
 ## Known issues
 
 ### Neuvector

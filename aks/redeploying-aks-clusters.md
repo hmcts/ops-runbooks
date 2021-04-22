@@ -139,11 +139,29 @@ Scaling to happen just before a cluster has been removed from AGW.
 - Confirm pods are back to correct numbers after revert
 
 ### Management (cftptl-intsvc)
-- Make an announcement that Jenkins will be unavailable
+- Make an announcement that Jenkins will be unavailable. This environment is best to be done early in the morning.
+
+#### Before deployment of a cluster
+- Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/580)
+- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
+- Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7138/files) .
+  - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
+- Remove resource locks for the below, using relevant serviceConnection 
+  -  [Azure Resource Locks Repository](https://github.com/hmcts/azure-resource-locks)
+  - [Disable-resource-locks Azure DevOps Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=423)
+  
+| azureSubscription | resource-groups-list |
+|------|-------------|
+| OPS-APPROVAL-GATE-STG-ENVS | MC_aat-00-rg_aat-00-aks_uksouth or MC_aat-01-rg_aat-00-aks_uksouth, managed-identities-aat-rg  |
+| azurerm-nonprod | managed-identities-aat-rg  |
+#### After deployment of a cluster
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/582)
+
 
 ### Perftest
+- Confirm that the environment isn't being used with Nickin Sitaram before starting. 
 
-TBC
+Redeploy each cluster and ensure everything comes back up as normal on said clusters.
 
 ### Demo
 

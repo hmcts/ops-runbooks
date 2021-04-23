@@ -141,8 +141,8 @@ Scaling to happen just before a cluster has been removed from AGW.
 ### Management (cftptl-intsvc)
 - Make an announcement that Jenkins will be unavailable. This environment is best to be done early in the morning. Example announcement to send in the cloud-native-announce slack channel is:-
 
-<Hi @here,
-Due to planned upgrades of AKS, we will be upgrading the management (cftplt-intsvc) cluster at 8am, Monday 26th April. As a result of this, Jenkins will be offline during the upgrade and unavailable for around one hour.>
+> Hi @here,
+> Due to planned upgrades of AKS, we will be upgrading the management (cftplt-intsvc) cluster at 8am, Monday 26th April. As a result of this, Jenkins will be offline during the upgrade and > unavailable for around one hour.>
 
 Run the AKS pipeline (https://dev.azure.com/hmcts/CNP/_release?definitionId=16&view=mine&_a=releases) and ensure that you have set the variables to delete the cluster and also then deploy the cluster. 
 

@@ -148,7 +148,7 @@ Run the AKS pipeline (https://dev.azure.com/hmcts/CNP/_release?definitionId=16&v
 
 #### After deployment of a cluster
 
-After the cluster has been redeployed successfully and hr's / pods are running as expected you need to verify that you can get to the Jenkins web ui, and then comment on the slack channel announcement made previously to advise Jenkins is back up.
+After the cluster has been redeployed successfully and hr's / pods are running as expected you need to verify that you can get to the [Jenkins web ui](https://build.platform.hmcts.net), and then comment on the slack channel announcement made previously to advise Jenkins is back up.
 
 ### Perftest
 - Confirm that the environment isn't being used with Nickin Sitaram before starting. 

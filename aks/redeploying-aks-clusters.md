@@ -153,8 +153,6 @@ After the cluster has been redeployed successfully and hr's / pods are running a
 ### Perftest
 - Confirm that the environment isn't being used with Nickin Sitaram before starting. 
 
-Redeploy each cluster and ensure everything comes back up as normal on said clusters.
-
 ### Demo
 
 Demo runs only one cluster at a time due to some limitations in the current setup. 

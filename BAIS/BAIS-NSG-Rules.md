@@ -2,11 +2,12 @@
 
 This document describes how to add/remove/edit NSG rules for the BAIS environments. All rules are managed through automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
 
+Rules should be adjusted by the project team on a self-service basis.
+
 ## Prerequisites
 
-* GitHub access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
+* GitHub write access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
 * Azure DevOps access to [BAIS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
-* Member of 'Platform Operations' or 'Heritage-BAIS' GitHub Teams.
 
 ## Process
 

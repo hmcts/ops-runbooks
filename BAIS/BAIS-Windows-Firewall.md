@@ -2,11 +2,12 @@
 
 This document describes how to add/remove/edit Windows Firewall rules for the BAIS servers. All rules are managed through Ansible automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
 
+Rules should be adjusted by the project team on a self-service basis.
+
 ## Prerequisites
 
-* GitHub access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
+* GitHub write access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
 * Azure DevOps access to [BAIS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
-* Member of 'Platform Operations' or 'Heritage-BAIS' GitHub Teams.
 
 ## Process
 
@@ -29,17 +30,17 @@ git checkout -b BRANCH-NAME
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
-8. Create Pull Request and review changes compared with master.
+7. Create Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
-9. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+8. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.
 
 ## Platform Operations Steps
 
-10. Review PR
-11. If terraform Plan is successful:
+9. Review PR
+10. If terraform Plan is successful:
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
@@ -51,6 +52,6 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 Click **Run**
 
-10. Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: [Server Access](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md)
+11. Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: [Server Access](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md)
 
-11. Merge branch with Master.
+12. Merge branch with Master.

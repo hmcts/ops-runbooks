@@ -1,6 +1,6 @@
-## AADDS Overview
+## Azure Active Directory Domain Services - Overview
 
-[What is AADDS?](https://docs.microsoft.com/en-us/azure/active-directory-domain-services/overview)
+[AADDS - Azure Docs](https://docs.microsoft.com/en-us/azure/active-directory-domain-services/overview)
 
 [AADDS Repo](https://github.com/hmcts/dtspo-aad-domain-services)
 

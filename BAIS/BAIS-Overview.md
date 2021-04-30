@@ -14,6 +14,6 @@
 
 [Windows Firewall Changes](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/BAIS-Windows-Firewall.md)
 
-[DNS Changes](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/BAIS-NSG-Rules.md)
+[DNS Changes](https://github.com/hmcts/ops-runbooks/blob/master/Domain-Services/DNS-Changes.md)
 
 

@@ -2,51 +2,47 @@
 
 This document describes how to add/remove/edit Windows Firewall rules for the BAIS servers. All rules are managed through Ansible automation in the [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure).
 
+Rules should be adjusted by the project team on a self-service basis.
+
 ## Prerequisites
 
-* GitHub access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
+* GitHub write access to [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure)
 * Azure DevOps access to [BAIS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
-* A CSV file containing Windows Firewall rules (typically provided by CGI in a DTSPO ticket)
-* Member of 'DTS Platform Operations' Azure AD group.
 
-## Steps
+## Process
 
-1. Any Windows Firewall requests should come in the form of a DTSPO ticket with an attached CSV file containing the complete set of rules.
+A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester.
+See steps 1 to 8 for details on raising a PR.
 
-2. If needed, clone [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure) to your local machine.
+## Self-Service Steps
+
+1. Clone [Globalscape Repo](https://github.com/hmcts/globalscape-azure-infrastructure) to your local machine.
 ```bash
 git clone https://github.com/hmcts/globalscape-azure-infrastructure
 ```
-3. Create a new branch, typically with the ticket number ID.
+2. Create a new branch, typically with a JIRA ticket number.
 ```bash
 git checkout -b BRANCH-NAME
 ```
 4. Navigate to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)
-5. Replace the entire contents of the relevant CSV file with the contents from the DTSPO ticket.
-6. Uncomment the Ansible steps which execute the code in: terraform/infrastructure/application/stack/02-servers/30-dmz.tf
-Find the following line and remove the starting block comment
-Before
-```bash
-/*resource "null_resource" "ansible-runs" {
-```
-After
-```bash
-resource "null_resource" "ansible-runs" {
-```
-* On the last line remove end of block comment Eg. */
-
-6. Commit your changes and push your new branch
+5. Modify the CSV file for the required environment looking to existing rules for formatting guidance. Note: removing rules from the CSV will remove them from the server.
+6. Push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
-7. Create Pull Request and review changes compared with master.
+7. Create a Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
-8. CI will run automatically across STG after PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+8. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+* Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.
 
-9. Review pipeline for errors and begin troubleshooting if present.
-10. If terraform Plan is successful:
+9. Raise a BAU ticket with the PlatOps team requesting PR approval and execution.
+
+## Platform Operations Steps
+
+10. Review PR
+11. If terraform Plan is successful:
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
@@ -58,4 +54,6 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 Click **Run**
 
-Troubleshoot any pipeline errors.
+12. Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: [Server Access](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md)
+
+13. Merge branch with Master.

@@ -19,11 +19,11 @@ You can add yourself to any groups via the [devops-azure-aad GitHub repo](https:
 ```text
  Production Bastion Server Access OR Non-Production Bastion Server
 ```
-4. Start an SSH tunnel through the HMCTS Bastion to BAIS EFT01
+4. Add your HMCTS username to the below command, open a terminal window and start an SSH tunnel through the HMCTS Bastion to BAIS EFT01
 ```bash
-ssh -L33390:10.225.251.135:3389 bastion-dev-nonprod.platform.hmcts.net
+ssh -L33390:10.225.251.135:3389 bastion-dev-nonprod.platform.hmcts.net -l USERNAME@hmcts.net
 # OR 
-ssh -L33391:10.224.251.135:3389 bastion-devops-prod.platform.hmcts.net
+ssh -L33391:10.224.251.135:3389 bastion-devops-prod.platform.hmcts.net -l USERNAME@hmcts.net
 ```
 **Follow the instructions output from the SSH command**
 

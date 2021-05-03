@@ -12,7 +12,7 @@ Rules should be adjusted by the project team on a self-service basis.
 ## Process
 
 A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester.
-See steps 1 to 7 for details on raising a PR.
+See steps 1 to 8 for details on raising a PR.
 
 ## Self-Service Steps
 
@@ -30,17 +30,19 @@ git checkout -b BRANCH-NAME
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
-7. Create Pull Request and review changes compared with master.
+7. Create a Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
 8. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.
 
+9. Raise a BAU ticket with the PlatOps team requesting PR approval and execution.
+
 ## Platform Operations Steps
 
-9. Review PR
-10. If terraform Plan is successful:
+10. Review PR
+11. If terraform Plan is successful:
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
@@ -52,6 +54,6 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 Click **Run**
 
-11. Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: [Server Access](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md)
+12. Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: [Server Access](https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md)
 
-12. Merge branch with Master.
+13. Merge branch with Master.

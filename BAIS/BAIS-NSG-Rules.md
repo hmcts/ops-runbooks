@@ -30,16 +30,18 @@ git checkout -b BRANCH-NAME
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
-6. Create Pull Request and review changes compared with master.
+6. Create a Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Specifically, the '-' in port ranges can often need deleted and retyped depending on how rules have been exported from a CSV.
 
+7. Raise a BAU ticket with the PlatOps team requesting PR approval and execution.
+
 ## Platform Operations Steps
 
-7. Review PR and provide approval as appropriate, see step 6 for common formatting issues.
+8. Review PR and provide approval as appropriate, see step 6 for common formatting issues.
 Check for failed tests in the terraform plan that was triggered following the PR.
 
-8. Terraform Apply
+9. Terraform Apply
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
@@ -51,8 +53,8 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 Click **Run**
 
-9. Review pipeline for errors and begin troubleshooting if present.
+10. Review pipeline for errors and begin troubleshooting if present.
 
-10. Verify NSG accurately reflects CSV file change in from PR. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group.
+11. Verify NSG accurately reflects CSV file change in from PR. NSG's are located in: Resource Group: BAU-BAIS_prod_resource_group and BAU-BAIS_stg_resource_group.
 
 11. Merge branch with Master.

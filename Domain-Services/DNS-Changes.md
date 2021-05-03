@@ -1,4 +1,4 @@
-# BAIS NSG Rules
+# DNS Records
 
 This document describes how to add/remove/edit DNS for the AADDS environment. All records are managed through automation in the [AADDS Repo](https://github.com/hmcts/dtspo-aad-domain-services).
 
@@ -30,7 +30,9 @@ git clone https://github.com/hmcts/dtspo-aad-domain-services
 git checkout -b BRANCH-NAME
 ```
 3. Navigate to terraform/scripts/dns-records.csv where you will see a CSV file containing DNS records.
+
 4. Modify the CSV file to meet your requirements, following existing formatting. Note: removing records from the CSV will remove them from the DNS server.
+
 5. Push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
@@ -38,7 +40,10 @@ git push --set-upstream origin BRANCH-NAME
 6. Create Pull Request and review changes compared with master.
 * Look out for typical formatting issues such as extra spaces or unusual characters. 
 * Ensure you are not adding anything other than an A record, see limitations section of this document.
-7. Ask PlatOps to review the PR, this can be done via a BAU ticket.
+
+7. Raise a BAU ticket with the PlatOps team requesting PR approval and execution.
+
 8. Once approved by PlatOps, you can merge your PR, this will trigger an automated deployment which will write your changes.
 * Ensure your build completes successfully by monitoring the [Azure DevOps Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416)
+
 9. Test your DNS changes meet your requirement.

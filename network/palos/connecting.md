@@ -6,8 +6,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 1. Connect to the HMCTS VPN.
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli or use DNS if available (currently only available for the Uk South VMs in Production).  
 3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
-    - ```bash az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv
-```
+    - `bash az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
     - 
 4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
 

@@ -45,7 +45,10 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
 
-    - <details> <summary>Validate Button</summary>![Validate Button](images/validate-button.png)</details>
+    <details> 
+    <summary>Validate Button</summary>
+    ![Validate Button](images/validate-button.png)
+    </details>
 
 4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. In this case we can see that the configuration is in fact invalid. The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
 

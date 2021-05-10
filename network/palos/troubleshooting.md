@@ -41,7 +41,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
 ![Commit Button](images/palo-commit.png)
    
-</details>
+    </details>
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
 

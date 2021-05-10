@@ -1,0 +1,61 @@
+# Connecting to a Palo 
+## Uk South 
+
+You can connect to the Palo VMs via the HMCTS VPN by following the following steps: 
+
+1. Connect to the HMCTS VPN.
+2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli or use DNS if available (currently only available for the Uk South VMs in Production).  
+3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
+    - ```bash az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv```
+4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
+
+<details>
+
+<summary>Non Production VMs</summary>
+
+- [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview)
+- [hmcts-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview)
+
+</details>
+
+
+
+<details>
+
+<summary>Production VMs</summary>
+
+- [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview) - https://uksouth-prod-palo-0.platform.hmcts.net
+- [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview) - https://uksouth-prod-palo-1.platform.hmcts.net
+
+</details>
+
+
+---
+## Uk West
+
+The connectivity for the UK west Palos is not currently set up. To access these you will need add a rule to allow  to use the Public IP address of the Palo you need to connect to 
+
+<details>
+
+<summary>Example Rule</summary>
+
+![Validate Button](images/nsg-rule.png)
+</details>
+
+#### Virtual machines
+
+<details>
+
+<summary>Production VMs</summary>
+
+- [ukw-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-0/overview)
+- [ukw-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-1/overview)
+</details>
+<details>
+
+<summary>Non Production VMs</summary>
+
+- [ukw-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-0/overview)
+- [ukw-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-1/overview)
+
+</details>

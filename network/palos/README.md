@@ -1,6 +1,6 @@
 # Palo Alto
 
-This guide aims to provide an introduction to the HMCTS Palo Alto firewalls. 
+This guide aims to provide an introduction to the HMCTS Palo Alto firewalls, with some tips on how to troubleshoot. 
 
 ### Further reading/watching 
 - [GitHub Repository](https://github.com/hmcts/rdo-terraform-hub-dmz)

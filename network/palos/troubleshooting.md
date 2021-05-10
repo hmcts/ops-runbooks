@@ -54,6 +54,11 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
 4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. In this case we can see that the configuration is in fact invalid. The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
 
-    - <details> <summary>Validate Example</summary>![Validate Example](images/example-validate.png)</details>
+    <details> 
+    <summary>Validate Example</summary>
+    
+    ![Validate Example](images/example-validate.png)
+    
+    </details>
 
 5. Make your changes in the rdo-terraform-hub-dmz repoistory and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.

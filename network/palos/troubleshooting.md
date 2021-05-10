@@ -1,11 +1,8 @@
 # Troubleshooting 
 
+Examples of common errors you may face when having to work on the Palos
 
-
-
-
-## Common errors  
----
+## Scenario 1
 ### **Problem:** not able to connect to ansible host
 
 #### **Example error:**
@@ -17,6 +14,7 @@
 This is most likely down to retrying steps in the pipeline. Each run a firewall rule is added to allow the devops agent to connect to the ansible agent and at the end of the pipeline it is removed so when you re-run failed steps in the pipeline you are not adding that rule back in, therefore the agent is unable to connect and you get the above error.
 
 ---
+## Scenario 2
 ## Problem: Ansible has failed to apply the palo configuration
 
 This error is usually caused by the Palo's XML config not applying due to malformed xml or incorrect references to objects etc. 

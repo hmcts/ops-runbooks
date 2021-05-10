@@ -6,8 +6,8 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 1. Connect to the HMCTS VPN.
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli or use DNS if available (currently only available for the Uk South VMs in Production).  
 3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
-    - `bash az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
-    - 
+    - **Non Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
+    - **Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
 4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
 
 
@@ -34,7 +34,15 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 ---
 ## Uk West
 
-The connectivity for the UK west Palos, via the VPN, is not currently set up. To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443, example rule below. You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab. 
+The connectivity for the UK west Palos, via the VPN, is not currently set up so connecting to them is slightly different to Uk south. To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443. You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab. 
+
+1. Create the NSG rule to allow your IP on port 443. (Example below)
+2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
+3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
+    - **Non Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
+    - **Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
+4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
+
 
 <details>
 

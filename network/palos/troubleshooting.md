@@ -39,7 +39,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
     <details> 
     <summary>Commit Button</summary>
 
-![Commit Button](images/palo-commit.png)
+    ![Commit Button](images/palo-commit.png)
    
     </details>
 

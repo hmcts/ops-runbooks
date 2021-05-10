@@ -36,9 +36,11 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 1. Follow the steps in [the connecting guide](connecting.md) and log into one of the palos in the environment where your changes are failing to apply. 
 
 2. Once you're logged in you will see a commit button in the top right-hand side of your screen like below:
-    <details> <summary>Commit Button</summary>
+<details> 
+    <summary>Commit Button</summary>
 ![Commit Button](images/palo-commit.png)
-    </details>
+   
+</details>
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
 

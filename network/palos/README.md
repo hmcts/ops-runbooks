@@ -17,7 +17,7 @@ This guide aims to give you an introduction to the HMCTS Palo Alto firewalls set
 - Running terraform locally - pipeline out of action, make sure you communicate
 - Pipeline tests (i.e. someone broke plum and the hub build doesn't work)
 
-## [Connecting to a Palo Alto firewall](general.md)
+## [Connecting to a Palo Alto firewall](connecting.md)
 
 - How to connect to palo login in prod vs nonprod
 - How to connect over ssh - advance use case, got a custom shell, see logs, tcp dump etc 

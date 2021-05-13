@@ -8,7 +8,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
     - **Non Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
     - **Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
-4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
+4. In production click 'Use Single Sign-On', in other environments use the local account `localadmin`
 
 
 <details>
@@ -64,7 +64,6 @@ Remember to remove the rule once you no longer need access.
 - [ukw-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-1/overview)
 
 </details>
-
 
 
 

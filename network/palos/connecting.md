@@ -35,9 +35,9 @@ The connectivity for the UK west Palos, via the VPN, is not currently set up so 
 
 1. Create the NSG rule to allow your IP on port 443. (Example below)
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
-3. Pull the admin password from the `hmcts-infra-dmz-prod-int` key vault
-    - **Non Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
-    - **Production** - `az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv`
+3. Pull the admin password from the `ukw-infra-dmz-nonprodi` key vault
+    - **Non Production** - `az keyvault secret show --vault-name ukw-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
+    - **Production** - `az keyvault secret show --vault-name ukw-infra-dmz-prod-int --name firewall-password --query value -o tsv`
 4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
 
 

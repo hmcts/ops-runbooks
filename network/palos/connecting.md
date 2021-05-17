@@ -10,7 +10,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.
 3. (skip in production which is SSO enabled) Retrieve the admin password from the sandbox key vault:
     ```
-    az keyvault secret show --vault-name ukw-infra-dmz-sbox-int --name firewall-password --query value -o tsv
+    az keyvault secret show --vault-name hmcts-infra-dmz-sbox-int --name firewall-password --query value -o tsv
     ```
 4. Use the local account `localadmin` to log in.
 

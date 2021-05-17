@@ -4,6 +4,19 @@
 
 You can connect to the Palo VMs via the HMCTS VPN by following the following steps: 
 
+### Sandbox
+
+1. Create the NSG rule to allow your IP on port 443. (Example and links to VMs below).
+2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.
+3. (skip in production which is SSO enabled) Retrieve the admin password from the sandbox key vault:
+    ```
+    # Sandbox
+    az keyvault secret show --vault-name ukw-infra-dmz-sbox-int --name firewall-password --query value -o tsv
+    ```
+4. Use the local account `localadmin` to log in.
+
+### Production
+
 1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net/).
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.  
 3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
@@ -50,8 +63,8 @@ The connectivity for the UK West Palos, via the VPN, is not currently set up so 
 To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443.
 You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab. 
 
-1. Create the NSG rule to allow your IP on port 443. (Example below)
-2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
+1. Create the NSG rule to allow your IP on port 443. (Example and links to VMs below)
+2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.
 3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
     ```
     # Sandbox

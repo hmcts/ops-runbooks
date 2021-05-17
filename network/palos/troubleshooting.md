@@ -16,7 +16,7 @@ Each run a firewall rule is added to allow the Azure DevOps agent to connect to 
 
 ---
 ## Scenario 2
-## Problem: Ansible has failed to apply the palo configuration
+### Problem: Ansible has failed to apply the palo configuration
 
 This error is usually caused by the Palo's XML config not applying due to malformed xml or incorrect references to objects etc. 
 
@@ -63,3 +63,25 @@ The errors tell us that the `log-setting` value `azure_log_analytics_out` is inc
     </details>
 
 5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
+
+
+## Scenario 3
+
+### Problem - debugging connectivity and using monitor to see why things are being blocked
+
+
+#### **Troubleshooting tip:**
+1. Log into the palo 
+2. Click on the monitoring tab at the top of the page
+3. Start with the `( action eq deny )` filtering rule to view connections being dropped by the Palo.
+4. Add any extra filters such as `(addr.src in a.a.a.a)` or `(addr.dst in b.b.b.b)` to help filter out logs you don't need to see.
+
+<details>
+
+<summary>Filtering Example</summary>
+
+![Traffic Filtering](images/filtering.png)
+
+</details>
+
+NOTE: More information on types of filters you can apply check out [BASICS OF TRAFFIC MONITOR FILTERING](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).

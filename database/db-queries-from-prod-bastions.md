@@ -8,7 +8,7 @@ production Db as they don't have access to this.
 To fulfill one of these request, you can follow steps below.
 
 ## Prerequisites 💥
-* **Important:** Verify you are all setup, [click here](https://tools.hmcts.net/confluence/display/RD/Bastion)
+* **Important:** Verify you are all setup, [click here](https://github.com/hmcts/cnp-module-postgres#production)
 * Turn on your VPN
 * Grant yourself access to production Bastion, [click here](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455#Bastion-RequestaccesstothebastionhostviaJIT) <br>
   Note if not on call then just one day is sufficient
@@ -32,12 +32,12 @@ Once on the bastion server you can execute queries against the db in any number 
 
 ### Small queries
 
-* Connect to  Postgres by typing the following command
+* Connect to  Postgres by typing the following command. Verify you have followed steps outlined [here](https://github.com/hmcts/cnp-module-postgres#production) <br> 
+  Note the **Bastion configuration** section, it's important.
   ```cmd 
   psql -U ccd@ccd-data-store-api-postgres-db-prod -h ccd-data-store-api-postgres-db-prod.postgres.database.azure.com
   ```
   I'm using the ccd data store database as an example here
-* This would prompt you for password, the password you can get from the key vault, if you dont already have if kept aside from above step
 * Once in, you can execute provided query
   ```cmd
    psql> paste your query here;

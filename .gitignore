@@ -1,0 +1,6 @@
+.vscode/*
+.history/
+.idea/
+library/.idea/
+.DS_Store
+

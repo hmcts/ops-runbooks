@@ -35,7 +35,8 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 </details>
 
 ---
-## Uk West
+
+## UK West
 
 The connectivity for the UK West Palos, via the VPN, is not currently set up so connecting to them is slightly different to UK south.
 To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443.

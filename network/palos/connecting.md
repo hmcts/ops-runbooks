@@ -31,7 +31,9 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 ---
 ## Uk West
 
-The connectivity for the UK west Palos, via the VPN, is not currently set up so connecting to them is slightly different to Uk south. To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443. You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab. 
+The connectivity for the UK West Palos, via the VPN, is not currently set up so connecting to them is slightly different to UK south.
+To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443.
+You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab. 
 
 1. Create the NSG rule to allow your IP on port 443. (Example below)
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
@@ -64,6 +66,5 @@ Remember to remove the rule once you no longer need access.
 - [ukw-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-1/overview)
 
 </details>
-
 
 

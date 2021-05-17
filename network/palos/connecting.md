@@ -46,8 +46,12 @@ You can add a rule by going to the VMs via one of the links below and adding an 
 1. Create the NSG rule to allow your IP on port 443. (Example below)
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
 3. Pull the admin password from the `ukw-infra-dmz-nonprodi` key vault
-    - **Non Production** - `az keyvault secret show --vault-name ukw-infra-dmz-nonprodi --name firewall-password --query value -o tsv`
-    - **Production** - `az keyvault secret show --vault-name ukw-infra-dmz-prod-int --name firewall-password --query value -o tsv`
+    ```
+    # Non Production 
+    az keyvault secret show --vault-name ukw-infra-dmz-nonprodi --name firewall-password --query value -o tsv
+    # Production
+    az keyvault secret show --vault-name ukw-infra-dmz-prod-int --name firewall-password --query value -o tsv
+    ```
 4. Log in as the user `localadmin` and use the firewall-password from the step above as the password.
 
 

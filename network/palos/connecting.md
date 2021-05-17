@@ -49,6 +49,7 @@ You can add a rule by going to the VMs via one of the links below and adding an 
     ```
     # Non Production 
     az keyvault secret show --vault-name ukw-infra-dmz-nonprodi --name firewall-password --query value -o tsv
+    
     # Production
     az keyvault secret show --vault-name ukw-infra-dmz-prod-int --name firewall-password --query value -o tsv
     ```

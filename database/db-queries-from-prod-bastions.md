@@ -61,7 +61,6 @@ Once on the bastion server you can execute queries against the db in any number 
   ```cmd 
   psql -U ccd@ccd-data-store-api-postgres-db-prod -h ccd-data-store-api-postgres-db-prod.postgres.database.azure.com -d ccd_data_store -o DTSPO-2766-result.csv < DTSPO-2766-get-case-data.sql
   ```
-* Provide db password when prompted
 * If no errors, you can `cat` the output file for a quick eye-balling 👀
   ```cmd 
   cat <output-file>.csv

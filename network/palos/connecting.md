@@ -9,6 +9,9 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
 
     ```
+    # Sandbox
+    az keyvault secret show --vault-name hmcts-infra-dmz-sbox-int --name firewall-password --query value -o tsv
+
     # Non production
     az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv
     
@@ -22,6 +25,11 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 <details>
 
 <summary>Virtual machines</summary>
+
+### Sandbox
+
+- [hmcts-hub-sbox-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview) - https://hmcts-hub-sbox-int-palo-mgmt-0.uksouth.cloudapp.azure.com
+- [hmcts-hub-sbox-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview) - https://hmcts-hub-sbox-int-palo-mgmt-1.uksouth.cloudapp.azure.com
 
 ### Non Production
 - [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview) - https://hmcts-hub-nonprodi-palo-mgmt-0.uksouth.cloudapp.azure.com
@@ -46,6 +54,9 @@ You can add a rule by going to the VMs via one of the links below and adding an 
 2. Either retrieve the IP address of the Palo VM via the links below or the AZ cli
 3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
     ```
+    # Sandbox
+    az keyvault secret show --vault-name ukw-infra-dmz-sbox-int --name firewall-password --query value -o tsv
+
     # Non Production 
     az keyvault secret show --vault-name ukw-infra-dmz-nonprodi --name firewall-password --query value -o tsv
     
@@ -69,7 +80,13 @@ Remember to remove the rule once you no longer need access.
 
 <summary>Virtual machines</summary>
 
+### Sandbox
+
+- [ukw-hub-sbox-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/UKW-HUB-SBOX-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-sbox-int-palo-vm-0/overview) - https://ukw-hub-sbox-int-palo-mgmt-0.ukwest.cloudapp.azure.com
+- [ukw-hub-sbox-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/UKW-HUB-SBOX-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-sbox-int-palo-vm-1/overview) - https://ukw-hub-sbox-int-palo-mgmt-0.ukwest.cloudapp.azure.com
+
 ### Non Production
+
 - [ukw-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-0/overview) - https://ukw-hub-nonprodi-palo-mgmt-0.ukwest.cloudapp.azure.com
 - [ukw-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-1/overview) - https://ukw-hub-nonprodi-palo-mgmt-0.ukwest.cloudapp.azure.com
 

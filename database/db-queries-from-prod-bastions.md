@@ -8,9 +8,9 @@ production Db as they don't have access to this.
 To fulfill one of these request, you can follow steps below.
 
 ## Prerequisites 💥
-* **Important:** Verify you are all setup, [click here](https://github.com/hmcts/cnp-module-postgres#production)
+* **Important:** Verify you are all setup, [click here for detail steps](https://github.com/hmcts/cnp-module-postgres#production)
 * Turn on your VPN
-* Grant yourself access to production Bastion, [click here](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455#Bastion-RequestaccesstothebastionhostviaJIT) <br>
+* Grant yourself access to production Bastion, [click here details](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455#Bastion-RequestaccesstothebastionhostviaJIT) <br>
   Note if not on call then just one day is sufficient
 * Keep your HMCTS user account detail handy
 

@@ -1,6 +1,6 @@
 # Connecting to a Palo Alto firewall
 
-## Uk South 
+## UK South 
 
 You can connect to the Palo VMs via the HMCTS VPN by following the following steps: 
 

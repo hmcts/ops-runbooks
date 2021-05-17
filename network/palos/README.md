@@ -20,6 +20,6 @@ This guide aims to give you an introduction to the HMCTS Palo Alto firewalls set
 ## [Connecting to a Palo Alto firewall](connecting.md)
 
 - How to connect to palo login in prod vs nonprod
-- How to connect over ssh - advance use case, got a custom shell, see logs, tcp dump etc 
+- How to connect over ssh
 
 ## [Troubleshooting issues](troubleshooting.md)

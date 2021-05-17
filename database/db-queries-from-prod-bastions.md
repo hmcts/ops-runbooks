@@ -18,7 +18,6 @@ To fulfill one of these request, you can follow steps below.
 
 * Confirm the database connection host by looking at the Key vaults on [Azure](https://portal.azure.com/#home) <br> 
   You can tell by looking at the Jira ticket and the host you have been asked to run the query against
-* From same place ([key vaults](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults)), keep the db host password handy as you'd need it to connect
 * Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥 <br>
 Sometimes typos or misplaced variables are easy to spot
 * Jump onto the production bastion with following command 

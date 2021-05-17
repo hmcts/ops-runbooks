@@ -11,6 +11,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 ```
 # Non production
 az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv
+
 # Production
 az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv
 ```

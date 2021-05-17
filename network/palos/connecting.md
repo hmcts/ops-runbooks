@@ -14,7 +14,18 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
     ```
 4. Use the local account `localadmin` to log in.
 
-### Production
+<details>
+
+<summary>Virtual machines</summary>
+
+### Sandbox
+
+- [hmcts-hub-sbox-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview) - https://hmcts-hub-sbox-int-palo-mgmt-0.uksouth.cloudapp.azure.com
+- [hmcts-hub-sbox-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview) - https://hmcts-hub-sbox-int-palo-mgmt-1.uksouth.cloudapp.azure.com
+
+</details>
+
+### Non-prod & Production
 
 1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net/).
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.  

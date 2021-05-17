@@ -32,7 +32,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
 #### **Troubleshooting tip:**
 
-1. Follow the steps in [the connecting guide](connecting.md) and log into one of the palos in the environment where your changes are failing to apply. 
+1. Follow the steps in [the connecting guide](connecting.md) and log into one of the Palos in the environment where your changes are failing to apply. 
 
 2. Once you're logged in you will see a commit button in the top right-hand side of your screen like below:
     <details> 
@@ -51,7 +51,9 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
     </details>
 
-4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. In this case we can see that the configuration is in fact invalid. The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
+4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. 
+In this case we can see that the configuration is in fact invalid. 
+The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
 
     <details> 
     <summary>Validate Example</summary>
@@ -60,4 +62,4 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
     
     </details>
 
-5. Make your changes in the rdo-terraform-hub-dmz repoistory and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
+5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.

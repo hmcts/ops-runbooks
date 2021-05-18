@@ -2,23 +2,23 @@
 
 Examples of common errors you may face when having to work on the Palos
 
-## **Problem:** not able to connect to ansible host
+## Problem - Not able to connect to ansible host
 
-### **Example error:**
+### **Example error**
 ```bash
 ##[error]Terraform command 'apply' failed with exit code '1'.:  timeout - last error: dial tcp 51.137.145.88:22: i/o timeout
 ```
 
-### **Troubleshooting tip:**
+### **Troubleshooting tip**
 This is most likely down to retrying steps in the pipeline.
 Each run a firewall rule is added to allow the Azure DevOps agent to connect to the ansible agent and at the end of the pipeline it is removed, so when you re-run failed steps in the pipeline you are not adding that rule back in, therefore the agent is unable to connect and you get the above error.
 
 ---
-## Problem: Ansible has failed to apply the palo configuration
+## Problem - Ansible has failed to apply the palo configuration
 
 This error is usually caused by the Palo's XML config not applying due to malformed xml or incorrect references to objects etc. 
 
-### **Example error:**
+### **Example error**
 ```
 module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): fatal: [51.11.xxx.xxx]: FAILED! => {
 ...
@@ -28,7 +28,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec):     "
 module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 ```
 
-### **Troubleshooting tip:**
+### **Troubleshooting tip**
 
 1. Follow the steps in [the connecting guide](connecting.md) and log into one of the Palos in the environment where your changes are failing to apply. 
 
@@ -68,7 +68,7 @@ The errors tell us that the `log-setting` value `azure_log_analytics_out` is inc
 ## Problem - debugging connectivity issues
 You may come across issues with connections being dropped and need to investigate where and why its happening.
 
-### **Troubleshooting tip:**
+### **Troubleshooting tip**
 The Palos have a built in traffic monitoring tool that could help you find the issue and tell you what the reason is for the drop.
 
 1. Log into the palo 

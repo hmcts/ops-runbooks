@@ -14,7 +14,6 @@ To fulfill one of these request, you can follow the steps below.
 * Turn on your VPN
 * Grant yourself access to production Bastion, [click here details](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455#Bastion-RequestaccesstothebastionhostviaJIT) <br>
   Note if not on call then just one day is sufficient
-* Keep your HMCTS user account detail handy
 
 ## Suggested Steps
 

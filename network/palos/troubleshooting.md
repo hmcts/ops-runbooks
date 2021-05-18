@@ -2,25 +2,23 @@
 
 Examples of common errors you may face when having to work on the Palos
 
-## Scenario 1
-### **Problem:** not able to connect to ansible host
+## **Problem:** not able to connect to ansible host
 
-#### **Example error:**
+### **Example error:**
 ```bash
 ##[error]Terraform command 'apply' failed with exit code '1'.:  timeout - last error: dial tcp 51.137.145.88:22: i/o timeout
 ```
 
-#### **Troubleshooting tip:**
+### **Troubleshooting tip:**
 This is most likely down to retrying steps in the pipeline.
 Each run a firewall rule is added to allow the Azure DevOps agent to connect to the ansible agent and at the end of the pipeline it is removed, so when you re-run failed steps in the pipeline you are not adding that rule back in, therefore the agent is unable to connect and you get the above error.
 
 ---
-## Scenario 2
-### Problem: Ansible has failed to apply the palo configuration
+## Problem: Ansible has failed to apply the palo configuration
 
 This error is usually caused by the Palo's XML config not applying due to malformed xml or incorrect references to objects etc. 
 
-#### **Example error:**
+### **Example error:**
 ```
 module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): fatal: [51.11.xxx.xxx]: FAILED! => {
 ...
@@ -30,7 +28,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec):     "
 module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 ```
 
-#### **Troubleshooting tip:**
+### **Troubleshooting tip:**
 
 1. Follow the steps in [the connecting guide](connecting.md) and log into one of the Palos in the environment where your changes are failing to apply. 
 
@@ -52,6 +50,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
     </details>
 
 4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. 
+
 In this case we can see that the configuration is in fact invalid. 
 The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
 
@@ -65,12 +64,13 @@ The errors tell us that the `log-setting` value `azure_log_analytics_out` is inc
 5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
 
 
-## Scenario 3
 
-### Problem - debugging connectivity and using monitor to see why things are being blocked
+## Problem - debugging connectivity issues
+You may come across issues with connections being dropped and need to investigate where and why its happening.
 
+### **Troubleshooting tip:**
+The Palos have a built in traffic monitoring tool that could help you find the issue and tell you what the reason is for the drop.
 
-#### **Troubleshooting tip:**
 1. Log into the palo 
 2. Click on the monitoring tab at the top of the page
 3. Start with the `( action eq deny )` filtering rule to view connections being dropped by the Palo.

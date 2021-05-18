@@ -5,25 +5,23 @@ Other teams sometimes need certain pieces of information from the production Db 
 a ticket, providing their sql query and requesting PlatOps run these against
 production Db as they don't have access to this.
 
-_Note: there's a [self service](https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+Database) process that should be used by the team if they have an SC person on their team instead
+*Note:* there's a [self service](https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+Database) process that should be used by the team if they have an SC person on their team instead
 
 To fulfill one of these request, you can follow the steps below.
 
 ## Prerequisites 💥
 * **Important:** Verify you are all setup, [click here for detail steps](https://github.com/hmcts/cnp-module-postgres#production)
 * Grant yourself access to production Bastion, [click here details](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
-  Note if not on call then just one day is sufficient
+  **Note:** If not on call then just one day is sufficient
 
 ## Suggested Steps
 
 * Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on [Azure](https://portal.azure.com/#home) <br>
 * Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥 <br>
   Sometimes typos or misplaced variables are easy to spot
-* Jump onto the production bastion with following command 
-  ```cmd
-  ssh user.name@hmcts.net@bastion-devops-prod.platform.hmcts.net
-  ```
-* Provide browser authentication code. Microsoft would prompt you for this  
+* Jump onto the production bastion, steps on how to do this are in the [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)  documentation <br>
+  _Example:_<br>
+  ![Connecting to DB](../images/connecting.png)
 
 ## Executing Queries
 Once on the bastion server you can execute queries against the db in any number of ways, below are some suggestions
@@ -35,7 +33,18 @@ Once on the bastion server you can execute queries against the db in any number 
   ```cmd
    psql> paste your query here;
   ```
+  **Note:** The prompt would most likely be the `DB_NAME` you provided in steps you followed when connecting to the DB
 * Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off  
+* For small queries with large results, you could do the following to output to file
+  ```cmd
+  \o <filename>.csv
+    <your query here>
+  \q
+   ```
+  This should create a file called `<filename>.csv` with the output in it. <br>
+  **Note:** the extension could be whatever you choose, here am using csv <br>
+  _Example:_<br>
+  ![Output to file](../images/query-output.png)
 
 ### Larger, lengthier queries
 
@@ -50,9 +59,9 @@ Once on the bastion server you can execute queries against the db in any number 
   :wq!
   ```
   If using `nano` then use its equivalent
-* Once file is saved you could run the command passing the file as input to Postgres. See an example below using ccd datastore db
+* Once file is saved you could run the command passing the file as input to Postgres.
   ```cmd 
-  psql -U ccd@ccd-data-store-api-postgres-db-prod -h ccd-data-store-api-postgres-db-prod.postgres.database.azure.com -d ccd_data_store -o DTSPO-2766-result.csv < DTSPO-2766-get-case-data.sql
+  psql "sslmode=require host=${POSTGRES_HOST} dbname=${DB_NAME} user=${DB_USER}" -o DTSPO-2766-result.csv < DTSPO-2766-get-case-data.sql
   ```
 * If no errors, you can `cat` the output file for a quick eye-balling 👀
   ```cmd 
@@ -72,3 +81,20 @@ You can use any `sftp` tool of your choice to connect to bastion or follow below
   If unclear, confirm with team members.
   
 If you run into any other issues please feel free to reach out to team members.
+
+## Notes
+In the documentation [here](https://github.com/hmcts/cnp-module-postgres#production)
+```cmd
+export PGPASSWORD=<result-from-earlier>
+```
+Assign to the variable `PGPASSWORD` the token returned from the `az account get-access-token ...` command you ran earlier <br>
+_Example:_<br>
+![Token to Password](../images/assign-to-password-var.png)
+
+## Some external reference
+
+You can have a quick peak for some `psql` info that may be useful
+* [Outputting Query Results to Files with \o](https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/)
+* [How to run an SQL file in Postgres](https://kb.objectrocket.com/postgresql/how-to-run-an-sql-file-in-postgres-846)
+  - Run a SQL file in Postgres using the ‘psql’ command 
+  - Connect to PostgreSQL and then run a SQL file using ‘psql’

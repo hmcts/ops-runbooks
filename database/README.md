@@ -11,16 +11,14 @@ To fulfill one of these request, you can follow the steps below.
 
 ## Prerequisites 💥
 * **Important:** Verify you are all setup, [click here for detail steps](https://github.com/hmcts/cnp-module-postgres#production)
-* Turn on your VPN
-* Grant yourself access to production Bastion, [click here details](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455#Bastion-RequestaccesstothebastionhostviaJIT) <br>
+* Grant yourself access to production Bastion, [click here details](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
   Note if not on call then just one day is sufficient
 
 ## Suggested Steps
 
-* Confirm the database connection host by looking at the Key vaults on [Azure](https://portal.azure.com/#home) <br> 
-  You can tell by looking at the Jira ticket and the host you have been asked to run the query against
+* Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on [Azure](https://portal.azure.com/#home) <br>
 * Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥 <br>
-Sometimes typos or misplaced variables are easy to spot
+  Sometimes typos or misplaced variables are easy to spot
 * Jump onto the production bastion with following command 
   ```cmd
   ssh user.name@hmcts.net@bastion-devops-prod.platform.hmcts.net
@@ -32,12 +30,7 @@ Once on the bastion server you can execute queries against the db in any number 
 
 ### Small queries
 
-* Connect to  Postgres by typing the following command. Verify you have followed steps outlined [here](https://github.com/hmcts/cnp-module-postgres#production) <br> 
-  Note the **Bastion configuration** section, it's important.
-  ```cmd 
-  psql -U ccd@ccd-data-store-api-postgres-db-prod -h ccd-data-store-api-postgres-db-prod.postgres.database.azure.com
-  ```
-  I'm using the ccd data store database as an example here
+* Connect to  Postgres by following commands outlined [here](https://github.com/hmcts/cnp-module-postgres#production) <br>
 * Once in, you can execute provided query
   ```cmd
    psql> paste your query here;

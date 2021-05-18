@@ -79,7 +79,7 @@ The Palos have a built in traffic monitoring tool that could help you find the i
 
 <summary>Filtering Example</summary>
 
-![Traffic Filtering](images/filtering.png)
+<img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
 
 </details>
 

@@ -28,7 +28,7 @@ Once on the bastion server you can execute queries against the db in any number 
 
 ### Small queries
 
-* Connect to  Postgres by following commands outlined [here](https://github.com/hmcts/cnp-module-postgres#production) <br>
+* Connect to  Postgres by following commands outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production) <br>
 * Once in, you can execute provided query
   ```cmd
    psql> paste your query here;

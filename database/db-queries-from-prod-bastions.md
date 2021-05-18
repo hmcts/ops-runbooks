@@ -5,6 +5,8 @@ Other teams sometimes need certain pieces of information from the production Db 
 a ticket, providing their sql query and requesting PlatOps run these against
 production Db as they don't have access to this.
 
+_Note: there's a [self service](https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+Database) process that should be used by the team if they have an SC person on their team instead
+
 To fulfill one of these request, you can follow steps below.
 
 ## Prerequisites 💥

@@ -10,8 +10,8 @@ production Db as they don't have access to this.
 To fulfill one of these request, you can follow the steps below.
 
 ## Prerequisites 💥
-* **Important:** Verify you are all setup, [click here for detail steps](https://github.com/hmcts/cnp-module-postgres#production)
-* Grant yourself access to production Bastion, [click here details](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
+* **Important:** Verify you are all setup as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)
+* Grant yourself access to production Bastion as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
   **Note:** If not on call then just one day is sufficient
 
 ## Suggested Steps
@@ -83,7 +83,7 @@ You can use any `sftp` tool of your choice to connect to bastion or follow below
 If you run into any other issues please feel free to reach out to team members.
 
 ## Notes
-In the documentation [here](https://github.com/hmcts/cnp-module-postgres#production)
+In the in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production) documentation
 ```cmd
 export PGPASSWORD=<result-from-earlier>
 ```

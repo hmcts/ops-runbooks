@@ -84,4 +84,4 @@ The Palos have a built in traffic monitoring tool that could help you find the i
 
 </details>
 
-NOTE: More information on types of filters you can apply check out [BASICS OF TRAFFIC MONITOR FILTERING](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).
+For more information on types of filters you can apply check out [Basics of traffic monitor filtering](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).

@@ -16,7 +16,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 
 <details>
 
-<summary>Virtual machines</summary>
+<summary>Sandbox virtual machines</summary>
 
 ### Sandbox
 
@@ -25,30 +25,38 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 
 </details>
 
-### Non-prod & Production
+### Non-prod 
 
 1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net/).
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.  
-3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
+3. Retrieve the admin password from the relevant key vault:
 
     ```
     # Non production
     az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv
-    
-    # Production
-    az keyvault secret show --vault-name hmcts-infra-dmz-prod-int --name firewall-password --query value -o tsv
     ```
 
-4. In production click 'Use Single Sign-On', in other environments use the local account `localadmin`
+4. Use the local account `localadmin`
+
+<details>
+
+<summary>Non Prod virtual machines</summary>
+
+- [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview) - https://hmcts-hub-nonprodi-palo-mgmt-0.uksouth.cloudapp.azure.com
+- [hmcts-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview) - https://hmcts-hub-nonprodi-palo-mgmt-1.uksouth.cloudapp.azure.com
+
+</detail>
+
+### Production
+
+1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net/).
+2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.  
+3. In production click 'Use Single Sign-On', in other environments use the local account `localadmin`
 
 
 <details>
 
 <summary>Virtual machines</summary>
-
-### Non Production
-- [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview) - https://hmcts-hub-nonprodi-palo-mgmt-0.uksouth.cloudapp.azure.com
-- [hmcts-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview) - https://hmcts-hub-nonprodi-palo-mgmt-1.uksouth.cloudapp.azure.com
 
 ### Production
 

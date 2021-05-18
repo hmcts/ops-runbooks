@@ -67,7 +67,7 @@ You can add a rule by going to the VMs via one of the links below and adding an 
 
 1. Create the NSG rule to allow your IP on port 443. (Example and links to VMs below)
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.
-3. (skip in production which is SSO enabled) Retrieve the admin password from the relevant key vault:
+3. Retrieve the admin password from the relevant key vault:
     ```
     # Sandbox
     az keyvault secret show --vault-name ukw-infra-dmz-sbox-int --name firewall-password --query value -o tsv
@@ -78,7 +78,7 @@ You can add a rule by going to the VMs via one of the links below and adding an 
     # Production
     az keyvault secret show --vault-name ukw-infra-dmz-prod-int --name firewall-password --query value -o tsv
     ```
-4. In production click 'Use Single Sign-On', in other environments use the local account `localadmin`
+4. Use the local account `localadmin`
 
 
 <details>

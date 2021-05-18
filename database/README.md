@@ -12,7 +12,7 @@ To fulfill one of these request, you can follow the steps below.
 ## Prerequisites 💥
 * **Important:** Verify you are all setup as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)
 * Grant yourself access to production Bastion as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
-  **Note:** If not on call then just one day is sufficient
+  **Note:** If not on call then just one day is sufficient, you could also customize how long you want access for.
 
 ## Suggested Steps
 
@@ -24,7 +24,7 @@ To fulfill one of these request, you can follow the steps below.
   ![Connecting to DB](../images/connecting.png)
 
 ## Executing Queries
-Once on the bastion server you can execute queries against the db in any number of ways, below are some suggestions
+You can execute queries in any number of ways, below are some suggestions
 
 ### Small queries
 
@@ -42,7 +42,7 @@ Once on the bastion server you can execute queries against the db in any number 
   \q
    ```
   This should create a file called `<filename>.csv` with the output in it. <br>
-  **Note:** the extension could be whatever you choose, here am using csv <br>
+  **Note:** the extension could be whatever you choose, here am using `csv` <br>
   _Example:_<br>
   ![Output to file](../images/query-output.png)
 
@@ -58,11 +58,12 @@ Once on the bastion server you can execute queries against the db in any number 
   ```cmd 
   :wq!
   ```
-  If using `nano` then use its equivalent
+  If using `nano` then use it's equivalent
 * Once file is saved you could run the command passing the file as input to Postgres.
   ```cmd 
   psql "sslmode=require host=${POSTGRES_HOST} dbname=${DB_NAME} user=${DB_USER}" -o DTSPO-2766-result.csv < DTSPO-2766-get-case-data.sql
   ```
+  _Here `DTSPO-2766-result.csv` is where I want the results saved and `DTSPO-2766-get-case-data.sql` is the file with provided sql query_
 * If no errors, you can `cat` the output file for a quick eye-balling 👀
   ```cmd 
   cat <output-file>.csv

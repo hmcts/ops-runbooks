@@ -21,7 +21,7 @@ To fulfill one of these request, you can follow the steps below.
   Sometimes typos or misplaced variables are easy to spot
 * Jump onto the production bastion, steps on how to do this are in the [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)  documentation <br>
   _Example:_<br>
-  ![Connecting to DB](../images/connecting.png)
+  ![Connecting to DB](connecting.png)
 
 ## Executing Queries
 You can execute queries in any number of ways, below are some suggestions
@@ -44,7 +44,7 @@ You can execute queries in any number of ways, below are some suggestions
   This should create a file called `<filename>.csv` with the output in it. <br>
   **Note:** the extension could be whatever you choose, here am using `csv` <br>
   _Example:_<br>
-  ![Output to file](../images/query-output.png)
+  ![Output to file](query-output.png)
 
 ### Larger, lengthier queries
 
@@ -90,7 +90,7 @@ export PGPASSWORD=<result-from-earlier>
 ```
 Assign to the variable `PGPASSWORD` the token returned from the `az account get-access-token ...` command you ran earlier <br>
 _Example:_<br>
-![Token to Password](../images/assign-to-password-var.png)
+![Token to Password](assign-to-password-var.png)
 
 ## Some external reference
 

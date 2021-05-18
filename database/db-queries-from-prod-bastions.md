@@ -1,6 +1,6 @@
 # DB Queries from Prod Bastion
 
-This document itemises steps to take when there is the need to access production database.
+Steps to take when there is the need to access production database.
 Other teams sometimes need certain pieces of information from the production Db and would raise
 a ticket, providing their sql query and requesting PlatOps run these against
 production Db as they don't have access to this.
@@ -78,4 +78,3 @@ You can use any `sftp` tool of your choice to connect to bastion or follow below
   If unclear, confirm with team members.
   
 If you run into any other issues please feel free to reach out to team members.
-

@@ -5,7 +5,6 @@ Check list for new joiners to the Platform Operations team
 - Give users Platform Operations Confluence page links and documentation to read
     1. [The HMCTS Way](https://hmcts.github.io/#the-hmcts-way)
     2. [Team Structure](https://tools.hmcts.net/confluence/display/DTSPO/Team+Structure)
-    3. [BAU How To's](https://tools.hmcts.net/confluence/display/DTSPO/BAU+How+Tos)
 - Add the new joiner to Platform Operations group in Slack
 - Send out relevant meeting invites for Stand ups, Retro, Show and Tells
 - Send PlatOps Jira board link to new joiner

@@ -15,4 +15,4 @@ Check list for new joiners to the Platform Operations team
 - Verify the new joiner has an entry in [github-management](https://github.com/hmcts/github-management), can be self serviced.
 - Add the new joiner to DTS Platform Operations group on [devops-azure-ad](https://github.com/hmcts/devops-azure-ad)
 - Add the new joiner to [Platform Operations group](https://github.com/orgs/hmcts/teams/platform-operations/members)
-- If and when required add user to DTS Platform Operations `SC` group in [devops-azure-ad](https://github.com/hmcts/devops-azure-ad)
+- If and when required add user to `DTS Platform Operations SC` group in [devops-azure-ad](https://github.com/hmcts/devops-azure-ad)

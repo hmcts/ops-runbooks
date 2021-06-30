@@ -10,7 +10,7 @@ The Platform Operations team currently manages certificates for:
 Consumer documentation can be found [here](http://localhost:4567/information-security/certificate-automation.html#tls-certificates).
 
 #### When to use Managed Certificates
-Apps which require one or more of the following will not be suitable for LetsEncrypt and should instead use managed certs:
+Apps which are hosted on one or more of the following should use [Managed certificates](managed.md) instead:
 - need to be passed to a another supplier 
 - Frontdoor
 - CDN
@@ -27,4 +27,3 @@ Apps which require one or more of the following will not be suitable for LetsEnc
 ## Renew an existing certificate
 The Function App renews certificates automatically. If there is a need to manually renew a certificate, this can be done using the same Function App, appending ‘renew-certificate’ to the url, such as:
 https://acmedtssdssbox.azurewebsites.net/renew-certificate. All existing certificates are available from the drop-down menu.
-

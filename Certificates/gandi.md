@@ -1,6 +1,5 @@
 # Manually Generated Certificates
 
-
 This article describes the process for issuing or renewing an SSL certificate that is not suitable for our automated certificates in the other guides of this chapter.
 
 ## Prerequisites
@@ -167,4 +166,3 @@ d) Restart traefik pods so its picks up new certs
 | Error | Solution | 
 |-----------------|:-------------|
 | employment.service.gov.uk mxtool DNS check cannot find record | ![](images/commonerror.png)  | 
-

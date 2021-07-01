@@ -1,0 +1,184 @@
+# Manually Generated Certificates
+
+
+Scenario Description:
+This article describes the process for renewing an SSL certificate end-to-end, from notification of expiry through to completion of the renewal.
+
+#### The requirements for following this process are:
+
+A local version of the rdo-ssl-creation repo (https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch)
+A local version of the azure-public-dns repo (https://github.com/hmcts/azure-public-dns)
+A cert in need of renewal (either a notification from Ops or a JIRA ticket that has followed this guide: Requesting a SSL Certificate from Platform Operations)
+
+A link to the certificate tracker is here: https://cjscommonplatform-my.sharepoint.com/:x:/r/personal/zoe_cope_hmcts_net/_layouts/15/Doc.aspx?sourcedoc=%7B6C8A9500-4D9D-45EA-8CC7-D75F3DDFF133%7D&file=Cert%20Tracker.xlsx&action=default&mobileredirect=true
+
+We use this in conjunction with the Operations team to track new and existing certificate requests. You can check a month in advance on the tabs to see if any certs are coming up for renewal. 
+
+##Step-by-step guide:
+There are 3 key stages to the renewal process:
+
+- [Generate the CSR and request form](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-1:-Generate-the-CSR-and-request-form)
+- [Point the DNS](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-2:-Point-the-DNS)
+- [Upload the certificate to Azure](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-3:-Upload-the-certificate-to-Azure)
+
+#### Note:
+If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). You can do this by going on https://mxtoolbox.com/ and running a DNS Check. If there are no results, you should contact the requester and get them to create the domain and DNS zone. DNS zones are created in https://github.com/hmcts/azure-public-dns as IaC.
+
+From there, they need to have the NS records at hand to pass over to whoever does the delegation. For hmcts.net domains, contact the Operations team for delegation. For service.gov.uk domains, you need to contact Government Digital Service (GDS) - you can speak to Cairbre Smith to assist with that.
+
+### Step 1: Generate the CSR and request form
+
+
+This section is described in the ReadMe of the GitHub repo.
+And also, in more depth, in this confluence page: Requesting SSL Certificates
+
+
+Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).
+
+### Step 2: Point the DNS
+
+
+Ops then return the validation instructions for pointing the DNS, for example:
+
+> "Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
+CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
+
+> Pointing the DNS is done using this repo:
+https://github.com/hmcts/azure-public-dns
+
+
+
+With the example above, the address would belong in the "apply-divorce-service-gov-uk.yml" file.
+
+These are the available files:
+![](images/envfiles.png)
+_*Addresses which do not fall into any of these domains are likely managed using a different service (eg AWS)._
+
+
+
+The format for pointing the DNS, using the example described in the validation instructions above, is as follows:
+
+> - name: "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"
+ttl: 300
+record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
+
+This is the DNS pointings when seen in the pull request:
+![](images/pullrequest.png)
+Broken down, the changes made to the validation instructions to achieve the correct format are:
+
+
+1. Add the name:
+
+- Convert the name to lowercase - this is because if it is left as uppercase, it will be an invalid name and azure will silently fix it for you and return lowercase, but Terraform will keep re-creating it on every change.
+- Remove '.apply-divorce.service.gov.uk', since this is added automatically.
+E.g:
+_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk
+becomes
+- name: "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"
+
+2. Add a time to live
+
+- any number would work, we use 300 seconds (5 minutes) for practicality
+E.g:
+ttl: 300
+
+3. Add the record
+
+Remember to keep the full-stop at the end of the CNAME.
+CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.
+becomes
+record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
+
+
+
+Once you have raised the PR and it has been approved and merged, you can check on the build here - https://dev.azure.com/hmcts/DevOps/_build?definitionId=278
+
+
+
+Prior to notifying Operations, check in MXToolBox - https://mxtoolbox.com/ - that the DNS has been propagated successfully, this will prevent possible delays. Use the whole name of the record like so:
+![](images/mxtools.png)
+Once the DNS has been pointed, we respond to Ops notifying them. They will return the generated cert to us as an email attachment.
+
+### Step 3: Upload the certificate to Azure
+
+1. Download the email attachment
+![](images/attachment.png)
+
+_2. (Optional but recommended)_ Create a new folder
+
+This is to keep your files organised and avoid confusion. Name it as you see fit, for example as below:
+![](images/newfolder.png)
+Copy and paste the relevant contents from the 'makepfx' folder in 'RDO-SSL-Creation', into the newly created folder. The below files now exist in 'decree-absolute':
+![](images/makepfx.png)
+In the terminal, change directory to the new folder in and place the downloaded cert from step 1 inside it.
+
+3. Convert the .txt file to a .p7b:
+
+openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b
+*Digi2al procured original certs will need the comodoca.crt cert chain in place of cert-chain: found in the makepfx folder
+
+4. Go to Azure Key Vault → decree-absolute-apply-divorce-service-gov-uk → certificate operation → 'merge signed request' and upload the p7b file.
+![](images/keyvault.png)
+Once the merge is complete, you should see this:
+![](images/complete.png)
+
+:information_source: At this point, the certificate is now renewed / procured. 
+
+The next steps are required only if the certificate is being placed in another vault in addition to infra-cert-prod. You can find out if required by either speaking to the dev who requested the cert or searching key vaults in Azure.
+
+If you are renewing a certificate, it is common to check vaults such as, but not limited to, infra-vault-prod, cft-apps-prod or <projectacronym>-prod for production certificates, cftapps-dev for development certificates, etc, and observing whether an old version of the renewed cert is there.
+
+5. Click into the current certificate version and download the pfx file by selecting 'Download in PFX/PEM format'
+![](images/downloadpfx.png)
+
+_**Optional:**_ Display private key.
+
+If in case you are procuring a certificate for a developer in another project for example, they would require the private key as they may not have access to the key vault. To display the certificate's private key, run below command. At this point, there is no password, so just press enter when prompted for one.
+
+> cat infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx | openssl pkcs12 -nodes
+
+6. Add a password to the cert:
+Move the pfx file into the 'makepfx' folder.
+Run from the makepfx folder:
+
+> ./pfxpassword.sh infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx
+
+7. Add the cert to the relevant key vault
+
+In this case, it's **cft-apps-prod**. 
+
+Go to the relevant cert (decree-absolute-apply-divorce-service-gov-uk) → new version → import → upload the cert.pfx file and type in the password.
+
+_*The password can be found in the 'pfxpassword.sh' file in the 'makepfx' folder._
+![](images/createcert.png)
+
+You should see this:
+![](images/success.png)
+
+
+### Step 6: Guidance for Shared Services and PET Certificates only 
+For some certs the process is slightly different, example certs include
+
+juror-bureau.justice.gov.uk
+
+reply-jury-summons.service.gov.uk
+
+a) Download pfx of the renewed cert from the vault
+b) Convert to base 64
+> openssl base64 -in ~/Downloads/traefik-jb.pfx -out ~/Downloads/traefik-jdbase64.kl
+
+c) Reverse engineer  and find new vault - e.g. shared service - ss-vault-prod
+d) Restart pods so its picks up new certs
+
+**Desired Outcome:**
+You should now have a renewed SSL cert for the domain!
+
+
+
+#### Common Errors and Solutions 
+
+| Error | Solution | 
+|-----------------|:-------------|
+| employment.service.gov.uk mxtool DNS check cannot find record | ![](images/commonerror.png)  | 
+
+

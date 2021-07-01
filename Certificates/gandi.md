@@ -17,9 +17,9 @@ We use this in conjunction with the Operations team to track new and existing ce
 ##Step-by-step guide:
 There are 3 key stages to the renewal process:
 
-- [Generate the CSR and request form](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-1:-Generate-the-CSR-and-request-form)
-- [Point the DNS](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-2:-Point-the-DNS)
-- [Upload the certificate to Azure](https://github.com/hmcts/ops-runbooks/tree/master/Certificates#Step-3:-Upload-the-certificate-to-Azure)
+- [Generate the CSR and request form](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-1:-Generate-the-CSR-and-request-form)
+- [Point the DNS](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-2:-Point-the-DNS)
+- [Upload the certificate to Azure](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-3:-Upload-the-certificate-to-Azure)
 
 #### Note:
 If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). You can do this by going on https://mxtoolbox.com/ and running a DNS Check. If there are no results, you should contact the requester and get them to create the domain and DNS zone. DNS zones are created in https://github.com/hmcts/azure-public-dns as IaC.

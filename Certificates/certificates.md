@@ -7,7 +7,7 @@ The Platform Operations team currently manages certificates for:
 - PET
 - Heritage
 
-Consumer documentation can be found [here](http://localhost:4567/information-security/certificate-automation.html#tls-certificates).
+Consumer documentation can be found [on the HMCTS way](https://hmcts.github.io/information-security/certificate-automation.html#tls-certificates).
 
 ## Create a new certificate
 

@@ -1,10 +1,9 @@
 # Certificates
----
 
-This guide describes the process for creating an SSL certificate using LetsEncrypt, Managed certificates, or manually generated certificates provided by Gandi.
+This guide describes the process for creating an SSL certificate using Let’s Encrypt, Managed certificates, or manually generated certificates provided by Gandi.
 
 
 ## Guides
-- [LetsEncrypt](certificates.md)
+- [Let’s Encrypt](certificates.md)
 - [Managed certificates](managed.md)
 - [Gandi](gandi.md)

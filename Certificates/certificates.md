@@ -1,4 +1,4 @@
- # How to Create or Renew SSL Certificates using LetsEncrypt
+# How to Create or Renew SSL Certificates using LetsEncrypt
 
 #### Scenario Description
 The Platform Operations team currently manages certificates for:

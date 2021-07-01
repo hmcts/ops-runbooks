@@ -1,4 +1,4 @@
-# How to Create or Renew SSL Certificates using LetsEncrypt
+# How to Create or Renew SSL Certificates using Let’s Encrypt
 
 #### Scenario Description
 The Platform Operations team currently manages certificates for:
@@ -7,9 +7,9 @@ The Platform Operations team currently manages certificates for:
 - PET
 - Heritage
 
-Consumer documentation can be found [on the HMCTS way](http://localhost:4567/information-security/certificate-automation.html#tls-certificates).
+Consumer documentation can be found [on the HMCTS way](https://hmcts.github.io/information-security/certificate-automation.html#tls-certificates).
 
-#### When to use Managed Certificates
+#### When to use Let’s Encrypt certificates
 Apps which are hosted on one or more of the following should use [Managed certificates](managed.md) instead:
 - need to be passed to a another supplier 
 - Frontdoor

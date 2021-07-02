@@ -1,1 +1,0 @@
-Managed certificates will need to follow [this process](https://tools.hmcts.net/confluence/display/RD/Create+or+Renew+a+SSL+Certificate). Microsoft documentation for managed certs are [here](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#option-1-default-use-a-certificate-managed-by-front-door).

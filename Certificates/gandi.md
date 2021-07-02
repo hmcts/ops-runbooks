@@ -31,8 +31,7 @@ For service.gov.uk domains, you need to contact Government Digital Service (GDS)
 ### Step 1: Generate the CSR and request form
 
 
-This section is described in the ReadMe of the [GitHub repo](https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch).
-
+This section is described in detail [on this page](csr.md).
 
 Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).
 

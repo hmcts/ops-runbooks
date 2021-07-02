@@ -7,3 +7,13 @@ If you are using one of the following services:
 - Frontdoor
 - CDN
 - App Service
+
+#### FrontDoor managed certificate limitations
+
+_Other services may have these limitations too, not verified_
+
+- [Apex domains](https://www.quora.com/What-is-an-apex-domain) do not work with managed certificates, e.g. `hmcts-access.service.gov.uk`
+- Domains using [afdverify](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain#map-the-temporary-afdverify-subdomain) only and not direct validation do not work
+
+You should use [Let’s encrypt certificates](certificates.md) in the above scenarios.
+

@@ -106,6 +106,7 @@ This is to keep your files organised and avoid confusion. Name it as you see fit
 ![](images/newfolder.png)
 
 Copy and paste the relevant contents from the 'makepfx' folder in [RDO-SSL-Creation](https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch), into the newly created folder. The below files now exist in 'decree-absolute':
+
 ![](images/makepfx.png)
 
 In the terminal, change directory to the new folder in and place the downloaded cert from step 1 inside it.

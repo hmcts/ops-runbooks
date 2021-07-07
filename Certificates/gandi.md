@@ -104,8 +104,10 @@ Once the DNS has been pointed, reply to the operations team saying you've added 
 
 This is to keep your files organised and avoid confusion. Name it as you see fit, for example as below:
 ![](images/newfolder.png)
+
 Copy and paste the relevant contents from the 'makepfx' folder in [RDO-SSL-Creation](https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch), into the newly created folder. The below files now exist in 'decree-absolute':
 ![](images/makepfx.png)
+
 In the terminal, change directory to the new folder in and place the downloaded cert from step 1 inside it.
 
 3. Convert the .txt file to a .p7b:
@@ -114,10 +116,11 @@ In the terminal, change directory to the new folder in and place the downloaded 
 
 4. Go to Azure Key Vault → decree-absolute-apply-divorce-service-gov-uk → certificate operation → 'merge signed request' and upload the p7b file.
 ![](images/keyvault.png)
+
 Once the merge is complete, you should see this:
 ![](images/complete.png)
 
-:information_source: At this point, the certificate is now renewed / procured. 
+:information_source:  At this point, the certificate is now renewed / procured. 
 
 The next steps are required only if the certificate is being placed in another vault in addition to infra-cert-prod. You can find out if required by either speaking to the dev who requested the cert or searching key vaults in Azure.
 

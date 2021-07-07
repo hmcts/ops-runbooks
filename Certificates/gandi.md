@@ -69,17 +69,20 @@ This is the DNS pointings when seen in the pull request:
 Broken down, the changes made to the validation instructions to achieve the correct format are:
 
 
-1. Add the name:
+**1. Add the name:**
 
 - Remove `.apply-divorce.service.gov.uk`, since this is added automatically.
 E.g:
 `_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk`
-becomes
-- name: `_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute`
 
-2. Add a time to live - any number would work, we use 300 seconds (5 minutes) for practicality, e.g. `ttl: 300`.
+_becomes_
 
-3. Add the record
+\- name: `_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute`
+
+**2. Add a time to live**
+- any number would work, we use 300 seconds (5 minutes) for practicality, e.g. `ttl: 300`.
+
+**3. Add the record**
 
 Remember to keep the full-stop at the end of the CNAME.
 `CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.`
@@ -97,7 +100,7 @@ Once the DNS has been pointed, reply to the operations team saying you've added 
 1. Download the email attachment
 ![](images/attachment.png)
 
-2. (Optional but recommended)_ Create a new folder
+2. _(Optional but recommended)_ Create a new folder
 
 This is to keep your files organised and avoid confusion. Name it as you see fit, for example as below:
 ![](images/newfolder.png)
@@ -108,12 +111,13 @@ In the terminal, change directory to the new folder in and place the downloaded 
 3. Convert the .txt file to a .p7b:
 
 `openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b`
+
 4. Go to Azure Key Vault → decree-absolute-apply-divorce-service-gov-uk → certificate operation → 'merge signed request' and upload the p7b file.
 ![](images/keyvault.png)
 Once the merge is complete, you should see this:
 ![](images/complete.png)
 
-:information_source: - At this point, the certificate is now renewed / procured. 
+:information_source: At this point, the certificate is now renewed / procured. 
 
 The next steps are required only if the certificate is being placed in another vault in addition to infra-cert-prod. You can find out if required by either speaking to the dev who requested the cert or searching key vaults in Azure.
 
@@ -150,15 +154,16 @@ You should see this:
 ### Shared Services and PET Certificates only 
 For some certs the process is slightly different, example certs include
 
-> juror-bureau.justice.gov.uk
-
-> reply-jury-summons.service.gov.uk
+- juror-bureau.justice.gov.uk
+- reply-jury-summons.service.gov.uk
 
 a) Download pfx of the renewed cert from the vault
+
 b) Convert to base 64
 > openssl base64 -in ~/Downloads/traefik-jb.pfx -out ~/Downloads/traefik-jdbase64.kl
 
 c) Reverse engineer and find new vault - e.g. shared service - `ss-vault-prod`
+
 d) Restart traefik pods so its picks up new certs
 
 #### Common Errors and Solutions 

@@ -14,15 +14,15 @@ We have a certificate tracker which is populated a month in advance by the Opera
 ## Step-by-step guide:
 There are 3 key stages to the renewal process:
 
-- [Generate the CSR and request form](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-1:-Generate-the-CSR-and-request-form)
-- [Point the DNS](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-2:-Point-the-DNS)
-- [Upload the certificate to Azure](https://github.com/hmcts/ops-runbooks/tree/master/Certificates/gandi.md#Step-3:-Upload-the-certificate-to-Azure)
+- [Generate the CSR and request form](#Step-1:-Generate-the-CSR-and-request-form)
+- [Point the DNS](#Step-2:-Point-the-DNS)
+- [Upload the certificate to Azure](#Step-3:-Upload-the-certificate-to-Azure)
 
 #### Note:
 If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
 You can do this by going on https://mxtoolbox.com/ and running a DNS Check.
 If there are no results, you should contact the requester and get them to create the domain and DNS zone.
-DNS zones are created in https://github.com/hmcts/azure-public-dns as IaC.
+DNS zones are created in https://github.com/hmcts/azure-public-dns.
 
 From there, they need to have the NS records at hand to pass over to whoever does the delegation.
 For hmcts.net domains, contact the Operations team for delegation.

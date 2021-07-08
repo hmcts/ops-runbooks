@@ -6,7 +6,7 @@ This article describes the process for issuing or renewing an SSL certificate th
 
 - A local version of the [rdo-ssl-creation repo](https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch)
 - A local version of the [azure-public-dns repo](https://github.com/hmcts/azure-public-dns)
-A certificate in need of renewal (either a notification from Ops or a Jira ticket that has followed this guide: Requesting a SSL Certificate from Platform Operations)
+- A certificate in need of renewal (either a notification from Ops or a Jira ticket)
 
 We have a certificate tracker which is populated a month in advance by the Operations team with certs that are expiring soon, view it on [sharepoint](https://cjscommonplatform-my.sharepoint.com/:x:/r/personal/zoe_cope_hmcts_net/_layouts/15/Doc.aspx?sourcedoc=%7B6C8A9500-4D9D-45EA-8CC7-D75F3DDFF133%7D&file=Cert%20Tracker.xlsx&action=default&mobileredirect=true), you may need to request access.
 
@@ -31,7 +31,7 @@ For service.gov.uk domains, you need to contact Government Digital Service (GDS)
 ### Step 1: Generate the CSR and request form
 
 
-This section is described in detail [on this page](csr.md).
+This section is described in detail on the [Requesting SSL Certificates](csr.md) guide.
 
 Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).
 
@@ -43,8 +43,7 @@ Ops then return the validation instructions for pointing the DNS, for example:
 > "Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
 
-> Pointing the DNS is done using this repo:
-https://github.com/hmcts/azure-public-dns
+Pointing the DNS is done in https://github.com/hmcts/azure-public-dns
 
 
 
@@ -80,13 +79,14 @@ _becomes_
 \- name: `_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute`
 
 **2. Add a time to live**
-- any number would work, we use 300 seconds (5 minutes) for practicality, e.g. `ttl: 300`.
+- any number would work, we use 300 seconds (5 minutes), e.g. `ttl: 300`.
 
 **3. Add the record**
 
 Remember to keep the full-stop at the end of the CNAME.
 `CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.`
-becomes record: `CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.`
+
+Becomes record: `CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.`
 
 Once you have raised the PR and it has been approved and merged, you can check on the build on  [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=278).
 
@@ -113,7 +113,6 @@ In the terminal, change directory to the new folder in and place the downloaded 
 
 3. Convert the .txt file to a .p7b:
 
-`openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b`
 
 4. Go to Azure Key Vault → decree-absolute-apply-divorce-service-gov-uk → certificate operation → 'merge signed request' and upload the p7b file.
 ![](images/keyvault.png)

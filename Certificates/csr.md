@@ -2,10 +2,10 @@
 
 Two things are required when requesting new Certs: 
 - A completed SSL Form - attached as SSL-Certificate-Request-Form.docx, a blank one has been added so that developers may fill in a new form:
-![SSL Certificate Request Form](SSL-Certificate-Request-Form.docx).
+[SSL Certificate Request Form](SSL-Certificate-Request-Form.docx).
 This form is only required for new SSLs and is not needed for renewal requests.
 
-- A newly generated CSR request. The CSR's can be generated through a csr.yml file following the guidance in this repo: \\ (wildcard certs are generated with a different syntax within the csr.yml file)
+- A newly generated CSR request. The CSR's can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file): 
 
 Example Csr.yml files can be found on the openssl-mac-branch branch
 

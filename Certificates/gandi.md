@@ -155,7 +155,7 @@ You should see this:
 ![](images/success.png)
 
 
-### Shared Services and PET Certificates only 
+### * Shared Services and PET Certificates only *
 For some certs the process is slightly different, example certs include
 
 - juror-bureau.justice.gov.uk

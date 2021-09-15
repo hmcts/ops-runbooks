@@ -2,7 +2,7 @@
 
 # Deploying & Troubleshooting Exim Mailrelay
 
-This runbook describes how to deploy an new Exim image to the Dev and Production Environments. The current version of mairelay is <b>0.2.8</b>. Mailrelay configurations are managed through the following repo [exim-relay](https://github.com/hmcts/exim-relay).
+This runbook describes how to deploy a new Exim image to the Dev and Production Environments. The current version of mairelay is <b>0.2.8</b>. Mailrelay configurations are managed through the following repo [exim-relay](https://github.com/hmcts/exim-relay).
 
 ## Prerequisites
 
@@ -22,9 +22,7 @@ Exim Mailrelay is currently deployed in SSD-DEV-00 / SS0DEV-01 / SS-Prod-00 / SS
 
 2. Modifying the Exim.conf File 
 
-The Exim.conf file has 5 sections which are 
-
-typical changes may include changing authemtication mechanism
+The exim.,conf file is written with makefile, you can find a makefile tutorial [here](https://makefiletutorial.com/)
 
 *more to be added*
 
@@ -44,6 +42,8 @@ A PR for changes to the EXIM relay or Exim Exporter. The Platform Operations wil
 
 3. Pipeline 
    * The pipeline will run after making a PR or merging to master and will build an image in the Azure Container Repository [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
+
+     *   The Service connection used for the pipeline is DTS SS Public Prod
 
 4. Configuring Shared-Service-Flux 
 
@@ -66,12 +66,16 @@ After making changes to Exim.conf you may need to test that emails are going thr
 ```bash
 kubectl run -it --rm --restart=Never -n admin --image=docker.io/alpine:3.13 alpine2 --command -- /bin/sh
 ```
-2. Create a new branch, typically with a JIRA ticket number.
+2. Add additional tools, this includes telnet 
 ```bash
 apk add busybox-extras
 ```
+3. Get the IP address, 
+```bash
+Kubectl get svc -n <namespace>
+```
 
-1. Push your new branch
+4. Send email from pcol to chosen email 
 ```bash
 telnet <ip:port>
 helo possessionclaim.gov.uk
@@ -83,7 +87,37 @@ data
 Subject: test                                         
 test test test
 ```
+* Note - unauthenticated relay should be tuned off and you should receive a 550 unauthenticated relay response 
+### Test TLS connection using SWAKS 
+```bash
+    kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
+    apt update
+    apt install swaks
+    apt install telnet
+    swaks -a -tls -q HELO -s <ip>-au v1test -ap '<password'
+```
 
+### Test StartTLS connection using OpenSSL
+
+Turn user name and password to base 64 
+```bash
+echo -ne '<password>' | base64
+
+```
+Connect to Mailrelay using StartTLS 
+```bash
+openssl s_client -connect ip:port -starttls smtp
+```
+Send Email 
+```bash
+helo possessionclaim.gov.uk
+mail from: noreply-pcol@hmcts.net
+rcpt to: <email>
+data
+Subject: test 
+test test test
+.
+```
 
 ## Monitoring MailRelay 
 Pre requisites 
@@ -91,7 +125,13 @@ Pre requisites
 * GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
 * Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 
+Prometheus 
+|* Prometheus is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 
+
+Grafana 
+
+*more to be added*
 ## Troubleshooting Common Errors 
 
 *more to be added*

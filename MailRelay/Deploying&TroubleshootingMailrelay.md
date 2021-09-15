@@ -1,0 +1,108 @@
+
+
+# Deploying & Troubleshooting Exim Mailrelay
+
+This runbook describes how to deploy an new Exim image to the Dev and Production Environments. The current version of mairelay is <b>0.2.8</b>. Mailrelay configurations are managed through the following repo [exim-relay](https://github.com/hmcts/exim-relay).
+
+## Prerequisites
+
+* GitHub write access to [Exim-Relay](https://github.com/hmcts/exim-relay)
+* Azure DevOps access to [Exim-Relay Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=503)
+
+If you are working with the Exim-Exporter you will need write access to the following 
+* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
+* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
+## Mailrelay Essentials
+
+1. What is Mailrelay and What is it used for? 
+
+Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from an Mail User Agent (MUA) and relays the email to other MTAs or a Mail Delivery Agent . In HMCTS it used by PCOL and MCOl to send emails to clients.  
+
+Exim Mailrelay is currently deployed in SSD-DEV-00 / SS0DEV-01 / SS-Prod-00 / SS-Prod-01. Mailrelay is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
+
+2. Modifying the Exim.conf File 
+
+The Exim.conf file has 5 sections which are 
+
+typical changes may include changing authemtication mechanism
+
+*more to be added*
+
+3. Authentication Mechanisms 
+   
+Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs.
+
+*more to be added*
+
+## Deployment
+A PR for changes to the EXIM relay or Exim Exporter. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester. 
+
+1. Clone Exim-Relay 
+
+2. After making changes to the Mailrelay configuration review PR and provide approval as appropriate.
+   * While making the Pull Request please ensure that the base repo is hmcts/ exim-relay and not luigibk/exim-relay
+
+3. Pipeline 
+   * The pipeline will run after making a PR or merging to master and will build an image in the Azure Container Repository [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
+
+4. Configuring Shared-Service-Flux 
+
+In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for. 
+In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+* Clone the shared-services-flux [repo](https://github.com/hmcts/shared-services-flux) 
+* change the tag to the latest tag number in the [patches file](https://github.com/hmcts/shared-services-flux/tree/master/k8s/release/mailrelay/mailrelay/patches)  
+* Add and Commit changes  
+* Review as required
+* Merge branch with Master.
+* After 5 to 10 minutes check the deployments have been updated on the cluster. 
+
+## Testing Mailrelay 
+
+After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host. 
+
+### Test unauthneticated relay, determine if unauthenticated relay is on or off
+
+1. Spin up a temporary pod in the Kubernetes Cluster
+```bash
+kubectl run -it --rm --restart=Never -n admin --image=docker.io/alpine:3.13 alpine2 --command -- /bin/sh
+```
+2. Create a new branch, typically with a JIRA ticket number.
+```bash
+apk add busybox-extras
+```
+
+1. Push your new branch
+```bash
+telnet <ip:port>
+helo possessionclaim.gov.uk
+mail from: noreply-pcol@hmcts.net
+rcpt to: <recipient email>
+data
+354 Enter message, ending with "." on a line by itself
+data
+Subject: test                                         
+test test test
+```
+
+
+## Monitoring MailRelay 
+Pre requisites 
+
+* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
+* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
+
+
+## Troubleshooting Common Errors 
+
+*more to be added*
+## Performance Testing 
+
+*more to be added*
+## Onboarding Customers 
+
+*more to be added*
+## Further Links 
+
+* https://www.exim.org/docs.html
+
+* https://serverfault.com/

@@ -18,17 +18,17 @@ If you are working with the Exim-Exporter you will need write access to the foll
 
 Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from an Mail User Agent (MUA) and relays the email to other MTAs or a Mail Delivery Agent . In HMCTS it used by PCOL and MCOl to send emails to clients.  
 
-Exim Mailrelay is currently deployed in SSD-DEV-00 / SS0DEV-01 / SS-Prod-00 / SS-Prod-01. Mailrelay is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
+Exim Mailrelay is currently deployed in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01. Mailrelay is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
 
-2. Modifying the Exim.conf File 
+2. Modifying the exim.conf File 
 
-The exim.conf file is written with makefile, you can find a makefile tutorial [here](https://makefiletutorial.com/)
+The exim.conf file is written with makefile, you can find more information in the [makefile tutorial](https://makefiletutorial.com/)
 
 *more to be added*
 
 3. Authentication Mechanisms 
    
-Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs.
+Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certifcates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
 
 *more to be added*
 

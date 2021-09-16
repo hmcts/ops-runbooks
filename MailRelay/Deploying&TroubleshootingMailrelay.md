@@ -22,7 +22,7 @@ Exim Mailrelay is currently deployed in SSD-DEV-00 / SS0DEV-01 / SS-Prod-00 / SS
 
 2. Modifying the Exim.conf File 
 
-The exim.,conf file is written with makefile, you can find a makefile tutorial [here](https://makefiletutorial.com/)
+The exim.conf file is written with makefile, you can find a makefile tutorial [here](https://makefiletutorial.com/)
 
 *more to be added*
 
@@ -87,7 +87,7 @@ data
 Subject: test                                         
 test test test
 ```
-* Note - unauthenticated relay should be tuned off and you should receive a 550 unauthenticated relay response 
+* Note - unauthenticated relay should be turned off and you should receive a 550 unauthenticated relay response 
 ### Test TLS connection using SWAKS 
 ```bash
     kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
@@ -98,16 +98,15 @@ test test test
 ```
 
 ### Test StartTLS connection using OpenSSL
-
-Turn user name and password to base 64 
 ```bash
+Turn user name and password to base 64 
+
 echo -ne '<password>' | base64
 
-```
 Connect to Mailrelay using StartTLS 
-```bash
+
 openssl s_client -connect ip:port -starttls smtp
-```
+
 Send Email 
 ```bash
 helo possessionclaim.gov.uk
@@ -126,19 +125,38 @@ Pre requisites
 * Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 
 Prometheus 
-|* Prometheus is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
-
+* The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
+* The exim exporter tool is a 3rd party tool, the official github for the tool can be found [here](https://github.com/gvengel/exim_exporter), the forked hmcts version can be found [here](https://github.com/hmcts/exim_exporter)  
+* The Exim Exporter is a third party rool which is exposed as a service, it obtains metrics and sends it to the Prometheus server 
+* The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 
+* If you need to add alerts or tweak current alerts you can do so [here](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) 
 
 Grafana 
 
 *more to be added*
 ## Troubleshooting Common Errors 
 
+Alerts are not being sent to Slack 
+
+* Check alert logs 
+```bash
+kubectl exec --stdin --tty alertmanager-kube-prometheus-stack-alertmanager-0   -n monitoring -- /bin/sh
+
+kubectl logs -f -c alertmanager alertmanager-kube-prometheus-stack-alertmanager-0 -n monitoring
+
+kubectl logs -f -c alertmanager alertmanager-kube-prometheus-stack-alertmanager-0 -n monitoring > alertmanager-logs.log
+```
+
+* Make post request 
+```bash
+wget --header "content-type: application/json" --post-data '[{"status": "firing","labels": {"alertname": "EximQueueLength","service": "mailrelay","severity": "warning","instance": "0"}}]' http://localhost:9093/api/v1/alert
+```
+
 *more to be added*
 ## Performance Testing 
 
 *more to be added*
-## Onboarding Customers 
+## Onboarding & Migrating Customers 
 
 *more to be added*
 ## Further Links 
@@ -146,3 +164,7 @@ Grafana
 * https://www.exim.org/docs.html
 
 * https://serverfault.com/
+
+* https://alanstorm.com/what-are-prometheus-exporters/
+
+* https://prometheus.io/docs/instrumenting/exporters/

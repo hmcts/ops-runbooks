@@ -61,6 +61,13 @@ We have the ability to create another preview cluster on demand. We don't run wi
 - Check an external IP has been assigned: kubectl get service -n admin |awk '$4 ~ /^[0-9]/'
 - Check OSBA is running, kubectl get pods -n osba, kubectl get pods -n catalog
 
+#### How to test a specific Preview cluster without swapping over
+https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files
+
+https://github.com/hmcts/cnp-jenkins-library/compare/preview01?expand=1
+
+This will simulate a repo/setup is using the Preview cluster that has not been swapped, useful to test if required.
+Same PR might not be re-usable when the cluster is swapped to active as DNS record could be invalid. You can verify and manually tweak the records to be able to reuse it.
 #### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#4348](https://github.com/hmcts/cnp-flux-config/pull/4348) .

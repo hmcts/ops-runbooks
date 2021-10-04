@@ -71,10 +71,11 @@ You may come across issues with connections being dropped and need to investigat
 ### **Troubleshooting tip**
 The Palos have a built in traffic monitoring tool that could help you find the issue and tell you what the reason is for the drop.
 
-1. Log into the palo 
-2. Click on the monitoring tab at the top of the page
-3. Start with the `( action eq deny )` filtering rule to view connections being dropped by the Palo.
-4. Add any extra filters such as `(addr.src in a.a.a.a)` or `(addr.dst in b.b.b.b)` to help filter out logs you don't need to see.
+1. Log into both of the Palo Alto's for the environment
+3. Click on the monitoring tab at the top of the page
+4. Start with the `( action eq deny )` filtering rule to view connections being dropped by the Palo.
+5. Add any extra filters such as `(addr.src in a.a.a.a)` or `(addr.dst in b.b.b.b)` to help filter out logs you don't need to see.
+6. Make sure you check both Palo Alto's as there's a load balancer in front, traffic could go to either or both.
 
 <details>
 

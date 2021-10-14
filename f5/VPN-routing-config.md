@@ -2,8 +2,7 @@
 
 This document details the steps to configure routing to make internal apps available over the vpn.
 
-
-Login to https://vpn.platform.hmcts.net/. 
+Login to https://vpn.platform.hmcts.net/.
 If you are accessing the F5 portal for the first time or forget your login details, a person with existing access can provide you with new credentials.
 ![Login](images/login.png)
 

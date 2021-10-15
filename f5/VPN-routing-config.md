@@ -3,7 +3,30 @@
 This document details the steps to configure routing to make internal apps available over the vpn.
 
 Login to https://vpn.platform.hmcts.net/.
-If you are accessing the F5 portal for the first time or lose your login details, a person with existing access can provide you with new credentials. ![List of current admins](admins.md).
+If you are accessing the F5 portal for the first time or lose your login details, a person with existing access can provide you with new credentials.
+
+<details>
+<summary>List of current admins</summary>
+arahman
+benn
+chriso
+dbromwich
+hannahs
+jordanb
+lbitonti
+louiseh
+matts
+mohanay
+pkumar
+praveena
+taherk
+thomast
+timja
+tkimber
+zoec
+</details>
+
+ ![List of current admins](admins.md).
 
 For making the changes to the ACL: click 'Access Control Lists' tab under the 'Access' tab and select `acl_vpn_reform`, page linked here:
 [Access Control List](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/list.jsp)

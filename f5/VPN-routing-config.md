@@ -43,6 +43,6 @@ Note: If using Firefox then the search function probably won't find the IP addre
 6. Add the new CIDR range under IPV4 and IPV6 . After verification, click on the `Apply Access policy` on the top left corner of the portal to propagate the routing changes.\
 [MoJ VPN ACL](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/remconnectivity/nwaccessresources/l2_settings.jsp?name=/Common/netacl_mojvpn&type=1)
 
-7. Logout of your current F5 VPN session and log back in to validate if the route propagation has taken place for the new AKS network address space as shown below:\
+7. Logout of your current F5 VPN session (https://portal.platform.hmcts.net) and log back in to validate if the routing table update has taken place for the new network address space as shown below:
 ![VPN Routing table](images/VPN_Routing_table.png)
 ![VPN Routing table](images/Routing_Change.png)

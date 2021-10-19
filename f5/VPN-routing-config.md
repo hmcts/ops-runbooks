@@ -28,7 +28,7 @@ zoec
 
 </details>
 
-2. For making the changes to the ACL: click 'Access Control Lists' tab under the 'Access' tab and select `acl_vpn_reform`, page linked here:\
+2. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'acl_vpn_reform', [direct link](vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
 [Access Control List](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/list.jsp)
 
 3. You will see a list of ACLs for all the entries. Find the one which you need to edit. The CIDR range will be in the column labeled as Dst IP/Mask.

@@ -33,7 +33,6 @@ zoec
 
 3. You will see a list of ACLs for all the entries. Find the one which you need to edit. The CIDR range will be in the column labeled as Dst IP/Mask.
 Note: If using Firefox then the search function probably won't find the IP address you type in.\
-[ACL Properties](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
 
 4. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:\
 ![properties](images/properties.png)

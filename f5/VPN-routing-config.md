@@ -15,6 +15,7 @@ Note: If using Firefox then the search function probably won't find the IP addre
 
 4. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:\
 ![properties](images/properties.png =200x)
+<img src=images/properties.png  width="200">
 
 ## Access Policy
 
@@ -24,6 +25,7 @@ Note: If using Firefox then the search function probably won't find the IP addre
 2. Add the new CIDR range under IPV4 and IPV6 . After verification, click on the `Apply Access policy` on the top left corner of the portal to propagate the routing changes.\
 [MoJ VPN ACL](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/remconnectivity/nwaccessresources/l2_settings.jsp?name=/Common/netacl_mojvpn&type=1)
 
-3. Logout of your current F5 VPN session (https://portal.platform.hmcts.net) and log back in to validate if the routing table update has taken place for the new network address space as shown below:
-![VPN Routing table](images/VPN_Routing_table.png =200x)
-![VPN Routing table](images/Routing_Change.png =200x)
+3. Logout of your current F5 VPN session (<https://portal.platform.hmcts.net>) and log back in to validate if the routing table update has taken place for the new network address space as shown below:
+
+<img src=images/VPN_Routing_table.png  width="200">
+<img src=images/Routing_Change.png  width="200">

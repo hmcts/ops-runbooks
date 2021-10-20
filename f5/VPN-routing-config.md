@@ -14,7 +14,6 @@ If you are accessing the F5 portal for the first time or lose your login details
 Note: If using Firefox then the search function probably won't find the IP address you type in.\
 
 4. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:\
-![properties](images/properties.png =200x)
 <img src=images/properties.png  width="200">
 
 ## Access Policy

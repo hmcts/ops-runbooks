@@ -3,7 +3,7 @@
 ## Useful links
 
 - [GitHub Repository](https://github.com/hmcts/azure-vpn-f5)
-- [User Accounts](accounds.md)
+- [User Accounts](accounts.md)
 
 ## Guides
 

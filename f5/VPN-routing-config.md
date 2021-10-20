@@ -26,5 +26,7 @@ Note: If using Firefox then the search function probably won't find the IP addre
 
 3. Logout of your current F5 VPN session (<https://portal.platform.hmcts.net>) and log back in to validate if the routing table update has taken place for the new network address space as shown below:
 
-<img src=images/VPN_Routing_table.png  width="400">
-<img src=images/Routing_Change.png  width="400">
+<p float="left">
+<img src=images/VPN_Routing_table.png  width="400" />
+<img src=images/Routing_Change.png  width="400" />
+</p>

@@ -5,17 +5,16 @@ This document details the steps to configure routing to make internal apps avail
 ## Routing
 
 1. Connect to the [VPN](https://portal.platform.hmcts.net)
-1. Login to <https://vpn.platform.hmcts.net/>.\
+2. Login to <https://vpn.platform.hmcts.net/>.\
 If you are accessing the F5 portal for the first time, submit a pull request to the [user accounts](accounts.md) file in this repo and ask someone with existing access to create your account.
 If you lose your login details, a person with existing access can provide you with new credentials.
 
-1. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'acl_vpn_reform', [direct link](vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
-[Access Control List](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
+3. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'acl_vpn_reform', [direct link](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
 
-3. You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click 'Add' for your new one. Copy the required details from the existing one to the new one.
+4. You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click 'Add' for your new one. Copy the required details from the existing one to the new one.
 Note: If using Firefox then the search function probably won't find the IP address you type in.
 
-4. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
+5. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
 <img src=images/properties.png  width="400">
 
 ## Access Policy

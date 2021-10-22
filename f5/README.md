@@ -2,7 +2,7 @@
 
 ## Useful links
 
-- [GitHub Repository](https://github.com/hmcts/azure-vpn-f5)
+- [GitHub Repository](https://github.com/hmcts/azure-vpn-f5) (not live yet, automation is in progress)
 - [User Accounts](accounts.md)
 
 ## Guides

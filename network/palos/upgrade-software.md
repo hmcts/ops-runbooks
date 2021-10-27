@@ -25,7 +25,7 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
   ![Operations Tabs](images/operations-tab.png)
 
   </details>
-* Generate and export tech support file go to `Device -> Suport ->Tech Support File` 
+* Generate and export tech support file go to `Device -> Suport -> Tech Support File` 
   in case having issues that can't be resolved then you'd need to send this to Palo Alto support
 * Check for latest available software go to `Device -> Software`. Click the Check Now at the button to refresh screen with latest software
   <details>
@@ -56,7 +56,7 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 
 ## Post Upgrade
 * Rerun pipeline to see if any issues with current config with new version of software
-* Fix forward if any issues, config might need to bu updated
+* Fix forward if any issues, config might need to be updated
 * Deleting old installation files to save space and cleanup is a nice to have
 * Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config
 * Let team members know that the upgrade was successful

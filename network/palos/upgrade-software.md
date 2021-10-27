@@ -60,3 +60,4 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 * Deleting old installation files to save space and cleanup is a nice to have
 * Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config
 * Let team members know that the upgrade was successful
+* 📕 Revisit in a quarter or 6 months time for another upgrade to keep the firewall software up-to-date

@@ -26,7 +26,7 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
 
   </details>
 * Generate and export tech support file go to `Device -> Suport -> Tech Support File` 
-  in case having issues that can't be resolved then you'd need to send this to Palo Alto support
+  in case of issues that can't be resolved then you'd need to send this to Palo Alto support
 * Check for latest available software go to `Device -> Software`. Click the Check Now at the button to refresh screen with latest software
   <details>
    <summary>Software view</summary>

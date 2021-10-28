@@ -62,4 +62,4 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 * Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config<br>
   Flow is: `sbox` -> `nonprod` -> `prod`
 * Let team members know that the upgrade was successful
-* 📕 Revisit in a quarter or 6 months time for another upgrade to keep the firewall software up-to-date
+* 📕 Revisit every 3 months for the next upgrade to keep the firewall software up-to-date

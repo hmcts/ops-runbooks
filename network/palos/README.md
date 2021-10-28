@@ -10,3 +10,4 @@ This guide aims to give you an introduction to the HMCTS Palo Alto firewalls set
 ## Guides
 - [Connecting to a Palo Alto firewall](connecting.md)
 - [Troubleshooting issues](troubleshooting.md)
+- [Upgrading Palo Alto firewall Software](upgrade-software.md)

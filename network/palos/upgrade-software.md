@@ -12,29 +12,26 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
 ## Prerequisite
 
 * Make sure no running pipeline
-* Perform dynamic updates, make sure latest versions are installed, go to `Device -> Dynamic Updates`
+* Perform dynamic updates, make sure latest versions are installed, go to `Device -> Dynamic Updates` on the left menu pane
     - Update Applications and Threats
     - Update WildFire
 * Make sure there are no candidate configuration that's not been committed, config has to be in a stable state
 * Make a config backup, go to  `Device -> Setup -> Operations`
     - Save a named config snapshot
-    - Export saved snapshot as backup to local location
-  <details>
-   <summary>Operations Tab</summary>
-  
-  ![Operations Tabs](images/operations-tab.png)
+    - Export saved snapshot as backup to local location`
+      <details>
+        <summary>Operations Tab</summary>
+          ![Operations Tabs](images/operations-tab.png)
+      </details>
 
-  </details>
 * Generate and export tech support file go to `Device -> Suport -> Tech Support File` 
   in case having issues that can't be resolved then you'd need to send this to Palo Alto support
 * Check for latest available software go to `Device -> Software`. Click the Check Now at the button to refresh screen with latest software
   <details>
    <summary>Software view</summary>
-
-  ![Operations Tabs](images/checknow.png)
-
+    ![Operations Tabs](images/checknow.png)
   </details>
-    - Download the version(s) to be installed
+* Download the version(s) to be installed
 * Same process as above but for Plugins, go to `Device -> Plugin` click `Check Now` for available plugins
 
 **Notes** 
@@ -45,7 +42,8 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
    issue but if doing manually then you'd have to install separately on all four
 
 ## Steps
-* ⚠️ Always start with `sbox`, if no issue when complete then chances of issues with `nonprod` and `prod` are very low
+* ⚠️ Always start with `sbox`, if no issue when complete then chances of issues with `nonprod` and `prod` are very low<br>
+   The flow is `sbox` -> `nonprod` -> `prod`
 * Download if not already and install last available maintenance i.e `v9.1.11-h3` or `v10.0.(max)`
 * Verify system is up and running, check cpu, memory, check firewall's system resources, should be reasonably low a 90% reading is a red flag wait until its dropped or investigate why it's so high
 * Download and install next major release i.e. `v10.0.0` if coming from `v9.1.x` or `v10.1.0` if coming from `v10.0.x`
@@ -53,11 +51,13 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 * Verify system is up and running, check cpu, memory, check firewall's system resources, if high wait until it settles, should not take long
 * Download if not already and install next major release i.e. `v10.0.7` or `v10.1.x`
 * Verify system is up and running, check cpu, memory etc
+* Note: Prod update would need a `CR`
 
 ## Post Upgrade
 * Rerun pipeline to see if any issues with current config with new version of software
 * Fix forward if any issues, config might need to be updated
 * Deleting old installation files to save space and cleanup is a nice to have
-* Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config
+* Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config<br>
+  Flow is: `sbox` -> `nonprod` -> `prod`
 * Let team members know that the upgrade was successful
 * 📕 Revisit in a quarter or 6 months time for another upgrade to keep the firewall software up-to-date

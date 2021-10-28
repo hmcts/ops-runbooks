@@ -18,7 +18,7 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
 * Make sure there are no candidate configuration that's not been committed, config has to be in a stable state
 * Make a config backup, go to  `Device -> Setup -> Operations`
     - Save a named config snapshot
-    - Export saved snapshot as backup to local location`
+    - Export saved snapshot as backup to local location
       <details>
         <summary>Operations Tab</summary>
           ![Operations Tabs](images/operations-tab.png)

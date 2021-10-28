@@ -21,7 +21,9 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
     - Export saved snapshot as backup to local location
       <details>
         <summary>Operations Tab</summary>
+
           ![Operations Tabs](images/operations-tab.png)
+
       </details>
 
 * Generate and export tech support file go to `Device -> Suport -> Tech Support File` 

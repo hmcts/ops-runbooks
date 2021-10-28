@@ -29,7 +29,9 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
 * Check for latest available software go to `Device -> Software`. Click the Check Now at the button to refresh screen with latest software
   <details>
    <summary>Software view</summary>
+
     ![Operations Tabs](images/checknow.png)
+
   </details>
 * Download the version(s) to be installed
 * Same process as above but for Plugins, go to `Device -> Plugin` click `Check Now` for available plugins

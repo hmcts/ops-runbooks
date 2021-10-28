@@ -60,7 +60,7 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 
 ## Post Upgrade
 * Rerun pipeline to see if any issues between current config and new software version
-* Fix forward if any issues, config might need to be updated i.e new markupintroduced
+* Fix forward if any issues, config might need to be updated i.e new markup introduced
 * Deleting old installation files to save space and cleanup is a nice to have
 * Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config<br>
   Flow is: `sbox` -> `nonprod` -> `prod`

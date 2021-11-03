@@ -11,7 +11,7 @@ while upgrading from the `v9.1.x` version to the `v10.0.x`
 
 ## Prerequisite
 
-* Make sure no running pipeline
+* Make sure no running pipeline and current pipeline runs without error
 * Perform dynamic updates, make sure latest versions are installed, go to `Device -> Dynamic Updates` on the left menu pane
     - Update Applications and Threats
     - Update WildFire

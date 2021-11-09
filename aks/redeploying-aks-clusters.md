@@ -78,10 +78,10 @@ Same PR might not be re-usable when the cluster is swapped to active as DNS reco
 - Update the charts for jobs and steps pointing to the new preview [cnp-azuredevops-pipelines#40](https://github.com/hmcts/cnp-azuredevops-libraries/pull/40)
 - Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example annoucenment:-
 
-Hi all, Preview cluster has been swapped preview-00-aks.
+Hi all, Preview cluster has been swapped cft-preview-00-aks.
 Login using:
 ```command
-az aks get-credentials --resource-group preview-00-rg --name preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
+az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
 ```
 
 * Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:

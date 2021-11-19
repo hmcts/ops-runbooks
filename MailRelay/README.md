@@ -62,7 +62,7 @@ After making changes to Exim.conf you may need to test that emails are going thr
 
 1. Spin up a temporary pod in the Kubernetes Cluster
 ```bash
-kubectl run -it --rm --restart=Never -n admin --image=docker.io/alpine:3.13 alpine2 --command -- /bin/sh
+kubectl run -it --rm --restart=Never -n admin --image=docker.io/infoblox/dnstools:latest dnstools --command -- /bin/sh
 ```
 2. Add additional tools, this includes telnet 
 ```bash

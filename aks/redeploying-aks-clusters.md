@@ -4,9 +4,11 @@ This wiki page documents some tasks that we have to perform when deploying any o
 
 ## To create a cluster:
 
-Go to the release pipeline
-Create a new release, updating the Clusters variable for the environment you want to redeploy, to include either 00, or 01 whichever one you want to build
-Click 'Deploy' for the **required stage** stage
+Go to the [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary). 
+
+Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to which ever one you want to build and that the environment is selected from the drop down menu. 
+
+Click on **Run** to start the pipeline.
 
 ## Deployment Order
 
@@ -61,6 +63,13 @@ We have the ability to create another preview cluster on demand. We don't run wi
 - Check an external IP has been assigned: kubectl get service -n admin |awk '$4 ~ /^[0-9]/'
 - Check OSBA is running, kubectl get pods -n osba, kubectl get pods -n catalog
 
+#### How to test a specific Preview cluster without swapping over
+https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files
+
+https://github.com/hmcts/cnp-jenkins-library/compare/preview01?expand=1
+
+This will simulate a repo/setup is using the Preview cluster that has not been swapped, useful to test if required.
+Same PR might not be re-usable when the cluster is swapped to active as DNS record could be invalid. You can verify and manually tweak the records to be able to reuse it.
 #### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#4348](https://github.com/hmcts/cnp-flux-config/pull/4348) .
@@ -71,10 +80,10 @@ We have the ability to create another preview cluster on demand. We don't run wi
 - Update the charts for jobs and steps pointing to the new preview [cnp-azuredevops-pipelines#40](https://github.com/hmcts/cnp-azuredevops-libraries/pull/40)
 - Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example annoucenment:-
 
-Hi all, Preview cluster has been swapped preview-00-aks.
+Hi all, Preview cluster has been swapped cft-preview-00-aks.
 Login using:
 ```command
-az aks get-credentials --resource-group preview-00-rg --name preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
+az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
 ```
 
 * Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:
@@ -92,9 +101,7 @@ az network private-dns record-set a list --zone-name service.core-compute-previe
 
 Once swap over is fully complete then delete the older cluster,
 
-* Create a new release in the release pipeline, setting Delete.Cluster to true and 
-updating the Clusters variable to contain just the cluster you want deleted.
-
+* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**. 
 ### AAT
 
 #### Before deployment of a cluster
@@ -137,7 +144,10 @@ Scaling to happen just before a cluster has been removed from AGW.
 > Hi @here,
 > Due to planned upgrades of AKS, we will be upgrading the management (cftplt-intsvc) cluster at 8am, Monday 26th April. As a result of this, Jenkins will be offline during the upgrade and > unavailable for around one hour.>
 
-Run the AKS pipeline (https://dev.azure.com/hmcts/CNP/_release?definitionId=16&view=mine&_a=releases) and ensure that you have set the variables to delete the cluster and also then deploy the cluster. 
+* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to **PTL** before clicking on **Run**. 
+
+* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to **PTL** before clicking on **Run**. 
+
 
 #### After deployment of a cluster
 
@@ -153,7 +163,7 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 - Check whether all deployments/ apps are up. `kubectl get hr -A` gives a quick snapshot of progress.
 - Swap backend application gateway in [azure-platform-terraform](https://github.com/hmcts/azure-platform-terraform/pull/622/files)
 - Swap active external dns deployments to route traffic to new cluster [Example PR](https://github.com/hmcts/cnp-flux-config/pull/7522/files)
-- Delete inactive cluster using Release pipeline pipeline.
+- Delete inactive cluster using the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**.
 
 #### After Deployment of Cluster
 

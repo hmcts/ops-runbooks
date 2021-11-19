@@ -4,19 +4,13 @@ This runbook describes how to deploy a new Exim image to the Dev and Production 
 
 ## Prerequisites
 
-* GitHub write access to [Exim-Relay](https://github.com/hmcts/exim-relay)
-* Azure DevOps access to [Exim-Relay Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=503)
-
-If you are working with the Exim-Exporter you will need write access to the following 
-* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
-* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 ## Mailrelay Essentials
 
-1. What is Mailrelay and What is it used for? 
+### What is Mailrelay and What is it used for? 
 
-Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from an Mail User Agent (MUA) and relays the email to other MTAs or a Mail Delivery Agent . In HMCTS it used by PCOL and MCOl to send emails to clients.  
+Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .
 
-Exim Mailrelay is currently deployed in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01. Mailrelay is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
+Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
 
 2. Modifying the exim.conf File 
 
@@ -41,9 +35,9 @@ A PR for changes to the EXIM relay or Exim Exporter. The Platform Operations wil
 3. Pipeline 
    * The pipeline will run after making a PR or merging to master and will build an image in the Azure Container Repository [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
 
-     *   The Service connection used for the pipeline is DTS SS Public Prod
+     *   The Service connection used for the pipeline is `DTS SS Public Prod`
 
-4. Configuring Shared-Service-Flux 
+4. Configuring Shared Services Flux 
 
 In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for. 
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
@@ -62,7 +56,7 @@ After making changes to Exim.conf you may need to test that emails are going thr
 
 1. Spin up a temporary pod in the Kubernetes Cluster
 ```bash
-kubectl run -it --rm --restart=Never -n admin --image=docker.io/alpine:3.13 alpine2 --command -- /bin/sh
+kubectl run -it --rm --restart=Never -n admin --image=docker.io/infoblox/dnstools:latest dnstools --command -- /bin/sh
 ```
 2. Add additional tools, this includes telnet 
 ```bash

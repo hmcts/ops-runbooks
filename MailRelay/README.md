@@ -4,12 +4,6 @@ This runbook describes how to deploy a new Exim image to the Dev and Production 
 
 ## Prerequisites
 
-* GitHub write access to [Exim-Relay](https://github.com/hmcts/exim-relay)
-* Azure DevOps access to [Exim-Relay Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=503)
-
-If you are working with the Exim-Exporter you will need write access to the following 
-* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
-* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 ## Mailrelay Essentials
 
 ### What is Mailrelay and What is it used for? 

@@ -43,7 +43,7 @@ A PR for changes to the EXIM relay or Exim Exporter. The Platform Operations wil
 
      *   The Service connection used for the pipeline is DTS SS Public Prod
 
-4. Configuring Shared-Service-Flux 
+4. Configuring Shared Services Flux 
 
 In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for. 
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 

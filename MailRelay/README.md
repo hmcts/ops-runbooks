@@ -12,7 +12,7 @@ If you are working with the Exim-Exporter you will need write access to the foll
 * Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 ## Mailrelay Essentials
 
-1. What is Mailrelay and What is it used for? 
+### What is Mailrelay and What is it used for? 
 
 Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .
 

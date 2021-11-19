@@ -20,7 +20,7 @@ Exim Mailrelay is currently deployed in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-
 
 2. Modifying the exim.conf File 
 
-The exim.conf file is written with makefile, you can find more information in the [makefile tutorial](https://makefiletutorial.com/)
+The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file is written with makefile, you can find more information in the [makefile tutorial](https://makefiletutorial.com/)
 
 *more to be added*
 
@@ -124,10 +124,9 @@ Pre requisites
 
 Prometheus 
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
-* The exim exporter tool is a 3rd party tool, the official github for the tool can be found [here](https://github.com/gvengel/exim_exporter), the forked hmcts version can be found [here](https://github.com/hmcts/exim_exporter)  
-* The Exim Exporter is a third party rool which is exposed as a service, it obtains metrics and sends it to the Prometheus server 
+* The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server 
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 
-* If you need to add alerts or tweak current alerts you can do so [here](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) 
+* The [Prometheus alerts](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be update if current alerts needs to be updated 
 
 Grafana 
 

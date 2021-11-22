@@ -8,3 +8,11 @@
 ## Guides
 
 - [Setup access to internal apps](VPN-routing-config.md)
+
+
+## Common Issues
+
+- Failed HDD encryption check: Likely means that FileVault is turned off if it's Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.
+- User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person
+
+If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you'll need the F5 serial number / Registration key.  (can we add it here?)

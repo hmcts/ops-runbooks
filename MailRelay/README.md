@@ -51,7 +51,7 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 
 After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host. 
 
-### Test unauthneticated relay, determine if unauthenticated relay is on or off
+### Test unauthenticated relay
 
 1. Spin up a temporary pod in the Kubernetes Cluster
 ```bash

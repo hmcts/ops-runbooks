@@ -32,7 +32,7 @@ Client applications use TLS to authenticate to the Mailrelay server to be able t
    * While making the Pull Request please ensure that the base repo is hmcts/ exim-relay and not luigibk/exim-relay
 
 3. Pipeline 
-   * The pipeline will run after making a PR or merging to master and will build an image in the Azure Container Repository [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
+   * The pipeline will run after making a PR or merging to master and will build an image in the [Azure Container Repository](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
 
      *   The Service connection used for the pipeline is `DTS SS Public Prod`
 

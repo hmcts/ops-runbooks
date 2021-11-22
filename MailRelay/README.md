@@ -1,6 +1,6 @@
 # Exim Mailrelay
 
-This runbook describes how to deploy a new Exim image to the Dev and Production Environments. The current version of mairelay is <b>0.2.8</b>. Mailrelay configurations are managed through the following repo [exim-relay](https://github.com/hmcts/exim-relay).
+This runbook describes how to deploy a new Exim image to the Dev and Production Environments. Mailrelay configurations are managed through the following repo [exim-relay](https://github.com/hmcts/exim-relay).
 
 ## Prerequisites
 

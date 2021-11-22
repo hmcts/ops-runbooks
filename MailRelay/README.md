@@ -25,7 +25,6 @@ Client applications use TLS to authenticate to the Mailrelay server to be able t
 *more to be added*
 
 ## Deployment
-A PR for changes to the EXIM relay or Exim Exporter. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester. 
 
 1. Clone Exim-Relay 
 

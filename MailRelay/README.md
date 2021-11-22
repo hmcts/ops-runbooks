@@ -20,7 +20,7 @@ The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file 
 
 3. Authentication Mechanisms 
    
-Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certifcates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
+Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
 
 *more to be added*
 

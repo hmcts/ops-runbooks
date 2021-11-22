@@ -28,7 +28,7 @@ Client applications use TLS to authenticate to the Mailrelay server to be able t
 
 1. Clone Exim-Relay 
 
-2. After making changes to the Mailrelay configuration review PR and provide approval as appropriate.
+2. After making changes to the Mailrelay configuration have someone review the pull request.
    * While making the Pull Request please ensure that the base repo is hmcts/ exim-relay and not luigibk/exim-relay
 
 3. Pipeline 

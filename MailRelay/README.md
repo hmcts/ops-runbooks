@@ -128,7 +128,7 @@ test test test
 ## Monitoring MailRelay 
 Pre requisites 
 
-* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
+* GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay) - Platform Operations team has access
 * Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504) - Platform Operations team has access
 
 ### Prometheus 

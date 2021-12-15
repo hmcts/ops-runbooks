@@ -131,7 +131,7 @@ Pre requisites
 * GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
 * Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
 
-Prometheus 
+### Prometheus 
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 * The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server 
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 

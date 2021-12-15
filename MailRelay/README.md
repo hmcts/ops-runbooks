@@ -63,7 +63,7 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Merge branch with Master.
 * After 5 to 10 minutes check the deployments have been updated on the cluster. 
 
-## <a name="testing"></a>Testing Mailrelay
+## Testing Mailrelay
 
 After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host. 
 

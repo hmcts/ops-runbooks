@@ -135,7 +135,7 @@ Pre requisites
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 * The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server 
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 
-* The [Prometheus alerts](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be update if current alerts needs to be updated 
+* The [Prometheus alerts](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated 
 
 ### Grafana
 

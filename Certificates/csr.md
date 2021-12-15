@@ -51,7 +51,9 @@ The certificate requests will be output to the archive_csr/<date> folder
 
 The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.
 
-Once the csr has been generated, feel free the send the csr and the ssl form to opsconfman@hmcts.net.
+Once the csr has been generated, feel free to send the csr and the ssl form to opsconfman@hmcts.net.
+
+You will receive an email back asking you to point the DNS, after which you can follow on from step 2 here: https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089833#CreateorRenewaSSLCertificate-Step2:PointtheDNS
 
 ### Appendix
 

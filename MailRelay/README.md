@@ -129,7 +129,7 @@ test test test
 Pre requisites 
 
 * GitHub write access to [Exim-Exporter](https://github.com/hmcts/exim-relay)
-* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504)
+* Azure Devops access to [Exim Exporter Pipeline](https://dev.azure.com/hmcts/Shared%20Services/_build?definitionId=504) - Platform Operations team has access
 
 ### Prometheus 
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool

@@ -19,7 +19,7 @@ The syntax is as follows:
      - "mailrelay-prod-user"
 ```
 3. Create a new P/R and merge into the master branch once authorised 
-4. Test access and connectivity as described in the section below [Testing Mailrelay](#testing)         
+4. Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
 
 
 ### What is Mailrelay and What is it used for? 

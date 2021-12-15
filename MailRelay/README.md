@@ -7,7 +7,7 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 
 ## How to On-board Clients
 
-Each service will require a username and password to utilise the Mailrelay service and theseh will be stored in Keyvault.  The Username will be the service name; the password should be randomly generated and be sufficiently complex.
+Each service will require a username and password to utilise the Mailrelay service and these will be stored in Keyvault.  The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
 1. Create a new secret in Key Vault and associate a complex password
 2. Branch off the [Flux](https://github.com/hmcts/shared-services-flux) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/shared-services-flux/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.

@@ -18,7 +18,7 @@ The syntax is as follows:
      - "my-service-user-account"
      - "mailrelay-prod-user"
 ```
-3. Create a new P/R and merge into the master branch once authorised 
+3. Create a new pull request and merge into the master branch once approved 
 4. Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
 
 

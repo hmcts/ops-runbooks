@@ -7,19 +7,19 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 
 ## How to On-board Clients
 
-Each service will require a username and password to utilise the Mailrelay service which will be stored in Keyvault.  The Username will be the service name; the password should be randomly generated and be sufficiently complex.
+Each service will require a username and password to utilise the Mailrelay service and theseh will be stored in Keyvault.  The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
 1. Create a new secret in Key Vault and associate a complex password
 2. Branch off the [Flux](https://github.com/hmcts/shared-services-flux) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/shared-services-flux/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
 
 The syntax is as follows:   
 
-authKeyVaultSecrets:
+```authKeyVaultSecrets:
      - "my-service-user-account"
      - "mailrelay-prod-user"
-
-3. Create a new P/R and merge into the master branch once authorised. 
-4. Test acccess and connectivity as [below](test)         
+```
+3. Create a new P/R and merge into the master branch once authorised 
+4. Test acccess and connectivity as described in the section below [Testing Mailrelay](#testing)         
 
 
 ### What is Mailrelay and What is it used for? 
@@ -63,7 +63,7 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Merge branch with Master.
 * After 5 to 10 minutes check the deployments have been updated on the cluster. 
 
-## <a name="Testing Mailrelay"></a> 
+## <a name="testing"></a>Testing Mailrelay
 
 After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host. 
 

@@ -88,11 +88,6 @@ This step is only required if the certificate is being placed elsewhere or being
 - You can now send the password-protected cert to whoever requested it. It's best to send the cert in one email, and the password you added to the "pfxpassword.sh" file in another. You can use a site like pwpush.com to do this.
 - Add the cert to the relevant key vault: Navigate to this key vault and find the cert (decree-absolute-apply-divorce-service-gov-uk in this case), click new version > import > upload the cert.pfx file downloaded earlier and type in the password. You should see a "successfully created" message after this.
 
-
-
-  
-  
-  
 ### Guidance for PET certificates only
   
 For some certs the process is slightly different, for example: helpwithcourtfees.service.gov.uk

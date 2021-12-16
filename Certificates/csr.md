@@ -86,7 +86,7 @@ This step is only required if the certificate is being placed elsewhere or being
 - If you're procuring this cert for a developer in another project that doesn't have access to the key vault, they will need the certs private key. This can be found by running this command: `cat infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx | openssl pkcs12 -nodes`.
 - If you just need to forward the cert on to the ticket raiser, then you need to add a password to the cert before emailing it. Move the pfx file into the 'makepfx' folder, and change the password in the "pfxpassword.sh" file. Run the command `./pfxpassword.sh infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx'.
 - You can now send the password-protected cert to whoever requested it. It's best to send the cert in one email, and the password you added to the "pfxpassword.sh" file in another. You can use a site like pwpush.com to do this.
-- Add the cert to the relevant key vault: For this example, it would be "cft-apps-prod". Navigate to this key vault and find the cert (decree-absolute-apply-divorce-service-gov-uk), click new version > import > upload the cert.pfx file downloaded earlier and type in the password. You should see a "successfully created" message after this.
+- Add the cert to the relevant key vault: Navigate to this key vault and find the cert (decree-absolute-apply-divorce-service-gov-uk in this case), click new version > import > upload the cert.pfx file downloaded earlier and type in the password. You should see a "successfully created" message after this.
 
 
 

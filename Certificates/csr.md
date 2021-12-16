@@ -65,8 +65,8 @@ There's some changes to make to these instructions before raising a PR:
 - Add the record: It's important to keep the full stop at the end of the CNAME.
  
 The changes made in the PR for this example would look like this:
-`- name:  "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"__
-   ttl: 300__
+`- name:  "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"\
+   ttl: 300\
    record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   
@@ -75,7 +75,7 @@ You can then raise a pull request [here](https://github.com/hmcts/azure-public-d
 ### Upload certificate to Azure
   
 - For this step, clone [this](https://github.com/hmcts/rdo-ssl-creation)repo locally, make sure you're on the correct branch by checking the readme. 
-- Convert the .txt cert file to .p7b. `openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b`. Note that Digi2al procured original certs will need the comodoca.crt cert chain in place of cert-chain: found in the makepfx folder.
+- Convert the .txt cert file to .p7b with this command: `openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b`. Note that Digi2al procured original certs will need the comodoca.crt cert chain in place of cert-chain: found in the makepfx folder.
 - Then you can navigate to the Azure Portal and find the relevant certificate in the "infra-cert-prod" vault, in this example it's "decree-absolute-apply-divorce-service-gov-uk". Click Certificate Operation > Merge Signed Request, and then upload the .p7b file created in the previous instruction. After this merge show status as complete, you've successfully renewed/procured the certificate.
   
 ### Send a certificate to be used by a 3rd Party

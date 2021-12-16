@@ -5,7 +5,7 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 ## Mailrelay Essentials
 
 
-## How to On-board Clients
+### How to On-board Clients
 
 Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault. The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 

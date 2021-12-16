@@ -65,8 +65,14 @@ There's some changes to make to these instructions before raising a PR:
 - Add the record: It's important to keep the full stop at the end of the CNAME.
  
 The changes made in the PR for this example would look like this:
+  
+  
 `- name:  "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute"
+  
+  
    ttl: 300
+  
+  
    record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   

@@ -93,11 +93,9 @@ This step is only required if the certificate is being placed elsewhere or being
   
   
   
-### Guidance for SDS & PET certificates only
+### Guidance for PET certificates only
   
-For some certs the process is slightly different, example certs include
-juror-bureau.justice.gov.uk
-reply-jury-summons.service.gov.uk
+For some certs the process is slightly different, for example: helpwithcourtfees.service.gov.uk
 
 - Download pfx of the renewed cert from the vault.
 - Convert to base 64 `openssl base64 -in ~/Downloads/traefik-jb.pfx -out ~/Downloads/traefik-jdbase64.kl`.

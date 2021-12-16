@@ -88,12 +88,6 @@ This step is only required if the certificate is being placed elsewhere or being
 - Add the cert to the relevant key vault: For this example, it would be "cft-apps-prod". Navigate to this key vault and find the cert (decree-absolute-apply-divorce-service-gov-uk), click new version > import > upload the cert.pfx file downloaded earlier and type in the password. You should see a "successfully created" message after this.
 
 
-### Flip the front door
-
-This is a non-disruptive step and can be done as soon as the new cert has been uploaded.
-- Go to Front-Doors in the Azure Portal and choose the relative environment.
-- Go to "Front Door Designer" and select the relevant frontend.
-- Update the 'secret version' to match the latest one.
 
   
 ### Update the CDN profile

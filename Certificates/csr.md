@@ -91,12 +91,6 @@ This step is only required if the certificate is being placed elsewhere or being
 
 
   
-### Update the CDN profile
- 
-- Search CDN in Azure portal, navigate to the CDN profile for hmcts-shutter-prod on Azure. find the service, in this case the apply-divorce.service.gov.uk is being renewed, so I will click on the hmcts-shutter-div.
-- Find and click on the corect endpoint, after this another set of endpoints will show, click the correct one again.
-- Change the secret version to latest, and double check that it matches with the cert updated in "cft-apps-prod".
-- Save your changes.
   
   
 ### Guidance for SDS & PET certificates only

@@ -64,16 +64,9 @@ There's some changes to make to these instructions before raising a PR:
 - TTL: Add a time to live, 300 is the usual TTL used here.
 - Add the record: It's important to keep the full stop at the end of the CNAME.
  
-The changes made in the PR for this example would look like this:
-  
-  
-`- name:  "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute"
-  
-  
-   ttl: 300
-  
-  
-   record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
+The changes made in the PR for this example would look like this: `- name:  "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute"  
+  ttl: 300
+  record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   
 You can then raise a pull request [here](https://github.com/hmcts/azure-public-dns) to add this DNS record to the corresponding yml file, which in this example would be "apply-divorce-service-gov-uk.yml", following the same formatting previous requests have used. After the PR is merged and the build finishes, check the DNS has propagated successfully [here](https://mxtoolbox.com/) before the next step.

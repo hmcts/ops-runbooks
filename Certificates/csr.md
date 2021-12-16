@@ -74,7 +74,7 @@ After the PR is merged and the build finishes, check the DNS has propagated succ
   
 ### Upload certificate to Azure
   
-- For this step, clone [rdo-ssl-creation](https://github.com/hmcts/rdo-ssl-creation) repository locally, make sure you're on the correct branch by checking the readme. 
+- For this step, clone [rdo-ssl-creation](https://github.com/hmcts/rdo-ssl-creation) repository locally, ** make sure you're on the correct branch by checking the readme **. For example Mac users should check out to the openssl-mac-branch.
 - Convert the .txt cert file to .p7b with this command: `openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b`.
 - Then you can navigate to the Azure Portal and find the relevant certificate in the "infra-cert-prod" vault, in this example it's "decree-absolute-apply-divorce-service-gov-uk". Click Certificate Operation > Merge Signed Request, and then upload the .p7b file created in the previous instruction. After this merge show status as complete, you've successfully renewed/procured the certificate.
   

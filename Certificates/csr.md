@@ -60,13 +60,13 @@ You will receive an email back asking you to point the DNS, this email will look
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
   
 There's some changes to make to these instructions before raising a PR:
-- Convert the name to lowercase, and remove the top level domains after the application. So "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk" from the example would become `-name: "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"` in the yml file.
+- Convert the name to lowercase, and remove the top level domains after the application. So "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk" from the example would become: `-name: "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"` in the yml file.
 - TTL: Add a time to live, 300 is the usual TTL used here.
 - Add the record: It's important to keep the full stop at the end of the CNAME.
  
 The changes made in the PR for this example would look like this:
-`- name:  "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"
-   ttl: 300
+`- name:  "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"__
+   ttl: 300__
    record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   
@@ -95,7 +95,6 @@ This is a non-disruptive step and can be done as soon as the new cert has been u
 - Go to Front-Doors in the Azure Portal and choose the relative environment.
 - Go to "Front Door Designer" and select the relevant frontend.
 - Update the 'secret version' to match the latest one.
-  https://tools.hmcts.net/confluence/download/attachments/1411089833/image%20copy.png?version=1&modificationDate=1592210851155&api=v2![image](https://user-images.githubusercontent.com/47995122/146364150-b0983936-de93-493e-99c1-c72a17e7a5bf.png)
 
   
 ### Update the CDN profile

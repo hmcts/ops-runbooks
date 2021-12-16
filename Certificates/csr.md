@@ -69,7 +69,8 @@ The changes made in the PR for this example would look like this: `- name:  "_EB
   record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   
-You can then raise a pull request [here](https://github.com/hmcts/azure-public-dns) to add this DNS record to the corresponding yml file, which in this example would be "apply-divorce-service-gov-uk.yml", following the same formatting previous requests have used. After the PR is merged and the build finishes, check the DNS has propagated successfully [here](https://mxtoolbox.com/) before the next step.
+You can then raise a pull request in [azure-public-dns](https://github.com/hmcts/azure-public-dns) to add this DNS record to the corresponding yaml file, which in this example would be `apply-divorce-service-gov-uk.yml`.
+After the PR is merged and the build finishes, check the DNS has propagated successfully with something like [mxtoolbox](https://mxtoolbox.com/) before the next step.
   
 ### Upload certificate to Azure
   

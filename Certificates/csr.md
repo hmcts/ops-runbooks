@@ -60,13 +60,13 @@ You will receive an email back asking you to point the DNS, this email will look
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
   
 There's some changes to make to these instructions before raising a PR:
-- Convert the name to lowercase, and remove the top level domains after the application. So "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk" from the example would become: `-name: "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"` in the yml file.
+- Remove the top level domains after the application. So "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk" from the example would become: `-name: "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute"` in the yml file.
 - TTL: Add a time to live, 300 is the usual TTL used here.
 - Add the record: It's important to keep the full stop at the end of the CNAME.
  
 The changes made in the PR for this example would look like this:
-`- name:  "_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"\
-   ttl: 300\
+`- name:  "_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute"
+   ttl: 300
    record: "CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   
   

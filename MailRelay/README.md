@@ -143,9 +143,12 @@ Pre requisites
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 
 * The [Prometheus alerts](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated 
 
+<!--
 ### Grafana
 
 *more to be added*
+
+-->
 ## Troubleshooting Common Errors 
 
 Alerts are not being sent to Slack 

@@ -28,7 +28,9 @@ Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails 
 
 1. Mailrelay AKS deployment
 
-Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
+An Exim Mailrelay container is built via Docker and stored in the ACR Azure image repository.  It's based on the featherweight image Alpine as defined in the git repo [Docker Exim Relay Image](https://github.com/hmcts/exim-relay) and is built via an Azure DevOps pipeline.
+
+Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01 as two replicas. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
 
 2. Modifying the exim.conf File 
 
@@ -38,7 +40,11 @@ The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file 
    
 Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
 
-*more to be added*
+The following certificates are installed in the Docker image which is the source of the mailrelay container:
+
+    dev-mailrelay-platform-hmcts-net
+    prod-mailrelay-platform-hmcts-net
+    dev-in.mailrelay.internal.platform.hmcts.net (self signed)
 
 ## Deployment
 

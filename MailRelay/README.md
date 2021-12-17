@@ -7,7 +7,7 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 
 ### How to On-board Clients
 
-Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault. The Username will be the service name; the password should be randomly generated and be sufficiently complex.
+Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault ([Dev: sds-mailrelay-dev](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets), [Prod: sds-mailrelay-prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview)). The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
 1. Create a new secret in Key Vault and associate a complex password
 2. Branch off the [Flux](https://github.com/hmcts/shared-services-flux) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/shared-services-flux/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.

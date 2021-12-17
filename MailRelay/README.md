@@ -26,13 +26,13 @@ The syntax is as follows:
 
 Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .
 
+1. Mailrelay AKS deployment
+
 Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical. 
 
 2. Modifying the exim.conf File 
 
-The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file is written with makefile, you can find more information in the [makefile tutorial](https://makefiletutorial.com/)
-
-*more to be added*
+The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file specifies the configuration and behaviour of the mailrelay service in terms of security (hosts that can use the system to route mail, authentication), DNS settings (domain names, routing), protocols and many other settings.  It's created with makefile which collects together a group of related actions into a single build file that when executed compiles or performs some processing to create artifacts.  Read more about makefile here: [makefile tutorial](https://makefiletutorial.com/).  
 
 3. Authentication Mechanisms 
    

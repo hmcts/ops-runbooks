@@ -164,13 +164,10 @@ kubectl logs -f -c alertmanager alertmanager-kube-prometheus-stack-alertmanager-
 wget --header "content-type: application/json" --post-data '[{"status": "firing","labels": {"alertname": "EximQueueLength","service": "mailrelay","severity": "warning","instance": "0"}}]' http://localhost:9093/api/v1/alert
 ```
 
-*more to be added*
 ## Performance Testing 
 
 *more to be added*
-## Onboarding & Migrating Customers 
 
-*more to be added*
 ## Further Links 
 
 * https://www.exim.org/docs.html

@@ -10,7 +10,7 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault ([Dev: sds-mailrelay-dev](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets), [Prod: sds-mailrelay-prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview)). The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
 1. Create a new secret in Key Vault and associate a complex password
-2. Branch off the [Flux](https://github.com/hmcts/shared-services-flux) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/shared-services-flux/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
+2. Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
 
 The syntax is as follows:   
 
@@ -62,8 +62,8 @@ The following certificates are installed in the Docker image which is the source
 
 In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for. 
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
-* Clone the shared-services-flux [repo](https://github.com/hmcts/shared-services-flux) 
-* change the tag to the latest tag number in the [patches file](https://github.com/hmcts/shared-services-flux/tree/master/k8s/release/mailrelay/mailrelay/patches)  
+* Clone the sds-flux-config [repo](https://github.com/hmcts/sds-flux-config) 
+* change the tag to the latest tag number in the [patches file](https://github.com/hmcts/sds-flux-config/tree/master/k8s/release/mailrelay/mailrelay/patches)  
 * Add and Commit changes  
 * Review as required
 * Merge branch with Master.
@@ -141,7 +141,7 @@ Pre requisites
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 * The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server 
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels. 
-* The [Prometheus alerts](https://github.com/hmcts/shared-services-flux/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated 
+* The [Prometheus alerts](https://github.com/hmcts/sds-flux-config/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated 
 
 <!--
 ### Grafana

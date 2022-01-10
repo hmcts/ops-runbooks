@@ -8,12 +8,12 @@ This involved:
 2. Run a terraform plan to ensure only change was disk expansion.
 3. Run a terraform apply.
 
-However, soon after this CGI raised an incident. It seemed that the deallocation of the server (during the terraform apply) had caused the drives to mount in the wrong order. This was resolved by a server restart and CGI manually starting the required services for the oracle DB.
+However, soon after this CGI raised an incident. It seemed that the deallocation of the server (during the terraform apply) had caused the drives to mount in the wrong order. This was resolved by a server restart and CGI manually starting the required services for the Oracle DB.
 
 ## Working Solution
 It was clear that the inital solution wouldn't be viable. From there a strategy was drawn up, tested and successfully carried out in production that didn't involve deallocating the server.
 
-Discovered during NLE testing, it is important CGI are available for changes in order to stop/start services to avoid an outage.
+Discovered during NLE testing, it is important CGI are available for disk expansion changes in order to stop/start services to avoid an outage.
 
 Steps:
 1. Check disks attached to VM and note the *LUN* of the disk that needs resized.

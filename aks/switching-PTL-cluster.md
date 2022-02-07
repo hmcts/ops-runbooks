@@ -48,7 +48,7 @@ return true
 
 * Now there should be no jobs running within Jenkins. Now you can need to delete all the agents that are within Jenkins [here](https://build.platform.hmcts.net/computer/). You can delete them manually or script it if easier.
 
-* Now you can shut Jenkins down via this [page](Go to this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
+* Now you can shut Jenkins down via this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
 
 * The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG.
 

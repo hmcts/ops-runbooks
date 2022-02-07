@@ -1,0 +1,87 @@
+# How to switch PTL Clusters Runbook
+
+Previously we moved away from ARM templates for the AKS cluster creation to Terraform from the old release pipeline [here](https://dev.azure.com/hmcts/CNP/_release?definitionId=16&view=mine&_a=releases) to this new one [here](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary).
+
+This wiki page documents some tasks that we had to perform when switching over PTL jenkins to Terraform and new infra. We don't expect this will need to be done again, however just incase it does the following information will likely be useful.
+
+
+## Change Request
+
+So, if you are bringing destroying / rebuilding the PTL cluster then you are going to need a Change Request to be raised as it will prevent teams from using Jenkins as a Path to live while it is unavailable. For example when moving PTL Jenkins to a new cluster recently we had to raise this [CR](https://mojcppprod.service-now.com/nav_to.do?uri=change_request.do?sys_id=0165575f1b3c01103d11a75b234bcbed) 
+
+## How to move PTL Jenkins to a new cluster
+
+So there are several steps to follow to move PTL Jenkins to a new cluster. These are:
+
+* Go to this [page](https://build.platform.hmcts.net/quietDown). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will put Jenkins into Quiet mode in preparation for a restart and will prevent any new jobs from starting.
+
+* In Jenkins and go to the [script console](https://build.platform.hmcts.net/script) and run the script below to cancel any current running jobs
+
+```command
+Jenkins.instance.queue.items.findAll { !it.task.name.contains("Extenda") }.each { 
+  println "Cancel ${it.task.name}"
+  Jenkins.instance.queue.cancel(it.task)
+}
+Jenkins.instance.items.each {
+  stopJobs(it)
+}
+def stopJobs(job) {
+  if (job in jenkins.branch.OrganizationFolder) {
+    // Git behaves well so no need to traverse it.
+    return
+  } else if (job in com.cloudbees.hudson.plugins.folder.Folder) {
+    job.items.each { stopJobs(it) }
+  } else if (job in org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) {
+    job.items.each { stopJobs(it) }
+  } else if (job in org.jenkinsci.plugins.workflow.job.WorkflowJob) {
+    if (job.isBuilding() || job.isInQueue() || job.isBuildBlocked()) {
+      job.builds.findAll { it.inProgress || it.building }.each { build ->
+        println "Kill $build"
+        build.finish(hudson.model.Result.ABORTED, new java.io.IOException("Aborted from Script Console"));
+      }
+    }
+  }
+}
+
+return true
+```
+
+* Now there should be no jobs running within Jenkins. Now you can need to delete all the agents that are within Jenkins [here](https://build.platform.hmcts.net/computer/). You can delete them manually or script it if easier.
+
+* Now you can shut Jenkins down via this [page](Go to this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
+
+* The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG.
+
+* If the Jenkins disk location has changed as per previous step then you will need to make an update in Flux to point to the new location [here](https://github.com/hmcts/cnp-flux-config/blob/ad4d68fc8bf1fa95067852c7c8be9687ff79fe87/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8). However if the location of the disk isn't changing then this step can be ignored.
+
+* Update database subnet whitelisting to new infrastructure, example [here](https://github.com/hmcts/cnp-database-subnet-whitelisting/pull/115).
+
+* Update DNS to point to new PTL load balancer IP, example [here](https://github.com/hmcts/azure-private-dns/pull/319).
+
+* Update dbrule for PTL example [here](https://github.com/hmcts/cnp-aks-pipelines/pull/154).
+
+* Update the palos to add the new vnet, example [here](https://github.com/hmcts/rdo-terraform-hub-dmz/pull/529).
+
+* Now we can destroy the cluster via this [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483). Just ensure you select the environment to PTL.
+
+* Once destroyed use the same pipeline and select the PTL environment and Apply to rebuild the cluster.
+
+* If any of the CIDR ranges have changed for the environment then you will need to updatethe F5 VPN routing, for which instructions are located within Confluence [here](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1507734212&__ncforminfo=jg5-z5dXO0uZNKs1UZKpEsg48dZNWXS6DXzxmNeJhRkVC5PVcmM1mwR3RjBL1u4SB8kNYsqIdl4=&__ncforminfo=PRBS3dnbiHelqAx5qdwuNiFxIcFGqUacblP4UYHTaS97GYb3xICFZ4MTZfumUVbjpZvV9yrWH-5uyXJcbSWrsxLeIy7RYbmyXl8jO9VW6xk=&__ncforminfo=Ek1uRjDv4p5aw9vBhQ3AFJlMRxxagHNKs4eFYMr0Cbtt6o09_xzmmd6YmOh7ZFBMGwli3bZw4FhWMQ6CERx0Jk4WWQpcZlyNhu1uBGiwaYbSib-SGwDOJg==&__ncforminfo=-mah-qGlXr3eKnJtMbGIu0TQiMjkvpsVjCdBK8ISvWyRfvnoK8a3hzENJZpLmYJBAP8eq4nor3UJulDEPD7638eG5db4_nSvzRGBz7oMFG0nx_y3jvuv15qmOTSIc3TU&__ncforminfo=bcwN5ndJOQfhzfdjxxhD1EUDUza6crAsTtIFeQG4oO7YHaVLE1f_tqmEe6RXpBmChniNSDPOsg1vGne-v22wKUTg4wBerXasPM8405tR_W3HaxhTdlk_l3s-OSTTdNvqGvr6IC3YYDM=&__ncforminfo=ibnVBMVvg-eF2oyZooi87nbWmngpp0tyuPdtuGf1wuoWDm2MxT9JphFEzEROnPXvQ60aq4UdTixEgp3u8zc2oOIcim8vXHjkZA-BUeRtAmRVjCi2xVlTi5IqmyEOaDWkGMnhAw_3iM9JV3aPEFci_g==&__ncforminfo=dXUCes0IB07ZUaVSrf-aab3xMzbh_zF2QNe84ibKD16lj-sdjQTXI7l6sy4tI1aED-uzXHmx0L0Z-HCycTucQdVOXHyXCdpIFP7v9NDyk3cWpHoFjy7pwReRUWb08R3DuOZnWJe3PIO8ElaEHXLLmscB2jyjOos6&__ncforminfo=hzwXbbmVk8Hhxa4LkczkGSGCn1PDWQ0Bx9qRXEeTPY91B3Fbexn8bIjHYabsZJs5q4LNTYKr_dpObK946RxpAhEBvqQe3JHu-08Iy4cZil90qdAjQ3DKgLpT0PxWJ2w1pArkNaHvXOblJLyD8XpLkYLq7nn9CQyA77feB8Cymyw=&__ncforminfo=jOx7Nh1lgnTN41nobqt27ZJWLdip1CCUEWrthbjvGapn3uQoEnNORHZCOc5iCiK0z8csgtXiagNV3TQstUNDHgOQ64vu9_dCpr8T5_TBiGa9Z1U93o10srRkCbSXNNHP8fr1zNdNScDgAuNh5t4xBDjs9cuukb8OOJQ5V2WRIgkx9oCad0fKcA==&__ncforminfo=UaMRZYtR1OBcHmeefiIronvHkrYabMuSDYnTA4P4j7LyZ4WfKXXWF2bHUgZlqrdWDDToQwU8VRjsirw9419LFChyycKRrZWkcbuAOZn9ay_kzB83rzEwZN8_EMP5NyvdtdJH3kJicw3ZedR92HMyVsOUWLcLJh6B1yKBlXs8LT6O-PmUVHUVFLLhFhvMNzoX).
+
+* If the load balancer IP has changed, you will also need to update local traffic within the F5 VPN too. Within the F5 VPN browse to **Local Traffic** on the main menu, then select **Pools** and **Pool List**. There is currently six pools listed, however you need to make updates to the following named pools **pool_build-beta.platform.hmcts.net**, **pool_response-api.platform.hmcts.net** and **pool_response.platform.hmcts.net**. Within each of these pools you will need to click on **Members** and add a new member, I would recommend looking at the existing member and copying everything into a new member except the Address which will need to be substituted with the new load balancer IP. Finally, ensure that you **Disable** the old member and then **Enable** the newly entered member before clicking on the **Update** button.
+
+* Now log back into Jenkins (it may take a while to come back) and once logged in run the cnp-plum-recipes-service [job](https://build.platform.hmcts.net/view/Platform/job/HMCTS_CNP/job/cnp-plum-recipes-service/job/master/) and confirm it is successful.
+
+* Providing the cnp-plum-recipes-service job was successful Jenkins should now be fine.
+
+## Gotcha's
+
+* On the last switchover, we noticed the next day that a few Jenkins jobs were failing to connect to several storage accounts. To get around this it was a case of going into the Networking section of the storage account and adding the vnet there for the new vnet that is associated with the PTL environment to cover the subnets named **aks-00**, **aks-01** and **iaas**.
+
+* On storage accounts again, there were three storage accounts which we had to add DNS records of into [this](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net) private dns zone for the storage accounts named as **reformscanaat**, **reformscanstaging** and **reformscanprod** as those storage accounts were using private endpoints.
+
+* There were agents within Jenkins which were randomly going offline and being deleted while jobs where still using them. Thankfully Tim found the cause of this issue [here](https://issues.jenkins.io/browse/JENKINS-56535?focusedCommentId=363823&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-363823). It was basically caused by the old PTL Cluster not fully stopping before switching over, this meant that the old Jenkins cluster kept deleting agents as they weren't being used by it. Once the old cluster was fully stopped agents were no longer being deleted while being used.
+
+## Troubleshooting
+
+* Once the cluster is up and running and if you see that the Jenkins pods keep rebooting then you can kubectl exec into pod or use Lens app to do this and then a script in place to put Jenkins into Quiet mode to prevent any jobs from starting at startup. Steps to do this are [here](https://support.cloudbees.com/hc/en-us/articles/203737684-How-can-I-prevent-jenkins-from-starting-new-jobs-after-a-restart-). When I encountered this issue previously I found it quicker to exec into the pod via the Lens app but if you can do it via the command line that is fine. Once Jenkins is back up with that script in place you should be able to look at logs and troubleshoot further if needed.

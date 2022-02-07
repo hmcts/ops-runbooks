@@ -1,0 +1,26 @@
+# Change Request's in Service Now
+
+As we don't often have to raise Change Requests people often forget the process of what is needed. So, these steps will hopefully help you raise a Change Request.
+
+## How to clone a Change Request in Service Now
+
+First of, if you have a change that needs to be made and know of the same kind of change being done previously and know the Change Request number that was used for that, then you can clone it as per below steps. I would recommend copying another change if possible as it will more often than not have the correct configuration already set and should just be as simple as you updating it with the new information on what is going to be changed with new times and dates etc.
+
+1. Login into Service Now and open the Change Request you want to clone.
+2. Click on the blue Copy Change button - shown below <br> ![copy-change](copy-change.png).
+3. You may get asked for confirmation of change type where you can just click on ok (if copying another CR) <br> ![confirmation-change-type](confirmation-change-type.png).
+4. Now its just a case of you going through each section of the Change and updating each field for your planned change. Once you have updated click on save and submit. If you are missing any information preventing the Change Request being submitted then Service Now will tell you when you attempt to submit it.
+
+## How to create a Change Request in Service Now
+
+To create a Change Request from a blank canvas perform the following steps.
+
+1. Open Service Now and on the left hand side bar, look for **Change**, and then click on **Create New** just below that. This will then give you a several options as shown below <br> ![create-new-change-request](create-new-change-request.png).
+
+2. Under All Service Portfolios, select the type of change you require and once you do, you should be presented with a empty Change Request like below <br> ![blank-change-request](blank-change-request.png). 
+
+3. Now you need to go through each section of the Change Request and ensure that all fields are completed before being submitted. If unsure on any of the information that should be put into the fields of the Change Request, then you can refer to the [Change Management Knowledge Base Articles](https://mojcppprod.service-now.com/nav_to.do?uri=%2Fwizard_view.do%3Fsysparm_wizardAction%3Dsysverb_new%26sysparm_stack%3Dchange_request_list.do%26sysparm_parent%3D8db4a378c611227401b96457a060e0f4%26sys_target%3Dchange_request) for more information or the Change Management process mentioned in the next section for contacts to direct queries at.
+
+## Change Management Process
+
+There is a page within Confluence on the Change Management process which has some useful contacts too if there are any issues / queries when it comes to raising Change Requests. This confluence page can be found [here](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=DIP&title=Change+Management+Process+Page+1&__ncforminfo=1o4ynxfM2ltOrMW13oXq4jbZVK6ty1ldsLgwnEccS43e1w_uJXuugjl6OqVT4AB7EBtZ9CeUeoZwGCW4FPb39g==#ChangeManagementProcessPage1-WhatisChangeManagement)

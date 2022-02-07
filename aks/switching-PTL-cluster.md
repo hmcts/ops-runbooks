@@ -50,7 +50,7 @@ return true
 
 * Now you can shut Jenkins down via this [page](Go to this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
 
-* The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG. 
+* The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG.
 
 * If the Jenkins disk location has changed as per previous step then you will need to make an update in Flux to point to the new location [here](https://github.com/hmcts/cnp-flux-config/blob/ad4d68fc8bf1fa95067852c7c8be9687ff79fe87/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8). However if the location of the disk isn't changing then this step can be ignored.
 

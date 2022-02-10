@@ -41,15 +41,20 @@ N/A
 
 ### Management Sandbox
 
+#### Before deployment of a cluster
+
 As this environment only tends to be used by IDAM, you need to confirm with Paul Verity that the Sandbox Jenkins instance which sits on this cluster isn't being used and that he is ok with the work to go ahead. The sandbox Jenkins instance can be logged into [here](https://sandbox-build.platform.hmcts.net/).
 
-Prior to redeploying this cluster, it is advised to confirm that the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) job runs successfully.
+Confirm that the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) job within Jenkins runs successfully.
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to **PTLSBOX** before clicking on **Run**. 
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to **PTLSBOX** before clicking on **Run**. 
+* Run this [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) to destroy the existing cluster, the environment is **PTLSBOX**.
 
-* Once the cluster has been redeployed and Jenkins is backup, test the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) job again to confirm it runs successfully as it did before (it should).
+* Run the same [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) again to apply to the cluster, the environment is **PTLSBOX**. 
+
+#### After deployment of a cluster
+
+Once the cluster has been redeployed and Jenkins is back up and running, test the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) job again to confirm it runs successfully as it did before (it should).
 
 ### ITHC
 

@@ -12,7 +12,7 @@ Consult the [database runbook](https://github.com/hmcts/ops-runbooks/tree/master
 
 3. Note the `last_modified` fields of the affected records.
 
-Every postgres database in use by the project should maintain a field called `last modified` in every table. Like the name would suggest, this stores a timestamp showing when the record was last updated. We are going to compare this timestamp to the timestamp of the same record in Elasticsearch to verify that this is indeed a sync issue between the database and Elasticsearch. If the timestamps match on the records, this may hint to the actual problem lying elsewhere.
+Many postgres databases used by the project such as CCD data store maintain a field called `last modified` in several of their tables. This is a field managed by postgres itself and like the name would suggest, it stores a timestamp showing when the record was last updated. We are going to compare this timestamp to the timestamp of the same record in Elasticsearch to verify that this is indeed a sync issue between the database and Elasticsearch. If the timestamps match on the records, this may hint to the actual problem lying elsewhere.
 
 To get the timestamp of the affected record, you'll need to query the database. Here's an example of such a query for a table in CCD:
 

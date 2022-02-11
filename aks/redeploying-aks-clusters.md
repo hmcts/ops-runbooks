@@ -43,14 +43,19 @@ N/A
 
 #### Before deployment of a cluster
 
+**Warning** - If you need to destroy this existing cluster then please ensure that you take a snapshot of the Jenkins disk (once the cluster has been stopped) that Sandbox Jenkins uses which runs on this cluster, the location can be obtained from [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8). Ensure that the snapshot is placed somewhere safe so that it can be used to take create a new disk. The reason for taking this snapshot is that the Jenkins disk is a persistent disk which on a recent destroy of the PTLSBOX cluster ended up also deleting that jenkin disk. As a result this meant that upon the cluster being re-deployed there was no Jenkins Disk available therefore Jenkins would not work at all until a the Jenkins disk was recreated from a previously taken snapshot.  
+
 As this environment only tends to be used by IDAM, you need to confirm with Paul Verity that the Sandbox Jenkins instance which sits on this cluster isn't being used and that he is ok with the work to go ahead. The sandbox Jenkins instance can be logged into [here](https://sandbox-build.platform.hmcts.net/).
 
 Confirm that the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) job within Jenkins runs successfully.
 
+* Stop the cluster and once the cluster has fully stopped take a snapshot of the disk referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8) and ensure it is placed somewhere safe so that we can re-use this snapshot to re-create the jenkins disk after the cluster has been redeployed.
 
 * Run this [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) to destroy the existing cluster, the environment is **PTLSBOX**.
 
 * Run the same [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) again to apply to the cluster, the environment is **PTLSBOX**. 
+
+* Once the pipeline to deploy the cluster has completed, refer to the snapshot previously taken and create a new disk from it named as **jenkins-disk** ensuring it is placed in the location referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8).
 
 #### After deployment of a cluster
 
@@ -152,15 +157,23 @@ Scaling to happen just before a cluster has been removed from AGW.
 - Confirm pods are back to correct numbers after revert
 
 ### Management (cftptl-intsvc)
+
+**Warning** - If you need to destroy this existing cluster then please ensure that you take a snapshot of the Jenkins disk (once the cluster has been stopped) that Sandbox Jenkins uses which runs on this cluster, the location can be obtained from [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8). Ensure that the snapshot is placed somewhere safe so that it can be used to take create a new disk. The reason for taking this snapshot is that the Jenkins disk is a persistent disk which on a recent destroy of the PTLSBOX cluster ended up also deleting that jenkin disk. As a result this meant that upon the cluster being re-deployed there was no Jenkins Disk available therefore Jenkins would not work at all until a the Jenkins disk was recreated from a previously taken snapshot.  
+
+#### Before deployment of a cluster
+
 - Make an announcement that Jenkins will be unavailable. This environment is best to be done early in the morning. Example announcement to send in the cloud-native-announce slack channel is:-
 
 > Hi @here,
 > Due to planned upgrades of AKS, we will be upgrading the management (cftplt-intsvc) cluster at 8am, Monday 26th April. As a result of this, Jenkins will be offline during the upgrade and > unavailable for around one hour.>
 
+* Stop the cluster and once it has has fully stopped take a snapshot of the disk referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8) and ensure it is placed somewhere safe so that we can re-use this snapshot to re-create the jenkins disk after the cluster has been redeployed.
+
 * Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to **PTL** before clicking on **Run**. 
 
 * Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to **PTL** before clicking on **Run**. 
 
+* Once the pipeline to deploy the cluster has completed, refer to the snapshot previously taken and create a new disk from it named as **jenkins-disk** ensuring it is placed in the location referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8).
 
 #### After deployment of a cluster
 

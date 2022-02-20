@@ -13,7 +13,11 @@ Warning  FailedScheduling  20m (x745 over 24m)   default-scheduler  0/72 nodes a
 `
 
 - This happens when there is capacity issue on specific cluster nodes
-- The pod is stuck in a `pending` state
-- Deleting the pod does not fix issue as pod restarts and goes into same `pending` state
-- Identify and delete or more non-DaemonSet pods to move to a different node
-- If delete pods are stuck in `Terminating`, use `kubectl delete pod <podname> --grace-period 0 --force` to forcefully delete
+- DaemonSet rolling update is blocked with the pod stuck in a `Pending` state
+- Deleting the pod does not fix issue as pod restarts and goes into same `Pending` state
+  
+- Run `kubectl get pod <podname> -o yaml | grep nodeName` to identify node where pod scheduling has failed
+- Run `kubectl get pods -A | grep <node name>` to list all pods running on node
+- Identify and delete or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node  
+- If deleted pods are stuck in `Terminating`, use `kubectl delete pod <podname> --grace-period 0 --force` to forcefully delete
+- Confirm DaemonSet pod now starts successfully

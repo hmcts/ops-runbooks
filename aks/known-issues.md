@@ -2,7 +2,7 @@
 
 Known issues encountered during AKS cluster update or rebuild
 
-## 1. DaemonSet Failed Scheduling
+## DaemonSet Failed Scheduling
 
 For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.  
 

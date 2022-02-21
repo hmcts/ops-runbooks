@@ -13,7 +13,7 @@ An error similar to the below may be seen in the cluster events log:
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state
 - Deleting the pod does not fix issue as pod restarts and goes into same `Pending` state
   
-- Run `kubectl get pod <podname> -o yaml | grep nodeName` to identify node where pod scheduling has failed
+- Run `kubectl get pod <podname> -o yaml | grep nodeName` to identify the node where pod scheduling has failed
 - Run `kubectl get pods -A | grep <node name>` to list all pods running on node
 - Identify and delete or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node  
 - If deleted pods are stuck in `Terminating` state, use `kubectl delete pod <podname> --grace-period 0 --force` to forcefully delete pod

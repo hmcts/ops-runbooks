@@ -8,9 +8,6 @@ For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying 
 
 An error similar to the below may be seen in the cluster events log:  
   
-`
-Warning  FailedScheduling  20m (x745 over 24m)   default-scheduler  0/72 nodes are available: 23 node(s) didn't match node selector, 43 node(s) didn't have free ports for the requested pod ports, 45 Insufficient cpu.
-`
 
 - This happens when there is capacity issue on specific cluster nodes
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state

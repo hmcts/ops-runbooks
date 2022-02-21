@@ -9,7 +9,7 @@ For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying 
 An error similar to the below may be seen in the cluster events log:  
   
 
-- This happens when there is capacity issue on specific cluster nodes
+- This happens when there is a capacity issue on specific cluster nodes
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state
 - Deleting the pod does not fix issue as pod restarts and goes into same `Pending` state
   

@@ -2,7 +2,7 @@
 
 ## Updating Docmosis Variables
 
-- Clone [this](https://github.com/hmcts/cnp-flux-config) repository locally and checkout to a new branch before making any changes.
+- Clone [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) repository locally and checkout to a new branch before making any changes.
 - Run the following command:
 
  ```

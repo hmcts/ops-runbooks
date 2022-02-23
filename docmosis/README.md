@@ -10,7 +10,6 @@
 - Make sure to fill in all the {} placeholders accordingly. You can obtain {License Key}, {Admin Password}, and {Access Key} by connecting to the K8S cluster in the environment you're making the change in and running this command `kubectl get secret docmosis-secret -o yaml -n docmosis`.
 
 
-<img width="1111" alt="image" src="https://user-images.githubusercontent.com/47995122/153570220-84880e5e-419d-4244-9bdb-28023efb5bc7.png">
 
 - These values in the `data:` block are in base64, so run `echo "value" | base64 --decode` to decode, these are to be used as the placeholders.
 - Once the above step is done, if the environment is using FluxV1 run: 

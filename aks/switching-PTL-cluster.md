@@ -15,40 +15,25 @@ So there are several steps to follow to move PTL Jenkins to a new cluster. These
 
 * Go to this [page](https://build.platform.hmcts.net/quietDown). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will put Jenkins into Quiet mode in preparation for a restart and will prevent any new jobs from starting.
 
-* In Jenkins and go to the [script console](https://build.platform.hmcts.net/script) and run the script below to cancel any current running jobs
+* In Jenkins and go to the [script console](https://build.platform.hmcts.net/script) and run the script below to cancel any current running and queued jobs
 
 ```command
-Jenkins.instance.queue.items.findAll { !it.task.name.contains("Extenda") }.each { 
-  println "Cancel ${it.task.name}"
-  Jenkins.instance.queue.cancel(it.task)
-}
-Jenkins.instance.items.each {
-  stopJobs(it)
-}
-def stopJobs(job) {
-  if (job in jenkins.branch.OrganizationFolder) {
-    // Git behaves well so no need to traverse it.
-    return
-  } else if (job in com.cloudbees.hudson.plugins.folder.Folder) {
-    job.items.each { stopJobs(it) }
-  } else if (job in org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) {
-    job.items.each { stopJobs(it) }
-  } else if (job in org.jenkinsci.plugins.workflow.job.WorkflowJob) {
-    if (job.isBuilding() || job.isInQueue() || job.isBuildBlocked()) {
-      job.builds.findAll { it.inProgress || it.building }.each { build ->
-        println "Kill $build"
-        build.finish(hudson.model.Result.ABORTED, new java.io.IOException("Aborted from Script Console"));
-      }
-    }
-  }
+import jenkins.model.Jenkins
+
+def numCancels = 0;
+Jenkins.instance.getAllItems(Job.class).each{ 
+  def job = it
+  for (build in job.builds) {
+    if (build.isBuilding()) { build.doStop(); numCancels++; }
+  }  
 }
 
-return true
+println("${numCancels}");
 ```
 
 * Now there should be no jobs running within Jenkins. Now you can need to delete all the agents that are within Jenkins [here](https://build.platform.hmcts.net/computer/). You can delete them manually or script it if easier.
 
-* Now you can shut Jenkins down via this [page](Go to this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
+* Now you can shut Jenkins down via this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
 
 * The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG.
 

@@ -20,6 +20,6 @@ Steps:
 2. Manually unattach the disk that needs resized via Azure.
 3. Manually resize the disk on the portal.
 4. Manually attach the disk to the VM on the portal, ensuring the LUN noted in step 1 is used.
-5. Retrofit the changes within the terraform code. See [example](https://github.com/hmcts/oracle-azure-infrastructure/commit/9e99883b6b52274ae8c66ba0b3cb06f721ae311f)
+5. Retrofit the changes within the terraform code. See [example.](https://github.com/hmcts/oracle-azure-infrastructure/commit/9e99883b6b52274ae8c66ba0b3cb06f721ae311f)
 6. Request approval from someone on your team. Once approved merge your pull request.
 7. Run a terraform plan to ensure there are no changes.

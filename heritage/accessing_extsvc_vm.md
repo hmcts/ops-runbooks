@@ -1,22 +1,22 @@
 # Accessing Heritage EXTSVC Virtual Machines
 
-Many External Services VMs in Heritage are not networked into the HMCTS bastions in the way that the rest of reform is. This document details how to gain access to these VMs, using `POAG-WEB-VM01` as an example.
+Many External Services VMs in Heritage (also known as the spoke VMs) are currently not networked into the HMCTS bastions in the way that the rest of reform is. This document details how to gain access to these VMs, using `POAG-WEB-VM01` as an example.
 
-1. Find the appropriate Management VM
+1. Find the appropriate DevOps VM
 
-Rather than being networked into the Bastions directly, most EXTSVC VMs are only accessible from their management VM, which in turn are accessible from the HMCTS bastion. Exactly what management VM corresponds to the VM we're trying to get into may require some investigation if not readily known.
+Rather than being networked into the Bastions directly, most spoke VMs are only accessible from their management and devops VMs, which in turn are accessible from the HMCTS bastion. Either of these VMs will allow access to the spoke VM, but PlatOps should prefer access through the devops VM. Exactly what devops VM corresponds to the VM we're trying to get into may require some investigation if not readily known.
 
 Using our example of `POAG-WEB-VM01`, in the azure portal, we can see that it's connected to the `vnet-prod-ext-01` virtual network.
 
-If we have a look at the virtual network and search for a device that sounds vaguely management-related, we can see two network interfaces attached to `PEXT-MGMT-VM-W` and `PEXT-MGMT-VM-L`. Either of these machines will work, the only difference is that the former is marked 'W' and is running Windows and the latter is marked 'L' and is running Linux. Since our desired VM, `POAG-WEB-VM01` is running linux, we will have an easier time connecting to it from `PEXT-MGMT-VM-L`.
+If we have a look at the virtual network and search for a device that sounds vaguely devops-related, we can see a network interface attached to `PEXT-DEVOPS-VM01`. We can use this machine to access the spoke VM.
 
 ![Screenshot of vnet-prod-ext-01 in the Azure Portal](vnet-prod-ext-01_screenshot.png)
 
 2. Find and Obtain the Admin Private Key
 
-Both the EXTSVC VMs and the management VMs rely on private key authentication for incomming connections.  We'll need to find out what private keys the machines want. Thankfully this is fairly easy.
+Both the EXTSVC VMs and the DevOps VMs rely on private key authentication for incomming connections.  We'll need to find out what private keys the machines want. Thankfully this is fairly easy.
 
-If we have a look at the 'Connect' tab of `POAG-WEB-VM-01` in the Azure Portal, under 'SSH', we can see we'll need a private key called 'v1admin.pem'. `PEXT-MGMT-VM-L` shows the same key.
+If we have a look at the 'Connect' tab of `POAG-WEB-VM-01` in the Azure Portal, under 'SSH', we can see we'll need a private key called 'v1admin.pem'. `PEXT-DEVOPS-VM01` shows the same key.
 
 ![Screenshot of POAG-WEB-VM01 in the Azure Portal](POAG-WEB-VM01_screenshot.png)
 
@@ -35,7 +35,7 @@ Details on how to obtain bastion access can be found in [the Bastion documentati
 ssh bastion-prod.platform.hmcts.net
 ```
 
-5. SSH into the Management VM
+5. SSH into the DevOps VM
 
 You'll need to provide the private key to obtained in step 2 here. To do this, create a file and paste the value in. Name it something obvious so you don't forget what the key corresponds to. In this example, we'll use 'v1admin.pem'.
 
@@ -53,14 +53,14 @@ chmod 400 v1admin.pem
 You can then provide the key to SSH using the `-i` flag:
 
 ```
-# Connect to PEXT-MGMT-VM-L
+# Connect to PEXT-DEVOPS-VM01
 # Swap the IP out if connecting to a different VM
-ssh -i v1admin.pem v1admin@10.24.248.112
+ssh -i v1admin.pem v1admin@10.224.249.196
 ```
 
-6. SSH into the EXTSVC VM
+6. SSH into the spoke VM
 
-Finally we can SSH into the EXTSVC VM. The admin private key may be present in the home directory of the machine you just SSH-ed into, albeit under a different name. If it is, you can just plug it right into SSH and log in to the EXTSVC VM:
+Finally we can SSH into the spoke VM. The admin private key may be present in the home directory of the machine you just SSH-ed into, albeit under a different name. If it is, you can just plug it right into SSH and log in to the spoke VM:
 
 ```
 # Connect to POAG-WEB-VM01
@@ -68,7 +68,7 @@ Finally we can SSH into the EXTSVC VM. The admin private key may be present in t
 ssh -i v1adminkey v1admin@10.224.249.4
 ```
 
-You should now be connected to the EXTSVC VM. While making the three SSH jumps, it can be easy to lose track of what machine you're connected to, especially if doing work across multiple EXTSVC machines. If you're ever unsure, you can always check the hostname file to verify what machine you're on:
+You should now be connected to the spoke VM. While making the three SSH jumps, it can be easy to lose track of what machine you're connected to, especially if doing work across multiple spokes. If you're ever unsure, you can always check the hostname file to verify what machine you're on:
 
 ```
 cat /etc/hostname

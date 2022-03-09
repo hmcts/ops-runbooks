@@ -190,7 +190,7 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 
 - Check whether all deployments/ apps are up. `kubectl get hr -A` gives a quick snapshot of progress.
 - Swap backend application gateway in [azure-platform-terraform](https://github.com/hmcts/azure-platform-terraform/pull/622/files)
-- Swap active external dns deployments to route traffic to new cluster [Example PR](https://github.com/hmcts/cnp-flux-config/pull/7522/files)
+- Swap active external dns deployments to route traffic to new cluster [Example PR](https://github.com/hmcts/cnp-flux-config/pull/14659/files)
 - Delete inactive cluster using the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**.
 
 #### After Deployment of Cluster

@@ -160,6 +160,9 @@ Scaling to happen just before a cluster has been removed from AGW.
 
 **Warning** - If you need to destroy this existing cluster then please ensure that you take a snapshot of the Jenkins disk (once the cluster has been stopped) that Sandbox Jenkins uses which runs on this cluster, the location can be obtained from [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/ptl-intsvc/disk.yaml#L8). Ensure that the snapshot is placed somewhere safe so that it can be used to take create a new disk. The reason for taking this snapshot is that the Jenkins disk is a persistent disk which on a recent destroy of the PTLSBOX cluster ended up also deleting that jenkin disk. As a result this meant that upon the cluster being re-deployed there was no Jenkins Disk available therefore Jenkins would not work at all until a the Jenkins disk was recreated from a previously taken snapshot.  
 
+Anything configuration wise i.e jobs, secrets, and config is stored externally from the Jenkins server, no requirement to back up the server.
+See https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml
+
 #### Before deployment of a cluster
 
 - Make an announcement that Jenkins will be unavailable. This environment is best to be done early in the morning. Example announcement to send in the cloud-native-announce slack channel is:-

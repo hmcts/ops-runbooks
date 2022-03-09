@@ -181,7 +181,9 @@ After the cluster has been redeployed successfully and hr's / pods are running a
 
 ### Perftest
 - Confirm that the environment isn't being used with Nickin Sitaram before starting. 
-
+- Use slack channel pertest-cluster for communication.
+- Scale the number of active nodes, increase by 5 nodes if removing a custer. 
+  Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.
 ### Demo
 
 Demo runs only one cluster at a time due to some limitations in the current setup. 

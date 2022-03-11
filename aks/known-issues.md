@@ -8,7 +8,7 @@ For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying 
 
 An error similar to the below may be seen in the cluster events log:  
 
-![](images/oneagent_scheduling_error.png)
+![](Images/oneagent_scheduling_error.png)
 
 - This happens when there is a capacity issue on specific cluster nodes
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state
@@ -22,10 +22,9 @@ An error similar to the below may be seen in the cluster events log:
 
 ## Dynatrace oneagent pods not deployed or failing to start
 
-For a rebuilt or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a CrashLoopBackOff status.
+For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
 
-Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) the CRDs to be applied before installing the chart.  
-The CRDs currently need to be manually applied as they are not done by the existing Flux config.
+Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) the CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not done by the existing Flux config.
 
 Run the below on the cluster. An empty result confirms CRDs are not installed. 
 

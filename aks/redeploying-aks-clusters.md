@@ -139,7 +139,7 @@ It is important to identify applications with underlying issues and allow suffic
 - To identity failed Helm releases, run `kubectl get hr -A | grep -v Succeeded`  
 - To identify failed pods, run `kubectl get pods -A | grep -v Completed | grep -v Running`
 - Investigate failed helm releases and missing pods as required  
-- For failed helm releases where pods are not deployed, test if rolling back `helm rollback` is successful (which helps narrows down issue is specific to current release) 
+- For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
 
 #### Before deployment of a cluster
@@ -163,7 +163,7 @@ Scaling to happen just before a cluster has been removed from AGW.
 #### After deployment of a cluster
 - Check all pods are deployed and running
 - Speak to teams (where required) for any specific issues related to failed pods
-- Ensure failed pods issues are either acknowledged by teams or fixed before rebuilding 2nd cluster.  This is to prevent a situation whereby application is failed across both clusters after rebuild
+- Ensure failed pods issues are either acknowledged by teams or fixed before rebuilding 2nd cluster.  This is to prevent a situation whereby applications are failed across both clusters after rebuild
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595)
 - Revert merge for scaling pods & merge [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7245)
 - Confirm pods are back to correct numbers after revert

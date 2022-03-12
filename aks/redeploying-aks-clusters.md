@@ -133,11 +133,11 @@ Once swap over is fully complete then delete the older cluster,
 
 ### Production
 
-#### Day before deployment of a cluster  
+#### Day or hours before deployment of a cluster  
 
 It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
 - To identity failed Helm releases, run `kubectl get hr -A | grep -v Succeeded`  
-- To identify failed pods, run `kubectl --context prod-00-aks get pods -A | grep -v Completed | grep -v Running`
+- To identify failed pods, run `kubectl get pods -A | grep -v Completed | grep -v Running`
 - Investigate failed helm releases and missing pods as required  
 - For failed helm releases where pods are not deployed, test if rolling back `helm rollback` is successful (which helps narrows down issue is specific to current release) 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
@@ -160,13 +160,10 @@ Scaling to happen just before a cluster has been removed from AGW.
 - Check cluster that won't be removed to confirm pods have scaled
 - Merge PR to remove a cluster from AGW
 
-#### After rebuilding 1st cluster (where both clusters are being rebuilt)
-- Check all pods are deployed and running
-- Speak to teams for any specific issues related to failed pods
-- Ensure failed pods issues are either acknowledged by teams or fixed before rebuilding 2nd cluster.  This is to prevent a situation where application is failed across both clusters after rebuild
-
-
 #### After deployment of a cluster
+- Check all pods are deployed and running
+- Speak to teams (where required) for any specific issues related to failed pods
+- Ensure failed pods issues are either acknowledged by teams or fixed before rebuilding 2nd cluster.  This is to prevent a situation whereby application is failed across both clusters after rebuild
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595)
 - Revert merge for scaling pods & merge [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7245)
 - Confirm pods are back to correct numbers after revert

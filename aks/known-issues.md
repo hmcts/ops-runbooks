@@ -38,4 +38,4 @@ To fix, run the below command to apply CRDs to the cluster:
 
 `kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
 
-**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Producation AKS cluster now upgraded to v1.21.7
+**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7

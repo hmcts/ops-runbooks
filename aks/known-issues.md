@@ -22,6 +22,8 @@ An error similar to the below may be seen in the cluster events log:
 
 ## Dynatrace oneagent pods not deployed or failing to start
 
+**NOTE:** The issue described here needs to be validated if still applies when the updated [Dynatrace Operator](https://tools.hmcts.net/jira/browse/DTSPO-6187) is rolled out.
+
 For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
 
 Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not part of the existing Flux config.

@@ -22,7 +22,7 @@ An error similar to the below may be seen in the cluster events log:
 
 ## Dynatrace oneagent pods not deployed or failing to start
 
-**NOTE:** The issue described here needs to be validated if still applies when the updated [Dynatrace Operator](https://tools.hmcts.net/jira/browse/DTSPO-6187) is rolled out.
+**NOTE:** The issue described here need to be validated if still applies when the updated [Dynatrace Operator](https://tools.hmcts.net/jira/browse/DTSPO-6187) is rolled out.
 
 For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
 

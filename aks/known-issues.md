@@ -24,16 +24,16 @@ An error similar to the below may be seen in the cluster events log:
 
 For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
 
-Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) the CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not done by the existing Flux config.
+Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not part of the existing Flux config.
 
-Run the below on the cluster. An empty result confirms CRDs are not installed. 
+Run the below command on the cluster. An empty result confirms CRDs are not installed. 
 
 `kubectl get crds | grep oneagent`
 
-To fix, run the below to apply the CRDs to the cluster:
+To fix, run the below command to apply CRDs to the cluster:
 
 `kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml`  
 
 `kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
 
-**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with Prod AKS cluster now upgraded to v1.21.7
+**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Producation AKS cluster now upgraded to v1.21.7

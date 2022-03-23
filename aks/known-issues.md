@@ -39,3 +39,9 @@ To fix, run the below command to apply CRDs to the cluster:
 `kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
 
 **Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7
+
+## Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\"
+
+> waiting for update of Node Pool "msnode" (Kubernetes Cluster "ss-sbox-00-aks" / Resource Group "ss-sbox-00-rg"): Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\" Message=\"Cannot add network interface '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode' with accelerated networking to an existing virtual machine '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0'.\" Details=[]"
+
+We've seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.

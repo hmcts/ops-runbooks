@@ -68,3 +68,32 @@ Go to https://jstack.review/ and upload a selection of the files in the threads 
 
 The thread we are interested in is NamedThread so it should be pretty easy to find.
 Search `SCMEvent`.
+
+To look for events taking too long to process run:
+
+More than one second:
+```
+grep 'processed in [0-9][0-9][0-9][0-9][0-9]\?ms' jenkins.branch.*
+```
+
+More than 10 seconds:
+```
+alias ll='ls -lash'
+grep 'processed in [0-9][0-9][0-9][0-9][0-9]ms' jenkins.branch.* | grep 'Mar 30 12'
+
+grep '' jenkins.branch.*
+```
+
+Customise folder log size:
+
+```groovy
+// 15mb
+System.setProperty("com.cloudbees.hudson.plugins.folder.computed.FolderComputation.EVENT_LOG_MAX_SIZE", "15000")
+
+System.setProperty("com.cloudbees.hudson.plugins.folder.computed.FolderComputation.BACKUP_LOG_COUNT", "10")
+```
+
+smee to forward webhook:
+```
+smee -u https://smee.io/FPC56rvI8d8mw2t --path /github-webhook/ --port 8080
+```

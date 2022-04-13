@@ -12,4 +12,8 @@ Once this has been activated, add yourself to a group with the **owner** permiss
 
 ## Generating the token
 
-Navigate to the storage account and open 'Shared Access signature'. Select the level of permission required, be sure to select your allowed resource types, set the expiry date, and include the allowed ip address. From here, securely pass the details to the requester and confirm token is working.
+Navigate to the storage account and open `Shared Access signature`. Select the level of permission required, be sure to select your allowed resource types and permissions, set the expiry date, and include the allowed IP address. After creating the token, ensure you copy the `Connection String` and the `SAS Token` shown on screen, securely pass these to the requester using something like pwpush.com.
+
+## Whitelist IP 
+
+In the same storage account navigate to Networking > Firewall and add the required IP, ensuring you click save after adding, and then confirm the token is working.

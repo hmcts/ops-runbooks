@@ -45,6 +45,10 @@ The following certificates are installed in the Docker image which is the source
     prod-mailrelay-platform-hmcts-net
     dev-in.mailrelay.internal.platform.hmcts.net (self signed)
 
+4. Client Whitelisting
+
+The IP address of the sending SMTP client must be added to the mailrelay whitelist on the Azure Firewall.  In the case of nonprod, it would be added to the source_ips arrays of mailrelay0 and mailrelay1 here: https://github.com/hmcts/rdo-terraform-hub-dmz/blob/4b317c5ae8f2792380a4e7bfdb49d9f845d1200c/env_tfvars/hub-nonprodi.tfvars#L215
+
 ## Deployment
 
 1. Clone Exim-Relay

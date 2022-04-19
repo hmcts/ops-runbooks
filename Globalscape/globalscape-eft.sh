@@ -14,7 +14,7 @@ fi
 EFT_RG="RDO-HUB-SFTP-PROD"
 LOCAL_PORT=5555
 VM_RDP_PORT=3389
-BASTION_HOSTNAME="bastion-prod-rg-bastion-prod"
+BASTION_HOSTNAME="bastion-prod.platform.hmcts.net"
 BASTION_VM_NAME="bastion-prod"
 BASTION_RG_NAME="bastion-prod-rg"
 BASTION_SUBSCRIPTION="DTS-MANAGEMENT-PROD-INTSVC"
@@ -29,7 +29,7 @@ fi
 
 # Add bastion host to config file
 echo "If hanging for too long, check your bastion JIT - https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455"
-az ssh config -n ${BASTION_VM_NAME} -g ${BASTION_RG_NAME} --subscription ${BASTION_SUBSCRIPTION} --prefer-private-ip --overwrite -f .ssh/config
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 
 # Port forward to Windows VM via bastion
 echo "If hanging for too long, check connected to F5 VPN... - https://portal.platform.hmcts.net"

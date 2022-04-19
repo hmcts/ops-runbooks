@@ -21,7 +21,7 @@ As an alternative to below you can run the `globalscape-eft.sh` file on your loc
 You need to connect to Bastion to port forward your traffic to the EFT VMs. In your shell, run the following command:
 
 ```
-az ssh config -n bastion-prod -g bastion-prod-rg --subscription DTS-MANAGEMENT-PROD-INTSVC --prefer-private-ip --overwrite -f .ssh/config
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 ```
 
 ## Port forwarding via Bastion
@@ -29,7 +29,7 @@ az ssh config -n bastion-prod -g bastion-prod-rg --subscription DTS-MANAGEMENT-P
 To port forward to the EFT VM, run the following command replacing the variable with the intended IP. You can find the IP by going to either the [rdo-sftp-eft-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/RDO-HUB-SFTP-PROD/providers/Microsoft.Compute/virtualMachines/rdo-sftp-eft-0/overview) or [rdo-sftp-eft-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/RDO-HUB-SFTP-PROD/providers/Microsoft.Compute/virtualMachines/rdo-sftp-eft-1/overview) resource, clicking Connect > RDP > IP address (Private IP).
 
 ```
-ssh -L 5555:{VM-PRIVATE-IP}:3389 bastion-prod-rg-bastion-prod
+ssh -L 5555:{VM-PRIVATE-IP}:3389 bastion-prod.platform.hmcts.net
 ```
 
 This will leave you connected in the bastion shell, which means you're ready to connect to the EFT VMS. You can replace `5555` here with a port of your choice on your machine if you wish.

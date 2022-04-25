@@ -4,8 +4,8 @@ Although the project is attempting to move away from it at the time of writing, 
 
 Contents in this directory:
 
-- [Setting Up Application Insights Reporting](/appinsights-setup.md)
-- [Availability Tests and Automated Alerting](/availability-tests.md)
+- [Setting Up Application Insights Reporting](appinsights-setup.md)
+- [Availability Tests and Automated Alerting](availability-tests.md)
 
 Contents in this document:
 

@@ -4,9 +4,9 @@ This document covers how to set up AppInsights reporting on your app. These inst
 
 To set up AppInsights, Specific instructions for your language can be found below:
 
-- [Node.JS Apps](##node-js-setup)
+- [Node.JS Apps](#node.js-apps)
 
-(#node-js-setup)
+## Node.JS Apps
 
 Microsoft provide three NPM packages for Node.JS applications: `applicationinsights`, `applicationinsights-js` and `@microsoft/applicationinsights-web`. For our purposes, we want **ONLY** the `applicationinsights` package. `applicationinsights-js` is considered deprecated and `@microsoft/applicationinsights-web` is designed for frontend applications only. Installing either of these other two options in our case may be detrimental and actually cause AppInsights to stop working.
 

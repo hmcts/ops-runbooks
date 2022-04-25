@@ -4,7 +4,7 @@ This document covers how to set up AppInsights reporting on your app. These inst
 
 To set up AppInsights, Specific instructions for your language can be found below:
 
-- [Node.JS Apps](#node.js-apps)
+- [Node.JS Apps](#nodejs-apps)
 
 ## Node.JS Apps
 

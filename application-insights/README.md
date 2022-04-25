@@ -9,9 +9,9 @@ Contents in this directory:
 
 Contents in this document:
 
-- [Resources in the Azure Portal](##resources-in-the-azure-portal)
-- [Querying AppInsights](##querying-appinsights)
-- [Common Problems and Troubleshooting](##common-problems-and-troubleshooting)
+- [Resources in the Azure Portal](#resources-in-the-azure-portal)
+- [Querying AppInsights](#querying-appinsights)
+- [Common Problems and Troubleshooting](#common-problems-and-troubleshooting)
 
 ## Resources in the Azure Portal
 

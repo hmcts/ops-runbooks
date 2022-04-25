@@ -1,5 +1,18 @@
 # Builds not triggering from web-hooks
 
+
+Check all credentials are valid:
+```
+Jenkins.instance.items.each { item ->
+  println("Checking ${item.fullName}")
+  def navigator = item.navigators[0]
+  println(navigator.descriptor.doCheckCredentialsId(item, null, navigator.credentialsId))
+  
+}
+
+return
+```
+
 Jenkins is configured to receive web-hook events from a GitHub organisation level webhook.
 
 The webhook can be seen at https://github.com/organizations/hmcts/settings/hooks
@@ -97,3 +110,45 @@ smee to forward webhook:
 ```
 smee -u https://smee.io/FPC56rvI8d8mw2t --path /github-webhook/ --port 8080
 ```
+
+Checking events since startup:
+
+```
+kubectl logs jenkins-0 jenkins | grep hmcts | grep 'Received ' > /tmp/repo-event-source
+cat /tmp/repo-event-source | cut -d ' ' -f 5 | sort | uniq -c | sort > event-count.txt
+```
+
+
+List all repositories built on Jenkins
+```
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject
+
+Jenkins.instance.getAllItems(WorkflowMultiBranchProject.class, { item -> !item.fullName.contains('Nightly') }).each { folder ->
+    println folder.name
+};
+
+return 
+```
+
+```
+cat github-repositories.txt | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-cft hmcts/%
+```
+
+Start all nightly builds:
+
+```
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject
+import hudson.model.Cause.UserIdCause
+
+
+Jenkins.instance.getAllItems(WorkflowMultiBranchProject.class).findAll {
+    return it.fullName =~ '^HMCTS_Nightly/.+'
+}.each {
+    it.scheduleBuild(0, new UserIdCause())
+}
+```
+
+drain jobs:
+https://gist.github.com/sasjo/6c0159d2a438f256b1127d1ef69b522d
+
+com.cloudbees.hudson.plugins.folder.computed.ThrottleComputationQueueTaskDispatcher.LIMIT = 20

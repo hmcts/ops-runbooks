@@ -2,9 +2,9 @@
 
 Availability tests are an AppInsights feature that can be used to measure the uptime of a service and trigger automatic alerts when downtime is detected. This document covers how to set up an availability test, how to set up automatic alerts for that availability test and how to assign an existing action group to an availability test. This document assumes you already have an AppInsights Azure Resource already configured and working.
 
-- [Making an Availability Test](##making-an-availability-test)
-- [Configuring Alerting](##configuring-alerting)
-- [Configuring Action Groups](##configuring-action-groups)
+- [Making an Availability Test](#making-an-availability-test)
+- [Configuring Alerting](#configuring-alerting)
+- [Configuring Action Groups](#configuring-action-groups)
 
 ## Making an Availability Test
 

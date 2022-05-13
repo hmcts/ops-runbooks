@@ -38,7 +38,7 @@ ALLOWED_ENV_VALUES=("sandbox" "development" "testing" "demo" "ithc" "staging" "p
 ALLOWED_BUSSINESS_AREAS=("CFT" "crime" "cross-cutting")
 
 
-# Function to check if a given value exists in an array
+# Function to check if a tag value matches requirements
 Allowance_Checker () {
     # Check application contains an allowed value
     ref=$1[@]
@@ -46,23 +46,12 @@ Allowance_Checker () {
     arr=("${!ref}")
     # If any array value matches the given value
     if [[ " ${arr[*]} " =~ " $2 " ]]; then
-        local result=1
-        echo $result
-    else
-        local result=0
-        echo $result
-    fi
-}
-
-Found_NotFound () {
-    if [[ ${result} == 1 ]]; then
         echo -e "${GREEN}Tag value in accepted range.${PLAIN}"
     else
         echo -e "${RED}Tag value was not found, please refer to the tagging dictionary, if you can't find your team here please contact #platops-help. https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1007945237#Taggingv0.4-TaggingDictionary."
         exit 1
     fi
 }
-
 
 # Collect target resource group and subscription
 read -p "Input Resource Group you wish to tag: " SELECTED_RG
@@ -90,16 +79,13 @@ fi
 echo -e "\n${YELLOW}For full tagging documentation, naming standards, and to understand the following questions in depth, please visit: \nhttps://tools.hmcts.net/confluence/display/DCO/Tagging+v0.4.\n ${PLAIN}"
 # Collect tagging details
 read -p "Application name: " APPLICATION
-result=$(Allowance_Checker ALLOWED_APPLICATION_VALUES ${APPLICATION})
-Found_NotFound ${result}
+Allowance_Checker ALLOWED_APPLICATION_VALUES ${APPLICATION}
 read -p "Input the environment this Resource Group exists in: " ENV
-result=$(Allowance_Checker ALLOWED_ENV_VALUES ${ENV})
-Found_NotFound ${result}
+Allowance_Checker ALLOWED_ENV_VALUES ${ENV}
 read -p "Input business Area: " BUSINESS_AREA
-result=$(Allowance_Checker ALLOWED_BUSSINESS_AREAS ${BUSINESS_AREA})
-Found_NotFound ${result}
+Allowance_Checker ALLOWED_BUSSINESS_AREAS ${BUSINESS_AREA}
 # No restrictions for this tag just needs including
-read -p "Input builtfrom tag: (Git repository these resources are built from)" BUILT_FROM
+read -p "Input builtfrom tag (Git repository these resources are built from): " BUILT_FROM
 # Check tag is not empty
 if [ -z "${BUILT_FROM}" ]
 then

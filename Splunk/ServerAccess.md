@@ -27,4 +27,4 @@ See here for a steps on how to do this: [HMCTS Confluence bastion access](https:
 ### Access package configuration
 The access packages 'SecOps Sandbox Bastion Server Access' and 'SecOps Production Bastion Server Access' can be found in the Azure Portal under 'Identity Governance', any updates and amendments to this should be made here.
 ### VM authentication
-User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension 'AADLoginForLinux'; this saves us having to retrieve and exchange SSH keys.
+User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension 'AADLoginForLinux'; this saves us having to retrieve and exchange SSH keys. The VMs have not been joined to the HMCTS domain.

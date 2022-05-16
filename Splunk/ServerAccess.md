@@ -20,13 +20,11 @@ This document describes how to get access to the Splunk servers for operational 
 4. SSH onto bastion secops server
 See here for a steps on how to do this: [HMCTS Confluence bastion access](https://tools.hmcts.net/confluence/display/RD/Bastion)
 
-5. SSH onto required Splunk server via the SecOps bastion you're now logged into.
+5. SSH onto required Splunk server via the SecOps bastion you're now logged into. You should be be able to login using your Azure Active Directory account details (assuming you've been added to the JIT groups above).
 **Follow the instructions output from the SSH command**
-
-_Note: You may need to reset your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of HMCTS accounts._
 
 ## Additional notes
 ### Access package configuration
 The access packages 'SecOps Sandbox Bastion Server Access' and 'SecOps Production Bastion Server Access' can be found in the Azure Portal under 'Identity Governance', any updates and amendments to this should be made here.
 ### VM authentication
-User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension 'AADLoginForLinux'.
+User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension 'AADLoginForLinux'; this saves us having to retrieve and exchange SSH keys.

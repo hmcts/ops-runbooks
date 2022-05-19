@@ -123,29 +123,34 @@ List all repositories built on Jenkins
 ```
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject
 
-Jenkins.instance.getAllItems(WorkflowMultiBranchProject.class, { item -> !item.fullName.contains('Nightly') }).each { folder ->
+Jenkins.instance.getAllItems(WorkflowMultiBranchProject.class).each { folder ->
     println folder.name
 };
 
-return 
+return
 ```
 
 ```
-cat github-repositories.txt | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-cft hmcts/%
+cat /tmp/repositories-a-to-c | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-cft-a-c hmcts/%
+cat /tmp/repositories-d-to-i | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-cft-d-i hmcts/%
+cat /tmp/repositories-j-to-z | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-cft-j-z hmcts/%
+
+cat /tmp/sds-github-repo-on-jenkins.txt | xargs -n 1 -P 10 -I % gh repo edit --add-topic jenkins-sds hmcts/%
 ```
 
 Start all nightly builds:
 
 ```
-import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject
 import hudson.model.Cause.UserIdCause
 
-
-Jenkins.instance.getAllItems(WorkflowMultiBranchProject.class).findAll {
-    return it.fullName =~ '^HMCTS_Nightly/.+'
+Jenkins.instance.getAllItems(AbstractItem.class)
+.findAll {
+    return it.fullName =~ '.+Nightly/.+/master'
 }.each {
-    it.scheduleBuild(0, new UserIdCause())
-}
+   it.scheduleBuild(0, new UserIdCause())
+};
+  
+return
 ```
 
 drain jobs:

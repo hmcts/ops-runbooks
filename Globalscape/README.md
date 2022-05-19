@@ -44,13 +44,18 @@ For the next step you'll need some RDP software on your machine, you can use `Wi
 
 ### Site root
 
-The site root folder is the storage location where files are stored. It is currently using an [Azure File Share](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/rdo-hub-sftp-prod/providers/Microsoft.Storage/storageAccounts/rdohubsftpprod/overview) to store these files.
+The site root folder is the storage location where files are stored. It is currently using an [Azure File Share](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/rdo-hub-sftp-prod/providers/Microsoft.Storage/storageAccounts/rdohubsftpprod/overview) to store these files. This is configured in the EFT software.
 
-This is configured in the EFT software. Changing this location will render users unable to interact with SFTP as it will remove all user and group folder permissions. 
+> Changing this location on EFT will render users unable to interact with SFTP as it will remove all user and group folder permissions. 
 
-If you do need to change the location, be aware of the previous definitions and redefine them after re-pointing the location. This is done in VFS.
+If you do need to change the location, be aware of the previous permissions and redefine them after. This is done in VFS.
 
-To change the location - stop the GlobalScape service on both nodes, copy all files from the old share to the new, point the site root directory to the new share then start the services again. Make sure you have re-configured folder permissions in VFS.
+To change the location:
+- stop the GlobalScape service on both nodes
+- copy all files from the old share to the new
+- point the site root directory to the new share then start the services again.
+
+Make sure you have added the folder permissions back in VFS.
 
 ### VFS
 

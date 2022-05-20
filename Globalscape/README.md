@@ -4,9 +4,11 @@ This readme describes a bit about the Globalscape EFT service and how you can ac
 
 ## Description
 
-Service Description TBA
+The Hub GlobalScape provides SFTP / FTPS services for secure File Transfer between 3rd Parties. Some of these parties include SSCS, Probate, Reference Data and HMRC.
 
+The solution has been built in the RDO-HUB-SFTP-PROD resource group in the HMCTS-HUB-PROD-INTSVC Azure subscription.
 
+There is only one environment - production and it is manually configured.
 
 ## Prerequisites
 
@@ -38,9 +40,49 @@ This will leave you connected in the bastion shell, which means you're ready to 
 
 For the next step you'll need some RDP software on your machine, you can use `Windows Remote Desktop` for instance. Now you need to connect to `localhost:5555`, the port opened in the previous step to forward traffic to the EFT VM. The [username](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://rdo-ftps-kvs.vault.azure.net/secrets/admin-username) and [password](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://rdo-ftps-kvs.vault.azure.net/secrets/sftpadmin) can be found [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/rdo-hub-sftp-prod/providers/Microsoft.KeyVault/vaults/rdo-ftps-kvs/secrets). 
 
+## EFT Configuratiion
+
+### Site root
+
+The site root folder is the storage location where files are stored. It is currently using an [Azure File Share](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/rdo-hub-sftp-prod/providers/Microsoft.Storage/storageAccounts/rdohubsftpprod/overview) to store these files. This is configured in the EFT software.
+
+> Changing this location on EFT will render users unable to interact with SFTP as it will remove all user and group folder permissions. 
+
+If you do need to change the location, be aware of the previous permissions and redefine them after. This is done in VFS.
+
+To change the location:
+- stop the GlobalScape service on both nodes
+- copy all files from the old share to the new
+- point the site root directory to the new share then start the services again.
+
+Make sure you have added the folder permissions back in VFS.
+
+### VFS
+
+This is where the file structure for the users are managed. It is where access to storage where they can upload/download files is controlled. For example, SSCS users will only have access to the `sscs` directory and nothing else.
+
+## Testing
+
+You can test SFTP by logging in as one of the `sscs` service accounts for example. The keys are stored in sscs-aat/prod.
+
+```
+sftp -i <sscs-key> sscs-<env>@sftp.platform.hmcts.net 
+```
+
+[More info on `sftp` command](https://linuxize.com/post/how-to-use-linux-sftp-command-to-transfer-files/)
+
 ## Troubleshooting
 
 In the bottom left open the Windows control panel and click `Server Manager`. You can also view logs and configuration in the `EFT Enterprise Application`. 
 
-More TBA.
+You can view EFT software logs such as startup by going to `C:\ProgramData\Globalscape\EFT Server Enterprise` then you can view the file `EFT-eft-0.log` for the eft-0 machine. Start by finding `Starting EFT` in the file and continue from there to look for any `ERROR` messages
 
+You can also see logs on how files have been moved around and by whom by going to `C:\ProgramData\Globalscape\EFT Server Enterprise\Logs` and viewing the log files there.
+
+## Support
+
+The current support contract is with a company called Pro2col Group, here are the contact details for raising a support call
+
+Telephone: 0333 123 1240
+
+Email: support@pro2colgroup.com

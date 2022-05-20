@@ -79,3 +79,10 @@ You can view EFT software logs such as startup by going to `C:\ProgramData\Globa
 
 You can also see logs on how files have been moved around and by whom by going to `C:\ProgramData\Globalscape\EFT Server Enterprise\Logs` and viewing the log files there.
 
+## Support
+
+The current support contract is with a company called Pro2col Group, here are the contact details for raising a support call
+
+Telephone: 0333 123 1240
+
+Email: support@pro2colgroup.com

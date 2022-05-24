@@ -68,3 +68,7 @@ You should see something like:
 Logs can be found in `/var/jenkins_home/logs/jenkins.branch.*`.
 
 They aren't terribly useful, [@timja](https://github.com/timja) enhanced the logging in https://github.com/jenkinsci/branch-api-plugin/pull/305 but we didn't end up investing time to try get it merged as it served its purpose but could be revived again if ever needed.
+
+## References
+
+- [My Jenkins build isn't triggering when I push](https://blog.timja.dev/my-jenkins-build-isnt-triggering-when-i-push/) - Post by [@timja](https://github.com/timja) on a previous issue we had with builds not triggering

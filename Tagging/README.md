@@ -4,7 +4,7 @@ This script was created for DTSPO-7971 to tag un-tagged resources on a per resou
 
 ## Pre-requisites
 
-Please ensure that you have jq installed in order for tagger.sh to be run. This can be installed by running the command 'brew install jq'
+Please ensure that you have jq installed in order for tagger.sh to be run. This can be installed by running the command `brew install jq`
 
 ## Description
 

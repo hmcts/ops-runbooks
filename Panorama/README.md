@@ -1,6 +1,6 @@
 ## Panorama - Software Updates
 
-The current version on Panorama and the Firewalls is `10.1.5-h1`, `h` stands for Hotfix.
+The current Panorama, Log Collectors and Firewall version is `10.1.5-h1`, `h` stands for Hotfix.
 We aim to be as close as possible with Palo Alto software releases on both the Panorama management servers and the firewall servers.
 
 ### Current Estate

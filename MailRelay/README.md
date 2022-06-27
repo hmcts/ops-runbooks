@@ -1,10 +1,10 @@
-# Mailrelay v2
+# MailRelay v2
 
-This runbook describes how Mailrelay is configured and deployed and the steps that are necessary to on-board new clients. The Mailrelay configuration can be found in the repo [exim-relay](https://github.com/hmcts/exim-relay).
+This runbook describes how MailRelay is configured and deployed and the steps that are necessary to on-board new clients. The MailRelay configuration can be found in the repo [exim-relay](https://github.com/hmcts/exim-relay).
 
 ## How to On-board Clients
 
-Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault ([Dev: sds-mailrelay-dev](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets), [Prod: sds-mailrelay-prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview)). The Username will be the service name; the password should be randomly generated and be sufficiently complex.
+Each service will require a username and password to utilise the MailRelay service and these will be stored in Key Vault ([Dev: sds-mailrelay-dev](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets), [Prod: sds-mailrelay-prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview)). The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
 1. Create a new secret in Key Vault and associate a complex password
 2. Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
@@ -17,17 +17,17 @@ The syntax is as follows:
 ```
 
 3. Create a new pull request and merge into the master branch once approved
-4. Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
+4. Test access and connectivity as described in the section below [Testing MailRelay](#testing-mailrelay)
 
-## What is Mailrelay and what is it used for?
+## What is MailRelay and what is it used for?
 
 Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .
 
-### Mailrelay AKS deployment
+### MailRelay AKS deployment
 
-An Exim Mailrelay container is built via Docker and stored in the ACR Azure image repository. It's based on the featherweight image Alpine as defined in the git repo [Docker Exim Relay Image](https://github.com/hmcts/exim-relay) and is built via an Azure DevOps pipeline.
+An Exim MailRelay container is built via Docker and stored in the ACR Azure image repository. It's based on the featherweight image Alpine as defined in the git repo [Docker Exim Relay Image](https://github.com/hmcts/exim-relay) and is built via an Azure DevOps pipeline.
 
-Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01 as two replicas. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical.
+Exim MailRelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01 as two replicas. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical.
 
 ### Modifying the exim.conf File
 
@@ -35,9 +35,9 @@ The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file 
 
 ### Authentication Mechanisms
 
-Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
+Client applications use TLS to authenticate to the MailRelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
 
-The following certificates are injected into the Mailrelay container at runtime:
+The following certificates are injected into the MailRelay container at runtime:
 
 ```
 dev-mailrelay-platform-hmcts-net
@@ -45,7 +45,7 @@ prod-mailrelay-platform-hmcts-net
 dev-in.mailrelay.internal.platform.hmcts.net (self signed)
 ```
 
-## Building and deploying Mailrelay
+## Building and deploying MailRelay
 
 ### Making changes to the exim-relay application
 
@@ -76,42 +76,115 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * After 5 to 10 minutes check the deployments have been updated on the cluster.
 ```
 
-## Testing Mailrelay
+## Testing MailRelay
 
 After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host.
 
-### Test StartTLS connection using OpenSSL
+### Send a test email via MailRelay using OpenSSL 
 
-Turn user name and password to base 64 
+#### Before you start
+
+Get the authentication secret from Key Vault and base64 encode it. Take note of the output.:
 
 ```bash
-echo -ne '<password>' | base64
+az keyvault secret show --vault-name sds-mailrelay-dev --name mailrelay-dev-user --query value -o tsv | base64
 ```
 
-Connect to Mailrelay using StartTLS 
+NOTE: We often flip between cluster 00 and 01, so if the above command doesn't work try `--context ss-dev-00-aks` in the command instead
+
+Create a container on the SDS Dev cluster (could be 00 or 01):
 
 ```bash
-openssl s_client -connect ip:port -starttls smtp
+kubectl run --context ss-dev-01-aks mail-relay-test -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
 ```
 
-Send Email 
+Once the container is running and you have the command prompt, run the commands below to install the tools needed for the test.
+
 ```bash
-helo possessionclaim.gov.uk
+apt update -y
+apt install -y telnet openssl
+```
+
+Connect to MailRelay using TLS on port 587:
+
+```bash
+openssl s_client -connect mailrelay2-exim.mailrelay2:587 -starttls smtp
+```
+
+<details>
+  <summary>Expected output</summary>
+You should get a response ending similarly to this:
+
+```---
+SSL handshake has read 5495 bytes and written 441 bytes
+Verification error: unable to get local issuer certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 4096 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 20 (unable to get local issuer certificate)
+---
+250 HELP
+```
+
+</details>
+
+If you get the above output you are good to carry on.
+
+Start the process of sending an email via MailRelay: 
+
+```bash
+EHLO possessionclaim.gov.uk
+```
+
+<details>
+  <summary>Expected output</summary>
+You should get output similar to below:
+
+```---
+EHLO possessionclaim.gov.uk
+250-mailrelay2-exim-1.exim.mailrelay2.svc.cluster.local Hello possessionclaim.gov.uk [10.145.18.159]
+250-SIZE 52428800
+250-8BITMIME
+250-PIPELINING
+250-PIPE_CONNECT
+250-AUTH LOGIN PLAIN
+250-CHUNKING
+250-PRDR
+250 HELP
+```
+
+</details>
+
+Authenticate using the base64 encoded password from the `az keyvault` command above:
+```bash 
+AUTH PLAIN {password}
+```
+
+You should get `235 Authentication succeeded` if everything has gone well.
+
+To complete and send the email, copy and paste each line below one-by-one and remember to replace {email} with your email address: 
+
+```bash
 mail from: noreply-pcol@hmcts.net
-rcpt to: <email>
+rcpt to: {email}
 data
-Subject: test 
-test test test
+Subject: Test Email 
+This is a test email sent via MailRelay.
 .
 ```
 
 ### Test unauthenticated relay
-NOTE: For Mailrelay2, if you try to send an email unauthenticated you will receive a 550 unauthenticated relay response.
+NOTE: For MailRelay2, if you try to send an email unauthenticated you will receive a 550 unauthenticated relay response.
 
-Get the IP address of the Mailrelay service and take note of the IP address in the CLUSTER-IP column
+Get the IP address of the MailRelay service and take note of the IP address in the CLUSTER-IP column
 
 ```bash
-kubectl get svc -n mailrelay mailrelay-exim
+kubectl get svc --context ss-dev-01-aks-admin -n mailrelay2 mailrelay2-exim --output jsonpath='{.spec.clusterIP}'
 ```
 
 Spin up a temporary pod in the Kubernetes Cluster

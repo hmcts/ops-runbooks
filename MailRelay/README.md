@@ -21,13 +21,13 @@ The syntax is as follows:
 3. Create a new pull request and merge into the master branch once approved
 4. Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
 
-### What is Mailrelay and What is it used for?
+### What is Mailrelay and what is it used for?
 
 Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .
 
 1. Mailrelay AKS deployment
 
-An Exim Mailrelay container is built via Docker and stored in the ACR Azure image repository.  It's based on the featherweight image Alpine as defined in the git repo [Docker Exim Relay Image](https://github.com/hmcts/exim-relay) and is built via an Azure DevOps pipeline.
+An Exim Mailrelay container is built via Docker and stored in the ACR Azure image repository. It's based on the featherweight image Alpine as defined in the git repo [Docker Exim Relay Image](https://github.com/hmcts/exim-relay) and is built via an Azure DevOps pipeline.
 
 Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01 as two replicas. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical.
 
@@ -111,19 +111,23 @@ test test test
     apt update
     apt install swaks
     apt install telnet
-    swaks -a -tls -q HELO -s <ip>-au v1test -ap '<password'
+    swaks -a -tls -q HELO -s <ip> -au v1test -ap '<password'
 ```
 
 ### Test StartTLS connection using OpenSSL
 
-```bash
+
 Turn user name and password to base 64 
 
+```bash
 echo -ne '<password>' | base64
+```
 
 Connect to Mailrelay using StartTLS 
 
+```bash
 openssl s_client -connect ip:port -starttls smtp
+```
 
 Send Email 
 ```bash

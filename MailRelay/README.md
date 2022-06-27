@@ -178,6 +178,9 @@ This is a test email sent via MailRelay.
 .
 ```
 
+If successful you should get a similar output to below and receive your email.
+`250 OK id=1o5sVA-00012W-LB`
+
 ### Test unauthenticated relay
 NOTE: For MailRelay2, if you try to send an email unauthenticated you will receive a 550 unauthenticated relay response.
 

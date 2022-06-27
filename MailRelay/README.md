@@ -107,11 +107,11 @@ test test test
 ### Test TLS connection using SWAKS
 
 ```bash
-    kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
-    apt update
-    apt install swaks
-    apt install telnet
-    swaks -a -tls -q HELO -s <ip> -au v1test -ap '<password'
+kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
+apt update
+apt install swaks
+apt install telnet
+swaks -a -tls -q HELO -s <ip> -au v1test -ap '<password'
 ```
 
 ### Test StartTLS connection using OpenSSL

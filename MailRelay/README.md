@@ -63,6 +63,8 @@ NOTE: The Service connection used for the pipeline is `DTS SS Public Prod`
 
 #### Configuring Shared Services Flux
 
+NOTE: these instructions are out of date and need to be updated for flux v2 (looks like image automation is on in dev too):
+```
 In order to deploy to the latest image to the Dev or Production environment flux needs to know the image it needs to look for.
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
 
@@ -72,54 +74,13 @@ In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definiti
 * Review as required
 * Merge branch with Master.
 * After 5 to 10 minutes check the deployments have been updated on the cluster.
+```
 
 ## Testing Mailrelay
 
 After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host.
 
-### Test unauthenticated relay
-
-1. Spin up a temporary pod in the Kubernetes Cluster
-
-```bash
-kubectl run -it --rm --restart=Never -n admin busybox --image=radial/busyboxplus:curl
-```
-
-2. Get the IP address of the Mailrelay service (take note of the IP address in the CLUSTER-IP column)
-
-```bash
-kubectl get svc -n mailrelay mailrelay-exim
-```
-
-3. Send email from PCOL to chosen email
-
-```bash
-telnet <ip:port>
-helo possessionclaim.gov.uk
-mail from: noreply-pcol@hmcts.net
-rcpt to: <recipient email>
-data
-354 Enter message, ending with "." on a line by itself
-data
-Subject: test                                         
-test test test
-.
-```
-
-* Note - For dev clusters, unauthenticated relay should be turned off and you should receive a 550 unauthenticated relay response
-
-### Test TLS connection using SWAKS
-
-```bash
-kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
-apt update
-apt install swaks
-apt install telnet
-swaks -a -tls -q HELO -s <ip> -au v1test -ap '<password'
-```
-
 ### Test StartTLS connection using OpenSSL
-
 
 Turn user name and password to base 64 
 
@@ -142,6 +103,46 @@ data
 Subject: test 
 test test test
 .
+```
+
+### Test unauthenticated relay
+NOTE: For Mailrelay2, if you try to send an email unauthenticated you will receive a 550 unauthenticated relay response.
+
+Get the IP address of the Mailrelay service and take note of the IP address in the CLUSTER-IP column
+
+```bash
+kubectl get svc -n mailrelay mailrelay-exim
+```
+
+Spin up a temporary pod in the Kubernetes Cluster
+
+```bash
+kubectl run -it --rm --restart=Never -n admin busybox --image=radial/busyboxplus:curl
+```
+
+Send email from PCOL to chosen email
+
+```bash
+telnet <ip:port>
+helo possessionclaim.gov.uk
+mail from: noreply-pcol@hmcts.net
+rcpt to: <recipient email>
+data
+354 Enter message, ending with "." on a line by itself
+data
+Subject: test                                         
+test test test
+.
+```
+
+### Test TLS connection using SWAKS
+
+```bash
+kubectl run my-shell -it --rm --restart=Never -n admin --image=ubuntu --command -- bash
+apt update
+apt install swaks
+apt install telnet
+swaks -a -tls -q HELO -s <ip> -au v1test -ap '<password'
 ```
 
 ## Monitoring MailRelay

@@ -31,7 +31,7 @@ Exim MailRelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-0
 
 ### Modifying the exim.conf File
 
-The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file specifies the configuration and behaviour of the mailrelay service in terms of security (hosts that can use the system to route mail, authentication), DNS settings (domain names, routing), protocols and many other settings.  It's created with makefile which collects together a group of related actions into a single build file that when executed compiles or performs some processing to create artifacts.  Read more about makefile here: [makefile tutorial](https://makefiletutorial.com/).  
+The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file specifies the configuration and behaviour of the MailRelay service in terms of security (hosts that can use the system to route mail, authentication), DNS settings (domain names, routing), protocols and many other settings.  It's created with makefile which collects together a group of related actions into a single build file that when executed compiles or performs some processing to create artifacts.  Read more about makefile here: [makefile tutorial](https://makefiletutorial.com/).  
 
 ### Authentication Mechanisms
 
@@ -239,7 +239,7 @@ Pre requisites
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 * The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels.
-* The [Prometheus alerts](https://github.com/hmcts/sds-flux-config/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated
+* The [Prometheus alerts](https://github.com/hmcts/sds-flux-config/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for MailRelay can be updated if current alerts needs to be updated
 
 <!--
 ### Grafana

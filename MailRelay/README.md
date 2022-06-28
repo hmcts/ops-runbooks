@@ -1,6 +1,6 @@
 # MailRelay v2
 
-This runbook describes how MailRelay is configured and deployed and the steps that are necessary to on-board new clients. The MailRelay configuration can be found in the repo [exim-relay](https://github.com/hmcts/exim-relay).
+This runbook describes how MailRelay is configured and deployed. It also includes the steps that are necessary to on-board new clients. The MailRelay configuration can be found in the repo [exim-relay](https://github.com/hmcts/exim-relay).
 
 ## How to On-board Clients
 

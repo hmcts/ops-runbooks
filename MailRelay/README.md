@@ -178,6 +178,8 @@ rcpt to: {email}
 ```bash
 data
 ```
+You should get `354 Enter message, ending with "." on a line by itself` after entering the above. Now copy the lines below to send an email or you can enter whatever subject and body you like, just remember to send the email you need to end with a `.` on a line of its own and hit enter.
+
 ```bash
 Subject: Test Email
 This is a test email sent via MailRelay.

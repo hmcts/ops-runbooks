@@ -171,9 +171,15 @@ To complete and send the email, copy and paste each line below one-by-one and re
 
 ```bash
 mail from: noreply-pcol@hmcts.net
+```
+```bash
 rcpt to: {email}
+```
+```bash
 data
-Subject: Test Email 
+```
+```bash
+Subject: Test Email
 This is a test email sent via MailRelay.
 .
 ```

@@ -204,9 +204,7 @@ helo possessionclaim.gov.uk
 mail from: noreply-pcol@hmcts.net
 rcpt to: <recipient email>
 data
-354 Enter message, ending with "." on a line by itself
-data
-Subject: test                                         
+Subject: test 
 test test test
 .
 ```

@@ -147,10 +147,10 @@ It is important to identify applications with underlying issues and allow suffic
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 
 Every Production change which involves taking down a cluster is supposed to include scaling up of the apps:-
-- idam-api 
+- idam-api (scale from 4 to 8)
 - ccd-data-store-api
 - ccd-definition-store-api 
-- dm-store
+- dm-store (scale from 7 to 14)
 
 *(idam-api requires 8 pods to be split up across 2 clusters and handle the load.  If we are bringing a cluster down then we need to ensure the other cluster has 8 pods for idam-api)*
 

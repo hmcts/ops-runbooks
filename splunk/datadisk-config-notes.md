@@ -1,0 +1,37 @@
+# Splunk datadisk configuration
+
+## Overview
+The purpose of this documentation is to provide engineers with some additional details on how the data disk configuration has been setup in the splunk infrastructure, where the configuration of this can seem obscure to those who havent worked in this space before.
+
+You can find all code related to the splunk infrastructure in the [hmcts/soc](https://github.com/hmcts/soc) repository, the terraform for this lives side-by-side with Tenable nessus scanner and EventHub configurations.
+
+Files related to the data-disk configuration:
+- [mountfs.sh](#mountfssh)
+- [datadisks.tf](#datadiskstf)
+- [local.tf](#localtf)
+
+
+## mountfs.sh
+The [mountfs.sh](https://github.com/hmcts/soc/blob/master/components/splunk/mountfs.sh) script is used to format and mount data disks attached to splunk VMs to the /splunkdata and /splunkcolddata directories. The decision logic looks at the size of the datadisk attached to the VM and mounts it to the directories accordingly. 
+
+Notes:
+- The script is executed as a Custom Script Extension.
+- /splunkdata for disk sizes < 1 TB, 2 TB or 15.6 TB in size.
+- /splunkcolddata for disk sizes 3.9T or 12.7 TB.
+- Sizes are read from fdisk command, this is incase the LUN numbers arent always consistent between the datadisks.
+- Disk size has to match exactly that from fdisk in order for this to work.
+- Disks are created within logical volume groups, so you could technically mount more than one disk a to given directory.
+- If a disk is already matched and mounted to a directory, then the script will bypass doing anything (i.e. it wont modify any existing configurations).
+
+## local.tf
+The [local.tf](https://github.com/hmcts/soc/blob/master/components/splunk/local.tf) file contains a number of objects related to the splunk data disk configurations. 
+
+Notes:
+- Object 'vmdisks' is where disks configurations should be placed, or referenced from the sbox.tfvars | prod.tfvars file.
+- Object 'disk_list' parases the vmdisks object into a map, such that it can be read by the terraform resource in datadisks.tf, without the need for complicated logic.
+
+## datadisks.tf
+The file [datadisks.tf](https://github.com/hmcts/soc/blob/master/components/splunk/datadisks.tf) contains the terraform resources for sorting data disk definitions and attachments applied to a VM.
+
+Notes:
+- The resources will read properties from 'local.disk_list'.

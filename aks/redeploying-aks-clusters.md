@@ -23,7 +23,7 @@ Redeploying in order:-
 - AAT              - (K8s service names are  = cft-aat-00-aks - cft-aat-01-aks)
 - Production       - (K8s service names are  = prod-00-aks - prod-01-aks) 
 - Management       - (K8s service name is    = cft-ptl-00-aks) 
-- Perftesta        - (K8s service names are  = cft-perftest-00-aks - cft-perftest-01-aks)
+- Perftest         - (K8s service names are  = cft-perftest-00-aks - cft-perftest-01-aks)
 - Demo             - (K8s service names are  = cft-demo-00-aks - cft-demo-01-aks)
 
 ## Dashboards

@@ -16,15 +16,15 @@ This order can change; created to give a brief overview of the environments.
 
 Redeploying in order:-
 
-- sbox                             - (k8s service names are cft-sbox-00-aks and cft-sbox-01-aks)
-- Management sbox (cftsbox-intsvc) - (K8s service name = cft-ptlsbox-00-aks)
-- ITHC
-- Preview 
-- AAT
-- Production
-- Management (cftptl-intsvc)
-- Perftest
-- Demo
+- sbox             - (K8s service names are  = cft-sbox-00-aks - cft-sbox-01-aks)
+- Management sbox  - (K8s service name is    = cft-ptlsbox-00-aks)
+- ITHC             - (K8s service names are  = cft-ithc-00-aks - cft-ithcx-01-aks)
+- Preview          - (K8s service name is    = cft-previewx-01-aks)
+- AAT              - (K8s service names are  = cft-aat-00-aks - cft-aat-01-aks)
+- Production       - (K8s service names are  = prod-00-aks - prod-01-aks) 
+- Management       - (K8s service name is    = cft-ptl-00-aks) 
+- Perftesta        - (K8s service names are  = cft-perftest-00-aks - cft-perftest-01-aks)
+- Demo             - (K8s service names are  = cft-demo-00-aks - cft-demo-01-aks)
 
 ## Dashboards
 A good indication along with reviewing the environments themselves, reviewing Grafana

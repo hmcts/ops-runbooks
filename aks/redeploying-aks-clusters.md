@@ -16,8 +16,8 @@ This order can change; created to give a brief overview of the environments.
 
 Redeploying in order:-
 
-- sbox
-- Management sbox (cftsbox-intsvc)
+- sbox                             - (k8s service names are cft-sbox-00-aks and cft-sbox-01-aks)
+- Management sbox (cftsbox-intsvc) - (K8s service name = cft-ptlsbox-00-aks)
 - ITHC
 - Preview 
 - AAT

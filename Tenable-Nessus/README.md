@@ -121,6 +121,8 @@ Check if the agent has deployed correctly
 ```
 systemctl status 
 ```
+
+Remove agent from server 
 ```
 rpm -qa | grep -i NessusAgent
 ```
@@ -141,21 +143,19 @@ tnc -port 8834 nessus-scanners-nonprod000005.platform.hmcts.net
 
 Nessus Link commands
 
-
 Open CMD
 
 ```
 Cd into  c:\programdata\nesses agent\nessuscli.exe
 ```
 
-```
-nessuscli agent link --key=<key> --host=nessus-scanners-nonprod000005.platform.hmcts.net --port=8834 --groups=NonProd-Test
-```
+Check if the agent is linked to a scanner with the command below 
+
 ```
 nessuscli agent status
 ```
 
-You should see a response such as below
+You should see a response similar to output below 
 
 ```
 C:\Program Files\Tenable\Nessus Agent>nessuscli agent status

@@ -1,0 +1,34 @@
+# Patching Heritage Virtual Machines
+
+This document covers the process for patching a heritage virtual machine and when an update may be required.
+
+See also: [Confluence documentation on this subject](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=~thomas.thornton&title=Patch+Management+-+Short-term+Solution&__ncforminfo=ZnRoLlL-x11bau7g6V7tutFOmtJwTZD7-yXnB-eWT3_clV-xl1Qxr5c4H_WUMTG6TaYD80Sz9YSFCPSYeXiObw==).
+
+## When is a reboot required?
+
+All virtual machines must be restarted once patching has been completed. Linux VMs should only require a single restart, whereas Windows VMs may need to restart multiple times for a single update.
+
+### Patching without rebooting?
+
+There is potential for Linux VMs to be patched without needing to reboot, however this would incur additional costs to the project.
+
+Ubuntu: Possible, requires [subscription](https://ubuntu.com/security/livepatch). (Entry level UA Essential for $75/year for virtual machines)
+
+RHEL: Possible, requires [subscription](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/kernel_administration_guide/applying_patches_with_kernel_live_patching). Red Hat's kpatch for Red Hat Enterprise Linux 7, is available on a Premium support subscription for $1299 per year. (Limitation: There are no live patches released for RHEL 8.3, 7.8, RHEL 6 and RHEL 5.)
+
+Windows: In-memory patching is not offered for Windows VMs.
+
+## How long does a restart take?
+
+Linux VMs restart fairly quickly and should come back online within 3-4 minutes. Windows VMs take slightly longer and can often take up to 15 minutes to restart.
+
+## What is the process for a restart?
+
+For all types of patching, the high-level patching process is as follows:
+
+1. A lower environment will be patched prior to Production ( e.g., Non Live Environment (NLE) → Production ).
+2. Ensure a valid backup is available prior to each environment/virtual machine being patched.
+3. Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc. This initial process should be documented if not already.
+4. A restart schedule ( e.g., restart app01 → db01 → app02 → db02 ) is to be provided by the Application team.
+5. Once restarts have been completed, development team to start & test applications.
+6. Once the above is successful, the next environment will be patched with similar steps.

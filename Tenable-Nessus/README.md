@@ -3,7 +3,11 @@
 Tenable Nessus is a proprietary vulnerability scanner developed by Tenable. The scanner allows the security team
 to scan devices and check them against the nessus database that contains thousands of known vulnerabilities
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
-and the agents. This runbook will cover (1) Tenable anvironments (2) Deploying agents and (3) Verifiying agent installation. 
+and the agents. This runbook will cover the following
+- Tenable anvironments 
+- Deploying agents
+- Verifiying agent installation. 
+
 This runbook does not cover the finer details of the Terraform bootstrap module.
 
 

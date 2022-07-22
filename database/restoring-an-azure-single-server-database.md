@@ -18,11 +18,11 @@ az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-de
 
 * Export data out of newly restored database
 
-  ```cmd
-pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql
-  ```
+  ```bash
+pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql ```
   
-  This should create a file called `role_assignment_demo.sql` with the binary output in it. <br>
+  This should create a file called `role_assignment_demo.sql` with the binary output in it.
+
   **Note:** a switch of `-Fc` was used in the export cmd. Ensure you restore using the `pg_restore` command
  
 * Clean out corrupted database (Source) using drop table commands
@@ -40,7 +40,7 @@ drop table  backup_role_assignment cascade ;
 ......
 ......
    ```
-   
+
 * Restore the exported database into the out-of-sync DB
 
 ```cmd

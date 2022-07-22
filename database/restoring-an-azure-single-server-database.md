@@ -7,8 +7,8 @@ This really depends on the nature of the database to be restored. The example be
 
 From your local machine, execute commands below:
 
-Source: am-role-assignment-service-postgres-db-v11-demo<br>
-Target: am-role-assignment-service-postgres-db-v11-demo-restore
+*Source:* am-role-assignment-service-postgres-db-v11-demo<br>
+*Target:* am-role-assignment-service-postgres-db-v11-demo-restore
 
   ```cmd
 az account set --subscription "DCD-CNP-DEV";
@@ -18,8 +18,12 @@ az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-de
 
 * Export data out of newly restored database
 
-  ```bash
-pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql ```
+
+```cmd
+
+pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql 
+   ```
+
   
   This should create a file called `role_assignment_demo.sql` with the binary output in it.
 
@@ -30,6 +34,7 @@ pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgr
 This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault
 
 -- Connect to DB <br>
+
 psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment
 
  ```cmd
@@ -50,7 +55,8 @@ pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.databa
 
 * The output from the above command looks like this ....
 
-  ```output
+  ```cmd
+
 pg_restore: connecting to database for restore
 Password:
 pg_restore: creating EXTENSION "dblink"
@@ -64,7 +70,7 @@ pg_restore: creating TABLE "public.batch_job_execution_params"
 pg_restore: creating SEQUENCE "public.batch_job_execution_seq"
 .......
 .......
-  ```
+     ```
 
 * Run Analyse on the newly restored Database
 

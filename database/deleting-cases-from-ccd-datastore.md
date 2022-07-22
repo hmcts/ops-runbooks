@@ -4,11 +4,10 @@ This is a 2-stage process that requires you delete the case from the database fi
 
 ## 1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete
 
-DB_HOST=ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com
-DB_USER="DTS\ Platform\ Operations\ SC@ccd-data-store-api-postgres-db-v11-prod"
-DB_NAME=ccd_data_store
 
-a) Hop on to the bastion and run the script below. The script calls an external .txt file which contains a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore. The first two tables may be empty, but the bottom two will most certainly contain data.
+Hop on to the bastion and run the script below. 
+
+The script calls an external .txt file which contains a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.
 
 ```bash
 #!/bin/bash

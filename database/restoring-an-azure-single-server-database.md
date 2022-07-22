@@ -7,7 +7,7 @@ This really depends on the nature of the database to be restored. The example be
 
 From your local machine, execute commands below:
 
-Source: am-role-assignment-service-postgres-db-v11-demo
+Source: am-role-assignment-service-postgres-db-v11-demo<br>
 Target: am-role-assignment-service-postgres-db-v11-demo-restore
 
   ```cmd
@@ -19,9 +19,7 @@ az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-de
 * Export data out of newly restored database
 
   ```cmd
-
 pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql
-  
   ```
   
   This should create a file called `role_assignment_demo.sql` with the binary output in it. <br>
@@ -31,7 +29,7 @@ pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgr
 
 This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault
 
--- Connect to DB
+-- Connect to DB <br>
 psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment
 
  ```cmd
@@ -42,6 +40,7 @@ drop table  backup_role_assignment cascade ;
 ......
 ......
    ```
+   
 * Restore the exported database into the out-of-sync DB
 
 ```cmd

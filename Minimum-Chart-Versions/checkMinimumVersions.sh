@@ -1,7 +1,7 @@
 #!/bin/bash
 MINIMUM_JAVA="4.0.1"
 MINIMUM_NODE="2.4.5"
-MINIMUM_BASE="1.1.0"
+MINIMUM_BASE="0.2.2"
 RELEASES=$(helm list -A -o json | jq -c '.[]')
 TO_CHECK=()
 IFS=$'\n' read -rd '' -a y <<<"$RELEASES"

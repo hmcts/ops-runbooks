@@ -63,14 +63,12 @@ pg_restore: creating EXTENSION "dblink"<br>
 pg_restore: creating COMMENT "EXTENSION dblink"<br>
 pg_restore: creating TABLE "public.actor_cache_control"<br>
 pg_restore: creating SEQUENCE "public.audit_id_seq"<br>
-pg_restore: creating TABLE "public.audit_faults"<br>
-pg_restore: creating TABLE "public.batch_job_execution"<br>
-pg_restore: creating TABLE "public.batch_job_execution_context"<br>
+.......
 pg_restore: creating TABLE "public.batch_job_execution_params"<br>
 pg_restore: creating SEQUENCE "public.batch_job_execution_seq"<br>
 .......<br>
 .......<br>
-     ```
+    ```
 
 * Run Analyse on the newly restored Database
 

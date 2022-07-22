@@ -26,3 +26,4 @@ To fulfill one of these request, you can follow the steps below.
 ## Guides
 - [Connecting to a Database](executing-queries.md)
 - [Deleting cases from CCD Datastore Database](deleting-cases-from-ccd-datastore.md)
+- [Restoring a Database](restoring-an-azure-single-server-database.md)

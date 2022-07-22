@@ -1,0 +1,82 @@
+# Restoring a Single Server Azure PostgreSQL Database
+This really depends on the nature of the database to be restored. The example below is based on a previous ticket e.g. DTSPO-9468
+
+## The Database restore steps
+
+* Execute the restore command
+
+From your local machine, execute commands below:
+
+Source: am-role-assignment-service-postgres-db-v11-demo
+Target: am-role-assignment-service-postgres-db-v11-demo-restore
+
+  ```cmd
+az account set --subscription "DCD-CNP-DEV";
+az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-demo -n am-role-assignment-service-postgres-db-v11-demo-restore --restore-point-in-time 2022-07-13T17:00:01Z -s am-role-assignment-service-postgres-db-v11-demo;
+  ```
+  **Note:** Note the new hostname with `-restore` suffix at the end.
+
+* Export data out of newly restored database
+
+  ```cmd
+
+pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql
+  
+  ```
+  
+  This should create a file called `role_assignment_demo.sql` with the binary output in it. <br>
+  **Note:** a switch of `-Fc` was used in the export cmd. Ensure you restore using the `pg_restore` command
+ 
+* Clean out corrupted database (Source) using drop table commands
+
+This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault
+
+-- Connect to DB
+psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment
+
+ ```cmd
+
+drop table  actor_cache_control cascade;
+drop table  audit_faults cascade;
+drop table  backup_role_assignment cascade ;
+......
+......
+   ```
+* Restore the exported database into the out-of-sync DB
+
+```cmd
+
+pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment < role_assignment_demo.sql
+   ```
+
+* The output from the above command looks like this ....
+
+  ```output
+pg_restore: connecting to database for restore
+Password:
+pg_restore: creating EXTENSION "dblink"
+pg_restore: creating COMMENT "EXTENSION dblink"
+pg_restore: creating TABLE "public.actor_cache_control"
+pg_restore: creating SEQUENCE "public.audit_id_seq"
+pg_restore: creating TABLE "public.audit_faults"
+pg_restore: creating TABLE "public.batch_job_execution"
+pg_restore: creating TABLE "public.batch_job_execution_context"
+pg_restore: creating TABLE "public.batch_job_execution_params"
+pg_restore: creating SEQUENCE "public.batch_job_execution_seq"
+.......
+.......
+  ```
+
+* Run Analyse on the newly restored Database
+
+ANALYZE collects statistics about the contents of tables in the database, and stores the results in the `pg_statistic` system catalog. Subsequently, the query planner uses these statistics to help determine the most efficient execution plans for queries.
+
+```cmd
+analyse;
+   ```
+
+### Some external references
+
+* [Database Backups](https://www.postgresqltutorial.com/postgresql-administration/postgresql-backup-database/)
+* [Database Restore](https://www.postgresqltutorial.com/postgresql-administration/postgresql-restore-database/)
+ 

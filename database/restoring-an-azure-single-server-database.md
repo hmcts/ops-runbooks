@@ -53,23 +53,23 @@ drop table  backup_role_assignment cascade ;
 pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment < role_assignment_demo.sql
    ```
 
-* The output from the above command looks like this ....
+* The output from the above command will look like this ....
 
   ```cmd
 
-pg_restore: connecting to database for restore
-Password:
-pg_restore: creating EXTENSION "dblink"
-pg_restore: creating COMMENT "EXTENSION dblink"
-pg_restore: creating TABLE "public.actor_cache_control"
-pg_restore: creating SEQUENCE "public.audit_id_seq"
-pg_restore: creating TABLE "public.audit_faults"
-pg_restore: creating TABLE "public.batch_job_execution"
-pg_restore: creating TABLE "public.batch_job_execution_context"
-pg_restore: creating TABLE "public.batch_job_execution_params"
-pg_restore: creating SEQUENCE "public.batch_job_execution_seq"
-.......
-.......
+pg_restore: connecting to database for restore<br>
+Password:<br>
+pg_restore: creating EXTENSION "dblink"<br>
+pg_restore: creating COMMENT "EXTENSION dblink"<br>
+pg_restore: creating TABLE "public.actor_cache_control"<br>
+pg_restore: creating SEQUENCE "public.audit_id_seq"<br>
+pg_restore: creating TABLE "public.audit_faults"<br>
+pg_restore: creating TABLE "public.batch_job_execution"<br>
+pg_restore: creating TABLE "public.batch_job_execution_context"<br>
+pg_restore: creating TABLE "public.batch_job_execution_params"<br>
+pg_restore: creating SEQUENCE "public.batch_job_execution_seq"<br>
+.......<br>
+.......<br>
      ```
 
 * Run Analyse on the newly restored Database

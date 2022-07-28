@@ -1,27 +1,45 @@
 #!/bin/bash
+DOT_REMOVER(){
+    echo $(echo $1 | tr -d ".")
+}
+
+CHECK_CHART(){
+    VERSION=$(echo $1 | tr -d "phelm.sh/chart=:$3.- ")
+    # Check version is at least the recommended one
+    [[ $(( $VERSION - $2 )) > 0 || $(( $VERSION - $2 )) == 0  ]]
+}
+
 MINIMUM_JAVA="4.0.1"
+MINIMUM_JAVA=$(DOT_REMOVER ${MINIMUM_JAVA})
 MINIMUM_NODE="2.4.5"
-MINIMUM_BASE="1.1.0"
+MINIMUM_NODE=$(DOT_REMOVER ${MINIMUM_NODE})
+MINIMUM_BASE="0.2.2"
+MINIMUM_BASE=$(DOT_REMOVER ${MINIMUM_BASE})
+
 RELEASES=$(helm list -A -o json | jq -c '.[]')
 TO_CHECK=()
-IFS=$'\n' read -rd '' -a y <<<"$RELEASES"
-
-
-for RELEASE in "${y[@]}"
+IFS=$'\n' read -rd '' -a RELEASE_LIST <<<"$RELEASES"
+for RELEASE in "${RELEASE_LIST[@]}"
 do
     NAME=$(echo ${RELEASE} | jq .name | tr -d '"')
     NAMESPACE=$(echo ${RELEASE} | jq .namespace | tr -d '"')
-    CHART_LINE=$(helm get all ${NAME} -n ${NAMESPACE} | grep helm.sh/chart: | head -1)
+    echo -e "Looking at ${NAME} release in ${NAMESPACE}.."
+    # Filter out errors and get release value
+    CHART_LINE=$(helm get all ${NAME} -n ${NAMESPACE} 2> /dev/null | grep helm.sh/chart | head -1)
     # Remove helm.sh/chart: from test input
     CHART_VERSION=$(echo ${CHART_LINE} | sed -r 's/.{15}//')
-
-    if [[ (${CHART_VERSION} == *"java"* || ${CHART_VERSION} == *"node"* || ${CHART_VERSION} == *"base"*) ]];
-    then
-        if [[ ${CHART_VERSION} == *"${MINIMUM_JAVA}"* || ${CHART_VERSION} == *"${MINIMUM_NODE}"* || ${CHART_VERSION} == *"${MINIMUM_BASE}"* ]];
-        then
-            echo -e "${NAME} release in ${NAMESPACE} namespace OK."
-        else
-            echo -e "${NAME} release in ${NAMESPACE} namespace doesn't have the latest chart!"
+    if [[ "${CHART_VERSION}" == *"java"* ]]; then
+        if ! CHECK_CHART $CHART_VERSION $MINIMUM_JAVA "java"; then
+            TO_CHECK+="${NAME} -- Current version: ${CHART_VERSION}\n"
+        fi
+    fi
+    if [[ "${CHART_VERSION}" == *"node"* ]]; then
+        if ! CHECK_CHART $CHART_VERSION $MINIMUM_NODE "nodejs"; then
+            TO_CHECK+="${NAME} -- Current version: ${CHART_VERSION}\n"
+        fi
+    fi
+    if [[ "${CHART_VERSION}" == *"base"* ]]; then
+        if ! CHECK_CHART $CHART_VERSION $MINIMUM_BASE "base"; then
             TO_CHECK+="${NAME} -- Current version: ${CHART_VERSION}\n"
         fi
     fi

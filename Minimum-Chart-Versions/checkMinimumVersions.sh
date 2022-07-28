@@ -6,14 +6,14 @@ DOT_REMOVER(){
 CHECK_CHART(){
     VERSION=$(echo $1 | tr -d "phelm.sh/chart=:$3.- ")
     # Check version is at least the recommended one
-    [[ $(( $VERSION - $2 )) > 0 || $(( $VERSION - $2 )) == 0  ]]
+    [[ "$(( $VERSION - $2 ))" -ge 0 ]]
 }
 
 MINIMUM_JAVA="4.0.1"
-MINIMUM_JAVA=$(DOT_REMOVER ${MINIMUM_JAVA})
 MINIMUM_NODE="2.4.5"
-MINIMUM_NODE=$(DOT_REMOVER ${MINIMUM_NODE})
 MINIMUM_BASE="0.2.2"
+MINIMUM_NODE=$(DOT_REMOVER ${MINIMUM_NODE})
+MINIMUM_JAVA=$(DOT_REMOVER ${MINIMUM_JAVA})
 MINIMUM_BASE=$(DOT_REMOVER ${MINIMUM_BASE})
 
 RELEASES=$(helm list -A -o json | jq -c '.[]')

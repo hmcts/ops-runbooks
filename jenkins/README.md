@@ -38,3 +38,4 @@ Configuration is in the Jenkins base for the corresponding flux repository.
 ## Guides
 
 - [Troubleshooting builds starting slowly](builds-starting-slowly.md)
+- [Run command on all agents](run-command-on-all-agents.md)

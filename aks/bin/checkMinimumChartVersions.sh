@@ -16,7 +16,7 @@ MINIMUM_NODE=$(DOT_REMOVER ${MINIMUM_NODE})
 MINIMUM_JAVA=$(DOT_REMOVER ${MINIMUM_JAVA})
 MINIMUM_BASE=$(DOT_REMOVER ${MINIMUM_BASE})
 
-RELEASES=$(helm list -A -o json | jq -c '.[]')
+RELEASES=$(helm list -a -A -o json | jq -c '.[]')
 TO_CHECK=()
 IFS=$'\n' read -rd '' -a RELEASE_LIST <<<"$RELEASES"
 for RELEASE in "${RELEASE_LIST[@]}"

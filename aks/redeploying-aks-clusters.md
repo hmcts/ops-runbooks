@@ -128,6 +128,7 @@ Once swap over is fully complete then delete the older cluster,
 
 #### After deployment of a cluster
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/582)
+- Update Civil team's DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). [Update active jenkins-cluster IP value in DNS](https://github.com/hmcts/azure-private-dns/pull/428/files) and [update existing platform-hmcts-net entries](https://github.com/hmcts/azure-private-dns/pull/430/files).
 
 ### Production
 

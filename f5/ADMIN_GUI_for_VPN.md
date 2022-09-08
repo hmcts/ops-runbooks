@@ -15,6 +15,7 @@ You will need to connect to your F5 VPN connection and confirm that it is connec
 ## Step 2
 
 Once connected click on the below link to load up the webpage to access the GUI.
+
 Click on the following link - <https://vpn.platform.hmcts.net/xui/> 
 
 <img src=images/Pic2.png  width="400">
@@ -53,6 +54,7 @@ You will then be displayed with the below where you will need to click on the op
 ## Step 7
 
 Once this has loaded you will need to scroll to the top of the page and select the below option.
+
 Need to click on the Edit Access link - This will load a new tab in your web browser
 
 <img src=images/Pic7.png  width="400">

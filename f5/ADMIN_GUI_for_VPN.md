@@ -34,7 +34,9 @@ On the left hand side click on Access - Then click on Profiles/Policies and then
 ## Step 5
 
 The below will populate and this is where you will need to choose the correct profile name.
+
 We will be looking at -<https://prof_portal.platform.hmcts.net> 
+
 Click on the above 
 
 <img src=images/Pic5.png  width="400">

@@ -6,9 +6,9 @@ This document details the steps on how to access the ADMIN GUI over the VPN.
 
 You will need to connect to your F5 VPN connection and confirm that it is connected.
 
-Connect to the [VPN](https://portal.platform.hmcts.net)
+1. Connect to the [VPN](https://portal.platform.hmcts.net)
 
-Login to <https://vpn.platform.hmcts.net/>.\
+2. Login to <https://vpn.platform.hmcts.net/>.\
 
 <img src=images/Pic1.png  width="400">
 

@@ -13,7 +13,8 @@ You will need to connect to your F5 VPN connection and confirm that it is connec
 
 Once connected click on the below link to load up the webpage to access the GUI.
 Click on the following link - <https://vpn.platform.hmcts.net/xui/> 
- <img src=images/Pic2.png  width="400">
+
+<img src=images/Pic2.png  width="400">
 
  Type in your login details as provided by your admin, this would be different to your usual logins being used.
 

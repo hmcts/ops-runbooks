@@ -15,19 +15,22 @@ An Operator which converts Kubernetes Ingress hosts to valid Reply URLs, updates
 | CFT Demo          | [Auto Reply URL K8s Operator](https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/fbf4cb6e-f09d-4fc4-89fa-b94cb582cb18/isMSAApp/) | Application.ReadWrite.All (Type: Application)  | Microsoft Graph API                                                                                                                                                                                                   |
 
 ## Where is the operator deployed to?
-The operator is in full use in the demo and AAT environments where it is managing reply urls for an application that is actually in use. It also runs in the sandbox environments where it serves as a place to test changes before pushing changes to the Demo environment. It runs in the admin Namespace.
+The operator is in full use in the demo and AAT environments where it is managing reply urls for an application that is actually in use. 
+It also runs in the sandbox environments where it serves as a place to test changes before pushing changes to the Demo environment. It's configured to run in the `admin` `Namespace`.
 
 ## Flux configuration
-Flux is used to deploy the Reply URLs Operator and keep the resources in sync. The configuration for SDS and CFT can be found below.
+Flux is used to deploy the Reply URLs Operator and keep the resources in sync. 
 
-[SDS Flux config](https://github.com/hmcts/sds-flux-config/tree/master/apps/admin/reply-urls-operator)
+The configuration for SDS and CFT can be found below:
 
-[CFT Flux config](https://github.com/hmcts/cnp-flux-config/tree/master/apps/admin/reply-urls-operator)
+- [SDS Flux config](https://github.com/hmcts/sds-flux-config/tree/master/apps/admin/reply-urls-operator)
+- [CFT Flux config](https://github.com/hmcts/cnp-flux-config/tree/master/apps/admin/reply-urls-operator)
 
 ## Accessing the Demo Tenant via the az cli
 You can create an App Registration in the `CJS COMMON PLATFORM` Tenant for testing the adding and removing of Reply URLs, but to run a more like-for-like environment it's best to create or use an already existing App Reg in the `HMCTS DEMO` Tenant.
 
-To authenticate to the Demo Tenant you can run the command below. If it doesn't work for you, it could mean that a user hasn't been created for you and you need one created. To get a user created you can ask a member of the PlatOps team.
+To authenticate to the Demo Tenant you can run the command below, if it doesn't work for you, it could mean that a user hasn't been created for you and you need one created. 
+To get a user created you can ask a member of the PlatOps team.
 
 ```shell
 az login --tenant  hmctsexecdemo.onmicrosoft.com --allow-no-subscriptions

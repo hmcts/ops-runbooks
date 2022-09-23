@@ -25,7 +25,7 @@ Flux is used to deploy the Reply URLs Operator and keep the resources in sync. T
 [CFT Flux config](https://github.com/hmcts/cnp-flux-config/tree/master/apps/admin/reply-urls-operator)
 
 ## Accessing the Demo Tenant via the az cli
-You can create an App Registration in the `CJS COMMON PLATFORM` Tenant, but to run a more like-for-like environment it's best to create or use an already existing App Reg in the `HMCTS DEMO` Tenant.
+You can create an App Registration in the `CJS COMMON PLATFORM` Tenant for testing, but to run a more like-for-like environment it's best to create or use an already existing App Reg in the `HMCTS DEMO` Tenant.
 
 To authenticate to the Demo Tenant you can run the command below. If it doesn't work for you, it could mean that a user hasn't been created for you and you need one created. To get a user created you can ask a member of the PlatOps team.
 

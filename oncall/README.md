@@ -8,10 +8,7 @@ It is required that you go through this document before going on-call, and verif
 
 You must be in the following groups:
 
-* dcd_group_devops_v2
-* dcd_platformengineering
-* dcd_group_aks_admin_dcd-cftapps-prod_v2
-* dcd_group_sub_reader_dcd-cftapps-prod_v2
+* DTS Platform Operations
 
 You can add yourself via the [devops-azure-aad GitHub repo](https://github.com/hmcts/devops-azure-ad/blob/master/users/prod_users.yml).
 
@@ -43,7 +40,7 @@ Idam is accessed via a bastion server of its own, also known as the idam jump bo
 1. Request time based access (Automatically approved)
 
 Navigate to https://myaccess.microsoft.com/
-* Select: DevOps Bastion Server Access followed by "+ Request Access"
+* Select: Production Bastion Server Access followed by "+ Request Access"
 * Select: On-Call policy, no business justification is required.
 * Request: For specific period: Enter the period you are on-call for.
 * Submit (A green notification will confirm this was successful).
@@ -64,7 +61,7 @@ ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passp
 ```bash
 # Bastion - DevOps production access
 Host prodbastion
-HostName bastion-devops-prod.platform.hmcts.net
+HostName bastion-prod.platform.hmcts.net
 User {AD USERNAME HERE}@hmcts.net # this must be all in lowercase.
 DynamicForward 10825
 ForwardAgent yes

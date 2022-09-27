@@ -22,8 +22,8 @@ CFT has two prod kubernetes clusters, the current login command is:
 
 ```bash
 az login
-az aks get-credentials --resource-group prod-00-rg --name prod-00-aks --subscription DCD-CFTAPPS-PROD --overwrite
-az aks get-credentials --resource-group prod-01-rg --name prod-01-aks --subscription DCD-CFTAPPS-PROD --overwrite
+az aks get-credentials --resource-group cft-prod-00-rg --name cft-prod-00-aks --subscription DCD-CFTAPPS-PROD --overwrite
+az aks get-credentials --resource-group cft-prod-01-rg --name cft-prod-01-aks --subscription DCD-CFTAPPS-PROD --overwrite
 
 kubectl get pods -n admin
 # this will prompt you to login via Azure Active Directory

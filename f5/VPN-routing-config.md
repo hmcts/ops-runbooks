@@ -31,3 +31,29 @@ Note: If using Firefox then the search function probably won't find the IP addre
 <img src=images/VPN_Routing_table.png  width="400" />
 <img src=images/Routing_Change.png  width="400" />
 </p>
+
+## Apply Access Policy
+
+Once you have made a change to F5, you are required to Apply Access Policy.
+
+1. When a change has been made, you need to Apply Access Policy before change is effective on F5. You will notice this in top left of the F5 Portal when you have made a change.
+
+Select Apply Access Policy
+
+<img src=images/apply_access_policy.png  width="400">
+
+2. Review Access profile & ensure option prof_portal.platform.hmcts.net is ticked
+
+Select Apply
+
+<img src=images/apply_access_profile.png  width="400">
+
+3. Access profile policies are then shown, it should already be ticked for all.
+
+Select Apply
+
+<img src=images/apply_access_profile_all.png  width="400">
+
+4. Once successful apply, all access profiles should be green
+
+<img src=images/apply_access_policy_review.png  width="400">

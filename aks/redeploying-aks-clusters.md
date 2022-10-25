@@ -142,6 +142,7 @@ It is important to identify applications with underlying issues and allow suffic
 - Investigate failed helm releases and missing pods as required  
 - For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
+- For pods where images beginning with *pr-* aren't found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.
 
 #### Before deployment of a cluster
 - Remove the cluster you are going to be redeploying from the AGW. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/594)

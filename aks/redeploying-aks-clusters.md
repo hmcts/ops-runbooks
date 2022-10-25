@@ -190,11 +190,40 @@ See https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/pt
 After the cluster has been redeployed successfully and hr's / pods are running as expected you need to verify that you can get to the [Jenkins web ui](https://build.platform.hmcts.net), and then comment on the slack channel announcement made previously to advise Jenkins is back up.
 
 ### Perftest
+
+#### Day or hours before deployment of a cluster  
+
+It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
+- Create a time-snapshot list of pods for comparison reference post-deployment - `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A > all_pods_status_$TIMESTAMP`
+- Create a time-snapshot count of pods for comparison reference post-deployment - `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A | wc -l > total_pods_$TIMESTAMP`  
+- To identity failed Helm releases and copy list into a file, run `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get hr -A | grep -v Succeeded > failed_hrs_$TIMESTAMP`  
+- To identify failed pods and copy list into a file, run `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A | grep -v Completed | grep -v Running > failed_pods_$TIMESTAMP`
+- Investigate failed helm releases and missing pods as required  
+- For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
+- For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
+- For pods where images beginning with *pr-* aren't found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.
+
+
 - Confirm that the environment isn't being used with Nickin Sitaram before starting. 
 - Use slack channel pertest-cluster for communication.
 - Scale the number of active nodes, increase by 5 nodes if removing a custer. 
   Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.
+
+#### After deployment of a cluster
+- Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
 ### Demo
+
+#### Day or hours before deployment of a cluster  
+
+It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
+- Create a time-snapshot list of pods for comparison reference post-deployment - `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A > all_pods_status_$TIMESTAMP`
+- Create a time-snapshot count of pods for comparison reference post-deployment - `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A | wc -l > total_pods_$TIMESTAMP`  
+- To identity failed Helm releases and copy list into a file, run `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get hr -A | grep -v Succeeded > failed_hrs_$TIMESTAMP`  
+- To identify failed pods and copy list into a file, run `TIMESTAMP="$(date +%F_%H%M%S)" && kubectl get pods -A | grep -v Completed | grep -v Running > failed_pods_$TIMESTAMP`
+- Investigate failed helm releases and missing pods as required  
+- For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
+- For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
+- For pods where images beginning with *pr-* aren't found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.
 
 Demo runs only one cluster at a time due to some limitations in the current setup. 
 
@@ -204,6 +233,7 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 - Delete inactive cluster using the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**.
 
 #### After Deployment of Cluster
+- Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
 
 * Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:
 

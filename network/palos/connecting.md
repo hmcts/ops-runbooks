@@ -9,19 +9,22 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 1. Log on to the F5 VPN.
 
 2. From the login page (virtual machines for env), click on the `Use Single Sign-On` link
+  <details>
+   <summary>View screenshot!</summary>
 
   ![SSO signing dialog with annotation pointing to login options](images/sso-step-1.png)
 
 3. On the `Single Sign-On (SSO)` page, leave input box empty, click the `Continue` button
+  <details>
+   <summary>View screenshot!</summary>
 
   ![SSO signing dialog with annotation pointing to user options](images/sso-step-2.png)
-  
-4. Provide your HMCTS login details and you will be redirected to Microsoft login page, if you've not already signed in
+  </details>
+4. Provide your HMCTS login details and you will be redirected to Microsoft login page, if you've not already signed in.
 
-5. After successful authentication you'll be redirected back
+5. After successful authentication you'll be redirected back.
 
 <details>
-
 <summary>Sandbox virtual machines</summary>
 
 ### Sandbox

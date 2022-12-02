@@ -115,9 +115,9 @@ _Replace 10.12.79.250 with the loadbalancer IP (kubernetes-internal) of the clus
 az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.12.79.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 ```
 
-Once swap over is fully complete then delete the older cluster,
+Once swap over is fully complete then delete the older cluster from azure portal.
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**. 
+
 ### AAT
 
 #### Before deployment of a cluster

@@ -88,12 +88,12 @@ This will simulate a repo/setup is using the Preview cluster that has not been s
 Same PR might not be re-usable when the cluster is swapped to active as DNS record could be invalid. You can verify and manually tweak the records to be able to reuse it.
 #### After deployment of a cluster
 
-- Change Jenkins to use the other cluster, e.g. [cnp-flux-config#4348](https://github.com/hmcts/cnp-flux-config/pull/4348) .
+- Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .
   - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
-- Swap external DNS active cluster, e.g. [cnp-flux-config#4606](https://github.com/hmcts/cnp-flux-config/pull/4606) 
+- Swap external DNS active cluster, e.g. [cnp-flux-config#19889](https://github.com/hmcts/cnp-flux-config/pull/19889) 
 - Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service) . [example PR](https://github.com/hmcts/rpe-pdf-service/pull/318)
   - Check this PR in Jenkins has successfully ran through stage [AKS deploy - preview](https://build.platform.hmcts.net/job/HMCTS_Platform/job/rpe-pdf-service/view/change-requests/job/PR-318/)
-- Update the charts for jobs and steps pointing to the new preview [cnp-azuredevops-pipelines#40](https://github.com/hmcts/cnp-azuredevops-libraries/pull/40)
+- Update the charts for jobs and steps pointing to the new preview [cnp-azuredevops-pipelines#127](https://github.com/hmcts/cnp-azuredevops-libraries/pull/127/files)
 - Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example annoucenment:-
 
 Hi all, Preview cluster has been swapped cft-preview-00-aks.

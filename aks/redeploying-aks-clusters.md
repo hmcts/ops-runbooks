@@ -34,7 +34,7 @@ Redeploying in order:-
 - STG              - (K8s service names are  = ss-stg-00-aks - ss-stg-01-aks)
 - Production       - (K8s service names are  = ss-prod-00-aks - ss-prod-01-aks) 
 - Management       - (K8s service name is    = ss-ptl-00-aks) 
-- Demo             - (K8s service names are  = cft-demo-00-aks - cft-demo-01-aks)
+- Demo             - (K8s service names are  = ss-demo-00-aks - ss-demo-01-aks)
 - Test             - (K8s service names are  = ss-test-00-aks - ss-test-01-aks)
 - Dev              - (K8s service names are  = ss-dev-01-aks)
 

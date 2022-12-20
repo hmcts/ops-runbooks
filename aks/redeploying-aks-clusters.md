@@ -4,7 +4,7 @@ This wiki page documents some tasks that we have to perform when deploying any o
 
 ## To create a cluster:
 
-Go to the [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary). 
+Go to the [CFT pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) or [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482&_a=summary) depending on which cluster you are deploying.
 
 Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to which ever one you want to build and that the environment is selected from the drop down menu. 
 

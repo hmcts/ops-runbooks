@@ -16,15 +16,27 @@ This order can change; created to give a brief overview of the environments.
 
 Redeploying in order:-
 
+**CFT Clusters**
 - sbox             - (K8s service names are  = cft-sbox-00-aks - cft-sbox-01-aks)
 - Management sbox  - (K8s service name is    = cft-ptlsbox-00-aks)
-- ITHC             - (K8s service names are  = cft-ithc-00-aks - cft-ithcx-01-aks)
-- Preview          - (K8s service name is    = cft-previewx-01-aks)
+- ITHC             - (K8s service names are  = cft-ithc-00-aks - cft-ithc-01-aks)
+- Preview          - (K8s service name is    = cft-preview-01-aks)
 - AAT              - (K8s service names are  = cft-aat-00-aks - cft-aat-01-aks)
 - Production       - (K8s service names are  = prod-00-aks - prod-01-aks) 
 - Management       - (K8s service name is    = cft-ptl-00-aks) 
 - Perftest         - (K8s service names are  = cft-perftest-00-aks - cft-perftest-01-aks)
 - Demo             - (K8s service names are  = cft-demo-00-aks - cft-demo-01-aks)
+
+**SDS Clusters**
+- sbox             - (K8s service names are  = ss-sbox-00-aks - ss-sbox-01-aks)
+- Management sbox  - (K8s service name is    = ss-ptlsbox-00-aks)
+- ITHC             - (K8s service names are  = ss-ithc-00-aks - ss-ithc-01-aks)
+- STG              - (K8s service names are  = ss-stg-00-aks - ss-stg-01-aks)
+- Production       - (K8s service names are  = ss-prod-00-aks - ss-prod-01-aks) 
+- Management       - (K8s service name is    = ss-ptl-00-aks) 
+- Demo             - (K8s service names are  = cft-demo-00-aks - cft-demo-01-aks)
+- Test             - (K8s service names are  = ss-test-00-aks - ss-test-01-aks)
+- Dev              - (K8s service names are  = ss-dev-01-aks)
 
 ## Dashboards
 A good indication along with reviewing the environments themselves, reviewing Grafana

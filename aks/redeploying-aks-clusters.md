@@ -117,8 +117,11 @@ az network private-dns record-set a list --zone-name service.core-compute-previe
 
 Deletes any txt records pointing to inactive:
 
-```command
+```bash
+# Private DNS
 az network private-dns record-set txt list --zone-name demo.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set txt delete --zone-name demo.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+# Public DNS
+az network dns record-set txt list --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set txt delete --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
 ```
 
 Once swap over is fully complete then delete the older cluster,

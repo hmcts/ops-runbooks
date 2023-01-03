@@ -114,8 +114,6 @@ _Replace 10.12.79.250 with the loadbalancer IP (kubernetes-internal) of the clus
 ```command
 # Private DNS
 az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.12.79.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
-```
-```command
 # Public DNS
 az network dns record-set a list --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?aRecords[0].ipv4Address=='20.90.254.226'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
 ```

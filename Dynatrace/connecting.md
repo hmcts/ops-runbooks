@@ -1,5 +1,9 @@
 # Dynatrace
 
+## Pre-Requisites
+
+- Connected to [F5](https://portal.platform.hmcts.net)
+
 ## Connecting to Dynatrace VMs (ActiveGate)
 
 - Dynatrace ActiveGate VMs exist as instances of different VMSS:

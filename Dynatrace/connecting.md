@@ -2,7 +2,7 @@
 
 ## Pre-Requisites
 
-- Connected to [F5](https://portal.platform.hmcts.net)
+- Connected to the [VPN](https://portal.platform.hmcts.net)
 
 ## Connecting to Dynatrace VMs (ActiveGate)
 
@@ -15,8 +15,7 @@
 
 - Connections to these VMs are handled with SSH. Run the commands below in order to connect to a given VM, there is a script in `/bin/IPlist.sh` to list IP addresses of VMs.
 ```bash
-  az account set --subscription DTS-CFTPTL-INTSVC
   az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
   chmod 600 ~/.ssh/dt-key
-  ssh -i dt-key azureuser@{replace_me_with_vm_ip}
+  ssh -i ~/.ssh/dt-key azureuser@{replace_me_with_vm_ip}
 ```

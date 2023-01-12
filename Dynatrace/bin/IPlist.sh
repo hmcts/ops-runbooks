@@ -3,6 +3,7 @@
 ENV=("ptl" "nonprod")
 LOCATION=("-private-" "-")
 RG="aks-infra-cftptl-intsvc-rg"
+az account set --subscription DTS-CFTPTL-INTSVC
 
 for env in ${ENV[@]}
 do

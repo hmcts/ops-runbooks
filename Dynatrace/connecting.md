@@ -2,7 +2,7 @@
 
 ## Pre-Requisites
 
-- Connected to [F5](https://portal.platform.hmcts.net)
+- Connected to the [VPN](https://portal.platform.hmcts.net)
 
 ## Connecting to Dynatrace VMs (ActiveGate)
 

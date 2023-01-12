@@ -14,7 +14,7 @@
 
 - Connections to these VMs are handled with SSH. Run the commands below in order to connect to a given VM.
 ```bash 
-  az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
-  chmod 600 ~/.ssh/dt-key
-  ssh -i ~/.ssh/dt-key azureuser@{replace_me_with_vm_ip}
+az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
+chmod 600 ~/.ssh/dt-key
+ssh -i ~/.ssh/dt-key azureuser@{replace_me_with_vm_ip}
 ```

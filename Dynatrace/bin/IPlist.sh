@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ENV=("ptl" "nonprod")
+LOCATION=("-private-" "-")
+RG="aks-infra-cftptl-intsvc-rg"
+
+for env in ${ENV[@]}
+do
+    for location in ${LOCATION[@]}
+    do
+        echo "Private IPS of VM instances in activegate$location$env-vmss scale set:"
+        az vmss nic list -g $RG --vmss-name activegate$location$env-vmss  | jq '.[].ipConfigurations[].privateIpAddress'
+    done
+done

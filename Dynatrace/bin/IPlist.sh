@@ -10,6 +10,6 @@ do
     for location in ${LOCATION[@]}
     do
         echo "Private IPS of VM instances in activegate$location$env-vmss scale set:"
-        az vmss nic list -g $RG --vmss-name activegate$location$env-vmss  | jq '.[].ipConfigurations[].privateIpAddress'
+        az vmss nic list -g $RG --vmss-name activegate$location$env-vmss  | jq -r '.[].ipConfigurations[].privateIpAddress'
     done
 done

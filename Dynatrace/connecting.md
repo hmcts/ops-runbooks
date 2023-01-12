@@ -16,5 +16,5 @@
 ```bash 
   az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
   chmod 600 ~/.ssh/dt-key
-  ssh -i dt-key azureuser@{replace_me_with_vm_ip}
+  ssh -i ~/.ssh/dt-key azureuser@{replace_me_with_vm_ip}
 ```

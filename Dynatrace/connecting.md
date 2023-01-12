@@ -18,7 +18,7 @@ Run the commands below in order to connect to a given VM.
     az account set --subscription DTS-CFTPTL-INTSVC
     ```
   - ```bash
-    az keyvault secret download -f dt-key --id https://cftptl-intsvc.vault.azure.net/secrets/aks-ssh-private-key/0ea947804a1142eab4c08c27de813e49; echo "\n" >> dt-key
+    az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
     ```
   - ```bash
     chmod 600 dt-key

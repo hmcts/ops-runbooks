@@ -238,23 +238,30 @@ It is important to identify applications with underlying issues and allow suffic
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
 - For pods where images beginning with *pr-* aren't found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.
 
-#### Before deployment of a cluster
+#### Before switchover of a cluster
 
 Demo runs only one cluster at a time due to some limitations in the current setup. 
 
+- Build the other demo cluster:
+  - CFT: Use the [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=677&_a=summary) in apply mode to build either 00/01 demo cluster.
+  - SDS: Uncomment 00/01 cluster in this file [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars) in a PR and merge into    master.
 - Check whether all deployments/ apps are up. `kubectl get hr -A` gives a quick snapshot of progress.
-- Swap backend application gateway in [azure-platform-terraform](https://github.com/hmcts/azure-platform-terraform/pull/622/files)
-- Swap active external dns deployments to route traffic to new cluster [Example PR](https://github.com/hmcts/cnp-flux-config/pull/14659/files)
-- Delete inactive cluster using the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**.
+- Check that Load Balancer IPs have been assigned `kubectl get svc -n admin`, one external-ip for each instance of traefik.
+- Check all pods are deployed and running. Compare with pods status reference taken pre-deployment.
 
-#### After Deployment of Cluster
-- Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
+#### After Deployment of Cluster, and all above health conditions met
 
-* Delete all ingress on the old cluster to ensure external-dns deletes it's existing records:
+- Swap backend application gateway in [azure-platform-terraform](https://github.com/hmcts/azure-platform-terraform/pull/622/files), or [sds-azure-platform](https://github.com/hmcts/sds-azure-platform/blob/master/environments/demo/demo.tfvars#L7) -- IP of traefik-private service.
+- Swap active external dns deployments to route traffic to new cluster [example CFT PR](https://github.com/hmcts/cnp-flux-config/pull/14659/files), [example SDS PR](https://github.com/hmcts/sds-flux-config/pull/2356/files)
+- Delete all ingress on the old cluster to ensure external-dns deletes it's existing records and the new cluster can repopulate DNS:
 
 ```command
 kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
 ```
+
+- Delete old cluster:
+  - CFT: We are currently manually stopping and deleting the old cluster in the Azure Portal for CFT until we have a code solution similar to SDS.
+  - SDS: Remove old cluster code from [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars), like in this [PR](https://github.com/hmcts/aks-sds-deploy/pull/208), once merged into master this will destroy the cluster.
 ## Known issues
 
 ### Neuvector

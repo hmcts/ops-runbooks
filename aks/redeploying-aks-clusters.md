@@ -244,7 +244,7 @@ Demo runs only one cluster at a time due to some limitations in the current setu
 
 - Build the other demo cluster:
   - CFT: Use the [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=677&_a=summary) in apply mode to build either 00/01 demo cluster.
-  - SDS: Uncomment 00/01 cluster in this file [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars) in a PR and merge into    master.
+  - SDS: Uncomment 00/01 cluster in this file [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars) in a PR and merge into master, then run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482) in apply mode.
 - Check whether all deployments/ apps are up. `kubectl get hr -A` gives a quick snapshot of progress.
 - Check that Load Balancer IPs have been assigned `kubectl get svc -n admin`, one external-ip for each instance of traefik.
 - Check all pods are deployed and running. Compare with pods status reference taken pre-deployment.
@@ -261,7 +261,7 @@ kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
 
 - Delete old cluster:
   - CFT: We are currently manually stopping and deleting the old cluster in the Azure Portal for CFT until we have a code solution similar to SDS.
-  - SDS: Remove old cluster code from [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars), like in this [PR](https://github.com/hmcts/aks-sds-deploy/pull/208), once merged into master this will destroy the cluster.
+  - SDS: Remove old cluster code from [this file](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars), like in this [PR](https://github.com/hmcts/aks-sds-deploy/pull/208), once merged into master run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482) in apply mode.
 ## Known issues
 
 ### Neuvector

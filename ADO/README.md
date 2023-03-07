@@ -18,7 +18,7 @@ These are agile tools that help us plan, and track any unit of  our works in sof
 
 - At the top right corner where you can see Run pipleline click on the "Kebab "(that is the three verticle dots)   
 
-- Then click on sttings, at the pipeline settings you will see dailog box which say YAMIL file path select the correct pipeline you want to run on. Then click Run pipeline
+- Then click on sttings, at the pipeline settings you will see dailog box which say YAML file path select the correct pipeline you want to run on. Then click Run pipeline
   
 ## Selecting 
 

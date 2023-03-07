@@ -1,5 +1,5 @@
 # Azure Boards 
-These are agile tools that help us plan, and track any unit of work in software project. (https://dev.azure.com/hmcts/PlatformOperations/_workitems/recentlyupdated/)
+These are agile tools that help us plan, and track any unit of  our works in software project. (https://dev.azure.com/hmcts/PlatformOperations/_workitems/recentlyupdated/)
 
 
 ##  ADO Projects
@@ -52,5 +52,5 @@ These are current environment on the ADO (https://dev.azure.com/hmcts/PlatformOp
 
 - [Troubleshooting links pipeline runs ]( https://learn.microsoft.com/en-us/azure/devops/pipelines/troubleshooting/troubleshooting?view=azure-devops)
   
-- [Run command on all agents](run-command-on-all-agents.md)
+- [Review logs to diagnose pipeline issues](https://learn.microsoft.com/en-us/azure/devops/pipelines/troubleshooting/review-logs?view=azure-devops)
   

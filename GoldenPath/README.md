@@ -41,7 +41,7 @@ At the end of this exercise you would have been introduced to the following tech
 - [Clean Up](path-4-logs.md)
 
 #### GoldenPath HandsOs
-To follow the hands on check out the [goldenpath-paltops](link) repo and follow the instructions
+To follow the hands on check out the [goldenpath-paltops](https://github.com/hmcts/goldenpath-platops) repo and follow the instructions
 
 ### Feedback
 We would appreciate your feedback at the end of this exercise. This would help us improve

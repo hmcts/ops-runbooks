@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    branches:
+      - source
+  push:
+    branches:
+      - source
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.1
+          architecture: 'x64'
+          bundler-cache: true
+      - name: Build
+        run: bundle exec middleman build
+      - name: Publish
+        run: |
+          rm -rf build
+          git config --global user.email "PlatformTeam@HMCTS.NET"
+          git config --global user.name "Platform Team"
+          git remote set-url origin https://nobody:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          bundle exec rake publish
+        if: github.ref == 'refs/heads/source'
+

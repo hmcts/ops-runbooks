@@ -1,5 +1,5 @@
 # Host to use for canonical URL generation (without trailing slash)
-host: https://hmcts.github.io
+host: https://hmcts-runbooks.github.io
 
 # Header-related options
 show_govuk_logo: false
@@ -34,7 +34,7 @@ max_toc_heading_level: 1
 prevent_indexing: false
 
 show_contribution_banner: true
-github_repo: hmcts/hmcts.github.io
+github_repo: hmcts/ops-runbooks
 github_branch: source
 
 owner_slack_workspace: hmcts-reform

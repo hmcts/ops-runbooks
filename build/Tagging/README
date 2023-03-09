@@ -1,0 +1,6 @@
+<h1 id="tagging-resources-manually">Tagging resources manually</h1>
+<p>This script was created for DTSPO-7971 to tag un-tagged resources on a per resource group level in a more automated way, following the tagging requirements <a href="https://tools.hmcts.net/confluence/display/DCO/Tagging+v0.4">here</a>. It tags all resources within the resource group and the resource group itself, whilst retaining all existing tags.</p>
+<h2 id="pre-requisites">Pre-requisites</h2>
+<p>Please ensure that you have jq installed in order for tagger.sh to be run. This can be installed by running the command <code>brew install jq</code></p>
+<h2 id="description">Description</h2>
+<p>To run the script, clone this repository and switch into the <code>Tagging</code> directory, then run <code>./tagger.sh</code>. You may need to give executable permissions first with <code>chmod +x tagger.sh</code> and make sure you&rsquo;ve ran <code>az login</code> too. The script should guide you through what you need to accomplish the tagging, and validates that the tagging values you&rsquo;ve entered fit HMCTS requirements.</p>

@@ -1,0 +1,16 @@
+<h1 id="palo-alto">Palo Alto</h1>
+<p>This guide aims to give you an introduction to the HMCTS Palo Alto firewalls setup and provide you with some tips on how to troubleshoot common errors.</p>
+<h2 id="useful-links">Useful links</h2>
+
+<ul>
+<li><a href="https://github.com/hmcts/rdo-terraform-hub-dmz">GitHub Repository</a></li>
+<li><a href="https://tools.hmcts.net/confluence/display/RD/HUB-DMZ">Hub DMZ documentation</a></li>
+<li><a href="https://cjscommonplatform.sharepoint.com/sites/DTSPlatformOperationsTeam/Shared%20Documents/Transition%20to%20new%20supplier/Videos/Hub,%20DMZ,%20VPN%20&amp;%20Networks.mp4">KT videos</a></li>
+</ul>
+<h2 id="guides">Guides</h2>
+
+<ul>
+<li><a href="connecting.md">Connecting to a Palo Alto firewall</a></li>
+<li><a href="troubleshooting.md">Troubleshooting issues</a></li>
+<li><a href="upgrade-software.md">Upgrading Palo Alto firewall Software</a></li>
+</ul>

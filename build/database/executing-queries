@@ -1,0 +1,75 @@
+<h1 id="executing-queries">Executing Queries</h1>
+<p>You can execute queries in any number of ways, below are some suggestions</p>
+<h2 id="small-queries">Small queries</h2>
+
+<ul>
+<li>Connect to  Postgres by following commands outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> <br></li>
+<li>Once in, you can execute provided query
+<code>cmd
+psql&gt; paste your query here;
+</code>
+<strong>Note:</strong> The prompt would most likely be the <code>DB_NAME</code> you provided in steps you followed when connecting to the DB</li>
+<li>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off<br></li>
+<li>For small queries with large results, you could do the following to output to file
+<code>cmd
+\o &lt;filename&gt;.csv
+&lt;your query here&gt;
+\q
+</code>
+This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it. <br>
+<strong>Note:</strong> the extension could be whatever you choose, here am using <code>csv</code> <br>
+<em>Example:</em><br>
+<a href="images/query-output.png" rel="noopener noreferrer"><img src="/database/images/query-output.png" alt="Output to file" /></a></li>
+</ul>
+<h2 id="larger-lengthier-queries">Larger, lengthier queries</h2>
+
+<ul>
+<li>Connect to Postgres as described in above step</li>
+<li>Create a new file, for example
+<code>cmd
+vi &lt;ticket-number&gt;-&lt;any-extras-labeling&gt;.sql
+</code>
+You could use <code>nano</code> as well. Just replace <code>vi</code> with <code>nano</code></li>
+<li>Copy/paste query and save it
+<code>cmd 
+:wq!
+</code>
+If using <code>nano</code> then use it&rsquo;s equivalent</li>
+<li>Once file is saved you could run the command passing the file as input to Postgres.
+<code>cmd 
+psql &quot;sslmode=require host=${POSTGRES_HOST} dbname=${DB_NAME} user=${DB_USER}&quot; -o DTSPO-2766-result.csv &lt; DTSPO-2766-get-case-data.sql
+</code>
+<em>Here <code>DTSPO-2766-result.csv</code> is where I want the results saved and <code>DTSPO-2766-get-case-data.sql</code> is the file with provided sql query</em></li>
+<li>If no errors, you can <code>cat</code> the output file for a quick eye-balling 👀
+<code>cmd 
+cat &lt;output-file&gt;.csv
+</code></li>
+</ul>
+<h2 id="bringing-query-file-home">Bringing query file home</h2>
+<p>You can use any <code>sftp</code> tool of your choice to connect to bastion or follow below steps</p>
+
+<ul>
+<li>Log out of your ssh terminal by exiting</li>
+<li>Copy the file from the bastion server right from your terminal
+<code>cmd 
+scp user.name@hmcts.net@bastion-devops-prod.platform.hmcts.net:/home/user.name/DTSPO-2766-result.csv /Users/&lt;location-of-choice&gt;
+</code>
+<code>/Users/&lt;location-of-choice&gt;</code> being a path on your file system, here is an example using a MAC</li>
+<li>You can now send the file(s) to authorised recipient(s) or share as instructed in the ticket.<br> 
+If unclear, confirm with team members.</li>
+</ul>
+<p>If you run into any other issues please feel free to reach out to team members.</p>
+<h3 id="notes">Notes</h3>
+<p>In the in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> documentation
+<code>cmd
+export PGPASSWORD=&lt;result-from-earlier&gt;
+</code>
+Assign to the variable <code>PGPASSWORD</code> the token returned from the <code>az account get-access-token ...</code> command you ran earlier <br>
+<em>Example:</em><br>
+<a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="/database/images/assign-to-password-var.png" alt="Token to Password" /></a></p>
+<h3 id="some-external-reference">Some external reference</h3>
+<p>You can have a quick peak for some <code>psql</code> info that may be useful
+* <a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a>
+* <a href="https://kb.objectrocket.com/postgresql/how-to-run-an-sql-file-in-postgres-846">How to run an SQL file in Postgres</a>
+  - Run a SQL file in Postgres using the ‘psql’ command 
+  - Connect to PostgreSQL and then run a SQL file using ‘psql’</p>

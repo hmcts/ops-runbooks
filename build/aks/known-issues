@@ -1,0 +1,33 @@
+<h1 id="aks-known-issues">AKS Known Issues</h1>
+<p>Known issues encountered during AKS cluster update or rebuild</p>
+<h2 id="daemonset-failed-scheduling">DaemonSet Failed Scheduling</h2>
+<p>For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.</p>
+<p>An error similar to the below may be seen in the cluster events log:</p>
+<p><a href="Images/oneagent_scheduling_error.png" rel="noopener noreferrer"><img src="/aks/Images/oneagent_scheduling_error.png" alt="" /></a></p>
+
+<ul>
+<li>This happens when there is a capacity issue on specific cluster nodes</li>
+<li>DaemonSet rolling update is blocked with the pod stuck in <code>Pending</code> state</li>
+<li><p>Deleting the pod does not fix issue as pod restarts and goes into same <code>Pending</code> state</p></li>
+<li><p>Run <code>kubectl get pod &lt;podname&gt; -o yaml | grep nodeName</code> to identify the node where pod scheduling has failed</p></li>
+<li><p>Run <code>kubectl get pods -A | grep &lt;node name&gt;</code> to list all pods running on node</p></li>
+<li><p>Identify and delete one or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node</p></li>
+<li><p>If deleted pods are stuck in <code>Terminating</code> state, use <code>kubectl delete pod &lt;podname&gt; --grace-period 0 --force</code> to forcefully delete pod</p></li>
+<li><p>Confirm DaemonSet pod now starts successfully</p></li>
+</ul>
+<h2 id="dynatrace-oneagent-pods-not-deployed-or-failing-to-start">Dynatrace oneagent pods not deployed or failing to start</h2>
+<p><strong>NOTE:</strong> The issue described here need to be validated if still applies when the updated <a href="https://tools.hmcts.net/jira/browse/DTSPO-6187">Dynatrace Operator</a> is rolled out.</p>
+<p>For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a <code>CrashLoopBackOff</code> status.</p>
+<p>Dynatrace Helm Chart <a href="https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions">requires</a> CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not part of the existing Flux config.</p>
+<p>Run the below command on the cluster. An empty result confirms CRDs are not installed.</p>
+<p><code>kubectl get crds | grep oneagent</code></p>
+<p>To fix, run the below command to apply CRDs to the cluster:</p>
+<p><code>kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml</code></p>
+<p><code>kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml</code></p>
+<p><strong>Note</strong>: A Flux config to apply the CRDs was previously tested (<a href="https://github.com/hmcts/cnp-flux-config/pull/14312">PR14321</a>) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7</p>
+<h2 id="code-quot-reconcilevmssagentpoolfailed-quot-message-quot-code-quot-cannotaddacceleratednetworkingnictoanexistingvirtualmachine-quot">Code=&ldquo;ReconcileVMSSAgentPoolFailed&rdquo; Message=&ldquo;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&rdquo;</h2>
+
+<blockquote>
+<p>waiting for update of Node Pool &ldquo;msnode&rdquo; (Kubernetes Cluster &ldquo;ss-sbox-00-aks&rdquo; / Resource Group &ldquo;ss-sbox-00-rg&rdquo;): Code=&ldquo;ReconcileVMSSAgentPoolFailed&rdquo; Message=&ldquo;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&rdquo; Message=\&ldquo;Cannot add network interface &lsquo;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode&rsquo; with accelerated networking to an existing virtual machine &lsquo;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0&rsquo;.\&rdquo; Details=[]&ldquo;</p>
+</blockquote>
+<p>We&rsquo;ve seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.</p>

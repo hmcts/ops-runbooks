@@ -1,0 +1,4 @@
+<h1 id="splunk-documentation">Splunk documentation</h1>
+<p>ops-runbooks for detailing splunk infrastructure low-level configuration:
+1. <a href="./datadisk-config-notes.md">Splunk Data disk configuration notes</a>
+2. <a href="./server-access.md">Splunk Server Access</a></p>

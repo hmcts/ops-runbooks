@@ -1,0 +1,10 @@
+<h1 id="generating-an-sas-token">Generating an SAS Token</h1>
+<p>This wiki page documents the procedure for generating a new SAS token</p>
+<h2 id="to-grant-yourself-permissions">To grant yourself permissions:</h2>
+<p>Go to the <a href="https://portal.azure.com/#blade/Microsoft_Azure_PIMCommon/CommonMenuBlade/quickStart">PIM settings</a>.</p>
+<p>Click on <strong>My roles</strong> under tasks in the left hand side. Select Group Administrator and select <strong>activate</strong>. Then submit your request for elevator permissions.</p>
+<p>Once this has been activated, add yourself to a group with the <strong>owner</strong> permission over the subscription the storage account you need to generate the token for sits in.</p>
+<h2 id="generating-the-token">Generating the token</h2>
+<p>Navigate to the storage account and open <code>Shared Access signature</code>. Select the level of permission required, be sure to select your allowed resource types and permissions, set the expiry date, and include the allowed IP address. After creating the token, ensure you copy the <code>Connection String</code> and the <code>SAS Token</code> shown on screen, securely pass these to the requester using something like pwpush.com.</p>
+<h2 id="whitelist-ip">Whitelist IP</h2>
+<p>In the same storage account navigate to Networking &gt; Firewall and add the required IP, ensuring you click save after adding, and then confirm the token is working.</p>

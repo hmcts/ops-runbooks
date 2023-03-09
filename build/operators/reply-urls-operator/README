@@ -1,0 +1,60 @@
+<h1 id="reply-urls-operator">reply-urls-operator</h1>
+<p>An Operator which converts Kubernetes Ingress hosts to valid Reply URLs, updates the App Registration and keeps them in sync.</p>
+<p><a href="https://github.com/hmcts/reply-urls-operator">Reply URLs Operator - GitHub Repo</a></p>
+<h2 id="app-registrations-currently-in-use">App Registrations currently in use</h2>
+<div class="table-container">
+        <table>
+          <tr>
+<th>Cluster</th>
+<th>App Registration</th>
+<th>Role</th>
+<th>Resource / API</th>
+</tr><tr>
+<td>GitHub Actions</td>
+<td><a href="https://portal.azure.com/531ff96d-0ae9-462a-8d2d-bec7c0b42082/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/ea8074af-5f20-45df-a3a2-25be693b5c8e/isMSAApp/">reply-urls-operator-demo</a></td>
+<td>Acr Push &amp; Contributor (Type: Application)</td>
+<td><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/overview">sdshmctspublic</a></td>
+</tr><tr>
+<td>Automated Testing</td>
+<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/2816f198-4c26-48bb-8732-e4ca72926ba7/isMSAApp/">reply-urls-testing-app</a></td>
+<td>Application.ReadWrite.All (Type: Application)</td>
+<td>Microsoft Graph API</td>
+</tr><tr>
+<td>SDS Sbox</td>
+<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/1f26b7c2-a15e-4fa6-a3c7-4c0d95beb2cb/isMSAApp/">reply-urls-operator-test</a></td>
+<td>Application.ReadWrite.All  (Type: Application)</td>
+<td>Microsoft Graph API</td>
+</tr><tr>
+<td>SDS Demo</td>
+<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/2a3f8b5a-ec0e-470d-b979-fc79d3e74cba/isMSAApp/">SDS Oauth Proxy</a></td>
+<td>Application.ReadWrite.All (Type: Application)</td>
+<td>Microsoft Graph API</td>
+</tr><tr>
+<td>CFT Sbox</td>
+<td>Not created yet</td>
+<td>Application.ReadWrite.All (Type: Application)</td>
+<td>Microsoft Graph API</td>
+</tr><tr>
+<td>CFT Demo</td>
+<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/fbf4cb6e-f09d-4fc4-89fa-b94cb582cb18/isMSAApp/">Auto Reply URL K8s Operator</a></td>
+<td>Application.ReadWrite.All (Type: Application)</td>
+<td>Microsoft Graph API</td>
+</tr>
+        </table>
+      </div><h2 id="where-is-the-operator-deployed-to">Where is the operator deployed to?</h2>
+<p>The operator is in full use in the demo environments where it is managing reply urls for an application that is actually in use. 
+It also runs in the sandbox environments where it serves as a place to test changes before pushing changes to the Demo environment. It&rsquo;s configured to run in the <code>admin</code> <code>Namespace</code>.</p>
+<h2 id="flux-configuration">Flux configuration</h2>
+<p>Flux is used to deploy the Reply URLs Operator and keep the resources in sync.</p>
+<p>The configuration for SDS and CFT can be found below:</p>
+
+<ul>
+<li><a href="https://github.com/hmcts/sds-flux-config/tree/master/apps/admin/reply-urls-operator">SDS Flux config</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/tree/master/apps/admin/reply-urls-operator">CFT Flux config</a></li>
+</ul>
+<h2 id="accessing-the-demo-tenant-via-the-az-cli">Accessing the Demo Tenant via the az cli</h2>
+<p>You can create an App Registration in the <code>CJS COMMON PLATFORM</code> Tenant for testing the adding and removing of Reply URLs, but to run a more like-for-like environment it&rsquo;s best to create or use an already existing App Reg in the <code>HMCTS DEMO</code> Tenant.</p>
+<p>To authenticate to the Demo Tenant you can run the command below, if it doesn&rsquo;t work for you, it could mean that a user hasn&rsquo;t been created for you and you need one created. 
+To get a user created you can ask a member of the Platform Operations team.</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az login <span class="nt">--tenant</span>  hmctsexecdemo.onmicrosoft.com <span class="nt">--allow-no-subscriptions</span>
+</code></pre></div>

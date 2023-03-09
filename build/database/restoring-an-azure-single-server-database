@@ -1,0 +1,70 @@
+<h1 id="restoring-a-single-server-azure-postgresql-database">Restoring a Single Server Azure PostgreSQL Database</h1>
+<p>This really depends on the nature of the database to be restored. The example below is based on a previous ticket e.g. DTSPO-9468</p>
+<h2 id="the-database-restore-steps">The Database restore steps</h2>
+
+<ul>
+<li>Execute the restore command</li>
+</ul>
+<p>From your local machine, execute commands below:</p>
+<p><em>Source:</em> am-role-assignment-service-postgres-db-v11-demo<br>
+<em>Target:</em> am-role-assignment-service-postgres-db-v11-demo-restore</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az account set --subscription "DCD-CNP-DEV";
+az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-demo -n am-role-assignment-service-postgres-db-v11-demo-restore --restore-point-in-time 2022-07-13T17:00:01Z -s am-role-assignment-service-postgres-db-v11-demo;
+</code></pre></div><p><strong>Note:</strong> Note the new hostname with <code>-restore</code> suffix at the end.</p>
+
+<ul>
+<li>Export data out of newly restored database</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>
+pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment &gt; role_assignment_demo.sql 
+</code></pre></div><p>This should create a file called <code>role_assignment_demo.sql</code> with the binary output in it.</p>
+<p><strong>Note:</strong> a switch of <code>-Fc</code> was used in the export cmd. Ensure you restore using the <code>pg_restore</code> command</p>
+
+<ul>
+<li>Clean out corrupted database (Source) using drop table commands</li>
+</ul>
+<p>This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault</p>
+<p>&ndash; Connect to DB <br></p>
+<p>psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>
+drop table  actor_cache_control cascade;
+drop table  audit_faults cascade;
+drop table  backup_role_assignment cascade ;
+......
+......
+</code></pre></div>
+<ul>
+<li>Restore the exported database into the out-of-sync DB</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>
+pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment &lt; role_assignment_demo.sql
+</code></pre></div>
+<ul>
+<li>The output from the above command will look like this &hellip;.</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>
+pg_restore: connecting to database for restore&lt;br&gt;
+Password:&lt;br&gt;
+pg_restore: creating EXTENSION "dblink"&lt;br&gt;
+pg_restore: creating COMMENT "EXTENSION dblink"&lt;br&gt;
+pg_restore: creating TABLE "public.actor_cache_control"&lt;br&gt;
+pg_restore: creating SEQUENCE "public.audit_id_seq"&lt;br&gt;
+.......
+pg_restore: creating TABLE "public.batch_job_execution_params"&lt;br&gt;
+pg_restore: creating SEQUENCE "public.batch_job_execution_seq"&lt;br&gt;
+.......&lt;br&gt;
+.......&lt;br&gt;
+    ```
+
+* Run Analyse on the newly restored Database
+
+ANALYZE collects statistics about the contents of tables in the database, and stores the results in the `pg_statistic` system catalog. Subsequently, the query planner uses these statistics to help determine the most efficient execution plans for queries.
+
+```cmd
+analyse;
+</code></pre></div><h3 id="some-external-references">Some external references</h3>
+
+<ul>
+<li><a href="https://www.postgresqltutorial.com/postgresql-administration/postgresql-backup-database/">Database Backups</a></li>
+<li><a href="https://www.postgresqltutorial.com/postgresql-administration/postgresql-restore-database/">Database Restore</a></li>
+</ul>

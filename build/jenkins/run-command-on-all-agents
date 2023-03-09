@@ -1,0 +1,54 @@
+<h1 id="run-command-on-all-agents">Run command on all agents</h1>
+<p><em>Note: Somehow people manage to break the Jenkins agents, likely by running docker commands with misconfigured mounts, you may not be able to access all agents and sudo will be broken on some of them. You can just delete these when no builds are running on them</em></p>
+<h2 id="collecting-agent-ip-addresses">Collecting agent IP addresses</h2>
+<p>First get a list of all agents from the Jenkins script console</p>
+
+<ul>
+<li><code>$JENKINS_URL/script</code>
+
+<ul>
+<li>https://build.platform.hmcts.net/script</li>
+<li>https://sandbox-build.platform.hmcts.net/script</li>
+<li>https://sds-build.platform.hmcts.net/script</li>
+<li>https://sds-sandbox-build.platform.hmcts.net/script</li>
+</ul></li>
+</ul>
+<p>By running the script:
+<code>groovy
+for (agent in jenkins.model.Jenkins.instance.slaves) {
+    println agent.privateIP
+}
+</code></p>
+<p>Store the result of this in a file called <code>/tmp/ips</code></p>
+<h2 id="get-agent-password">Get agent password</h2>
+<p>Then get the Jenkins agent password from the vault for the corresponding Jenkins:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c"># sds prod</span>
+az keyvault secret show <span class="nt">--vault-name</span> ptl <span class="nt">--name</span> jenkins-agent-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
+<span class="c"># sds sandbox</span>
+az keyvault secret show <span class="nt">--vault-name</span> ptl <span class="nt">--name</span> jenkins-agent-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
+
+<span class="c"># cft prod</span>
+az keyvault secret show <span class="nt">--vault-name</span> cftptl-intsvc <span class="nt">--name</span> mgmt-bastion-creds-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
+<span class="c"># cft sbox</span>
+az keyvault secret show <span class="nt">--vault-name</span> cftsbox-intsvc <span class="nt">--name</span> mgmt-bastion-creds-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
+</code></pre></div><p>Export it in your shell:
+<code>bash
+export JENKINS_AGENT_PASSWORD=$(az keyvault ...)
+</code></p>
+<h2 id="run-command">Run command</h2>
+<p>First make sure you have connected to the VPN.</p>
+<p>Copy this to a file on your machine and edit the command and then run script
+&ldquo;`bash</p>
+<h1 id="bin-bash">!/bin/bash</h1>
+<p>SHELL_COMMAND=&quot;tfcmt &ndash;version; sonar-scanner &ndash;version&rdquo;</p>
+<p>while IFS= read -u 10 -r host; do
+   echo $host
+  sshpass -p &ldquo;${JENKINS_AGENT_PASSWORD}&rdquo; ssh jenkinsssh@&ldquo;$host&rdquo; -o &ldquo;UserKnownHostsFile=/dev/null&rdquo; -o StrictHostKeyChecking=no &ldquo;${SHELL_COMMAND}&rdquo;
+done 10&lt; /tmp/ips
+&ldquo;`</p>
+<h2 id="ip-to-agent-name">IP to agent name</h2>
+<p>If you need to tie and agent name back to an IP address you can run this in the Jenkins script console:</p>
+<div class="highlight"><pre class="highlight groovy" tabindex="0"><code><span class="k">for</span> <span class="o">(</span><span class="n">agent</span> <span class="k">in</span> <span class="n">jenkins</span><span class="o">.</span><span class="na">model</span><span class="o">.</span><span class="na">Jenkins</span><span class="o">.</span><span class="na">instance</span><span class="o">.</span><span class="na">slaves</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">println</span> <span class="n">agent</span><span class="o">.</span><span class="na">name</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="n">agent</span><span class="o">.</span><span class="na">privateIP</span>
+<span class="o">}</span>
+</code></pre></div>

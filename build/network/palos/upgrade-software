@@ -1,0 +1,70 @@
+<h1 id="palo-alto-software-upgrade">Palo Alto Software Upgrade</h1>
+<p>It is recommended that the software version of the firewall be updated
+frequently to take advantage of new next generation firewall features
+to better help in securing the firewalls.</p>
+<p>The steps to take are outlined in the <a href="https://docs.paloaltonetworks.com/pan-os/9-0/pan-os-admin/software-and-content-updates/pan-os-software-updates.html">PAN-OS Software Updates</a> documentation
+and are summarised and illustrated below as per the steps that have been recently taken
+while upgrading from the <code>v9.1.x</code> version to the <code>v10.0.x</code></p>
+<h2 id="prerequisite">Prerequisite</h2>
+
+<ul>
+<li>Make sure no running pipeline and current pipeline runs without error</li>
+<li>Perform dynamic updates, make sure latest versions are installed, go to <code>Device -&gt; Dynamic Updates</code> on the left menu pane
+
+<ul>
+<li>Update Applications and Threats</li>
+<li>Update WildFire</li>
+</ul></li>
+<li>Make sure there are no candidate configuration that&rsquo;s not been committed, config has to be in a stable state</li>
+<li><p>Make a config backup, go to  <code>Device -&gt; Setup -&gt; Operations</code></p>
+
+<ul>
+<li>Save a named config snapshot</li>
+<li>Export saved snapshot as backup to local location
+<details>
+<summary>Operations Tab</summary></li>
+</ul>
+<p><a href="images/operations-tab.png" rel="noopener noreferrer"><img src="/network/palos/images/operations-tab.png" alt="Operations Tabs" /></a></p>
+<p></details></p></li>
+<li><p>Generate and export tech support file go to <code>Device -&gt; Suport -&gt; Tech Support File</code> 
+in case of issues that can&rsquo;t be resolved then you&rsquo;d need to send this to Palo Alto support</p></li>
+<li><p>Check for latest available software go to <code>Device -&gt; Software</code>. Click the Check Now at the button to refresh screen with latest software
+<details>
+<summary>Available software</summary></p>
+<p><a href="images/checknow.png" rel="noopener noreferrer"><img src="/network/palos/images/checknow.png" alt="Available software" /></a></p></li>
+</ul>
+<p></details>
+* Download the version(s) to be installed
+* Same process as above but for Plugins, go to <code>Device -&gt; Plugin</code> click <code>Check Now</code> for available plugins</p>
+<p><strong>Notes</strong> 
+ - Always install latest available maintenance release before major release
+e.g <code>v9.1.0-h3 -&gt; 9.1.11-h3 before v10.0.0</code>
+ - When moving to the <code>v10.1.x</code> release then that would be <code>v10.0.(max) -&gt; v10.1.0 -&gt; v10.1.x</code>
+ - Don&rsquo;t forget there are two regions that&rsquo;s 4 firewall vm&rsquo;s to upgrade. In Panorama this might not be an 
+   issue but if doing manually then you&rsquo;d have to install separately on all four
+ - Start with the ukwest firewall vms first and do them one at a time i.e. <code>vm-1</code> then <code>vm-0</code> as it requires a reboot after installation</p>
+<h2 id="steps">Steps</h2>
+
+<ul>
+<li>⚠️ Always start with <code>sbox</code>, if no issue when complete then chances of issues with <code>nonprod</code> and <code>prod</code> are very low<br>
+The flow is <code>sbox</code> -&gt; <code>nonprod</code> -&gt; <code>prod</code></li>
+<li>Download if not already and install last available maintenance i.e <code>v9.1.11-h3</code> or <code>v10.0.(max)</code></li>
+<li>Verify system is up and running, check cpu, memory, check firewall&rsquo;s system resources, should be reasonably low a 90% reading is a red flag wait until its dropped or investigate why it&rsquo;s so high</li>
+<li>Download and install next major release i.e. <code>v10.0.0</code> if coming from <code>v9.1.x</code> or <code>v10.1.0</code> if coming from <code>v10.0.x</code></li>
+<li>Download if not already and install plugins if prompted</li>
+<li>Verify system is up and running, check cpu, memory, check firewall&rsquo;s system resources, if high wait until it settles, should not take long</li>
+<li>Download if not already and install next major release i.e. <code>v10.0.7</code> or <code>v10.1.x</code></li>
+<li>Verify system is up and running, check cpu, memory etc</li>
+<li>⚠️ Note: Prod update would need a <code>CR</code> raised and done out of office hours as the vm will reboot</li>
+</ul>
+<h2 id="post-upgrade">Post Upgrade</h2>
+
+<ul>
+<li>Rerun pipeline to see if any issues between current config and new software version</li>
+<li>Fix forward if any issues, config might need to be updated i.e new markup introduced</li>
+<li>Deleting old installation files to save space and cleanup is a nice to have</li>
+<li>Move to <code>nonprod</code> after <code>sbox</code> is stable and pipeline runs well i.e. commits current config<br>
+Flow is: <code>sbox</code> -&gt; <code>nonprod</code> -&gt; <code>prod</code></li>
+<li>Let team members know that the upgrade was successful</li>
+<li>📕 Revisit every 3 months for the next upgrade to keep the firewall software up-to-date</li>
+</ul>

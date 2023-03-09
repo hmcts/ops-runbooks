@@ -1,0 +1,16 @@
+<h1 id="how-to-add-the-acme-function-app-to-a-new-subscription">How to add the ACME Function App to a new subscription</h1>
+
+<ol>
+<li>Add the subscrption to these two blocks in the ops-bootstrap repo:</li>
+</ol>
+<p>https://github.com/hmcts/ops-bootstrap/blob/dfaafa0b38405816ac634afb9af3cc0fa9a5900f/pipeline-scripts/sub-bootstrap.ps1#L184-L204</p>
+<p>https://github.com/hmcts/ops-bootstrap/blob/dfaafa0b38405816ac634afb9af3cc0fa9a5900f/pipeline-scripts/sub-bootstrap.ps1#L207-L255</p>
+
+<ol>
+<li>Add an entry in the common tags file:</li>
+</ol>
+<p>https://github.com/hmcts/terraform-module-common-tags/blob/master/team-config.yml</p>
+
+<ol>
+<li>Then run the <a href="https://dev.azure.com/hmcts/Operations/_build?definitionId=435">ops-bootstrap pipeline</a> in the right supscription.</li>
+</ol>

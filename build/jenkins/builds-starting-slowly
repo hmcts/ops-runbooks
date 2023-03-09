@@ -1,0 +1,49 @@
+<h1 id="troubleshooting-builds-starting-slowly">Troubleshooting builds starting slowly</h1>
+<p>There are two main reasons for builds starting slowly.</p>
+<p>One is contention for the <code>Queue</code> lock.</p>
+<p>The other is multi branch events not being processed in a timely manner.</p>
+<h2 id="symptoms-of-the-queue-lock-contention">Symptoms of the queue lock contention</h2>
+
+<ul>
+<li>Builds not starting when &lsquo;Build now&rsquo; is pressed</li>
+<li>Builds not starting when actions are done in GitHub like &lsquo;push&rsquo; or creating a pull request.</li>
+</ul>
+<p>More information can be found on the <a href="https://support.cloudbees.com/hc/en-us/articles/360016134572-Jenkins-Jobs-are-not-Starting">CloudBees support article</a>.</p>
+<p>Generally this will involve taking thread dumps with <a href="https://support.cloudbees.com/hc/en-us/articles/360016440131-What-is-collectPerformanceData-sh-and-how-does-it-help-">collectPerformanceData.sh</a> and then analysing them in something like <a href="https://jstack.review/">jstack.review</a>.</p>
+<p>To use it you will need to find the PID of the Jenkins controller which can be done by running <code>jps</code></p>
+<p>Run <code>./collectPerformanceData.sh</code> to see what options you have.</p>
+<p>Normally it&rsquo;s run with something like:
+<code>command
+./collectPerformanceData.sh  6 120 10
+</code></p>
+<p>You can copy the tarball to your machine with:</p>
+<p>(Replacing the pid if required, it&rsquo;s 6 in the example)</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl cp -c jenkins jenkins-0:/var/jenkins_home/performanceData.6.output.tar.gz performanceData.6.output.tar.gz
+</code></pre></div><p>Given we have no support contract for Jenkins you will likely need to either pin to the last working version (this can make upgrades very difficult so try avoid it) and report an issue on the plugin&rsquo;s issue tracker or create a fix ourselves (recommended).</p>
+<h2 id="multi-branch-events-not-being-processed-in-a-timely-manner">Multi branch events not being processed in a timely manner</h2>
+<p>There are two likely causes for this.</p>
+
+<ol>
+<li>Events aren&rsquo;t actually arriving or are coming slowly because of a problem on the GitHub side</li>
+<li>Jenkins can&rsquo;t process the queue quick enough</li>
+</ol>
+<p>CFT Jenkins publishes metrics about the event queue to dynatrace.</p>
+<p>You can see the events queue size on the <a href="https://ebe20728.live.dynatrace.com/#dashboard;id=4a6a6184-f1b6-486f-b810-3b93ef05e5b2;gf=all;gtf=-2h">CFT Jenkins dashboard</a>.</p>
+<p><a href="./scm-event-queue.png" rel="noopener noreferrer"><img src="/jenkins/scm-event-queue.png" alt="SCM Event queue" /></a></p>
+<p>As long as it&rsquo;s under 50 or so it&rsquo;s fine. During previous issues it was up to 1500+ which caused multi hour delays to builds starting.</p>
+<p>There are additional metrics that you can look at like <code>pending</code> and <code>running</code>.</p>
+<p>These can be checked in the Dynatrace metrics explorer, search <code>jenkins.scm.event</code>.</p>
+<p>If Dynatrace isn&rsquo;t working or you&rsquo;re using SDS which doesn&rsquo;t currently have Dynatrace you can get the metrics directly at the current point in time by running the below script in the <a href="https://www.jenkins.io/doc/book/managing/script-console/">Jenkins script console</a></p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>jenkins.scm.api.SCMEvent.executorService
+</code></pre></div><p>You should see something like:</p>
+
+<blockquote>
+<p>Result: java.util.concurrent.ScheduledThreadPoolExecutor@8b0291b[Running, pool size = 10, active threads = 10, queued tasks = 84, completed tasks = 21888]</p>
+</blockquote>
+<p>Logs can be found in <code>/var/jenkins_home/logs/jenkins.branch.*</code>.</p>
+<p>They aren&rsquo;t terribly useful, <a href="https://github.com/timja">@timja</a> enhanced the logging in https://github.com/jenkinsci/branch-api-plugin/pull/305 but we didn&rsquo;t end up investing time to try get it merged as it served its purpose but could be revived again if ever needed.</p>
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://blog.timja.dev/my-jenkins-build-isnt-triggering-when-i-push/">My Jenkins build isn&rsquo;t triggering when I push</a> - Post by <a href="https://github.com/timja">@timja</a> on a previous issue we had with builds not triggering</li>
+</ul>

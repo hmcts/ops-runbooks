@@ -1,0 +1,31 @@
+<h1 id="docmosis">Docmosis</h1>
+<h2 id="updating-docmosis-variables">Updating Docmosis Variables</h2>
+
+<ul>
+<li>Clone <a href="https://github.com/hmcts/cnp-flux-config">cnp-flux-config</a> repository locally and checkout to a new branch before making any changes.</li>
+<li>Run the following command:</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code> mkdir tmp; kubectl create secret generic docmosis-secret --from-literal DOCMOSIS_KEY={License Key} --from-literal DOCMOSIS_ADMINPW={Admin Password} --from-literal DOCMOSIS_ACCESSKEY={Access Key} --from-literal DOCMOSIS_SITE="Licensed To: Ministry Of Justice.  For use with single project: Reform Document Generation" --namespace docmosis --dry-run=client -o json &gt; tmp/{env}-docmosis.json
+</code></pre></div>
+<ul>
+<li>Make sure to fill in all the {} placeholders accordingly. You can obtain {License Key}, {Admin Password}, and {Access Key} by connecting to the K8S cluster in the environment you&rsquo;re making the change in and running this command <code>kubectl get secret docmosis-secret -o yaml -n docmosis</code>.</li>
+<li>The values shown in the <code>data:</code> block are in base64, so run <code>echo &quot;value&quot; | base64 --decode</code> to decode, these are to be used as the placeholders.</li>
+<li>Once the above step is done, if the environment is using FluxV1 run: </li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code> kubeseal --format=yaml --cert=k8s/{env}/pub-cert.pem &lt; tmp/{env}-docmosis.json &gt; k8s/{env}/common/sealed-secrets/docmosis-secret.yaml
+</code></pre></div>
+<ul>
+<li>For environments that have fully migrated to FluxV2, run: </li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code> kubeseal --format=yaml --cert=clusters/{env}/pub-cert.pem &lt; {env}/sandbox-docmosis.json &gt; apps/docmosis/{env}/base/docmosis-secret.yaml
+</code></pre></div>
+<ul>
+<li>You can delete the tmp directory. Now commit your changes to Github, ensuring you don&rsquo;t include the <code>tmp/{env}-docmosis.json</code> file, and raise a PR. Once this PR is approved flux will handle replacing the secrets in the cluster.</li>
+<li>Kill the docmosis pods in the cluster for the environment you&rsquo;re altering a variable in for your changes to take effect. Docmosis pods live in the docmosis namespace.</li>
+</ul>
+<h2 id="verifying-your-changes">Verifying your changes</h2>
+
+<ul>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://docmosisdevkv.vault.azure.net/secrets/docmosis-admin-key">Docmosis GUI Password</a> </li>
+<li><a href="https://docmosis.aat.platform.hmcts.net/tornado.html">Docmosis GUI (AAT)</a> - Connect to the VPN and then log in with the password found in the above point. You can then navigate to the Configuration tab and view the changes here.</li>
+</ul>

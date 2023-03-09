@@ -1,0 +1,32 @@
+<h1 id="jenkins">Jenkins</h1>
+<h2 id="instances">Instances</h2>
+<p>There are two sets of Jenkins instances, SDS and CFT, both have a sandbox instance and a production one.</p>
+<p>SDS:</p>
+
+<ul>
+<li><a href="https://sds-sandbox-build.platform.hmcts.net">sds-sandbox-build.platform.hmcts.net</a></li>
+<li><a href="https://sds-build.platform.hmcts.net">sds-build.platform.hmcts.net</a></li>
+</ul>
+<p>CFT: 
+- <a href="https://sandbox-build.platform.hmcts.net">sandbox-build.platform.hmcts.net</a>
+- <a href="https://build.platform.hmcts.net">build.platform.hmcts.net</a></p>
+<h2 id="monitoring">Monitoring</h2>
+
+<ul>
+<li><a href="https://ebe20728.live.dynatrace.com/#dashboard;id=4a6a6184-f1b6-486f-b810-3b93ef05e5b2;gf=all;gtf=-2h">CFT Jenkins dashboard</a></li>
+</ul>
+<h2 id="jenkins-patching">Jenkins patching</h2>
+<p>The container image is built from <a href="https://github.com/hmcts/cnp-jenkins-docker">cnp-jenkins-docker</a>.</p>
+<p>Renovate creates pull requests to update plugins and Dependabot creates pull requests to update the Jenkins controller version.</p>
+<p>Currently promotion of the Jenkins image is done by manually updating the tag in flux.</p>
+<p>There&rsquo;s documentation for <a href="https://github.com/hmcts/cnp-jenkins-docker#promoting-a-new-jenkins-image">Promoting a new Jenkins image</a> in the cnp-jenkins-docker repository.</p>
+<h2 id="configuration">Configuration</h2>
+<p>All instances are 100% managed as code, you should never have to edit any configuration manually.</p>
+<p>It&rsquo;s configured with the <a href="https://github.com/jenkinsci/configuration-as-code-plugin/">Configuration as Code plugin</a> using the integration configured in the <a href="https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins">official helm chart</a>.</p>
+<p>Configuration is in the Jenkins base for the corresponding flux repository.</p>
+<h2 id="guides">Guides</h2>
+
+<ul>
+<li><a href="builds-starting-slowly.md">Troubleshooting builds starting slowly</a></li>
+<li><a href="run-command-on-all-agents.md">Run command on all agents</a></li>
+</ul>

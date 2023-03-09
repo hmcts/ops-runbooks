@@ -1,0 +1,89 @@
+<h1 id="requesting-ssl-certificates">Requesting SSL Certificates</h1>
+<p>Two things are required when requesting new Certs: 
+- A completed SSL Form - attached as SSL-Certificate-Request-Form.docx, a blank one has been added so that developers may fill in a new form:
+<a href="SSL-Certificate-Request-Form.docx">SSL Certificate Request Form</a>.
+This form is only required for new SSLs and is not needed for renewal requests.</p>
+
+<ul>
+<li>A newly generated CSR request. The CSR&rsquo;s can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file): </li>
+</ul>
+<p>Example Csr.yml files can be found on the openssl-mac-branch branch</p>
+<p>MAC Users</p>
+<p>https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch</p>
+<p>Linux Users</p>
+<p>https://github.com/hmcts/rdo-ssl-creation/tree/master</p>
+<h3 id="running-the-csr-generator">Running the CSR generator</h3>
+<p>Ensure you are logged into the azurecli</p>
+
+<blockquote>
+<p>az login</p>
+</blockquote>
+<p>Create a YAML file called csr.yml in the working directory and fill in as per YAML Syntax</p>
+<p>Ensure that you have the requirements in the requirements.txt file</p>
+
+<blockquote>
+<p>pip install -r requirements.txt</p>
+</blockquote>
+<p>Generate the certificate policy to be uploaded</p>
+
+<blockquote>
+<p>./generate_policy.py</p>
+</blockquote>
+<p>Alternatively run</p>
+
+<blockquote>
+<p>python3 ./generate_policy.py</p>
+</blockquote>
+<p>The vault used to process certificates for renewal is infra-cert-prod 
+Note: this can configuring by changing the subscription + vault in the generate_csr script (change variables at the top)</p>
+<p>Generate the csr:</p>
+
+<blockquote>
+<p>./generate_csr</p>
+</blockquote>
+<p>The certificate requests will be output to the archive_csr/<date> folder
+(wildcard CSRs e.g. *.platform.hmcts.net are generated as wildcard-platform-hmcts-net in the archive folder)</p>
+<p>The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.</p>
+<p>Once the csr has been generated, feel free to send the csr and the ssl form to opsconfman@hmcts.net.</p>
+<h3 id="pointing-the-dns">Pointing the DNS</h3>
+<p>You will receive an email back asking you to point the DNS, this email will look something like:
+&ldquo;Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
+CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.&rdquo;</p>
+<p>There&rsquo;s some changes to make to these instructions before raising a PR:
+- Remove the top level domains after the application. So &ldquo;_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk&rdquo; from the example would become: <code>-name: &quot;_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute&quot;</code> in the yml file.
+- TTL: Add a time to live, 300 is the usual TTL used here.
+- Add the record: It&rsquo;s important to keep the full stop at the end of the CNAME.</p>
+<p>The changes made in the PR for this example would look like this: <code>- name:  &quot;_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute&quot;  
+  ttl: 300
+  record: &quot;CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.&quot;</code></p>
+<p>You can then raise a pull request in <a href="https://github.com/hmcts/azure-public-dns">azure-public-dns</a> to add this DNS record to the corresponding yaml file, which in this example would be <code>apply-divorce-service-gov-uk.yml</code>.
+After the PR is merged and the build finishes, check the DNS has propagated successfully with something like <a href="https://mxtoolbox.com/">mxtoolbox</a> before the next step.</p>
+<h3 id="upload-certificate-to-azure">Upload certificate to Azure</h3>
+
+<ul>
+<li>For this step, clone <a href="https://github.com/hmcts/rdo-ssl-creation">rdo-ssl-creation</a> repository locally, <strong>make sure you&rsquo;re on the correct branch by checking the readme</strong>. For example Mac users should check out to the openssl-mac-branch.</li>
+<li>Convert the .txt cert file to .p7b with this command: <code>openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b</code>.</li>
+<li>Then you can navigate to the Azure Portal and find the relevant certificate in the &ldquo;infra-cert-prod&rdquo; vault, in this example it&rsquo;s &ldquo;decree-absolute-apply-divorce-service-gov-uk&rdquo;. Click Certificate Operation &gt; Merge Signed Request, and then upload the .p7b file created in the previous instruction. After this merge show status as complete, you&rsquo;ve successfully renewed/procured the certificate.</li>
+</ul>
+<h3 id="send-a-certificate-to-be-used-by-a-3rd-party">Send a certificate to be used by a 3rd Party</h3>
+<p>This step is only required if the certificate is being placed elsewhere or being used by a 3rd Party.</p>
+
+<ul>
+<li>After merging the signed request in the last step, click on the certificate and &ldquo;Download in PFX/PEM format&rdquo;.</li>
+<li>If you&rsquo;re procuring this cert for a developer in another project that doesn&rsquo;t have access to the key vault, they will need the certs private key. This can be found by running this command: <code>cat infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx | openssl pkcs12 -nodes</code>.</li>
+<li>If you just need to forward the cert on to the ticket raiser, then you need to add a password to the cert before emailing it. Move the pfx file into the &lsquo;makepfx&rsquo; folder, and change the password in the &ldquo;pfxpassword.sh&rdquo; file. Run the command `./pfxpassword.sh infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx&rsquo;.</li>
+<li>You can now send the password-protected cert to whoever requested it. It&rsquo;s best to send the cert in one email, and the password you added to the &ldquo;pfxpassword.sh&rdquo; file in another. You can use a site like pwpush.com to do this.</li>
+<li>Add the cert to the relevant key vault: Navigate to this key vault and find the cert (decree-absolute-apply-divorce-service-gov-uk in this case), click new version &gt; import &gt; upload the cert.pfx file downloaded earlier and type in the password. You should see a &ldquo;successfully created&rdquo; message after this.</li>
+</ul>
+<h3 id="guidance-for-pet-certificates-only">Guidance for PET certificates only</h3>
+<p>For some certs the process is slightly different, for example: helpwithcourtfees.service.gov.uk</p>
+
+<ul>
+<li>Download pfx of the renewed cert from the vault.</li>
+<li>Convert to base 64 <code>openssl base64 -in ~/Downloads/traefik-jb.pfx -out ~/Downloads/traefik-jdbase64.kl</code>.</li>
+<li>Reverse engineer  and find new vault - e.g. shared service - ss-vault-prod.</li>
+<li>Restart pods so they pick up the new certs.</li>
+</ul>
+<h3 id="appendix">Appendix</h3>
+<p>SSL Creation Video:
+https://cjscommonplatform.sharepoint.com/sites/cftdevops/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2Fcftdevops%2FShared%20Documents%2FSSL%20Creation%20Video%2Emp4&amp;parent=%2Fsites%2Fcftdevops%2FShared%20Documents</p>

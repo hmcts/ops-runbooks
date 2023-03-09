@@ -1,6 +1,0 @@
-<h2 id="azure-active-directory-domain-services-overview">Azure Active Directory Domain Services - Overview</h2>
-<p><a href="https://docs.microsoft.com/en-us/azure/active-directory-domain-services/overview">AADDS - Azure Docs</a></p>
-<p><a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a></p>
-<p><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416">Azure DevOps Pipeline</a></p>
-<h2 id="aadds-how-to-docs">AADDS How-to docs</h2>
-<p><a href="https://github.com/hmcts/ops-runbooks/blob/master/Domain-Services/DNS-Changes.md">DNS Changes</a></p>

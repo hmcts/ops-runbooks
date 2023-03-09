@@ -1,9 +1,0 @@
-<h2 id="bais-overview">BAIS Overview</h2>
-<p><a href="https://github.com/hmcts/globalscape-azure-infrastructure">BAIS Globalscape Repo</a></p>
-<p><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps Pipeline</a></p>
-<p><a href="https://tools.hmcts.net/confluence/display/DCCFT/Design">Design</a></p>
-<h2 id="bais-how-to-docs">BAIS How-to docs</h2>
-<p><a href="https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md">Server Access</a></p>
-<p><a href="https://github.com/hmcts/ops-runbooks/blob/master/BAIS/BAIS-NSG-Rules.md">NSG Changes</a></p>
-<p><a href="https://github.com/hmcts/ops-runbooks/blob/master/BAIS/BAIS-Windows-Firewall.md">Windows Firewall Changes</a></p>
-<p><a href="https://github.com/hmcts/ops-runbooks/blob/master/Domain-Services/DNS-Changes.md">DNS Changes</a></p>

@@ -5,23 +5,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Certificates - HMCTS</title>
+    <title>HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Certificates/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Certificates - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Certificates/" />
+      <meta name="twitter:title" content="HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Certificates" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Certificates/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html" />
 
     
   </head>
@@ -274,25 +273,57 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="certificates">Certificates</h1>
-<p>This guide describes the process for creating an SSL certificate using Let’s Encrypt, Managed certificates, or manually generated certificates provided by Gandi. As well as how to add the ACME Function App to a new subscription.</p>
-<h2 id="guides">Guides</h2>
+            <h1 id="dns-records">DNS Records</h1>
+<p>This document describes how to add/remove/edit DNS for the AADDS environment. All records are managed through automation in the <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a>.</p>
+<p>Rules should be adjusted by the project team on a self-service basis.</p>
+<h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
-<li><a href="managed.md">Managed certificates</a></li>
-<li><a href="letsencrypt.md">Let’s Encrypt</a></li>
-<li><a href="gandi.md">Gandi</a></li>
-<li><a href="csr.md">Requesting SSL Certificates</a></li>
-<li><a href="newacme.md">Add the ACME Function App to a new subscription</a></li>
+<li>GitHub write access to <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a></li>
+<li>Azure DevOps access to <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416">Azure DevOps Pipeline</a></li>
 </ul>
+<h2 id="limitations">Limitations</h2>
+
+<ul>
+<li>At the time of writing this document, this automation does NOT support anything other than A records.</li>
+<li>AADDS can only be deployed once within an Azure tenant. This means there is only a production environment. </li>
+</ul>
+<h2 id="process">Process</h2>
+<p>A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, you will then be able to merge your PR for an automated deployment.
+See steps 1 to 7 for details on raising a PR.</p>
+<h2 id="self-service-steps">Self-Service Steps</h2>
+
+<ol>
+<li>Clone <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a> to your local machine.
+<code>bash
+git clone https://github.com/hmcts/dtspo-aad-domain-services
+</code></li>
+<li>Create a new branch, typically with a JIRA ticket number.
+<code>bash
+git checkout -b BRANCH-NAME
+</code></li>
+<li><p>Navigate to terraform/scripts/dns-records.csv where you will see a CSV file containing DNS records.</p></li>
+<li><p>Modify the CSV file to meet your requirements, following existing formatting. Note: removing records from the CSV will remove them from the DNS server.</p></li>
+<li><p>Push your new branch
+<code>bash
+git push --set-upstream origin BRANCH-NAME
+</code></p></li>
+<li><p>Create Pull Request and review changes compared with master.</p></li>
+<li><p>Look out for typical formatting issues such as extra spaces or unusual characters.</p></li>
+<li><p>Ensure you are not adding anything other than an A record, see limitations section of this document.</p></li>
+<li><p>Raise a BAU ticket with the PlatOps team requesting PR approval and execution.</p></li>
+<li><p>Once approved by PlatOps, you can merge your PR, this will trigger an automated deployment which will write your changes.</p></li>
+<li><p>Ensure your build completes successfully by monitoring the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416">Azure DevOps Pipeline</a></p></li>
+<li><p>Test your DNS changes meet your requirement.</p></li>
+</ol>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Certificates/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Certificates%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FCertificates%2F%29&amp;labels=bug&amp;title=Re%3A+%27Certificates%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Domain-Services/DNS-Changes.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FDomain-Services%2FDNS-Changes.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

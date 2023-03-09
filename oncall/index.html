@@ -169,7 +169,7 @@
   </li>
 </ul>
 </li>
-<li><a href="../database/index.html"><span>Accessing Databases from Prod Bastion</span></a>
+<li><a href="../database/index.html"><span>Databases</span></a>
 <ul>
   <li>
     <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
@@ -185,6 +185,16 @@
   <li>
     <a href="../docmosis/index.html"><span>Docmosis</span></a>
   </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+  <li>
+    <a href="../Domain-Services/AADDS-Overview.html"><span>Azure Active Directory Domain Services - Overview</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../f5/index.html"><span>F5 VPN</span></a>
 <ul>
   <li>
@@ -220,15 +230,6 @@
     <a href="../network/palos/connecting.html"><span>Connecting to a Palo Alto firewall</span></a>
   </li>
   <li>
-    <a href="../network/palos/connecting.html"><span>Sandbox</span></a>
-  </li>
-  <li>
-    <a href="../network/palos/connecting.html"><span>Non Production</span></a>
-  </li>
-  <li>
-    <a href="../network/palos/connecting.html"><span>Production</span></a>
-  </li>
-  <li>
     <a href="../network/palos/upgrade-software.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
 </ul>
@@ -238,9 +239,6 @@
   </li>
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
-  </li>
-  <li>
-    <a href="../oncall/index.html"><span>Bastion - DevOps production access</span></a>
   </li>
   <li>
     <a href="../operators/reply-urls-operator/index.html"><span>Reply URLs Operator</span></a>
@@ -324,18 +322,18 @@ ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passp
 </code></li>
 <li>Open the <code>~/.ssh/config</code> file (create if it doesn&rsquo;t already exist) and add the below:</li>
 </ol>
-<p><strong>Add your own username to line 3</strong>
-&ldquo;`bash</p>
-<h1 id="bastion-devops-production-access">Bastion - DevOps production access</h1>
-<p>Host prodbastion
+<p><strong>Add your own username to line 3</strong></p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>Host prodbastion
 HostName bastion-prod.platform.hmcts.net
-User {AD USERNAME HERE}@hmcts.net # this must be all in lowercase.
+User <span class="o">{</span>AD USERNAME HERE<span class="o">}</span>@hmcts.net <span class="c"># this must be all in lowercase.</span>
 DynamicForward 10825
-ForwardAgent yes
-KeepAlive yes
-ServerAliveInterval 60
-&rdquo;`
-5. Connect to HMCTS <a href="https://portal.platform.hmcts.net/">VPN</a></p>
+ForwardAgent <span class="nb">yes
+</span>KeepAlive <span class="nb">yes
+</span>ServerAliveInterval 60
+</code></pre></div>
+<ol>
+<li>Connect to HMCTS <a href="https://portal.platform.hmcts.net/">VPN</a></li>
+</ol>
 <p>Connect with:
 <code>bash
 ssh prodbastion

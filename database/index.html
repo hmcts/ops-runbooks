@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Accessing Databases from Prod Bastion - HMCTS</title>
+    <title>Databases - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
@@ -14,12 +14,12 @@
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Accessing Databases from Prod Bastion - HMCTS" />
+      <meta name="twitter:title" content="Databases - HMCTS" />
       <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Accessing Databases from Prod Bastion" />
+      <meta property="og:title" content="Databases" />
       <meta property="og:type" content="object" />
       <meta property="og:url" content="https://hmcts-runbooks.github.io/database/" />
 
@@ -169,7 +169,7 @@
   </li>
 </ul>
 </li>
-<li><a href="../database/index.html"><span>Accessing Databases from Prod Bastion</span></a>
+<li><a href="../database/index.html"><span>Databases</span></a>
 <ul>
   <li>
     <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
@@ -185,6 +185,16 @@
   <li>
     <a href="../docmosis/index.html"><span>Docmosis</span></a>
   </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+  <li>
+    <a href="../Domain-Services/AADDS-Overview.html"><span>Azure Active Directory Domain Services - Overview</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../f5/index.html"><span>F5 VPN</span></a>
 <ul>
   <li>
@@ -220,15 +230,6 @@
     <a href="../network/palos/connecting.html"><span>Connecting to a Palo Alto firewall</span></a>
   </li>
   <li>
-    <a href="../network/palos/connecting.html"><span>Sandbox</span></a>
-  </li>
-  <li>
-    <a href="../network/palos/connecting.html"><span>Non Production</span></a>
-  </li>
-  <li>
-    <a href="../network/palos/connecting.html"><span>Production</span></a>
-  </li>
-  <li>
     <a href="../network/palos/upgrade-software.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
 </ul>
@@ -238,9 +239,6 @@
   </li>
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
-  </li>
-  <li>
-    <a href="../oncall/index.html"><span>Bastion - DevOps production access</span></a>
   </li>
   <li>
     <a href="../operators/reply-urls-operator/index.html"><span>Reply URLs Operator</span></a>
@@ -276,7 +274,7 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="accessing-databases-from-prod-bastion">Accessing Databases from Prod Bastion</h1>
+            <h1 id="databases">Databases</h1>
 <p>Steps to take when there is the need to access production databases to run queries that retrieve, update or delete data from tables.
 Other teams sometimes need certain pieces of information from the production DB and would raise
 a ticket, providing their sql query and requesting PlatOps run these against
@@ -314,7 +312,7 @@ Sometimes typos or misplaced variables are easy to spot</li>
           <aside>
               <ul class="contribution-banner">
                 <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Accessing+Databases+from+Prod+Bastion%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2F%29&amp;labels=bug&amp;title=Re%3A+%27Accessing+Databases+from+Prod+Bastion%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Databases%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2F%29&amp;labels=bug&amp;title=Re%3A+%27Databases%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

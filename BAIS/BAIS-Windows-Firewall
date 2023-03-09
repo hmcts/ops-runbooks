@@ -1,0 +1,56 @@
+<h1 id="bais-nwindows-firewall-rules">BAIS NWindows Firewall Rules</h1>
+<p>This document describes how to add/remove/edit Windows Firewall rules for the BAIS servers. All rules are managed through Ansible automation in the <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a>.</p>
+<p>Rules should be adjusted by the project team on a self-service basis.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+<li>GitHub write access to <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a></li>
+<li>Azure DevOps access to <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">BAIS Pipeline</a></li>
+</ul>
+<h2 id="process">Process</h2>
+<p>A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester.
+See steps 1 to 8 for details on raising a PR.</p>
+<h2 id="self-service-steps">Self-Service Steps</h2>
+
+<ol>
+<li>Clone <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a> to your local machine.
+<code>bash
+git clone https://github.com/hmcts/globalscape-azure-infrastructure
+</code></li>
+<li>Create a new branch, typically with a JIRA ticket number.
+<code>bash
+git checkout -b BRANCH-NAME
+</code></li>
+<li>Navigate to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)</li>
+<li>Modify the CSV file for the required environment looking to existing rules for formatting guidance. Note: removing rules from the CSV will remove them from the server.</li>
+<li>Push your new branch
+<code>bash
+git push --set-upstream origin BRANCH-NAME
+</code></li>
+<li>Create a Pull Request and review changes compared with master.</li>
+<li>Look out for typical formatting issues such as extra spaces or unusual characters. </li>
+<li><p>Specifically the &lsquo;-&rsquo; in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.</p></li>
+<li><p>CI will run automatically across STG after the PR is raised. <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps</a></p></li>
+<li><p>Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.</p></li>
+<li><p>Raise a BAU ticket with the PlatOps team requesting PR approval and execution.</p></li>
+</ol>
+<h2 id="platform-operations-steps">Platform Operations Steps</h2>
+
+<ol>
+<li>Review PR</li>
+<li>If terraform Plan is successful:
+In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps</a> </li>
+<li>&lsquo;Run Pipeline&rsquo;</li>
+<li>Branch/tag: Your new branch name</li>
+<li>Commit: Blank</li>
+<li>Stage to Run: BAIS_Servers</li>
+<li>Location: UK South</li>
+<li>Environment: Set as required.</li>
+<li>Advanced Options: Leave as default.</li>
+</ol>
+<p>Click <strong>Run</strong></p>
+
+<ol>
+<li><p>Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: <a href="https://github.com/hmcts/ops-runbooks/blob/master/BAIS/ServerAccess.md">Server Access</a></p></li>
+<li><p>Merge branch with Master.</p></li>
+</ol>

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Certificates/gandi.html">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Certificates/gandi.html" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Certificates/gandi.html" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="/">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>The HMCTS way</span></a>
+  </li>
+<li><a href="../network/palos/index.html"><span>Palo Alto</span></a>
+<ul>
+  <li>
+    <a href="../network/palos/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos/connecting.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/palos/connecting.html"><span>Sandbox</span></a>
+  </li>
+  <li>
+    <a href="../network/palos/connecting.html"><span>Non Production</span></a>
+  </li>
+  <li>
+    <a href="../network/palos/connecting.html"><span>Production</span></a>
+  </li>
+  <li>
+    <a href="../network/palos/upgrade-software.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS Scripts</span></a>
+<ul>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Private DNS</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Public DNS</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../application-insights/index.html"><span>Azure Application Insights</span></a>
+<ul>
+  <li>
+    <a href="../application-insights/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../application-insights/availability-tests.html"><span>Availability Tests</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/ServerAccess"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/ServerAccess"><span>OR</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Accessing Databases from Prod Bastion</span></a>
+<ul>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../docmosis/index.html"><span>Docmosis</span></a>
+  </li>
+<li><a href="../f5/index.html"><span>F5 VPN</span></a>
+<ul>
+  <li>
+    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
+  </li>
+  <li>
+    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../MailRelay/index.html"><span>MailRelay</span></a>
+  </li>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+  <li>
+    <a href="../oncall/index.html"><span>Bastion - DevOps production access</span></a>
+  </li>
+  <li>
+    <a href="../operators/reply-urls-operator/index.html"><span>Reply URLs Operator</span></a>
+  </li>
+  <li>
+    <a href="../Panorama/index.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../splunk/index.html"><span>Splunk Documentation</span></a>
+<ul>
+  <li>
+    <a href="../splunk/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../splunk/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../Tagging/index.html"><span>Tagging resources manually</span></a>
+  </li>
+  <li>
+    <a href="../Tenable-Nessus/index.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="manually-generated-certificates">Manually Generated Certificates</h1>
+<p>This article describes the process for issuing or renewing an SSL certificate that is not suitable for our automated certificates in the other guides of this chapter.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+<li>A local version of the <a href="https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch">rdo-ssl-creation repo</a></li>
+<li>A local version of the <a href="https://github.com/hmcts/azure-public-dns">azure-public-dns repo</a></li>
+<li>A certificate in need of renewal (either a notification from Ops or a Jira ticket)</li>
+</ul>
+<p>We have a certificate tracker which is populated a month in advance by the Operations team with certs that are expiring soon, view it on <a href="https://cjscommonplatform-my.sharepoint.com/:x:/r/personal/zoe_cope_hmcts_net/_layouts/15/Doc.aspx?sourcedoc=%7B6C8A9500-4D9D-45EA-8CC7-D75F3DDFF133%7D&amp;file=Cert%20Tracker.xlsx&amp;action=default&amp;mobileredirect=true">sharepoint</a>, you may need to request access.</p>
+<h2 id="step-by-step-guide">Step-by-step guide:</h2>
+<p>There are 3 key stages to the renewal process:</p>
+
+<ul>
+<li><a href="#Step-1:-Generate-the-CSR-and-request-form">Generate the CSR and request form</a></li>
+<li><a href="#Step-2:-Point-the-DNS">Point the DNS</a></li>
+<li><a href="#Step-3:-Upload-the-certificate-to-Azure">Upload the certificate to Azure</a></li>
+</ul>
+<h4 id="note">Note:</h4>
+<p>If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
+You can do this by going on https://mxtoolbox.com/ and running a DNS Check.
+If there are no results, you should contact the requester and get them to create the domain and DNS zone.
+DNS zones are created in https://github.com/hmcts/azure-public-dns.</p>
+<p>From there, they need to have the NS records at hand to pass over to whoever does the delegation.
+For hmcts.net domains, contact the Operations team for delegation.
+For service.gov.uk domains, you need to contact Government Digital Service (GDS) - you can speak to Cairbre Smith to assist with that.</p>
+<h3 id="step-1-generate-the-csr-and-request-form">Step 1: Generate the CSR and request form</h3>
+<p>This section is described in detail on the <a href="csr.md">Requesting SSL Certificates</a> guide.</p>
+<p>Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).</p>
+<h3 id="step-2-point-the-dns">Step 2: Point the DNS</h3>
+<p>Ops then return the validation instructions for pointing the DNS, for example:</p>
+
+<blockquote>
+<p>&ldquo;Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
+CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.&rdquo;</p>
+</blockquote>
+<p>Pointing the DNS is done in https://github.com/hmcts/azure-public-dns</p>
+<p>With the example above, the address would belong in the &ldquo;apply-divorce-service-gov-uk.yml&rdquo; file.</p>
+<p>These are some of the domains, but make sure you search the repo for the domain to find the one you are after:</p>
+<p><a href="images/envfiles.png" rel="noopener noreferrer"><img src="images/envfiles.png" alt="" /></a>
+<em>*Addresses which do not fall into any of these domains may be managed using a different service (eg legacy AWS dns zone).</em></p>
+<p>The format for pointing the DNS, using the example described in the validation instructions above, is as follows:</p>
+<div class="highlight"><pre class="highlight yaml" tabindex="0"><code> <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"</span>
+   <span class="na">ttl</span><span class="pi">:</span> <span class="m">300</span>
+   <span class="na">record</span><span class="pi">:</span> <span class="s2">"</span><span class="s">CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."</span>
+</code></pre></div><p>This is the DNS pointings when seen in the pull request:
+<a href="images/pullrequest.png" rel="noopener noreferrer"><img src="images/pullrequest.png" alt="" /></a>
+Broken down, the changes made to the validation instructions to achieve the correct format are:</p>
+<p><strong>1. Add the name:</strong></p>
+
+<ul>
+<li>Remove <code>.apply-divorce.service.gov.uk</code>, since this is added automatically.
+E.g:
+<code>_EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk</code></li>
+</ul>
+<p><em>becomes</em></p>
+<p>- name: <code>_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute</code></p>
+<p><strong>2. Add a time to live</strong>
+- any number would work, we use 300 seconds (5 minutes), e.g. <code>ttl: 300</code>.</p>
+<p><strong>3. Add the record</strong></p>
+<p>Remember to keep the full-stop at the end of the CNAME.
+<code>CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.</code></p>
+<p>Becomes record: <code>CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.</code></p>
+<p>Once you have raised the PR and it has been approved and merged, you can check on the build on  <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=278">Azure DevOps</a>.</p>
+<p>Prior to notifying Operations, check in <a href="https://mxtoolbox.com/">MXToolBox</a> that the DNS has been propagated successfully, this will prevent possible delays. Use the whole name of the record like so:
+<a href="images/mxtools.png" rel="noopener noreferrer"><img src="images/mxtools.png" alt="" /></a>
+Once the DNS has been pointed, reply to the operations team saying you&rsquo;ve added the DNS records. They will return the generated cert as an email attachment.</p>
+<h3 id="step-3-upload-the-certificate-to-azure">Step 3: Upload the certificate to Azure</h3>
+
+<ol>
+<li><p>Download the email attachment
+<a href="images/attachment.png" rel="noopener noreferrer"><img src="images/attachment.png" alt="" /></a></p></li>
+<li><p><em>(Optional but recommended)</em> Create a new folder</p></li>
+</ol>
+<p>This is to keep your files organised and avoid confusion. Name it as you see fit, for example as below:
+<a href="images/newfolder.png" rel="noopener noreferrer"><img src="images/newfolder.png" alt="" /></a></p>
+<p>Copy and paste the relevant contents from the &lsquo;makepfx&rsquo; folder in <a href="https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch">RDO-SSL-Creation</a>, into the newly created folder. The below files now exist in &lsquo;decree-absolute&rsquo;:</p>
+<p><a href="images/makepfx.png" rel="noopener noreferrer"><img src="images/makepfx.png" alt="" /></a></p>
+<p>In the terminal, change directory to the new folder in and place the downloaded cert from step 1 inside it.</p>
+
+<ol>
+<li><p>Convert the .txt file to a .p7b:</p></li>
+<li><p>Go to Azure Key Vault → decree-absolute-apply-divorce-service-gov-uk → certificate operation → &lsquo;merge signed request&rsquo; and upload the p7b file.
+<a href="images/keyvault.png" rel="noopener noreferrer"><img src="images/keyvault.png" alt="" /></a></p></li>
+</ol>
+<p>Once the merge is complete, you should see this:
+<a href="images/complete.png" rel="noopener noreferrer"><img src="images/complete.png" alt="" /></a></p>
+<p>:information_source:  At this point, the certificate is now renewed / procured.</p>
+<p>The next steps are required only if the certificate is being placed in another vault in addition to infra-cert-prod. You can find out if required by either speaking to the dev who requested the cert or searching key vaults in Azure.</p>
+<p>If you are renewing a certificate, it is common to check vaults such as, but not limited to, <code>cft-apps-prod</code> or <code>&lt;projectacronym&gt;-prod</code> for production certificates, <code>cftapps-dev</code> for development certificates, etc, and observing whether an old version of the renewed cert is there.</p>
+
+<ol>
+<li>Click into the current certificate version and download the pfx file by selecting &lsquo;Download in PFX/PEM format&rsquo;
+<a href="images/downloadpfx.png" rel="noopener noreferrer"><img src="images/downloadpfx.png" alt="" /></a></li>
+</ol>
+<p><em><strong>Optional:</strong></em> Display private key.</p>
+<p>If in case you are procuring a certificate for a developer in another project for example, they would require the private key as they may not have access to the key vault. To display the certificate&rsquo;s private key, run below command. At this point, there is no password, so just press enter when prompted for one.</p>
+
+<blockquote>
+<p>cat infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx | openssl pkcs12 -nodes</p>
+</blockquote>
+
+<ol>
+<li>Add a password to the cert:
+Move the pfx file into the &lsquo;makepfx&rsquo; folder.
+Run from the makepfx folder:</li>
+</ol>
+
+<blockquote>
+<p>./pfxpassword.sh infra-cert-prod-decree-absolute-apply-divorce-service-gov-uk-20200609.pfx</p>
+</blockquote>
+
+<ol>
+<li>Add the cert to the relevant key vault</li>
+</ol>
+<p>In this case, it&rsquo;s <strong>cft-apps-prod</strong>.</p>
+<p>Go to the relevant cert (decree-absolute-apply-divorce-service-gov-uk) → new version → import → upload the cert.pfx file and type in the password.</p>
+<p><em>*The password can be found in the &lsquo;pfxpassword.sh&rsquo; file in the &lsquo;makepfx&rsquo; folder.</em>
+<a href="images/createcert.png" rel="noopener noreferrer"><img src="images/createcert.png" alt="" /></a></p>
+<p>You should see this:
+<a href="images/success.png" rel="noopener noreferrer"><img src="images/success.png" alt="" /></a></p>
+<h3 id="shared-services-and-pet-certificates-only">* Shared Services and PET Certificates only *</h3>
+<p>For some certs the process is slightly different, example certs include</p>
+
+<ul>
+<li>juror-bureau.justice.gov.uk</li>
+<li>reply-jury-summons.service.gov.uk</li>
+</ul>
+<p>a) Download pfx of the renewed cert from the vault</p>
+<p>b) Convert to base 64</p>
+
+<blockquote>
+<p>openssl base64 -in ~/Downloads/traefik-jb.pfx -out ~/Downloads/traefik-jdbase64.kl</p>
+</blockquote>
+<p>c) Reverse engineer and find new vault - e.g. shared service - <code>ss-vault-prod</code></p>
+<p>d) Restart traefik pods so its picks up new certs</p>
+<h4 id="common-errors-and-solutions">Common Errors and Solutions</h4>
+<div class="table-container">
+        <table>
+          <tr>
+<th>Error</th>
+<th style="text-align: left">Solution</th>
+</tr><tr>
+<td>employment.service.gov.uk mxtool DNS check cannot find record</td>
+<td style="text-align: left"><a href="images/commonerror.png" rel="noopener noreferrer"><img src="images/commonerror.png" alt=""></a></td>
+</tr>
+        </table>
+      </div>
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Certificates/gandi.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FCertificates%2Fgandi.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

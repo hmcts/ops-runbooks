@@ -10,3 +10,16 @@ These pages are written in the Markdown, lightweight markup language and stored 
 ## Documentation
 
 Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb 
+
+## Index Page
+The first page in every folder should be called **index.html.md.erb** and start with these 7 lines of code.
+
+    ---
+    title: Contribution Guide
+    weight: 5
+    ---
+    
+    # <%%= current_page.data.title %>
+    
+
+Weight is used to control the pages possition in the master index.  With low numbers at the top.  Where possible increment the count by 10. 

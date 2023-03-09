@@ -1,0 +1,51 @@
+# Testing Changes
+
+You can run a local version of "The Middleman" to render markdown web pages on your laptop.
+
+## Prerequisites
+
+- Access to the repo [hmcts/ops-runbooks](https://github.com/hmcts/ops-runbooks)
+- Local clone of repo [hmcts/ops-runbooks](https://github.com/hmcts/ops-runbooks)
+- Installed ruby package manager
+- Mac Only, Installed xcode terminal
+- Bundler
+
+## How To
+
+Install Ruby Package manager
+
+```
+curl -sSL https://get.rvm.io | bash -s stable
+```
+
+Install Apple terminal xcode application
+
+```
+xcode-select --install
+```
+
+Install Bundler
+
+```
+gem install bundler
+```
+
+Navigate terminal to javascript folder
+
+```
+cd /Users/a.name/Documents/Code/hmcts.github.io/source/javascripts
+```
+
+Install application
+
+```
+bundle install
+```
+
+Run website
+
+```
+bundle exec middleman serve
+```
+
+Open web browser and connect

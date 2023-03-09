@@ -9,18 +9,18 @@
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/BAIS/ServerAccess.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta name="twitter:title" content="HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/BAIS/ServerAccess.html" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/BAIS/ServerAccess.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
 
     
   </head>
@@ -275,44 +275,24 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="bais-server-access">BAIS Server Access</h1>
-<p>This document describes how to get access to the BAIS servers for operational support.</p>
+            <h1 id="adding-pages">Adding Pages</h1>
+<p>These pages are written in the Markdown, lightweight markup language and stored with a github repo.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
-<li>HMCTS email account</li>
-<li>Connected to the VPN</li>
-<li>Member of &lsquo;DTS Platform Operations&rsquo; Azure AD group</li>
-<li>SSH Config for HMCTS Bastions</li>
+<li>Basic knowledge of using markdown to create documents</li>
+<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
 </ul>
-<p>You can add yourself to any groups via the <a href="https://github.com/hmcts/devops-azure-ad/blob/master/users/prod_users.yml">devops-azure-aad GitHub repo</a>.</p>
-<h2 id="connecting-to-bais-servers">Connecting to BAIS servers</h2>
-
-<ol>
-<li><p>Connect to the <a href="https://portal.platform.hmcts.net">HMCTS VPN</a>.</p></li>
-<li><p>Request JIT access to HMCTS Bastion Server - https://myaccess.microsoft.com/
-<code>text
-Production Bastion Server Access OR Non-Production Bastion Server
-</code></p></li>
-<li><p>Add your HMCTS username to the below command, open a terminal window and start an SSH tunnel through the HMCTS Bastion to BAIS EFT01</p></li>
-</ol>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>ssh <span class="nt">-L33390</span>:10.225.251.135:3389 bastion-dev-nonprod.platform.hmcts.net <span class="nt">-l</span> USERNAME@hmcts.net
-</code></pre></div><h3 id="or">or</h3>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>ssh <span class="nt">-L33391</span>:10.224.251.135:3389 bastion-devops-prod.platform.hmcts.net <span class="nt">-l</span> USERNAME@hmcts.net
-</code></pre></div><p><strong>Follow the instructions output from the SSH command</strong></p>
-
-<ol>
-<li>Open an RDP window and remote to localhost:33390 for NLE or localhost:33391 for Production. An HMCTS account will work here as these machines have been domain joined.</li>
-</ol>
-<p><em>Note: You may need to reset your password if you have never logged into the HMCTS managed domain before. This is because the domain was created after the majority of HMCTS accounts.</em></p>
+<h2 id="documentation">Documentation</h2>
+<p>Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/BAIS/ServerAccess.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FBAIS%2FServerAccess.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/addingpages.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Faddingpages.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

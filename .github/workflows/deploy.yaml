@@ -1,3 +1,5 @@
+name: publish
+
 on:
   pull_request:
     branches:
@@ -23,6 +25,7 @@ jobs:
       - name: Publish
         run: |
           rm -rf build
+          git status
           git config --global user.email "PlatformTeam@HMCTS.NET"
           git config --global user.name "Platform Team"
           git remote set-url origin https://nobody:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}

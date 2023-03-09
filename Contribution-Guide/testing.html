@@ -9,18 +9,18 @@
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Certificates/managed.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta name="twitter:title" content="HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Certificates/managed.html" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Certificates/managed.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html" />
 
     
   </head>
@@ -283,29 +283,39 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="managed-certificates">Managed certificates</h1>
-<p>Microsoft documentation for managed certs are specific to each product, here&rsquo;s the <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#option-1-default-use-a-certificate-managed-by-front-door">FrontDoor documentation</a>.</p>
-<h4 id="when-to-use-managed-certificates">When to use Managed Certificates</h4>
-<p>If you are using one of the following services:
-- Frontdoor
-- CDN
-- App Service</p>
-<h4 id="frontdoor-managed-certificate-limitations">FrontDoor managed certificate limitations</h4>
-<p><em>Other services may have these limitations too, not verified</em></p>
+            <h1 id="testing-changes">Testing Changes</h1>
+<p>You can run a local version of &ldquo;The Middleman&rdquo; to render markdown web pages on your laptop.</p>
+<h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
-<li><a href="https://www.quora.com/What-is-an-apex-domain">Apex domains</a> do not work with managed certificates, e.g. <code>hmcts-access.service.gov.uk</code></li>
-<li>Domains using <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain#map-the-temporary-afdverify-subdomain">afdverify</a> only and not direct validation do not work</li>
+<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
+<li>Local clone of repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
+<li>Installed ruby package manager</li>
+<li>Mac Only, Installed xcode terminal</li>
+<li>Bundler</li>
 </ul>
-<p>You should use <a href="letsencrypt.md">Let’s encrypt certificates</a> in the above scenarios.</p>
+<h2 id="how-to">How To</h2>
+<p>Install Ruby Package manager</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl -sSL https://get.rvm.io | bash -s stable
+</code></pre></div><p>Install Apple terminal xcode application</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>xcode-select --install
+</code></pre></div><p>Install Bundler</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>gem install bundler
+</code></pre></div><p>Navigate terminal to javascript folder</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>cd /Users/a.name/Documents/Code/hmcts.github.io/source/javascripts
+</code></pre></div><p>Install application</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>bundle install
+</code></pre></div><p>Run website</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>bundle exec middleman serve
+</code></pre></div><p>Open web browser and connect</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Certificates/managed.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FCertificates%2Fmanaged.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/testing.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Ftesting.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

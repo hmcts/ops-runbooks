@@ -103,6 +103,9 @@
     <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
   </li>
   <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
     <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
   </li>
 </ul>
@@ -290,6 +293,15 @@
 </ul>
 <h2 id="documentation">Documentation</h2>
 <p>Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb</p>
+<h2 id="index-page">Index Page</h2>
+<p>The first page in every folder should be called <strong>index.html.md.erb</strong> and start with these 7 lines of code.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>---
+title: Contribution Guide
+weight: 5
+---
+
+# &lt;%= current_page.data.title %&gt;
+</code></pre></div><p>Weight is used to control the pages possition in the master index.  With low numbers at the top.  Where possible increment the count by 10.</p>
 
             
           </main>

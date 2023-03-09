@@ -1,0 +1,39 @@
+---
+title: Azure Application Insights
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Although the project is attempting to move away from it at the time of writing, Azure Application Insights remains the primary method of monitoring various reforms services. This document will cover some general information about the technology, for a more focused look at a particular topic, please refer to the appropriate document in this directory:
+
+Contents in this directory:
+
+- [Setting Up Application Insights Reporting](appinsights-setup.md)
+- [Availability Tests and Automated Alerting](availability-tests.md)
+
+Contents in this document:
+
+- [Resources in the Azure Portal](#resources-in-the-azure-portal)
+- [Querying AppInsights](#querying-appinsights)
+- [Common Problems and Troubleshooting](#common-problems-and-troubleshooting)
+
+## Resources in the Azure Portal
+
+AppInsights Resources generally share the same naming conventions as Key Vaults: Area followed by environment. So for CCD resources operating in AAT, the appropriate AppInsights Resource is called `ccd-aat`. The 'Overview' dashboard displays some general information about the performance of the environment. Also displayed here is the Instrumentation Key, this is a UUID value that applications will use to send their telemetry data to this resource. While applications *can* report to AppInsights using only the Instrumentation Key, it's preferred to use the Connection String to do so instead. This can be found directly below the Instrumentation Key in the portal.
+
+## Querying AppInsights
+
+AppInsights collects and reports several types of telemetry such as availability results, requests and traces. To view these in detail or perform analysis, one must make use of the Azure Data Explorer. This can be found by navigating to the AppInsights resource in the Azure Portal and going into `Monitoring > Logs` in the panel on the left. Once the query editor is loaded, telemetry results can then be viewed, aggregated and manipulated by writing a query. These queries are somewhat similar to SQL `SELECT` statements, but make heavy use of pipe-like syntax to filter and manipulate data. In-depth documentation for this query language can be found in the [Microsoft documentation for the Azure Data Explorer Language](https://docs.microsoft.com/en-us/azure/data-explorer/write-queries).
+
+## Common Problems and Troubleshooting
+
+### Why do logs take so long to show up in the Azure Portal?
+
+It's normal for logs to take a few minutes between being sent to AppInsights and showing up in the Azure Portal. This is because of the ingestion process where data has to be analyzed and indexed before showing up in the Portal as well as the sheer volume of telemetry data being processed by Azure. If logs aren't showing up at all, this could point to a configuration problem with the application.
+
+### Why are some telemetry items not showing up in the Azure Portal?
+
+This could be due to a feature called sampling. In short, AppInsights can be configured to purposefully omit a fixed percentage of tracked telemetry items from being transmitted in full. This is disabled by default for Java and Node.JS applications and is normally enabled by the team responsible for the service as a performance saving measure. If you're currently investigating a problem and find important requests or traces are missing, consider asking the team to check their AppInsights configuration to see if they've enabled sampling.
+
+More information on sampling can be found in the [Microsoft docs for the subject](https://docs.microsoft.com/en-us/azure/azure-monitor/app/sampling).

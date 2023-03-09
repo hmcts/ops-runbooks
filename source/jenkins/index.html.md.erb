@@ -1,0 +1,46 @@
+---
+title: Jenkins
+weight: 140
+---
+
+# <%= current_page.data.title %>
+
+## Instances
+
+There are two sets of Jenkins instances, SDS and CFT, both have a sandbox instance and a production one.
+
+SDS:
+
+- [sds-sandbox-build.platform.hmcts.net](https://sds-sandbox-build.platform.hmcts.net)
+- [sds-build.platform.hmcts.net](https://sds-build.platform.hmcts.net)
+
+CFT: 
+- [sandbox-build.platform.hmcts.net](https://sandbox-build.platform.hmcts.net)
+- [build.platform.hmcts.net](https://build.platform.hmcts.net)
+
+## Monitoring
+
+- [CFT Jenkins dashboard](https://ebe20728.live.dynatrace.com/#dashboard;id=4a6a6184-f1b6-486f-b810-3b93ef05e5b2;gf=all;gtf=-2h)
+
+## Jenkins patching
+
+The container image is built from [cnp-jenkins-docker](https://github.com/hmcts/cnp-jenkins-docker).
+
+Renovate creates pull requests to update plugins and Dependabot creates pull requests to update the Jenkins controller version.
+
+Currently promotion of the Jenkins image is done by manually updating the tag in flux.
+
+There's documentation for [Promoting a new Jenkins image](https://github.com/hmcts/cnp-jenkins-docker#promoting-a-new-jenkins-image) in the cnp-jenkins-docker repository.
+
+## Configuration
+
+All instances are 100% managed as code, you should never have to edit any configuration manually.
+
+It's configured with the [Configuration as Code plugin](https://github.com/jenkinsci/configuration-as-code-plugin/) using the integration configured in the [official helm chart](https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins).
+
+Configuration is in the Jenkins base for the corresponding flux repository.
+
+## Guides
+
+- [Troubleshooting builds starting slowly](builds-starting-slowly.md)
+- [Run command on all agents](run-command-on-all-agents.md)

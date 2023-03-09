@@ -1,0 +1,54 @@
+---
+title: Setting Up Application Insights Reporting
+weight: 2
+---
+# <%= current_page.data.title %>
+
+This document covers how to set up AppInsights reporting on your app. These instructions assume you already have an AppInsights resource configured and set up. Your application will need access to the Connection String for this AppInsights resource. This Connection String can be found in the 'Overview' section when viewing the resource in the Azure Portal. Although the value is not obfuscated in the portal, it should still be treated as sensitive and it should be provided to your application as if it were a secret. The methods for doing this are language specific and beyond the scope of this document.
+
+To set up AppInsights, Specific instructions for your language can be found below:
+
+- [Node.JS Apps](#nodejs-apps)
+
+## Node.JS Apps
+
+Microsoft provide three NPM packages for Node.JS applications: `applicationinsights`, `applicationinsights-js` and `@microsoft/applicationinsights-web`. For our purposes, we want **ONLY** the `applicationinsights` package. `applicationinsights-js` is considered deprecated and `@microsoft/applicationinsights-web` is designed for frontend applications only. Installing either of these other two options in our case may be detrimental and actually cause AppInsights to stop working.
+
+Start by installing the `applicationinsights` package to your project:
+
+```bash
+npm -i applicationinsights
+```
+
+Next, preferably near the top of your app, we need to `require` the library:
+
+```js
+let appInsights = require('applicationinsights');
+```
+
+Next, we can finally set up AppInsights using the following snippet. You'll need to substitute the connection string for your AppInsights resource here.
+
+**The default configuration snippet provided in the Microsoft Docs for this package does not work. Use this instead.**
+
+```js
+appInsights.setup('<your connection string here>')
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true, true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true, true)
+    .setUseDiskRetryCaching(true)
+    .setSendLiveMetrics(false)
+    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI);
+appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = '<your application name>';
+appInsights.start();
+```
+
+ Exactly what all these values mean and do is explained in the [Microsoft Docs for this package](https://docs.microsoft.com/en-us/azure/azure-monitor/app/nodejs#advanced-configuration-options). These values have been more-or-less kept to their defaults, with the exception of `.setAutoCollectConsole(true, true)`, this has been changed to report any message sent to the console via `console.log(...)` or similar. Feel free to adjust these values to your needs. Note that this snippet will also set the 'cloudRole' tag to whatever your application is called (e.g. 'slack-help-bot', 'idam-frontend', etc.). This will show up in the 'cloud_RoleName' field when exploring the trace viewer in the Azure Portal and can be used to filter traces for those sent by your application.
+
+ To verify that AppInsights reporting is working correctly, you can send a trace message directly to AppInsights with the following line in your app and then check it appears in the Azure Portal. Note that it can take several minutes for a message to appear in AppInsights once it is sent.
+
+ ```js
+appInsights.defaultClient.trackTrace({message: "Is AppInsights working?"});
+ ```

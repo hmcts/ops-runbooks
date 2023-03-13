@@ -1,4 +1,4 @@
-# # List of users with admin access to the F5 portal
+#  List of users with admin access to the F5 portal
 
 - abance
 - arahman

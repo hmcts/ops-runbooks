@@ -1,6 +1,8 @@
 # Operations runbooks
 
-This repo is a collection of runbooks for common tasks and activities done by the operations / platforms teams.
+This repo is a collection of runbooks for common tasks and activities done by the operations / platforms teams, hosted with GitHub Pages on:
+
+[Ops-Runbooks Site](https://turbo-fiesta-ov7yye3.pages.github.io/)
 
 <a href="https://gitpod.io/#https://github.com/hmcts/hmcts.github.io">
   <img

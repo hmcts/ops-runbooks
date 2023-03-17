@@ -4,7 +4,7 @@ This repo is a collection of runbooks for common tasks and activities done by th
 
 [Ops-Runbooks Site](https://turbo-fiesta-ov7yye3.pages.github.io/)
 
-<a href="https://gitpod.io/#https://github.com/hmcts/hmcts.github.io">
+<a href="https://gitpod.io/#https://github.com/hmcts/ops-runbooks">
   <img
     src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
     alt="Contribute with Gitpod"
@@ -21,7 +21,7 @@ Gitpod is the easiest way to develop on this repository, you will get a fresh au
 
 Click the below button to get started:
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/hmcts/hmcts.github.io)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/hmcts/ops-runbooks)
 
 ### Local installation
 

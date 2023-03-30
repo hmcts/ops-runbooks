@@ -5,23 +5,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Reply URLs Operator - HMCTS</title>
+    <title>HMCTS</title>
 
     <link href="../../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/operators/reply-urls-operator/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/bin/README.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Reply URLs Operator - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/operators/reply-urls-operator/" />
+      <meta name="twitter:title" content="HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/bin/README.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Reply URLs Operator" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/operators/reply-urls-operator/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/bin/README.html" />
 
     
   </head>
@@ -111,16 +110,10 @@
   </li>
 </ul>
 </li>
-<li><a href="../../aks/index.html"><span>AKS Scripts</span></a>
+<li><a href="../../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
     <a href="../../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
-  </li>
-  <li>
-    <a href="../../aks/redeploying-aks-clusters.html"><span>Private DNS</span></a>
-  </li>
-  <li>
-    <a href="../../aks/redeploying-aks-clusters.html"><span>Public DNS</span></a>
   </li>
   <li>
     <a href="../../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -251,9 +244,6 @@
     <a href="../../oncall/index.html"><span>On Call</span></a>
   </li>
   <li>
-    <a href="../../operators/reply-urls-operator/index.html"><span>Reply URLs Operator</span></a>
-  </li>
-  <li>
     <a href="../../Panorama/index.html"><span>Panorama - Software Updates</span></a>
   </li>
   <li>
@@ -275,6 +265,9 @@
   <li>
     <a href="../../Tenable-Nessus/index.html"><span>Tenable Nessus</span></a>
   </li>
+  <li>
+    <a href="../../aks/bin/README.html"><span>AKS Scripts</span></a>
+  </li>
 </ul>
 
 
@@ -284,73 +277,34 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="reply-urls-operator">Reply URLs Operator</h1>
-<p>An Operator which converts Kubernetes Ingress hosts to valid Reply URLs, updates the App Registration and keeps them in sync.</p>
-<p><a href="https://github.com/hmcts/reply-urls-operator">Reply URLs Operator - GitHub Repo</a></p>
-<h2 id="app-registrations-currently-in-use">App Registrations currently in use</h2>
-<div class="table-container">
-        <table>
-          <tr>
-<th>Cluster</th>
-<th>App Registration</th>
-<th>Role</th>
-<th>Resource / API</th>
-</tr><tr>
-<td>GitHub Actions</td>
-<td><a href="https://portal.azure.com/531ff96d-0ae9-462a-8d2d-bec7c0b42082/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/ea8074af-5f20-45df-a3a2-25be693b5c8e/isMSAApp/">reply-urls-operator-demo</a></td>
-<td>Acr Push &amp; Contributor (Type: Application)</td>
-<td><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/overview">sdshmctspublic</a></td>
-</tr><tr>
-<td>Automated Testing</td>
-<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/2816f198-4c26-48bb-8732-e4ca72926ba7/isMSAApp/">reply-urls-testing-app</a></td>
-<td>Application.ReadWrite.All (Type: Application)</td>
-<td>Microsoft Graph API</td>
-</tr><tr>
-<td>SDS Sbox</td>
-<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/1f26b7c2-a15e-4fa6-a3c7-4c0d95beb2cb/isMSAApp/">reply-urls-operator-test</a></td>
-<td>Application.ReadWrite.All  (Type: Application)</td>
-<td>Microsoft Graph API</td>
-</tr><tr>
-<td>SDS Demo</td>
-<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/2a3f8b5a-ec0e-470d-b979-fc79d3e74cba/isMSAApp/">SDS Oauth Proxy</a></td>
-<td>Application.ReadWrite.All (Type: Application)</td>
-<td>Microsoft Graph API</td>
-</tr><tr>
-<td>CFT Sbox</td>
-<td>Not created yet</td>
-<td>Application.ReadWrite.All (Type: Application)</td>
-<td>Microsoft Graph API</td>
-</tr><tr>
-<td>CFT Demo</td>
-<td><a href="https://portal.azure.com/21ae17a1-694c-4005-8e0f-6a0e51c35a5f/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/fbf4cb6e-f09d-4fc4-89fa-b94cb582cb18/isMSAApp/">Auto Reply URL K8s Operator</a></td>
-<td>Application.ReadWrite.All (Type: Application)</td>
-<td>Microsoft Graph API</td>
-</tr>
-        </table>
-      </div><h2 id="where-is-the-operator-deployed-to">Where is the operator deployed to?</h2>
-<p>The operator is in full use in the demo environments where it is managing reply urls for an application that is actually in use. 
-It also runs in the sandbox environments where it serves as a place to test changes before pushing changes to the Demo environment. It&rsquo;s configured to run in the <code>admin</code> <code>Namespace</code>.</p>
-<h2 id="flux-configuration">Flux configuration</h2>
-<p>Flux is used to deploy the Reply URLs Operator and keep the resources in sync.</p>
-<p>The configuration for SDS and CFT can be found below:</p>
+            <h1 id="aks-scripts">AKS Scripts</h1>
+
+<hr>
+<p>title: AKS Readme</p>
+<h2 id="weight-10">weight: 10</h2>
+
+<hr>
+<h2 id="check-minimum-chart-versions">Check Minimum Chart Versions</h2>
+<p>This script was created to compare chart versions being used in the cluster with a minimum chart requirement. This will be a useful tool for checking all teams have updated before rebuilding a cluster with a necessary change added to a given chart version.</p>
+<h3 id="pre-requisites">Pre-requisites</h3>
 
 <ul>
-<li><a href="https://github.com/hmcts/sds-flux-config/tree/master/apps/admin/reply-urls-operator">SDS Flux config</a></li>
-<li><a href="https://github.com/hmcts/cnp-flux-config/tree/master/apps/admin/reply-urls-operator">CFT Flux config</a></li>
+<li><a href="https://stedolan.github.io/jq/download/"><code>jq</code></a>. </li>
+<li><a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"><code>azure-cli</code></a></li>
+<li><a href="https://hmcts.github.io/ways-of-working/troubleshooting/">Connect to one of the AKS clusters</a> before running the script.</li>
 </ul>
-<h2 id="accessing-the-demo-tenant-via-the-az-cli">Accessing the Demo Tenant via the az cli</h2>
-<p>You can create an App Registration in the <code>CJS COMMON PLATFORM</code> Tenant for testing the adding and removing of Reply URLs, but to run a more like-for-like environment it&rsquo;s best to create or use an already existing App Reg in the <code>HMCTS DEMO</code> Tenant.</p>
-<p>To authenticate to the Demo Tenant you can run the command below, if it doesn&rsquo;t work for you, it could mean that a user hasn&rsquo;t been created for you and you need one created. 
-To get a user created you can ask a member of the Platform Operations team.</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az login <span class="nt">--tenant</span>  hmctsexecdemo.onmicrosoft.com <span class="nt">--allow-no-subscriptions</span>
-</code></pre></div>
+<h3 id="running-the-script">Running the script</h3>
+<p>Make sure to run <code>az login</code>, to run the script, clone this repository and switch into the <code>aks</code> directory, run <code>./checkMinimumChartVersions.sh</code>. The script runs against your current kubectl context, and generates output based on applications running in the cluster.</p>
+
+<hr>
+
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/operators/reply-urls-operator/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Reply+URLs+Operator%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Foperators%2Freply-urls-operator%2F%29&amp;labels=bug&amp;title=Re%3A+%27Reply+URLs+Operator%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/bin/README.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fbin%2FREADME.html%29&amp;labels=bug&amp;title=Re%3A+%27%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

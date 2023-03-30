@@ -110,16 +110,10 @@
   </li>
 </ul>
 </li>
-<li><a href="../aks/index.html"><span>AKS Scripts</span></a>
+<li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
     <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
-  </li>
-  <li>
-    <a href="../aks/redeploying-aks-clusters.html"><span>Private DNS</span></a>
-  </li>
-  <li>
-    <a href="../aks/redeploying-aks-clusters.html"><span>Public DNS</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -250,9 +244,6 @@
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
   <li>
-    <a href="../operators/reply-urls-operator/index.html"><span>Reply URLs Operator</span></a>
-  </li>
-  <li>
     <a href="../Panorama/index.html"><span>Panorama - Software Updates</span></a>
   </li>
   <li>
@@ -273,6 +264,9 @@
   </li>
   <li>
     <a href="../Tenable-Nessus/index.html"><span>Tenable Nessus</span></a>
+  </li>
+  <li>
+    <a href="../aks/bin/README.html"><span>AKS Scripts</span></a>
   </li>
 </ul>
 
@@ -382,14 +376,12 @@ az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-
 <ul>
 <li>Delete any orphan A records that external-dns might have missed:</li>
 </ul>
-<p><em>Replace 10.12.79.250 with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup</em>
-&ldquo;`command</p>
-<h1 id="private-dns">Private DNS</h1>
-<p>az network private-dns record-set a list &ndash;zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg &ndash;subscription DTS-CFTPTL-INTSVC &ndash;query &rdquo;[?aRecords[0].ipv4Address==&lsquo;10.12.79.250&rsquo;].[name]&ldquo; -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete &ndash;zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg &ndash;subscription DTS-CFTPTL-INTSVC &ndash;yes &ndash;name {}</p>
-<h1 id="public-dns">Public DNS</h1>
-<p>az network dns record-set a list &ndash;zone-name demo.platform.hmcts.net -g reformmgmtrg &ndash;subscription Reform-CFT-Mgmt &ndash;query &rdquo;[?aRecords[0].ipv4Address==&lsquo;20.90.254.226&rsquo;].[name]&ldquo; -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete &ndash;zone-name demo.platform.hmcts.net -g reformmgmtrg &ndash;subscription Reform-CFT-Mgmt &ndash;yes &ndash;name {}
-&rdquo;`</p>
-<p>Deletes any txt records pointing to inactive:</p>
+<p><em>Replace 10.12.79.250 with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup</em></p>
+<p>Private DNS</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.12.79.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+</code></pre></div><p>Public DNS</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az network dns record-set a list --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?aRecords[0].ipv4Address=='20.90.254.226'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
+</code></pre></div><p>Deletes any txt records pointing to inactive:</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c"># Private DNS</span>
 az network private-dns record-set txt list <span class="nt">--zone-name</span> demo.platform.hmcts.net <span class="nt">-g</span> core-infra-intsvc-rg <span class="nt">--subscription</span> DTS-CFTPTL-INTSVC <span class="nt">--query</span> <span class="s2">"[?contains(txtRecords[0].value[0], 'inactive')].[name]"</span> <span class="nt">-o</span> tsv | xargs <span class="nt">-I</span> <span class="o">{}</span> <span class="nt">-n</span> 1 <span class="nt">-P</span> 8 az network private-dns record-set txt delete <span class="nt">--zone-name</span> demo.platform.hmcts.net <span class="nt">-g</span> core-infra-intsvc-rg <span class="nt">--subscription</span> DTS-CFTPTL-INTSVC <span class="nt">--yes</span> <span class="nt">--name</span> <span class="o">{}</span>
 <span class="c"># Public DNS</span>
@@ -397,10 +389,10 @@ az network dns record-set txt list <span class="nt">--zone-name</span> demo.plat
 </code></pre></div><p>Once swap over is fully complete then delete the older cluster,</p>
 
 <ul>
-<li>Run the <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on <strong>Run</strong>. 
-### AAT</li>
+<li>Run the <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on <strong>Run</strong>. </li>
 </ul>
-<h4 id="public-dns-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
+<h3 id="aat">AAT</h3>
+<h4 id="aat-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
 
 <ul>
 <li>Remove the cluster you are going to redeploying from the AGW. <a href="https://github.com/hmcts/azure-platform-terraform/pull/580">PR example here</a></li>
@@ -411,39 +403,48 @@ az network dns record-set txt list <span class="nt">--zone-name</span> demo.plat
 <li>If not updated, you can change manually providing PR has been approved and merged <a href="https://build.platform.hmcts.net/configure">View Jenkins Configuration</a></li>
 </ul></li>
 </ul>
-<h4 id="public-dns-after-deployment-of-a-cluster">After deployment of a cluster</h4>
+<h4 id="aat-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
 <li>Add the cluster back into AGW once you have confirmed deployment has been successful. <a href="https://github.com/hmcts/azure-platform-terraform/pull/582">PR example here</a></li>
-<li>Update Civil team&rsquo;s DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). <a href="https://github.com/hmcts/azure-private-dns/pull/428/files">Update active jenkins-cluster IP value in DNS</a> and <a href="https://github.com/hmcts/azure-private-dns/pull/430/files">update existing platform-hmcts-net entries</a>.</li>
+<li>Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). <a href="https://github.com/hmcts/azure-private-dns/pull/428/files">Update active jenkins-cluster IP value in DNS</a> and <a href="https://github.com/hmcts/azure-private-dns/pull/430/files">update existing platform-hmcts-net entries</a>.</li>
 </ul>
 <h3 id="production">Production</h3>
 <h4 id="day-or-hours-before-deployment-of-a-cluster">Day or hours before deployment of a cluster</h4>
-<p>It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
-- Create a time-snapshot list of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A &gt; all_pods_status_$TIMESTAMP</code>
-- Create a time-snapshot count of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | wc -l &gt; total_pods_$TIMESTAMP</code><br>
-- To identity failed Helm releases and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get hr -A | grep -v Succeeded &gt; failed_hrs_$TIMESTAMP</code><br>
-- To identify failed pods and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | grep -v Completed | grep -v Running &gt; failed_pods_$TIMESTAMP</code>
-- Investigate failed helm releases and missing pods as required<br>
-- For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release) 
-- For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</p>
+<p>It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.</p>
+
+<ul>
+<li><p>Create a time-snapshot list of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A &gt; all_pods_status_$TIMESTAMP</code></p></li>
+<li><p>Create a time-snapshot count of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | wc -l &gt; total_pods_$TIMESTAMP</code></p></li>
+<li><p>To identity failed Helm releases and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get hr -A | grep -v Succeeded &gt; failed_hrs_$TIMESTAMP</code></p></li>
+<li><p>To identify failed pods and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | grep -v Completed | grep -v Running &gt; failed_pods_$TIMESTAMP</code></p></li>
+<li><p>Investigate failed helm releases and missing pods as required</p></li>
+<li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release)</p></li>
+<li><p>For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</p></li>
+</ul>
 <h4 id="production-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
 
 <ul>
 <li>Remove the cluster you are going to be redeploying from the AGW. <a href="https://github.com/hmcts/azure-platform-terraform/pull/594">PR example here</a></li>
 <li>Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer</li>
 </ul>
-<p>Every Production change which involves taking down a cluster is supposed to include scaling up of the apps (these can chan e):-
-- idam-api (scale from 4 to 8)
-- ccd-data-store-api (scale from 15 to 30)
-- ccd-definition-store-api (scale from 4 to 8)
-- dm-store (scale from 7 to 14)</p>
+<p>Every Production change which involves taking down a cluster is supposed to include scaling up of the apps (these can change):</p>
+
+<ul>
+<li>idam-api (scale from 4 to 8)</li>
+<li>ccd-data-store-api (scale from 15 to 30)</li>
+<li>ccd-definition-store-api (scale from 4 to 8)</li>
+<li>dm-store (scale from 7 to 14)</li>
+</ul>
 <p><em>(idam-api requires 8 pods to be split up across 2 clusters and handle the load.  If we are bringing a cluster down then we need to ensure the other cluster has 8 pods for idam-api)</em></p>
-<p>This scaling is done via a PR <a href="https://github.com/hmcts/cnp-flux-config/pull/7245">PR example here</a>
-Scaling to happen just before a cluster has been removed from AGW. 
-- Create PR to scale apps and merge. 
-- Check cluster that won&rsquo;t be removed to confirm pods have scaled
-- Merge PR to remove a cluster from AGW</p>
+<p>This scaling is done via a <a href="https://github.com/hmcts/cnp-flux-config/pull/7245">PR</a></p>
+<p>Scaling to happen just before a cluster has been removed from AGW.</p>
+
+<ul>
+<li>Create PR to scale apps and merge. </li>
+<li>Check cluster that won&rsquo;t be removed to confirm pods have scaled</li>
+<li>Merge PR to remove a cluster from AGW</li>
+</ul>
 <h4 id="production-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
@@ -476,15 +477,18 @@ Due to planned upgrades of AKS, we will be upgrading the management (cftplt-ints
 <p>After the cluster has been redeployed successfully and hr&rsquo;s / pods are running as expected you need to verify that you can get to the <a href="https://build.platform.hmcts.net">Jenkins web ui</a>, and then comment on the slack channel announcement made previously to advise Jenkins is back up.</p>
 <h3 id="perftest">Perftest</h3>
 <h4 id="perftest-day-or-hours-before-deployment-of-a-cluster">Day or hours before deployment of a cluster</h4>
-<p>It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
-- Create a time-snapshot list of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A &gt; all_pods_status_$TIMESTAMP</code>
-- Create a time-snapshot count of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | wc -l &gt; total_pods_$TIMESTAMP</code><br>
-- To identity failed Helm releases and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get hr -A | grep -v Succeeded &gt; failed_hrs_$TIMESTAMP</code><br>
-- To identify failed pods and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | grep -v Completed | grep -v Running &gt; failed_pods_$TIMESTAMP</code>
-- Investigate failed helm releases and missing pods as required<br>
-- For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release) 
-- For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
-- For pods where images beginning with <em>pr-</em> aren&rsquo;t found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.</p>
+<p>It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.</p>
+
+<ul>
+<li><p>Create a time-snapshot list of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A &gt; all_pods_status_$TIMESTAMP</code></p></li>
+<li><p>Create a time-snapshot count of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | wc -l &gt; total_pods_$TIMESTAMP</code></p></li>
+<li><p>To identity failed Helm releases and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get hr -A | grep -v Succeeded &gt; failed_hrs_$TIMESTAMP</code></p></li>
+<li><p>To identify failed pods and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | grep -v Completed | grep -v Running &gt; failed_pods_$TIMESTAMP</code></p></li>
+<li><p>Investigate failed helm releases and missing pods as required</p></li>
+<li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release)</p></li>
+<li><p>For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</p></li>
+<li><p>For pods where images beginning with <em>pr-</em> aren&rsquo;t found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.</p></li>
+</ul>
 <h4 id="perftest-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
 
 <ul>
@@ -496,51 +500,21 @@ Reason for this CCD and IDAM will auto-scale the number of running pods when a c
 <h4 id="perftest-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
-<li>Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
-### Demo</li>
+<li>Check all pods are deployed and running. Compare with pods status reference taken pre-deployment</li>
 </ul>
-<h4 id="perftest-day-or-hours-before-deployment-of-a-cluster-2">Day or hours before deployment of a cluster</h4>
-<p>It is important to identify applications with underlying issues and allow sufficient time for teams to acknowledge or fix issues before proceeding with cluster rebuild.
-- Create a time-snapshot list of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A &gt; all_pods_status_$TIMESTAMP</code>
-- Create a time-snapshot count of pods for comparison reference post-deployment - <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | wc -l &gt; total_pods_$TIMESTAMP</code><br>
-- To identity failed Helm releases and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get hr -A | grep -v Succeeded &gt; failed_hrs_$TIMESTAMP</code><br>
-- To identify failed pods and copy list into a file, run <code>TIMESTAMP=&quot;$(date +%F_%H%M%S)&quot; &amp;&amp; kubectl get pods -A | grep -v Completed | grep -v Running &gt; failed_pods_$TIMESTAMP</code>
-- Investigate failed helm releases and missing pods as required<br>
-- For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release) 
-- For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
-- For pods where images beginning with <em>pr-</em> aren&rsquo;t found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this one done previously - https://github.com/hmcts/cnp-flux-config/pull/17115/files.</p>
-<h4 id="before-switchover-of-a-cluster">Before switchover of a cluster</h4>
-<p>Demo runs only one cluster at a time due to some limitations in the current setup.</p>
+<h3 id="demo">Demo</h3>
+<h4 id="demo-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
 
 <ul>
-<li>Build the other demo cluster:
+<li>Remove the cluster you are going to redeploying from the AGW. <a href="https://github.com/hmcts/azure-platform-terraform/pull/580">PR example here</a></li>
+<li>Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer</li>
+</ul>
+<h4 id="demo-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
-<li>CFT: Use the <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=677&amp;_a=summary">pipeline</a> in apply mode to build either 00/01 demo cluster.</li>
-<li>SDS: Uncomment 00/01 cluster in this file <a href="https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars">this file</a> in a PR and merge into master, then run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482">pipeline</a> in apply mode.</li>
-</ul></li>
-<li>Check whether all deployments/ apps are up. <code>kubectl get hr -A</code> gives a quick snapshot of progress.</li>
-<li>Check that Load Balancer IPs have been assigned <code>kubectl get svc -n admin</code>, one external-ip for each instance of traefik.</li>
-<li>Check all pods are deployed and running. Compare with pods status reference taken pre-deployment.</li>
+<li>Add the cluster back into AGW once you have confirmed deployment has been successful. <a href="https://github.com/hmcts/azure-platform-terraform/pull/582">PR example here</a></li>
 </ul>
-<h4 id="after-deployment-of-cluster-and-all-above-health-conditions-met">After Deployment of Cluster, and all above health conditions met</h4>
-
-<ul>
-<li>Swap backend application gateway in <a href="https://github.com/hmcts/azure-platform-terraform/pull/622/files">azure-platform-terraform</a>, or <a href="https://github.com/hmcts/sds-azure-platform/blob/master/environments/demo/demo.tfvars#L7">sds-azure-platform</a> &ndash; IP of traefik-private service.</li>
-<li>Swap active external dns deployments to route traffic to new cluster <a href="https://github.com/hmcts/cnp-flux-config/pull/14659/files">example CFT PR</a>, <a href="https://github.com/hmcts/sds-flux-config/pull/2356/files">example SDS PR</a></li>
-<li>Delete all ingress on the old cluster to ensure external-dns deletes it&rsquo;s existing records and the new cluster can repopulate DNS:</li>
-</ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl delete ingress --all-namespaces -l app.kubernetes.io/managed-by=Helm
-</code></pre></div>
-<ul>
-<li>Delete old cluster:
-
-<ul>
-<li>CFT: We are currently manually stopping and deleting the old cluster in the Azure Portal for CFT until we have a code solution similar to SDS.</li>
-<li>SDS: Remove old cluster code from <a href="https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/demo.tfvars">this file</a>, like in this <a href="https://github.com/hmcts/aks-sds-deploy/pull/208">PR</a>, once merged into master run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482">pipeline</a> in apply mode.
-## Known issues</li>
-</ul></li>
-</ul>
+<h2 id="known-issues">Known issues</h2>
 <h3 id="neuvector">Neuvector</h3>
 
 <ol>

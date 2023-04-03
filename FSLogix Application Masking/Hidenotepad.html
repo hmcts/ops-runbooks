@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>F5 VPN - HMCTS</title>
+    <title>Hide Notepad Demo - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/f5/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/FSLogix Application Masking/Hidenotepad.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="F5 VPN - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta name="twitter:title" content="Hide Notepad Demo - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/FSLogix Application Masking/Hidenotepad.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="F5 VPN" />
+      <meta property="og:title" content="Hide Notepad Demo" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/FSLogix Application Masking/Hidenotepad.html" />
 
     
   </head>
@@ -288,37 +288,53 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="f5-vpn">F5 VPN</h1>
-<h2 id="useful-links">Useful links</h2>
-
-<ul>
-<li><a href="https://github.com/hmcts/azure-vpn-f5">GitHub Repository</a> (not live yet, automation is in progress)</li>
-<li><a href="accounts.md">User Accounts</a></li>
-</ul>
-<h2 id="guides">Guides</h2>
-
-<ul>
-<li><a href="VPN-routing-config.md">Setup access to internal apps</a></li>
-</ul>
-<h2 id="common-issues">Common Issues</h2>
-
-<ul>
-<li>Failed HDD encryption check: Likely means that FileVault is turned off if it&rsquo;s Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.</li>
-<li>User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person</li>
-<li>Failed to open tunnel, Tunnel server already launched: Find the svpn process id: <code>ps alx | grep svpn</code>, on the result process ID use the kill command: <code>kill -9 [the process id from the ps command]</code>, and or restart the machine.</li>
-</ul>
-<p>If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you&rsquo;ll need the F5 serial number / Registration key.  To get this, you need to access the command line by SSHing into the VPN: https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview.</p>
-<p>There you can run this command: <code>show sys license</code>.</p>
-<p>The registration key will show in the output and you can then initiate the support request.</p>
-<p>As of September 2022 the registration key is: <code>KVKMY-TGVEZ-FXDLU-ZBKMY-FMAYERM</code></p>
+            <h1 id="fslogix-application-masking">FSLogix Application Masking</h1>
+<p>FSLogix App Rule Editor can be used to create rules to hide certain applications from users. In this example, we will create a rule to hide the Notepad application from users.</p>
+<p>To create a rule to hide Notepad using FSLogix App Rule Editor, follow these steps:
+Installing FSLogix Rule Editor
+From the FSLogix page, there’s a URL called https://aka.ms/fslogix_download. When you click the download, it goes straight to the download folder. Open the folder and extract the FSLogix app. Then open x64 releases folder. In that, you will notice three options i.e
+1 FSLogixAppsJavaRuleEditorSetup
+2 FSLogixAppRuleEditorSetup
+3 FSlogixAppsSetup
+In our case, we select FSLogixAppRuleEditorSetup</p>
+<p>Launch the rule editor application (right click and runs as administrator)</p>
+<p>Click File and New, or click the new icon available towards the top of the application</p>
+<p>For the purpose of this demo, Will hide Notepad so will name my rule HideNotepad as shown below. Click Enter file name when done
+<a href="images/HideNotepad.png" rel="noopener noreferrer"><img src="images/HideNotepad.png" alt="" /></a></p>
+<p>Creating a Blank Rule Set and clicking OK. If you’re app is already installed and visible, click Choose from installed programs.
+<a href="images/BlankRuleSet.png" rel="noopener noreferrer"><img src="images/BlankRuleSet.png" alt="" /></a></p>
+<p>Next,click on the + Icon to create a new rule.</p>
+<p>There are several options to choose from.
+Hiding Rule – Hides the specified items using specified criteria,
+Redirection Rule – causes the specified item to be redirected as defined,
+App container Rule – redirects the specified content into a VHD,
+Specify value Rule – assigns a value for the specified item.</p>
+<p><a href="images/Rules.png" rel="noopener noreferrer"><img src="images/Rules.png" alt="" /></a></p>
+<p>For this demo, Will be using the Hiding Rule. Select file</p>
+<p><a href="images/SelectFile.png" rel="noopener noreferrer"><img src="images/SelectFile.png" alt="" /></a>
+Browse to the application.exe located in the system32 folder. C:\Windows\System32 and click notepad</p>
+<p>Click Ok and click Yes
+<a href="images/AddRule.png" rel="noopener noreferrer"><img src="images/AddRule.png" alt="" /></a></p>
+<p>Click the manage assignments icon as shown below.</p>
+<p><a href="images/ManageIcon.png" rel="noopener noreferrer"><img src="images/ManageIcon.png" alt="" /></a></p>
+<p>For this demo, will be hiding notepad for certain group(e.g-Orange Team) in the Rule Set. By default the rule applies to no one.Note that if you click on Everyone, the option is set to Rule Set does not apply to user/group.</p>
+<p>Apply the rule for everyone apart from certain group (eg- Orange team). Click Save.
+Browse to the location where the FSlogix rule sets are saved and copy the rules. See below
+<a href="images/listoffiles.png" rel="noopener noreferrer"><img src="images/listoffiles.png" alt="" /></a></p>
+<p>Copy files from: Documents\FSlogix rule sets to C:\Program Files\FSLogix\Apps\Rules</p>
+<p>You’ll find that a number of files are automatically created by the FSLogix application in the CompiledRules location after copying the files.Files are copied to the Rules Folder and the automatically created files are compiled in the Compiled Rules folder.
+<a href="images/Numberoffiles.png" rel="noopener noreferrer"><img src="images/Numberoffiles.png" alt="" /></a></p>
+<p>In a production environment, you will want to create a network share including a copy of the rule sets from where you can automated the copy of files to your session hosts and update as and when requires from one central location.</p>
+<h2 id="testing">Testing:</h2>
+<p>Login with a user who is the part of the group(eg- Orange Team). Notepad will not be available for this group.By using this tool, you can create rules to hide or show applications and files to specific users or groups.</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/f5/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+VPN%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Ff5%2F%29&amp;labels=bug&amp;title=Re%3A+%27F5+VPN%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FSLogix%20Application%20Masking/Hidenotepad.html.md">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Hide+Notepad+Demo%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FFSLogix+Application+Masking%2FHidenotepad.html%29&amp;labels=bug&amp;title=Re%3A+%27Hide+Notepad+Demo%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

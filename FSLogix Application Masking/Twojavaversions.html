@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>F5 VPN - HMCTS</title>
+    <title>FSlogix-TwoJavaversions - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/f5/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/FSLogix Application Masking/Twojavaversions.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="F5 VPN - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta name="twitter:title" content="FSlogix-TwoJavaversions - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/FSLogix Application Masking/Twojavaversions.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="F5 VPN" />
+      <meta property="og:title" content="FSlogix-TwoJavaversions" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/FSLogix Application Masking/Twojavaversions.html" />
 
     
   </head>
@@ -288,37 +288,62 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="f5-vpn">F5 VPN</h1>
-<h2 id="useful-links">Useful links</h2>
-
-<ul>
-<li><a href="https://github.com/hmcts/azure-vpn-f5">GitHub Repository</a> (not live yet, automation is in progress)</li>
-<li><a href="accounts.md">User Accounts</a></li>
-</ul>
-<h2 id="guides">Guides</h2>
-
-<ul>
-<li><a href="VPN-routing-config.md">Setup access to internal apps</a></li>
-</ul>
-<h2 id="common-issues">Common Issues</h2>
-
-<ul>
-<li>Failed HDD encryption check: Likely means that FileVault is turned off if it&rsquo;s Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.</li>
-<li>User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person</li>
-<li>Failed to open tunnel, Tunnel server already launched: Find the svpn process id: <code>ps alx | grep svpn</code>, on the result process ID use the kill command: <code>kill -9 [the process id from the ps command]</code>, and or restart the machine.</li>
-</ul>
-<p>If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you&rsquo;ll need the F5 serial number / Registration key.  To get this, you need to access the command line by SSHing into the VPN: https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview.</p>
-<p>There you can run this command: <code>show sys license</code>.</p>
-<p>The registration key will show in the output and you can then initiate the support request.</p>
-<p>As of September 2022 the registration key is: <code>KVKMY-TGVEZ-FXDLU-ZBKMY-FMAYERM</code></p>
+            <h1 id="fslogix-java-rule-editor">FSLogix-Java Rule Editor</h1>
+<p>FSLogix has a &lsquo;Java Rule Editor&rsquo; that allows creating rules limiting certain web URLs or applications (specifically .exe files) to using specific versions of the Java Runtime Environment (JRE). This can be used to limit internet explorer itself or specific java applets running in those browsers to a specific version of Java. A demo of this feature has not been created yet. I believe we can utilise https://javatester.org/version.html to accomplish this. See also: https://www.htg.co.uk/blog/fslogix-first-look-1-managing-legacy-or
+Currently FSLogix has been tested using &lsquo;ClickOps&rsquo; i.e. connecting to a jumpbox via RDP and entering the rules manually via the FSLogix GUI. There exist some methods to deploy FSLogix rules via terraform. These need looking into: https://github.com/MicrosoftDocs/azure-dev-docs/blob/main/articles/terraform/create-avd-azure-files-storage.md</p>
+<p>We&rsquo;ve constructed a demo with two java applets on different sites running different versions of Java concurrently. One running JRE 7u80 and another, (while showing an error) can be seen to be running JRE 7u45.
+<p float="left'>
+<img src=images/Javaversion.png width="400" />
+<img src=images/Error.png width="400" />
+<img src=images/TwoJavaVersions.png width="400" />
+</p></p>
+<p>It should be noted that the 32-bit JRE must be installed in order for the java redirection to work. If only the 64-bit version of the desired JRE is present, it will default to the latest JRE installed on the machine. These rules will be applied when Internet Explorer starts up. In order to apply rules while Internet Explorer is running, it will need to be closed and re-opened before they are applied. Some applets may require a security exception in the Java Control Panel to work.
+The FSLogix Java Rule Editor is a separate software package to the normal Rule Editor. It saves rule projects as a .xmlp file. This is not sufficient to apply the rules, however. To do this, a .xml file must be generated by clicking the &lsquo;generate&rsquo; button or selecting &lsquo;file -&gt; generate&rsquo; from the menu bar. The .xml file must then be copied to the FSLogix system directory as detailed previously. Only the .xml file is required to apply the Java Rule. The .xmlp file is used only to generate the .xml file.</p>
+<p>In order to configure FSLogix rules via code, we can use a Powershell module called FSLogix.Powershell.Rules to create and configure FSLogix rules and assignments: https://github.com/FSLogix/FSLogix.Powershell.Rules/tree/master
+This module can be installed from Powershell Gallery with the following commands:
+Set-PSRepository -Name &lsquo;PSGallery&rsquo; -InstallationPolicy Trusted
+Install-Module -Name FSLogix.Powershell.Rules
+It&rsquo;s important to note I&rsquo;ve been unable to find any documentation for this module, so I will provide some information here that I&rsquo;ve gleamed largely from digging around in the module&rsquo;s source code.</p>
+<h2 id="adding-rules">Adding Rules</h2>
+<p>FSLogix rules can then be added via the Add-FslRule command:
+Add-FslRule -Path &ldquo;C:\Program Files\FSLogix\Apps\Rules\HideNotepad.fxr&rdquo; -HidingType FileOrValue -FullName &ldquo;C:\Windows\system32\notepad.exe&rdquo;
+The Path parameter specifies the path to the FSLogix rule file. Here we write directly to the FSLogix program directory where it reads it&rsquo;s rules from. This will require administrator priviliges. If said priviliges are not available, it may be desirable to create the files to a different directory and then copy them over later.
+The HidingType parameter is an enum and specifies the type of object we&rsquo;re hiding. This can be any of:
+• FolderOrKey
+• FileOrValue
+• Font
+• Printer
+For our purposes, we&rsquo;re only concerned with FolderOrKey to hide folders and FileOrValue to hide individual files.
+The FullName parameter specifies the full path of the object we want to hide. In the example above, we direct this to the windows notepad executable.</p>
+<h3 id="adding-assignments">Adding Assignments</h3>
+<p>FSLogix rules can then be assigned to users/groups via the Add-FslAssignment command:
+Add-FslAssignment -Path &ldquo;C:\Program Files\FSLogix\Apps\Rules\HideNotepad.fxa&rdquo; -RuleSetApplies -UserName &ldquo;your.email@hmcts.net&rdquo;
+The Path parameter specifies the path to the FSLogix assignment file. These should have the same name as the rule file they apply to, but with the .fxa extension instead of .fxr
+The RuleSetApplies parameter is a switch that determines whether a rule set applies to the group or user we&rsquo;re specifying. If present, the rule will apply to the entity we specify, if absent the rule will not apply. This can be used to include/exclude groups of users from a rule.
+The UserName parameter specifies the name of the user this assignment is targeting. Wildcards (*) are supported. Alternatives to targeting usernames include GroupName to target groups, ProcessName to target running programs and ADDistinguishedName to target active directory objects.</p>
+<h3 id="additional-functions">Additional Functions</h3>
+<p>The full list of commands added by the FSLogix.PowerShell.Rules module can be seen in the module&rsquo;s git repository: https://github.com/FSLogix/FSLogix.Powershell.Rules/tree/master/FSLogix.PowerShell.Rules/functions/Public
+Adding the -? flag to the end of a command name details the parameters of that command and sometimes provides examples, though the quality and quantity of documentation varies from command to command.</p>
+<h2 id="reloading-rules">Reloading Rules</h2>
+<p>Once rules have been added to the FSLogix program directory, FSLogix needs to be reloaded to apply them. This can be done with the FSLogix command-line utility that is installed alongside FSLogix:
+C:\Program` Files\FSLogix\Apps\frx.exe reload-rules</p>
+<h2 id="java-rules">Java Rules</h2>
+<p>The FSLogix.PowerShell.Rules module does not have functionality required to create and add Java redirection rules. Thankfully, unlike .fxa and .fxr files, Java rules are plaintext .xml files. This makes it possible to simply construct the Java rules with native PowerShell, if so desired. I&rsquo;ve provided a sample xml file that I created during testing. The structure of the file is very simple largely self-explanatory:
+&lt;?xml version=&ldquo;1.0&rdquo;?&gt;
+<FrxBrowserAssignments version="1.0">
+  <BrowserAssignment Url="*://*.javatester.org/*" Java="1.7.0_45" />
+  <BrowserAssignment Url="*://*.pinlady.net/*" Java="1.7.0_80" />
+  <BrowserAssignment Url="*://www.stat.cmu.edu/*" Java="1.7.0_45" />
+  <BrowserAssignment Url="https://caff.de/applettest/" Java="1.7.0_45" />
+</FrxBrowserAssignments></p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/f5/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+VPN%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Ff5%2F%29&amp;labels=bug&amp;title=Re%3A+%27F5+VPN%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FSLogix%20Application%20Masking/Twojavaversions.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27FSlogix-TwoJavaversions%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FFSLogix+Application+Masking%2FTwojavaversions.html%29&amp;labels=bug&amp;title=Re%3A+%27FSlogix-TwoJavaversions%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

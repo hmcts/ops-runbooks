@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # temp workaround for external.metrics.k8s.io/v1beta1 error
-# https://github.com/kubernetes-sigs/custom-metrics-apiserver/issues/146
+# https://github.com/kubernetes-sigs/custom-metrics-apiserver/issues/146
 exec 2>/dev/null
 
 # positional arguments
@@ -24,11 +24,11 @@ fi
 # check for azure.workload.identity/use
 if [ $# -eq 0 ]; then
     # setup files
-    > migrated.csv
-    > not_migrated.csv
+    > has_label.csv
+    > no_label.csv
     > azureidentities.csv
-    echo "namespace, deployment" >> has_label.csv
-    echo "namespace, deployment" >> no_label.csv
+    echo "namespace, type, name" >> has_label.csv
+    echo "namespace, type, name" >> no_label.csv
     echo "namespace, identity, binding, resource" >> azureidentities.csv
 
     # get cluster name
@@ -53,12 +53,12 @@ if [ $# -eq 0 ]; then
             #logic on label_check contents
             if [ $label_check = "null" ];
             then
-                echo $deployment: needs migrating.
-                echo $namespace, $deployment >> no_label.csv
+                echo deployment: $deployment: no label.
+                echo $namespace, deployment, $deployment >> no_label.csv
 
             else
-                echo $deployment: is migrated.
-                echo $namespace, $deployment >> has_label.csv
+                echo deployment: $deployment: has label.
+                echo $namespace, deployment, $deployment >> has_label.csv
             fi
         done
 
@@ -76,11 +76,31 @@ if [ $# -eq 0 ]; then
 
                 echo $namespace, $bound_identity_name, $binding_name, $bound_resource_name >> azureidentities.csv
             done
+
+        #get CronJobs in namespace
+        cronjobs=($(kubectl get CronJobs -n $namespace -o json | jq -r '.items[].metadata.name' ))
+
+            for cronjob in "${cronjobs[@]}"; do
+                # get json block of the cronjob
+                cronjob_label_check=$(kubectl get deployment $deployment -n $namespace -o json | jq -r '.metadata.labels."azure.workload.identity/use"')
+
+                #logic on label_check contents
+                if [ $cronjob_label_check = "null" ];
+                then
+                    echo cronJob: $cronjob: no label.
+                    echo $namespace, cronJob, $cronjob >> no_label.csv
+
+                else
+                    echo cronJob: $cronjob: has label.
+                    echo $namespace, cronJob, $deployment >> has_label.csv
+                fi
+            done
     done
 
+    # clone repo and check job manifest
     echo
     echo script has finished executing
-    echo \'workload_identity_checker.sh view_migrated\' to view the migrated deployments
-    echo \'workload_identity_checker.sh view_not_migrated\' to view not migrated deployments
+    echo \'workload_identity_checker.sh view_labelled\' to view labelled deployments/cronJobs
+    echo \'workload_identity_checker.sh view_not_labelled\' to view deployments/cronJobs without workload identity label
     echo \'workload_identity_checker.sh view_azureidentities\' to view remaining old azure identities and bindings
 fi

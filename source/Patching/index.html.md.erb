@@ -23,13 +23,13 @@ be shut down prior to patching and started after and tested.)
 consists of rota, server lists and services scheduled for patching per month.
 
 <b>High-level patching process:</b>
-	A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
-	Ensure a valid backup is available prior to each environment/virtual machine being patched.
-	Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
-	This initial process should be documented if not already.
-	To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
-	Once restarts have been completed, development team to start & test applications.
-	Once the above is successful, the next environment will be patched with similar steps.
+    - A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
+	- Ensure a valid backup is available prior to each environment/virtual machine being patched.
+	- Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
+	- This initial process should be documented if not already.
+	- To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
+	- Once restarts have been completed, development team to start & test applications.
+	- Once the above is successful, the next environment will be patched with similar steps.
 
 
 ## OS Patching Instructions
@@ -38,6 +38,7 @@ See instructions below on how to generate list and apply patching for each OS �
 
 ### RHEL
 1.	Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default
+
 ```
 [root@tamops-rhel ~]# yum install yum-plugin-security
 Loaded plugins: langpacks, product-id, search-disabled-repos
@@ -46,6 +47,7 @@ Nothing to do
 ```
 
 2. Check for Security Critical Updates (Check for Critical Updates only)
+
 ```
 [root@tamops-rhel ~]# yum --security --sec-severity=Critical check-update
 --> maven30-maven-profile-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
@@ -55,6 +57,7 @@ No packages needed for security; 14 packages available
 ```
 
 3. List any available Updates
+
 ```
 [root@tamops-rhel ~]# yum updateinfo list
 Loaded plugins: langpacks, product-id, search-disabled-repos
@@ -81,12 +84,14 @@ RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
 ```
 
 4. Run yum update to update RHEL
+
 ```
 [root@tamops-rhel ~]# yum update
 ```
 
 ### Ubuntu
 1.	Upgrade
+
 ```
 root@tamops-ubuntu:~# apt-get update
 Hit:1 http://azure.archive.ubuntu.com/ubuntu bionic InRelease
@@ -98,6 +103,7 @@ Get:6 http://azure.archive.ubuntu.com/ubuntu bionic/universe Translation-en [494
 ```
 
 2. Review Security Updates against CVE Dashboard
+
 ```
 root@tamops-ubuntu:~# apt-get upgrade -s | grep -i security
 19 standard security updates
@@ -118,6 +124,7 @@ Inst vim-common [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu
 ```
 
 3. Lists any available Updates
+
 ```
 root@tamops-ubuntu:~# apt list --upgradable
 Listing... Done
@@ -130,11 +137,13 @@ linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47
 ```
 
 4. Update Ubuntu
+
 ```
 root@tamops-ubuntu:~# apt-get upgrade -y
 ```
 
 ### Windows
+
 ```
 PS C:\Users\tamops> ((New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher()).Search('IsInstalled=0 and IsHidden=0').updates | Select-Object -Property Title,IsDownloaded,RebootRequired | ft -AutoSize
  

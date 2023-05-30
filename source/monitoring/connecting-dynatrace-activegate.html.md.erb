@@ -1,4 +1,8 @@
-# Dynatrace ActiveGate
+---
+title: Connecting to Dynatrace VMs (ActiveGate)
+weight: 4
+---
+# <%= current_page.data.title %>
 
 ## Pre-Requisites
 
@@ -16,7 +20,7 @@ Use SSH to connect to the virtual machine, run the below `IPList.sh` to output a
 
 ```bash
 # List all active gate virtual machine IP addresses
-./Dynatrace/bin/IPList.sh
+./monitoring/bin/IPList.sh
 
 # Download key
 az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key

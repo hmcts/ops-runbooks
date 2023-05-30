@@ -1,11 +1,9 @@
-# AKS Scripts
 ---
-title: AKS Readme
+title: AKS Scripts
 weight: 10
 ---
--------------
 
-
+# <%= current_page.data.title %>
 
 ## Check Minimum Chart Versions
 This script was created to compare chart versions being used in the cluster with a minimum chart requirement. This will be a useful tool for checking all teams have updated before rebuilding a cluster with a necessary change added to a given chart version.
@@ -17,6 +15,4 @@ This script was created to compare chart versions being used in the cluster with
 - [Connect to one of the AKS clusters](https://hmcts.github.io/ways-of-working/troubleshooting/) before running the script.
 
 ### Running the script
-Make sure to run `az login`, to run the script, clone this repository and switch into the `aks` directory, run `./checkMinimumChartVersions.sh`. The script runs against your current kubectl context, and generates output based on applications running in the cluster.
-
-------------
+Make sure to run `az login`, to run the script, clone this repository and switch into the `aks` directory, run `./bin/checkMinimumChartVersions.sh`. The script runs against your current kubectl context, and generates output based on applications running in the cluster.

@@ -12,7 +12,7 @@ covers the patching process, patching instructions for each OS type and troubles
 ## Patching Process
 PlatOps resources confirmed to participate in patching, including out of hours.
 
-A quarterly patching schedule needs to be created, reviewed, and approved (by PlatOps and the customer), where the 
+A quarterly patching schedule needs to be created, reviewed, and approved (by PlatOps and the customer).  The 
 non-live environments for a service needs to be scheduled and successfully patched first prior to production.
 
 Production services will require a change request and scheduled out of hours, for the agreed change window.  Changes 
@@ -24,8 +24,11 @@ consists of rota, server lists and services scheduled for patching per month.
 
 <b>High-level patching process:</b>
     - A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
-	- Ensure a valid backup is available prior to each environment/virtual machine being patched.
-	- Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
+    - Ensure production changes are approved and at the implement status and window and resources have been approved and provided.
+    - Prior to patching log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches.
+	- Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed.
+	- Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching.
+    - Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
 	- This initial process should be documented if not already.
 	- To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
 	- Once restarts have been completed, development team to start & test applications.
@@ -167,3 +170,66 @@ There is an automated patching solution for Heritage services.
 
 ## Patching Troubleshooting
 This section includes updates of any issues encountered during patching and how to resolve.
+
+### RHEL 6.10 not showing any patches available
+RHEL 6.10 is the latest version for RHEL 6 and is End of Life and not supported - therefore there will be no available patches if previously patched to latest version.
+
+### Patching and upgrading RHEL 7 to latest version and not showing any patches available
+If trying to patch and upgrade RHEL 7 to the latest version (i.e. 7.7 to 7.9) and if no patches are showing as available then the repos will need checked and updated:
+
+```
+[root@NSDT-DB-VM01 ~]# yum updateinfo list
+Loaded plugins: langpacks, product-id, search-disabled-repos, subscription-manager
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+updateinfo list done
+```
+
+If patching to the latest version remove the releasever file:
+
+```
+rm /etc/yum/vars/releasever
+```
+
+If patching to a specific higher version then update this file to the required version.
+
+Disable non-EUS repositories:
+
+```
+yum repolist enabled
+
+yum-config-manager --disable rhui-microsoft-azure-rhel7-eus
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-supplementary-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-optional-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-rpms
+```
+
+Get the latest Azure RHEL 7 repository config file:
+
+```
+wget https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel7.config
+```
+
+Add the latest Azure RHEL 7 repositories:
+
+```
+yum --config=rhui-microsoft-azure-rhel7.config install rhui-azure-rhel7
+```
+
+Remove the disabled repos to reduce space usage:
+
+```
+cd /var/cache/yum/x86_64/7.7
+du -sh *
+rm -rf rhui-microsoft-azure-rhel7-eus
+rm -rf rhui-rhel-7-server-rhui-eus-optional-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-supplementary-rpms
+```
+
+Clean up the repos and confirm patches are now available and can upgrade to latest version:
+
+```
+yum clean all
+yum repolist enabled
+yum updateinfo list
+```

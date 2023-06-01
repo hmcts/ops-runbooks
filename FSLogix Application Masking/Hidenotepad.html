@@ -98,16 +98,16 @@
 <li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
 <ul>
   <li>
-    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
   </li>
   <li>
-    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
   </li>
   <li>
     <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
   </li>
   <li>
-    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
   </li>
 </ul>
 </li>
@@ -117,13 +117,13 @@
     <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
     <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
-  </li>
-  <li>
-    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
   </li>
 </ul>
 </li>
@@ -136,7 +136,7 @@
     <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
   </li>
   <li>
-    <a href="../monitoring/availability-tests.html"><span>Availability Tests</span></a>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
   </li>
   <li>
     <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
@@ -146,10 +146,13 @@
 <li><a href="../Certificates/index.html"><span>Certificates</span></a>
 <ul>
   <li>
-    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
   </li>
   <li>
     <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
   </li>
   <li>
     <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
@@ -157,56 +160,53 @@
   <li>
     <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
   </li>
-  <li>
-    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
-  </li>
 </ul>
 </li>
 <li><a href="../database/index.html"><span>Databases</span></a>
 <ul>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
   <li>
     <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
   </li>
   <li>
     <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
   </li>
-  <li>
-    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
-  </li>
 </ul>
 </li>
 <li><a href="../network/index.html"><span>Networking</span></a>
 <ul>
   <li>
-    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
   <li>
     <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
   </li>
   <li>
-    <a href="../network/palos-troubleshooting.html"><span>Troubleshooting</span></a>
-  </li>
-  <li>
-    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
-  </li>
-  <li>
-    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
   </li>
 </ul>
 </li>
 <li><a href="../heritage/index.html"><span>Heritage</span></a>
 <ul>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions (PCOL)</span></a>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
   </li>
   <li>
-    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
   </li>
 </ul>
 </li>
@@ -223,23 +223,23 @@
 <li><a href="../jenkins/index.html"><span>Jenkins</span></a>
 <ul>
   <li>
-    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
   </li>
   <li>
-    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
   </li>
 </ul>
 </li>
 <li><a href="../Services/index.html"><span>Services</span></a>
 <ul>
   <li>
-    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
-  </li>
-  <li>
     <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
   </li>
   <li>
     <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
   </li>
 </ul>
 </li>
@@ -249,6 +249,13 @@
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
+<li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
+<ul>
+  <li>
+    <a href="../Change-Requests/How-to-raise-a-Change-request.html"><span>Raise a change request</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../BAIS/index.html"><span>BAIS</span></a>
 <ul>
   <li>
@@ -295,10 +302,10 @@
 <li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
 <ul>
   <li>
-    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FSLogix-Java Rule Editor</span></a>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
   </li>
   <li>
-    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>FSLogix Application Masking</span></a>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
   </li>
 </ul>
 </li>
@@ -314,7 +321,8 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="fslogix-application-masking">FSLogix Application Masking</h1>
+            <h1 id="hide-notepad-demo">Hide Notepad Demo</h1>
+<h2 id="fslogix-application-masking">FSLogix Application Masking</h2>
 <p>FSLogix App Rule Editor can be used to create rules to hide certain applications from users. In this example, we will create a rule to hide the Notepad application from users.</p>
 <p>To create a rule to hide Notepad using FSLogix App Rule Editor, follow these steps:
 Installing FSLogix Rule Editor
@@ -359,7 +367,7 @@ Browse to the location where the FSlogix rule sets are saved and copy the rules.
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FSLogix%20Application%20Masking/Hidenotepad.html.md">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FSLogix%20Application%20Masking/Hidenotepad.html.md.erb">View source</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Hide+Notepad+Demo%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FFSLogix+Application+Masking%2FHidenotepad.html%29&amp;labels=bug&amp;title=Re%3A+%27Hide+Notepad+Demo%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>

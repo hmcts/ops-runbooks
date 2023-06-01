@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>OS Patch Management - HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Patching/">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="OS Patch Management - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Patching/" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:title" content="OS Patch Management" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Patching/" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="/">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>Operations Runbooks</span></a>
+  </li>
+<li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
+<ul>
+  <li>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS</span></a>
+<ul>
+  <li>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../monitoring/index.html"><span>Monitoring</span></a>
+<ul>
+  <li>
+    <a href="../monitoring/app-insights.html"><span>Azure Application Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Databases</span></a>
+<ul>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../network/index.html"><span>Networking</span></a>
+<ul>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+  <li>
+    <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../heritage/index.html"><span>Heritage</span></a>
+<ul>
+  <li>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions (PCOL)</span></a>
+  </li>
+  <li>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+  </li>
+  <li>
+    <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
+  </li>
+  <li>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../f5/index.html"><span>F5 VPN</span></a>
+<ul>
+  <li>
+    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+  <li>
+    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Services/index.html"><span>Services</span></a>
+<ul>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
+  </li>
+  <li>
+    <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
+  </li>
+  <li>
+    <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/ServerAccess.html"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules.html"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall.html"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Security/index.html"><span>Security Operations</span></a>
+<ul>
+  <li>
+    <a href="../Security/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../Security/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+  <li>
+    <a href="../Security/tenable-nessus.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FinOps/index.html"><span>FinOps</span></a>
+<ul>
+  <li>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<ul>
+  <li>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FSLogix-Java Rule Editor</span></a>
+  </li>
+  <li>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>FSLogix Application Masking</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../Patching/index.html"><span>OS Patch Management</span></a>
+  </li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="os-patch-management">OS Patch Management</h1>
+<p>We need to ensure that Virtual Machines within the HMCTS subscription are kept up to date in terms of OS patching.
+The patching approach will be on a quarterly basis unless a critical patch(es) have been identified.  This document 
+covers the patching process, patching instructions for each OS type and troubleshooting sections.</p>
+<h2 id="patching-process">Patching Process</h2>
+<p>PlatOps resources confirmed to participate in patching, including out of hours.</p>
+<p>A quarterly patching schedule needs to be created, reviewed, and approved (by PlatOps and the customer).  The 
+non-live environments for a service needs to be scheduled and successfully patched first prior to production.</p>
+<p>Production services will require a change request and scheduled out of hours, for the agreed change window.  Changes 
+should be raised in advance to allow changes to be approved and resources/teams scheduled (i.e. applications and DBs to 
+be shut down prior to patching and started after and tested.)</p>
+<p><a href="https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/_layouts/15/Doc.aspx?sourcedoc=%7B97F4A896-AAB7-4CCD-A4D9-B4D158B8071D%7D&amp;file=Patching%20Calendar%20v2.xlsx&amp;action=default&amp;mobileredirect=true">Patching Calendar</a> 
+consists of rota, server lists and services scheduled for patching per month.</p>
+<p><b>High-level patching process:</b>
+    - A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
+    - Ensure production changes are approved and at the implement status and window and resources have been approved and provided.
+    - Prior to patching log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches.
+    - Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed.
+    - Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching.
+    - Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
+    - This initial process should be documented if not already.
+    - To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
+    - Once restarts have been completed, development team to start &amp; test applications.
+    - Once the above is successful, the next environment will be patched with similar steps.</p>
+<h2 id="os-patching-instructions">OS Patching Instructions</h2>
+<p>See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:</p>
+<h3 id="rhel">RHEL</h3>
+
+<ol>
+<li> Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum install yum-plugin-security
+Loaded plugins: langpacks, product-id, search-disabled-repos
+Package yum-3.4.3-163.el7.noarch already installed and latest version
+Nothing to do
+</code></pre></div>
+<ol>
+<li>Check for Security Critical Updates (Check for Critical Updates only)</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum --security --sec-severity=Critical check-update
+--&gt; maven30-maven-profile-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+--&gt; python27-python-jinja2-2.6-15.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+--&gt; maven30-maven-model-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+No packages needed for security; 14 packages available
+</code></pre></div>
+<ol>
+<li>List any available Updates</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum updateinfo list
+Loaded plugins: langpacks, product-id, search-disabled-repos
+RHSA-2021:2523 Important/Sec. bpftool-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. bpftool-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2405 Important/Sec. dhclient-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2405 Important/Sec. dhcp-common-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2405 Important/Sec. dhcp-libs-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2175 Important/Sec. glib2-2.56.1-6.el7_7.x86_64
+RHSA-2021:2998 Moderate/Sec.  glibc-2.17-292.el7_7.2.x86_64
+RHSA-2021:2998 Moderate/Sec.  glibc-common-2.17-292.el7_7.2.x86_64
+RHSA-2021:2523 Important/Sec. kernel-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2523 Important/Sec. kernel-tools-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-tools-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2523 Important/Sec. kernel-tools-libs-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-tools-libs-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2304 Important/Sec. microcode_ctl-2:2.1-53.16.el7_7.x86_64
+RHSA-2021:3029 Important/Sec. microcode_ctl-2:2.1-53.18.el7_7.x86_64
+RHSA-2021:2523 Important/Sec. python-perf-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. python-perf-3.10.0-1062.52.2.el7.x86_64
+RHBA-2021:2951 bugfix         redhat-release-server-7.7-12.el7.x86_64
+RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
+</code></pre></div>
+<ol>
+<li>Run yum update to update RHEL</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum update
+</code></pre></div><h3 id="ubuntu">Ubuntu</h3>
+
+<ol>
+<li> Upgrade</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get update
+Hit:1 http://azure.archive.ubuntu.com/ubuntu bionic InRelease
+Get:2 http://azure.archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]
+Get:3 http://azure.archive.ubuntu.com/ubuntu bionic-backports InRelease [74.6 kB]
+Get:4 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu bionic/universe amd64 Packages [8570 kB]
+Get:6 http://azure.archive.ubuntu.com/ubuntu bionic/universe Translation-en [4941 kB]
+</code></pre></div>
+<ol>
+<li>Review Security Updates against CVE Dashboard</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get upgrade -s | grep -i security
+19 standard security updates
+Inst login [1:4.5-1ubuntu2] (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Conf login (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst python-samba [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst samba-common-bin [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst samba-common [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [all]) []
+Inst samba-libs [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst libwbclient0 [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst passwd [1:4.5-1ubuntu2] (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Conf passwd (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst vim [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-tiny [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-runtime [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [all]) []
+Inst xxd [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-common [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu
+</code></pre></div>
+<ol>
+<li>Lists any available Updates</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt list --upgradable
+Listing... Done
+libpolkit-agent-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libpolkit-backend-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libpolkit-gobject-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libwbclient0/bionic-updates,bionic-security 2:4.7.6+dfsg~ubuntu-0ubuntu2.28 amd64 [upgradable from: 2:4.7.6+dfsg~ubuntu-0ubuntu2.27]
+linux-azure/bionic-updates,bionic-security 5.4.0.1068.47 amd64 [upgradable from: 5.4.0.1067.46]
+linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47 
+</code></pre></div>
+<ol>
+<li>Update Ubuntu</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get upgrade -y
+</code></pre></div><h3 id="windows">Windows</h3>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>PS C:\Users\tamops&gt; ((New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher()).Search('IsInstalled=0 and IsHidden=0').updates | Select-Object -Property Title,IsDownloaded,RebootRequired | ft -AutoSize
+
+Title                                                                                                               IsDownloaded RebootRequired
+-----                                                                                                               ------------ --------------
+2021-01 Update for Windows Server 2019 for x64-based Systems (KB4589208)                                                   False          False
+2022-01 Cumulative Update Preview for .NET Framework 3.5, 4.7.2 and 4.8 for Windows Server 2019 for x64 (KB5009823)        False          False
+</code></pre></div><h2 id="automated-patching">Automated Patching</h2>
+<p>There is an automated patching solution for Heritage services.</p>
+<p><b>Walkthrough session:</b>
+<a href="https://justiceuk.sharepoint.com/sites/DTSPlatformOperations/_layouts/15/stream.aspx?id=%2Fsites%2FDTSPlatformOperations%2FShared%20Documents%2FGeneral%2Fknowledge%2Dsharing%2FRedSquadKTSessions%2FPatch%20Management%20solution%20demo%20%28placeholder%29%2D20220816%5F120309%2DMeeting%20Recording%2Emp4&amp;wdLOR=c08271A28%2DB82F%2D5B40%2DB87F%2D69A1E28E545D&amp;ga=1">Walkthrough Session</a></p>
+<p><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=606">Heritage Azure Update Management Pipeline</a></p>
+<p><a href="https://portal.azure.com/?feature.msaljs=true#view/HubsExtension/BrowseResource/resourceType/Microsoft.Automation%2FAutomationAccounts">Automated Accounts</a></p>
+<h2 id="patching-troubleshooting">Patching Troubleshooting</h2>
+<p>This section includes updates of any issues encountered during patching and how to resolve.</p>
+<h3 id="rhel-6-10-not-showing-any-patches-available">RHEL 6.10 not showing any patches available</h3>
+<p>RHEL 6.10 is the latest version for RHEL 6 and is End of Life and not supported - therefore there will be no available patches if previously patched to latest version.</p>
+<h3 id="patching-and-upgrading-rhel-7-to-latest-version-and-not-showing-any-patches-available">Patching and upgrading RHEL 7 to latest version and not showing any patches available</h3>
+<p>If trying to patch and upgrade RHEL 7 to the latest version (i.e. 7.7 to 7.9) and if no patches are showing as available then the repos will need checked and updated:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@NSDT-DB-VM01 ~]# yum updateinfo list
+Loaded plugins: langpacks, product-id, search-disabled-repos, subscription-manager
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+updateinfo list done
+</code></pre></div><p>If patching to the latest version remove the releasever file:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>rm /etc/yum/vars/releasever
+</code></pre></div><p>If patching to a specific higher version then update this file to the required version.</p>
+<p>Disable non-EUS repositories:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>yum repolist enabled
+
+yum-config-manager --disable rhui-microsoft-azure-rhel7-eus
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-supplementary-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-optional-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-rpms
+</code></pre></div><p>Get the latest Azure RHEL 7 repository config file:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>wget https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel7.config
+</code></pre></div><p>Add the latest Azure RHEL 7 repositories:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>yum --config=rhui-microsoft-azure-rhel7.config install rhui-azure-rhel7
+</code></pre></div><p>Remove the disabled repos to reduce space usage:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>cd /var/cache/yum/x86_64/7.7
+du -sh *
+rm -rf rhui-microsoft-azure-rhel7-eus
+rm -rf rhui-rhel-7-server-rhui-eus-optional-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-supplementary-rpms
+</code></pre></div><p>Clean up the repos and confirm patches are now available and can upgrade to latest version:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>yum clean all
+yum repolist enabled
+yum updateinfo list
+</code></pre></div>
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/index.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27OS+Patch+Management%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPatching%2F%29&amp;labels=bug&amp;title=Re%3A+%27OS+Patch+Management%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

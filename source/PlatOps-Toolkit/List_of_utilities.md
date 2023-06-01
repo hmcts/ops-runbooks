@@ -11,7 +11,6 @@ Multi-device fast charging USB-C backup battery, extra time away from mains powe
 https://maccy.app/
 Clipboard manager for macOS which does one job - keep your copy history at hand. Period
 
-
 ## TechSmith Capture (Formerly Jing)
 https://www.techsmith.com/jing-tool.html
 TechSmith Capture provides a simple way to take and share images and videos of your screen.
@@ -51,7 +50,7 @@ A cross-platform database tool for data professionals who use on-premises and cl
 ## Azure Storage explorer
 https://azure.microsoft.com/en-gb/products/storage/storage-explorer
 Helps you upload, download, and manage the data you store in Azure Storage.
----
+
 
 # SECURITY
 
@@ -72,7 +71,6 @@ A password manager, digital vault, form filler and secure digital wallet. (great
 https://www.microsoft.com/en-gb/security/mobile-authenticator-app
 Conveniently and securely sign in to all your online accounts using multifactor authentication, passwordless sign-in 
 
----
 
 # WEBSITES
 Azure Network Watcher
@@ -104,7 +102,7 @@ Is an open-source Kubernetes application for ready-to-code cloud development env
 https://www.calculator.net/ip-subnet-calculator.html
 This IP subnet calculator covers both IPv4 and IPv6 protocols, providing information such as IP address, network address, subnet mask, IP range, and more
 
-Markdow cheat-sheet
+## Markdow cheat-sheet
 https://www.markdownguide.org/cheat-sheet/
 A quick overview of all the Markdown syntax elements.
 

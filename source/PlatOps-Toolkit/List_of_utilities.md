@@ -35,10 +35,6 @@ Starship is the minimal, blazing fast, and extremely customizable prompt for any
 https://github.com/tfutils/tfenv
 A simple-to-use open-source command line program that enables you to manage and switch between multiple versions of Terraform
 
-## The F ck
-https://github.com/nvbn/thefuck
-Not that safe for work, but helpful when you make a typo in a command
-
 ## Wireshark
 https://www.wireshark.org/
 A free and open-source packet analyzer. (Use Azure Network Watcher to get traces)
@@ -73,7 +69,8 @@ Conveniently and securely sign in to all your online accounts using multifactor 
 
 
 # WEBSITES
-Azure Network Watcher
+
+## Azure Network Watcher
 https://portal.azure.com/#view/Microsoft_Azure_Network/NetworkWatcherMenuBlade/~/overview
 Provides tools to monitor, diagnose, view metrics, and enable or disable logs for resources in an Azure virtual network
 
@@ -89,11 +86,6 @@ A free online diagram software for making flowcharts, process diagrams, org char
 https://www.sublimetext.com/
 A sophisticated text editor for code, markup and prose.
 
-## GitHub Copilot 
-https://docs.github.com/en/copilot/quickstart
-*(requires subscription)*
-Turns natural language prompts into coding suggestions across dozens of languages.
-
 ## Gitpod
 https://github.com/marketplace/gitpod-io
 Is an open-source Kubernetes application for ready-to-code cloud development environments that spins up fresh, automated dev environments for each task
@@ -106,11 +98,9 @@ This IP subnet calculator covers both IPv4 and IPv6 protocols, providing informa
 https://www.markdownguide.org/cheat-sheet/
 A quick overview of all the Markdown syntax elements.
 
----
-
 # MICROSOFT's VS CODE EXTENSIONS
 
-Terraform Extension for Visual Studio Code
+## Terraform Extension for Visual Studio Code
 Adds editing features for Terraform files such as syntax highlighting, IntelliSense, code navigation, code formatting, module explorer and much more!
 *(Don't forget to set the Format on save feature)*
 

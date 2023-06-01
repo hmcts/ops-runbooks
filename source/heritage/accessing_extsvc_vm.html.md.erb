@@ -1,4 +1,9 @@
-# Accessing Heritage EXTSVC Virtual Machines
+---
+title: Accessing Heritage EXTSVC Virtual Machines
+weight: 40
+---
+
+# <%= current_page.data.title %>
 
 Many External Services VMs in Heritage (also known as the spoke VMs) are currently not networked into the HMCTS bastions in the way that the rest of reform is. This document details how to gain access to these VMs, using `POAG-WEB-VM01` as an example.
 
@@ -10,7 +15,7 @@ Using our example of `POAG-WEB-VM01`, in the azure portal, we can see that it's 
 
 If we have a look at the virtual network and search for a device that sounds vaguely devops-related, we can see a network interface attached to `PEXT-DEVOPS-VM01`. We can use this machine to access the spoke VM.
 
-![Screenshot of vnet-prod-ext-01 in the Azure Portal](vnet-prod-ext-01_screenshot.png)
+![Screenshot of vnet-prod-ext-01 in the Azure Portal](images/vnet-prod-ext-01_screenshot.png)
 
 2. Find and Obtain the Admin Private Key
 
@@ -18,7 +23,7 @@ Both the EXTSVC VMs and the DevOps VMs rely on private key authentication for in
 
 If we have a look at the 'Connect' tab of `POAG-WEB-VM-01` in the Azure Portal, under 'SSH', we can see we'll need a private key called 'v1admin.pem'. `PEXT-DEVOPS-VM01` shows the same key.
 
-![Screenshot of POAG-WEB-VM01 in the Azure Portal](POAG-WEB-VM01_screenshot.png)
+![Screenshot of POAG-WEB-VM01 in the Azure Portal](images/POAG-WEB-VM01_screenshot.png)
 
 These keys are almost always stored in a key vault within the same subscription as the VMs. In this case, both VMs are in the `DTS-HERITAGE-EXTSVC-PROD` subscription, which only has one key vault: `hmcts-kv-prod-ext`.
 

@@ -1,4 +1,9 @@
-# Troubleshooting builds starting slowly
+---
+title: Troubleshooting builds starting slowly
+weight: 10
+---
+
+# <%= current_page.data.title %>
 
 There are two main reasons for builds starting slowly.
 
@@ -46,7 +51,7 @@ CFT Jenkins publishes metrics about the event queue to dynatrace.
 
 You can see the events queue size on the [CFT Jenkins dashboard](https://ebe20728.live.dynatrace.com/#dashboard;id=4a6a6184-f1b6-486f-b810-3b93ef05e5b2;gf=all;gtf=-2h).
 
-![SCM Event queue](./scm-event-queue.png)
+![SCM Event queue](images/scm-event-queue.png)
 
 As long as it's under 50 or so it's fine. During previous issues it was up to 1500+ which caused multi hour delays to builds starting.
 

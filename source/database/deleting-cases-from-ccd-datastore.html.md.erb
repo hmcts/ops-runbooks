@@ -7,7 +7,7 @@ weight: 20
 
 This is a 2-stage process that requires you delete the case from the database first and then ssh to the Elastic Search VM to delete the same. Please ensure you have a valid ServiceNow Change Request to do so.
 
-## 1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete
+### 1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete
 
 
 Hop on to the bastion and run the script below. 
@@ -51,7 +51,7 @@ psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=543
 ```
 
 
-## 2. On the Elastic Search VM, execute the script below using the `16-digit reference` to identify the Case 
+### 2. On the Elastic Search VM, execute the script below using the `16-digit reference` to identify the Case 
 
 
 ```bash 

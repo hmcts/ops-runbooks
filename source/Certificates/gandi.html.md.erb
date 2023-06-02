@@ -25,9 +25,9 @@ There are 3 key stages to the renewal process:
 
 #### Note:
 If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
-You can do this by going on https://mxtoolbox.com/ and running a DNS Check.
+You can do this by going on [mxtoolbox](https://mxtoolbox.com/) and running a DNS Check.
 If there are no results, you should contact the requester and get them to create the domain and DNS zone.
-DNS zones are created in https://github.com/hmcts/azure-public-dns.
+DNS zones are created in [azure-public-dns](https://github.com/hmcts/azure-public-dns)
 
 From there, they need to have the NS records at hand to pass over to whoever does the delegation.
 For hmcts.net domains, contact the Operations team for delegation.
@@ -45,10 +45,12 @@ Once the CSR and form has been generated, they are sent via email to Ops Config 
 
 Ops then return the validation instructions for pointing the DNS, for example:
 
-> "Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
+```
+"Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
+```
 
-Pointing the DNS is done in https://github.com/hmcts/azure-public-dns
+Pointing the DNS is done in [azure-public-dns](https://github.com/hmcts/azure-public-dns)
 
 
 

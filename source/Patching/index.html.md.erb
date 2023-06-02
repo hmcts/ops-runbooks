@@ -25,7 +25,7 @@ consists of rota, server lists and services scheduled for patching per month.
 <b>High-level patching process:</b> <br>
 * A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production). <br>
 * Ensure production changes are approved and at the implement status and window and resources have been approved and provided. <br>
-* Prior to patching log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches. <br>
+* Prior to patching (i.e. the day before) log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches and scheduled backups are successful, etc. <br>
 * Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed. <br>
 * Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching. <br>
 * Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc. <br>

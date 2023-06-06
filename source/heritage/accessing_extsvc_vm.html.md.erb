@@ -7,7 +7,7 @@ weight: 40
 
 Many External Services VMs in Heritage (also known as the spoke VMs) are currently not networked into the HMCTS bastions in the way that the rest of reform is. This document details how to gain access to these VMs, using `POAG-WEB-VM01` as an example.
 
-1. Find the appropriate DevOps VM
+### 1. Find the appropriate DevOps VM
 
 Rather than being networked into the Bastions directly, most spoke VMs are only accessible from their management and devops VMs, which in turn are accessible from the HMCTS bastion. Either of these VMs will allow access to the spoke VM, but PlatOps should prefer access through the devops VM. Exactly what devops VM corresponds to the VM we're trying to get into may require some investigation if not readily known.
 
@@ -17,7 +17,7 @@ If we have a look at the virtual network and search for a device that sounds vag
 
 ![Screenshot of vnet-prod-ext-01 in the Azure Portal](images/vnet-prod-ext-01_screenshot.png)
 
-2. Find and Obtain the Admin Private Key
+### 2. Find and Obtain the Admin Private Key
 
 Both the EXTSVC VMs and the DevOps VMs rely on private key authentication for incomming connections.  We'll need to find out what private keys the machines want. Thankfully this is fairly easy.
 
@@ -29,18 +29,18 @@ These keys are almost always stored in a key vault within the same subscription 
 
 Private keys are located under the 'Secrets' tab of the key vault in the Azure Portal. If you don't have secret 'get' or 'list' permissions on the key vault in question, you may need to add an access policy for yourself under the 'Access policies' tab.
 
-3. Gain bastion access for the desited environment.
+### 3. Gain bastion access for the desired environment.
 
 Details on how to obtain bastion access can be found in [the Bastion documentation on Confluence](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455). Since `POAG-WEB-VM01` is a production VM, we'll need to request and obtain bastion access for the production environment.
 
 
-4. SSH into the Bastion Server
+### 4. SSH into the Bastion Server
 
 ```
 ssh bastion-prod.platform.hmcts.net
 ```
 
-5. SSH into the DevOps VM
+### 5. SSH into the DevOps VM
 
 You'll need to provide the private key to obtained in step 2 here. To do this, create a file and paste the value in. Name it something obvious so you don't forget what the key corresponds to. In this example, we'll use 'v1admin.pem'.
 
@@ -63,7 +63,7 @@ You can then provide the key to SSH using the `-i` flag:
 ssh -i v1admin.pem v1admin@10.224.249.196
 ```
 
-6. SSH into the spoke VM
+### 6. SSH into the spoke VM
 
 Finally we can SSH into the spoke VM. The admin private key may be present in the home directory of the machine you just SSH-ed into, albeit under a different name. If it is, you can just plug it right into SSH and log in to the spoke VM:
 

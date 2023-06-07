@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Panorama - Software Updates - HMCTS</title>
+    <title>Contribution Guide - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/network/panorama-upgrade.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/PlatOps-Toolkit/">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Panorama - Software Updates - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/network/panorama-upgrade.html" />
+      <meta name="twitter:title" content="Contribution Guide - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/PlatOps-Toolkit/" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Panorama - Software Updates" />
+      <meta property="og:title" content="Contribution Guide" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/network/panorama-upgrade.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/PlatOps-Toolkit/" />
 
     
   </head>
@@ -336,70 +336,99 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="panorama-software-updates">Panorama - Software Updates</h1>
-<p>The current Panorama, Log Collectors and Firewall version is <code>10.1.5-h1</code>, <code>h</code> stands for Hotfix.
-We aim to be as close as possible with Palo Alto software releases on both the Panorama management servers and the firewall servers.</p>
-<h3 id="current-estate">Current Estate</h3>
-<p>We have infrastructure in both UKSouth and UKWest listed below
-- 2 <code>sbox</code> Panorama servers in Panorama mode (1 in each region)
-- 4 <code>prod</code> Panorama servers in HA mode (2 in each region)
-- 2 Log collectors (1 in each region)</p>
-<h3 id="update-process">Update Process</h3>
-<p>To update the Panorama servers is straight forward and there are already documented steps to 
-follow in the <a href="https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-internet-connection">Upgrade Panorama with an Internet Connection</a> documentation.</p>
-<p>For the prod Panorama&rsquo;s in HA mode please follow the <a href="https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-ha-configuration">Upgrade Panorama in an HA Configuration</a> guide.</p>
-<h3 id="updates-via-panorama">Updates via Panorama</h3>
-<p>There is an extensive guide, <a href="https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama">Deploy Upgrades to Firewalls, Log Collectors, and WildFire Appliances Using Panorama</a> with steps 
-on how to use Panorama to update other resources and the <a href="https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama/upgrade-firewalls-when-panorama-is-internet-connected#id7434b9a4-90ca-4842-a5db-2afb4033753a">Firewalls</a>.</p>
-<p>Log in details for the UKWest or UKSouth Panorama management servers requires only your HMCTS account as SSO has been setup, if you need elevated privileges e.g. to reboot the vm then log in using the admin details mentioned below.</p>
-<h3 id="log-collectors">Log Collectors</h3>
-<p>At the time of last update for the Log Collectors, this was done manually by login onto the vms. Admin login details for each region&rsquo;s Panorama management server can be found in the respective <code>panorama-sbox-xxx-kv</code> or <code>panorama-prod-xxx-kv</code>  keyvault in Azure. This would be the <code>panorama-admin-username</code> and <code>panorama-admin-password</code> items.
-Please follow the below steps.</p>
-
-<ul>
-<li>Login onto the log collector vm, you need to be on the <code>VPN</code> and via the <code>bastions</code></li>
-<li>Run the follow commands in order
-<code>bash
-show system info | match sw-version
-</code>
-to get the current version
-<code>bash
-request system software check
-</code>
-to get available versions to install
-<code>bash
-request system software download version &lt;version-number&gt;
-</code>
-to download target version, this will output a job id
-<code>bash
-show jobs id &lt;job-id&gt;
-</code>
-to view job status
-<code>bash
-request system software install version &lt;version-number&gt;
-</code>
-to install target version, this returns a job id
-<code>bash
-show jobs id &lt;job-id&gt;
-</code><br>
-to view job status
-<code>bash
-request restart system 
-</code>
-to restart the system, This will disconnect you from the SSH CLI session that you are connected to</li>
-<li>Log back unto the Log Collector, give 5 to 7min for it to reboot<br>
-Run the <code>show system info</code> command as above to verify that the version has been updated</li>
-<li>Log unto the Panorama management web UI, navigate to
-<code>Panorama</code> -&gt; <code>Managed Collectors</code> and verify that the Panorama log collector Status entries are <code>connected</code> and <code>In sync</code> and the Software Version also reflects the new version</li>
-</ul>
+            <h1 id="lt-current-page-data-title-gt">&lt;%= current_page.data.title %&gt;</h1>
+<h1 id="macbook-utilities">MACBOOK UTILITIES</h1>
+<h2 id="homebrew">Homebrew</h2>
+<p>https://brew.sh/
+Package manager for macOS (or Linux), installs apps and makes upgrading them simple</p>
+<h2 id="laptop-power-bank">Laptop Power Bank</h2>
+<p>Multi-device fast charging USB-C backup battery, extra time away from mains power</p>
+<h2 id="maccy">Maccy</h2>
+<p>https://maccy.app/
+Clipboard manager for macOS which does one job - keep your copy history at hand. Period</p>
+<h2 id="techsmith-capture-formerly-jing">TechSmith Capture (Formerly Jing)</h2>
+<p>https://www.techsmith.com/jing-tool.html
+TechSmith Capture provides a simple way to take and share images and videos of your screen.</p>
+<h2 id="microsoft-onedrive">Microsoft OneDrive</h2>
+<p>https://onedrive.live.com/about/en-gb/signin/
+A file hosting service operated by Microsoft. (Saves and backs up my work, not already in GitHub)</p>
+<h2 id="oh-my-zsh">Oh My Zsh</h2>
+<p>https://ohmyz.sh/
+A framework for managing your Zsh configuration. It comes bundled with several helpful functions, helpers, plugins, themes, and a few things that make you shout.</p>
+<h2 id="zsh-autosuggestions">zsh-autosuggestions</h2>
+<p>https://github.com/zsh-users/zsh-autosuggestions
+It suggests zsh commands as you type based on history and completions.</p>
+<h2 id="starship-cross-shell-prompt">Starship: Cross-Shell Prompt</h2>
+<p>https://starship.rs/
+Starship is the minimal, blazing fast, and extremely customizable prompt for any shell! Shows the information you need, while staying sleek and minimal.</p>
+<h2 id="tfenv">tfenv</h2>
+<p>https://github.com/tfutils/tfenv
+A simple-to-use open-source command line program that enables you to manage and switch between multiple versions of Terraform</p>
+<h2 id="wireshark">Wireshark</h2>
+<p>https://www.wireshark.org/
+A free and open-source packet analyzer. (Use Azure Network Watcher to get traces)</p>
+<h2 id="azure-data-studio">Azure Data Studio</h2>
+<p>https://learn.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio
+A cross-platform database tool for data professionals who use on-premises and cloud data platforms on Windows, macOS, and Linux.</p>
+<h2 id="azure-storage-explorer">Azure Storage explorer</h2>
+<p>https://azure.microsoft.com/en-gb/products/storage/storage-explorer
+Helps you upload, download, and manage the data you store in Azure Storage.</p>
+<h1 id="security">SECURITY</h1>
+<h2 id="password-pusher">Password Pusher</h2>
+<p>https://pwpush.kainos.com/en
+Password Pusher is an application to securely send passwords over the web. Links to passwords expire after a certain number of views and/or time has passed.</p>
+<h2 id="lastpass">LastPass</h2>
+<p>https://www.lastpass.com/
+Store Passwords, Logins &amp; Digital Records To Your Favorite Sites. Keep Your Logins Secure. One-Click Access: Protect &amp; Manage Your Passwords, Logins &amp; Digital Records</p>
+<h2 id="1password">1Password</h2>
+<p>https://1password.com/
+A password manager, digital vault, form filler and secure digital wallet. (great for the inner techie as it has a CLI)
+<em>Can also use it as an external secrets store for K8s</em></p>
+<h2 id="microsoft-authenticator">Microsoft Authenticator</h2>
+<p>https://www.microsoft.com/en-gb/security/mobile-authenticator-app
+Conveniently and securely sign in to all your online accounts using multifactor authentication, passwordless sign-in</p>
+<h1 id="websites">WEBSITES</h1>
+<h2 id="azure-network-watcher">Azure Network Watcher</h2>
+<p>https://portal.azure.com/#view/Microsoft_Azure_Network/NetworkWatcherMenuBlade/~/overview
+Provides tools to monitor, diagnose, view metrics, and enable or disable logs for resources in an Azure virtual network</p>
+<h2 id="lt">LT</h2>
+<p>https://languagetool.org/
+LanguageTool - Online Grammar, Style &amp; Spell Checker. (Browser plug in)</p>
+<h2 id="diagrams-net-previously-draw-io">diagrams.net (previously draw.io)</h2>
+<p>https://app.diagrams.net/ 
+A free online diagram software for making flowcharts, process diagrams, org charts, UML, ER and network diagrams.</p>
+<h2 id="sublime-text">Sublime Text</h2>
+<p>https://www.sublimetext.com/
+A sophisticated text editor for code, markup and prose.</p>
+<h2 id="gitpod">Gitpod</h2>
+<p>https://github.com/marketplace/gitpod-io
+Is an open-source Kubernetes application for ready-to-code cloud development environments that spins up fresh, automated dev environments for each task</p>
+<h2 id="ip-subnet-calculator">IP Subnet Calculator</h2>
+<p>https://www.calculator.net/ip-subnet-calculator.html
+This IP subnet calculator covers both IPv4 and IPv6 protocols, providing information such as IP address, network address, subnet mask, IP range, and more</p>
+<h2 id="markdow-cheat-sheet">Markdow cheat-sheet</h2>
+<p>https://www.markdownguide.org/cheat-sheet/
+A quick overview of all the Markdown syntax elements.</p>
+<h1 id="microsoft-39-s-vs-code-extensions">MICROSOFT&rsquo;s VS CODE EXTENSIONS</h1>
+<h2 id="terraform-extension-for-visual-studio-code">Terraform Extension for Visual Studio Code</h2>
+<p>Adds editing features for Terraform files such as syntax highlighting, IntelliSense, code navigation, code formatting, module explorer and much more!
+<em>(Don&rsquo;t forget to set the Format on save feature)</em></p>
+<h2 id="indent-rainbow">Indent-Rainbow</h2>
+<p>Extension colorizes the indentation in front of your text, alternating four different colors on each step.</p>
+<h2 id="swissknife">Swissknife</h2>
+<p>A provides a set of features to convert data in the editor, like converting to hex, base64 or to generate new data like current timestamps or random strings, etc.</p>
+<h2 id="rapidapi-client">RapidAPI Client</h2>
+<p>A full-featured HTTP client that lets you test and describes the APIs you build or consume. Designed to work with your VS Code themes, RapidAPI Client makes composing requests, inspecting responses, generating code, and types for application development simple and intuitive.</p>
+<h2 id="code-spell-checker">Code Spell Checker</h2>
+<p>A basic spell checker that works well with code and documents. The goal of this spell checker is to help catch common spelling errors while keeping the number of false positives low.</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/network/panorama-upgrade.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Panorama+-+Software+Updates%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fnetwork%2Fpanorama-upgrade.html%29&amp;labels=bug&amp;title=Re%3A+%27Panorama+-+Software+Updates%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/PlatOps-Toolkit/index.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Contribution+Guide%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPlatOps-Toolkit%2F%29&amp;labels=bug&amp;title=Re%3A+%27Contribution+Guide%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

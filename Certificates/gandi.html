@@ -356,9 +356,9 @@
 </ul>
 <h4 id="note">Note:</h4>
 <p>If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
-You can do this by going on https://mxtoolbox.com/ and running a DNS Check.
+You can do this by going on <a href="https://mxtoolbox.com/">mxtoolbox</a> and running a DNS Check.
 If there are no results, you should contact the requester and get them to create the domain and DNS zone.
-DNS zones are created in https://github.com/hmcts/azure-public-dns.</p>
+DNS zones are created in <a href="https://github.com/hmcts/azure-public-dns">azure-public-dns</a></p>
 <p>From there, they need to have the NS records at hand to pass over to whoever does the delegation.
 For hmcts.net domains, contact the Operations team for delegation.
 For service.gov.uk domains, you need to contact Government Digital Service (GDS) - you can speak to Cairbre Smith to assist with that.</p>
@@ -367,12 +367,9 @@ For service.gov.uk domains, you need to contact Government Digital Service (GDS)
 <p>Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).</p>
 <h3 id="step-2-point-the-dns">Step 2: Point the DNS</h3>
 <p>Ops then return the validation instructions for pointing the DNS, for example:</p>
-
-<blockquote>
-<p>&ldquo;Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
-CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.&rdquo;</p>
-</blockquote>
-<p>Pointing the DNS is done in https://github.com/hmcts/azure-public-dns</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>"Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
+CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
+</code></pre></div><p>Pointing the DNS is done in <a href="https://github.com/hmcts/azure-public-dns">azure-public-dns</a></p>
 <p>With the example above, the address would belong in the &ldquo;apply-divorce-service-gov-uk.yml&rdquo; file.</p>
 <p>These are some of the domains, but make sure you search the repo for the domain to find the one you are after:</p>
 <p><a href="images/envfiles.png" rel="noopener noreferrer"><img src="images/envfiles.png" alt="" /></a>

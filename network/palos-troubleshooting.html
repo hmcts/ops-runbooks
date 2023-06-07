@@ -359,32 +359,22 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 <li><p>Follow the steps in <a href="connecting.md">the connecting guide</a> and log into one of the Palos in the environment where your changes are failing to apply.</p></li>
 <li><p>Once you&rsquo;re logged in you will see a commit button in the top right-hand side of your screen like below:
 <details> 
-<summary>Commit Button</summary></p>
-<p><a href="images/palo-commit.png" rel="noopener noreferrer"><img src="images/palo-commit.png" alt="Commit Button" /></a></p>
-<p></details></p></li>
-<li><p>A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit.</p>
-
+<summary>Commit Button</summary>
+<img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
+</details></p></li>
+<li><p>A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
 <details> 
 <summary>Validate Button</summary>
-
-![Validate Button](images/validate-button.png)
-
-</details></li>
-<li><p>This will run for a few seconds, once it&rsquo;s complete you&rsquo;ll be presented with a status page giving you a clearer idea of what the problem is.</p></li>
-</ol>
-<p>In this case we can see that the configuration is in fact invalid. 
-The errors tell us that the <code>log-setting</code> value <code>azure_log_analytics_out</code> is incorrect, after looking through the code the <code>azure_log_analytics_out</code> log setting is a nonprod setting that isn&rsquo;t available in Production and just removing the line fixed the issue.</p>
-
+<img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
+</details></p></li>
+<li><p>This will run for a few seconds, once it&rsquo;s complete you&rsquo;ll be presented with a status page giving you a clearer idea of what the problem is.
+In this case we can see that the configuration is in fact invalid. 
+The errors tell us that the <code>log-setting</code> value <code>azure_log_analytics_out</code> is incorrect, after looking through the code the <code>azure_log_analytics_out</code> log setting is a nonprod setting that isn&rsquo;t available in Production and just removing the line fixed the issue. 
 <details> 
-    
 <summary>Validate Example</summary>
-    
-![Validate Example](images/example-validate.png)
-    
-</details>
-
-<ol>
-<li>Make your changes in the rdo-terraform-hub-dmz repository and run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&amp;_a=summary">pipeline</a> again.</li>
+<img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
+</details></p></li>
+<li><p>Make your changes in the rdo-terraform-hub-dmz repository and run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&amp;_a=summary">pipeline</a> again.</p></li>
 </ol>
 <h2 id="problem-debugging-connectivity-issues">Problem - debugging connectivity issues</h2>
 <p>You may come across issues with connections being dropped and need to investigate where and why its happening.</p>
@@ -400,11 +390,8 @@ The errors tell us that the <code>log-setting</code> value <code>azure_log_analy
 </ol>
 
 <details>
-
-<summary>Filtering Example</summary>
-
-<img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
-
+    <summary>Filtering Example</summary>
+    <img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
 </details>
 <p>For more information on types of filters you can apply check out <a href="https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK">Basics of traffic monitor filtering</a>.</p>
 

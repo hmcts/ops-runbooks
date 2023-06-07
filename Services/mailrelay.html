@@ -338,63 +338,45 @@
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="mailrelay-essentials">Mailrelay Essentials</h1>
 <p>This runbook describes how Mailrelay is configured and deployed and the steps that are necessary to on-board new clients. The Mailrelay configuration can be found in the repo <a href="https://github.com/hmcts/exim-relay">exim-relay</a>.</p>
-<h3 id="how-to-on-board-clients">How to On-board Clients</h3>
+<h2 id="how-to-on-board-clients">How to On-board Clients</h2>
 <p>Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault (<a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets">Dev: sds-mailrelay-dev</a>, <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview">Prod: sds-mailrelay-prod</a>). The Username will be the service name; the password should be randomly generated and be sufficiently complex.</p>
-
-<ol>
-<li>Create a new secret in Key Vault and associate a complex password</li>
-<li>Branch off the <a href="https://github.com/hmcts/sds-flux-config">Flux</a> repo, edit the configuration file <a href="https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml">mailrelay2.yaml</a> then append the new service account to the section authKeyVaultSecrets.</li>
-</ol>
+<p><strong>1.</strong> Create a new secret in Key Vault and associate a complex password</p>
+<p><strong>2.</strong> Branch off the <a href="https://github.com/hmcts/sds-flux-config">Flux</a> repo, edit the configuration file <a href="https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml">mailrelay2.yaml</a> then append the new service account to the section authKeyVaultSecrets.</p>
 <p>The syntax is as follows:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>     - "my-service-user-account"
      - "mailrelay-prod-user"
-</code></pre></div>
-<ol>
-<li>Create a new pull request and merge into the master branch once approved</li>
-<li>Test access and connectivity as described in the section below <a href="#testing-mailrelay">Testing Mailrelay</a></li>
-</ol>
-<h3 id="what-is-mailrelay-and-what-is-it-used-for">What is Mailrelay and What is it used for?</h3>
+</code></pre></div><p><strong>3.</strong> Create a new pull request and merge into the master branch once approved</p>
+<p><strong>4.</strong> Test access and connectivity as described in the section below <a href="#testing-mailrelay">Testing Mailrelay</a></p>
+<h2 id="what-is-mailrelay-and-what-is-it-used-for">What is Mailrelay and What is it used for?</h2>
 <p>Exim Mail Relay is a Mail Transfer Agent, its main purpose is to receive emails from a Mail User Agent (MUA) and relay the email to other MTAs or a Mail Delivery Agent .</p>
-
-<ol>
-<li>Mailrelay AKS deployment</li>
-</ol>
+<h4 id="mailrelay-aks-deployment">Mailrelay AKS deployment</h4>
 <p>An Exim Mailrelay container is built via Docker and stored in the ACR Azure image repository.  It&rsquo;s based on the featherweight image Alpine as defined in the git repo <a href="https://github.com/hmcts/exim-relay">Docker Exim Relay Image</a> and is built via an Azure DevOps pipeline.</p>
 <p>Exim Mailrelay is currently deployed on AKS in SS-dev-00 / SS-dev-01 / SS-prod-00 / SS-prod-01 as two replicas. It is monitored using Prometheus and Grafana. Alerts are sent to the following Slack channel #prometheus-alerting-prod , #prometheus-alerts, #prometheus-critical.</p>
-
-<ol>
-<li>Modifying the exim.conf File</li>
-</ol>
+<h4 id="modifying-the-exim-conf-file">Modifying the exim.conf File</h4>
 <p>The <a href="https://github.com/hmcts/exim-relay/blob/master/exim.conf">exim.conf</a> file specifies the configuration and behaviour of the mailrelay service in terms of security (hosts that can use the system to route mail, authentication), DNS settings (domain names, routing), protocols and many other settings.  It&rsquo;s created with makefile which collects together a group of related actions into a single build file that when executed compiles or performs some processing to create artifacts.  Read more about makefile here: <a href="https://makefiletutorial.com/">makefile tutorial</a>.</p>
-
-<ol>
-<li>Authentication Mechanisms</li>
-</ol>
+<h4 id="authentication-mechanisms">Authentication Mechanisms</h4>
 <p>Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the <a href="https://github.com/hmcts/ops-runbooks/tree/master/Certificates">ACME Function App</a></p>
 <p>The following certificates are installed in the Docker image which is the source of the mailrelay container:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>dev-mailrelay-platform-hmcts-net
 prod-mailrelay-platform-hmcts-net
 dev-in.mailrelay.internal.platform.hmcts.net (self signed)
 </code></pre></div><h2 id="deployment">Deployment</h2>
-
-<ol>
-<li><p>Clone Exim-Relay</p></li>
-<li><p>After making changes to the Mailrelay configuration have someone review the pull request.</p>
+<p><strong>1.</strong> Clone Exim-Relay</p>
+<p><strong>2.</strong> After making changes to the Mailrelay configuration have someone review the pull request.</p>
 
 <ul>
 <li>While making the Pull Request please ensure that the base repo is hmcts/ exim-relay and not luigibk/exim-relay</li>
-</ul></li>
-<li><p>Pipeline</p>
+</ul>
+<p><strong>3.</strong> Pipeline</p>
 
 <ul>
-<li>The pipeline will run after making a PR or merging to master and will build an image in the <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository">Azure Container Repository</a></li>
+<li><p>The pipeline will run after making a PR or merging to master and will build an image in the <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository">Azure Container Repository</a></p>
+
+<ul>
+<li>The Service connection used for the pipeline is <code>DTS SS Public Prod</code></li>
 </ul></li>
-</ol>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code> * The Service connection used for the pipeline is `DTS SS Public Prod`
-</code></pre></div>
-<ol>
-<li>Configuring Shared Services Flux</li>
-</ol>
+</ul>
+<p><strong>4.</strong> Configuring Shared Services Flux</p>
 <p>In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for.
 In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps</a></p>
 
@@ -409,20 +391,11 @@ In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=4
 <h2 id="testing-mailrelay">Testing Mailrelay</h2>
 <p>After making changes to Exim.conf you may need to test that emails are going through according to the authentication mechanism that you have set to be advertised by the host.</p>
 <h3 id="test-unauthenticated-relay">Test unauthenticated relay</h3>
-
-<ol>
-<li>Spin up a temporary pod in the Kubernetes Cluster</li>
-</ol>
+<p><strong>1.</strong> Spin up a temporary pod in the Kubernetes Cluster</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl run <span class="nt">-it</span> <span class="nt">--rm</span> <span class="nt">--restart</span><span class="o">=</span>Never <span class="nt">-n</span> admin busybox <span class="nt">--image</span><span class="o">=</span>radial/busyboxplus:curl
-</code></pre></div>
-<ol>
-<li>Get the IP address</li>
-</ol>
+</code></pre></div><p><strong>2.</strong> Get the IP address</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code>Kubectl get svc <span class="nt">-n</span> &lt;namespace&gt;
-</code></pre></div>
-<ol>
-<li>Send email from pcol to chosen email</li>
-</ol>
+</code></pre></div><p><strong>3.</strong> Send email from pcol to chosen email</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code>telnet &lt;ip:port&gt;
 helo possessionclaim.gov.uk
 mail from: noreply-pcol@hmcts.net

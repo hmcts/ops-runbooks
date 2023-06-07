@@ -341,24 +341,27 @@
 <h2 id="small-queries">Small queries</h2>
 
 <ul>
-<li>Connect to  Postgres by following commands outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> <br></li>
-<li>Once in, you can execute provided query
+<li><p>Connect to  Postgres by following commands outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> <br></p></li>
+<li><p>Once in, you can execute provided query
 <code>cmd
 psql&gt; paste your query here;
-</code>
-<strong>Note:</strong> The prompt would most likely be the <code>DB_NAME</code> you provided in steps you followed when connecting to the DB</li>
-<li>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off<br></li>
-<li>For small queries with large results, you could do the following to output to file
+</code></p></li>
+</ul>
+<p><strong>Note:</strong> The prompt would most likely be the <code>DB_NAME</code> you provided in steps you followed when connecting to the DB</p>
+
+<ul>
+<li><p>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off</p></li>
+<li><p>For small queries with large results, you could do the following to output to file
 <code>cmd
 \o &lt;filename&gt;.csv
 &lt;your query here&gt;
 \q
 </code>
-This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it. <br>
-<strong>Note:</strong> the extension could be whatever you choose, here am using <code>csv</code> <br>
-<em>Example:</em><br>
-<a href="images/query-output.png" rel="noopener noreferrer"><img src="images/query-output.png" alt="Output to file" /></a></li>
+This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it.</p></li>
 </ul>
+<p><strong>Note:</strong> the extension could be whatever you choose, using <code>csv</code> in the example below</p>
+<p><strong>Example:</strong>
+  <a href="images/query-output.png" rel="noopener noreferrer"><img src="images/query-output.png" alt="Output to file" /></a></p>
 <h2 id="larger-lengthier-queries">Larger, lengthier queries</h2>
 
 <ul>
@@ -402,9 +405,9 @@ If unclear, confirm with team members.</li>
 <code>cmd
 export PGPASSWORD=&lt;result-from-earlier&gt;
 </code>
-Assign to the variable <code>PGPASSWORD</code> the token returned from the <code>az account get-access-token ...</code> command you ran earlier <br>
-<em>Example:</em><br>
-<a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="images/assign-to-password-var.png" alt="Token to Password" /></a></p>
+Assign to the variable <code>PGPASSWORD</code> the token returned from the <code>az account get-access-token ...</code> command you ran earlier</p>
+<p><strong>Example:</strong></p>
+<p><a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="images/assign-to-password-var.png" alt="Token to Password" /></a></p>
 <h3 id="some-external-reference">Some external reference</h3>
 <p>You can have a quick peak for some <code>psql</code> info that may be useful
 * <a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a>

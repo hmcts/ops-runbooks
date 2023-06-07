@@ -363,27 +363,18 @@ consists of rota, server lists and services scheduled for patching per month.</p
 <h2 id="os-patching-instructions">OS Patching Instructions</h2>
 <p>See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:</p>
 <h3 id="rhel">RHEL</h3>
-
-<ol>
-<li> Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default</li>
-</ol>
+<p><strong>1.</strong>  Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum install yum-plugin-security
 Loaded plugins: langpacks, product-id, search-disabled-repos
 Package yum-3.4.3-163.el7.noarch already installed and latest version
 Nothing to do
-</code></pre></div>
-<ol>
-<li>Check for Security Critical Updates (Check for Critical Updates only)</li>
-</ol>
+</code></pre></div><p><strong>2.</strong> Check for Security Critical Updates (Check for Critical Updates only)</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum --security --sec-severity=Critical check-update
 --&gt; maven30-maven-profile-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
 --&gt; python27-python-jinja2-2.6-15.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
 --&gt; maven30-maven-model-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
 No packages needed for security; 14 packages available
-</code></pre></div>
-<ol>
-<li>List any available Updates</li>
-</ol>
+</code></pre></div><p><strong>3.</strong> List any available Updates</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum updateinfo list
 Loaded plugins: langpacks, product-id, search-disabled-repos
 RHSA-2021:2523 Important/Sec. bpftool-3.10.0-1062.51.1.el7.x86_64
@@ -406,16 +397,10 @@ RHSA-2021:2523 Important/Sec. python-perf-3.10.0-1062.51.1.el7.x86_64
 RHSA-2021:2728 Important/Sec. python-perf-3.10.0-1062.52.2.el7.x86_64
 RHBA-2021:2951 bugfix         redhat-release-server-7.7-12.el7.x86_64
 RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
-</code></pre></div>
-<ol>
-<li>Run yum update to update RHEL</li>
-</ol>
+</code></pre></div><p><strong>4.</strong> Run yum update to update RHEL</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum update
 </code></pre></div><h3 id="ubuntu">Ubuntu</h3>
-
-<ol>
-<li> Upgrade</li>
-</ol>
+<p><strong>1.</strong>  Upgrade</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get update
 Hit:1 http://azure.archive.ubuntu.com/ubuntu bionic InRelease
 Get:2 http://azure.archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]
@@ -423,10 +408,7 @@ Get:3 http://azure.archive.ubuntu.com/ubuntu bionic-backports InRelease [74.6 kB
 Get:4 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]
 Get:5 http://azure.archive.ubuntu.com/ubuntu bionic/universe amd64 Packages [8570 kB]
 Get:6 http://azure.archive.ubuntu.com/ubuntu bionic/universe Translation-en [4941 kB]
-</code></pre></div>
-<ol>
-<li>Review Security Updates against CVE Dashboard</li>
-</ol>
+</code></pre></div><p><strong>2.</strong> Review Security Updates against CVE Dashboard</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get upgrade -s | grep -i security
 19 standard security updates
 Inst login [1:4.5-1ubuntu2] (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
@@ -443,10 +425,7 @@ Inst vim-tiny [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic
 Inst vim-runtime [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [all]) []
 Inst xxd [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
 Inst vim-common [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu
-</code></pre></div>
-<ol>
-<li>Lists any available Updates</li>
-</ol>
+</code></pre></div><p><strong>3.</strong> Lists any available Updates</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt list --upgradable
 Listing... Done
 libpolkit-agent-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
@@ -455,10 +434,7 @@ libpolkit-gobject-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd
 libwbclient0/bionic-updates,bionic-security 2:4.7.6+dfsg~ubuntu-0ubuntu2.28 amd64 [upgradable from: 2:4.7.6+dfsg~ubuntu-0ubuntu2.27]
 linux-azure/bionic-updates,bionic-security 5.4.0.1068.47 amd64 [upgradable from: 5.4.0.1067.46]
 linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47 
-</code></pre></div>
-<ol>
-<li>Update Ubuntu</li>
-</ol>
+</code></pre></div><p><strong>4.</strong> Update Ubuntu</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get upgrade -y
 </code></pre></div><h3 id="windows">Windows</h3>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>PS C:\Users\tamops&gt; ((New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher()).Search('IsInstalled=0 and IsHidden=0').updates | Select-Object -Property Title,IsDownloaded,RebootRequired | ft -AutoSize

@@ -361,29 +361,22 @@ kubectl delete pod <span class="nt">-n</span> admin <span class="nt">-l</span> <
 </code></pre></div><p>The default configuration for an application is two pods on each cluster, but teams may have more.</p>
 <h3 id="idam-access">IDAM access</h3>
 <p>Idam is accessed via a bastion server of its own, also known as the idam jump box. Follow the below steps for access via the production bastion server.</p>
+<h4 id="1-request-time-based-access-automatically-approved"> 1. Request time based access (Automatically approved)</h4>
+<p>Navigate to https://myaccess.microsoft.com/</p>
 
-<ol>
-<li>Request time based access (Automatically approved)</li>
-</ol>
-<p>Navigate to https://myaccess.microsoft.com/
-* Select: Production Bastion Server Access followed by &ldquo;+ Request Access&rdquo;
-* Select: On-Call policy, no business justification is required.
-* Request: For specific period: Enter the period you are on-call for.
-* Submit (A green notification will confirm this was successful).</p>
-
-<ol>
-<li>Download <code>devops-sshkey-privatekey</code> and set permissions
-<code>bash
-az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
-chmod 600 ~/.ssh/cft-idam
-</code></li>
-<li>Retrieve passphrase for IDAM SSH key and add RSA identity. 
-<code>bash
-az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
-ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
-</code></li>
-<li>Open the <code>~/.ssh/config</code> file (create if it doesn&rsquo;t already exist) and add the below:</li>
-</ol>
+<ul>
+<li><p>Select: Production Bastion Server Access followed by &ldquo;+ Request Access&rdquo;</p></li>
+<li><p>Select: On-Call policy, no business justification is required.</p></li>
+<li><p>Request: For specific period: Enter the period you are on-call for.</p></li>
+<li><p>Submit (A green notification will confirm this was successful).</p></li>
+</ul>
+<h4 id="2-download-devops-sshkey-privatekey-and-set-permissions">2. Download <code>devops-sshkey-privatekey</code> and set permissions</h4>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az keyvault secret download <span class="nt">-f</span> ~/.ssh/cft-idam <span class="nt">--vault-name</span> idamvaultprod <span class="nt">--name</span> devops-ssh-privatekey
+<span class="nb">chmod </span>600 ~/.ssh/cft-idam
+</code></pre></div><h4 id="3-retrieve-passphrase-for-idam-ssh-key-and-add-rsa-identity">3. Retrieve passphrase for IDAM SSH key and add RSA identity.</h4>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az keyvault secret show <span class="nt">--vault-name</span> idamvaultprod <span class="nt">--name</span> devops-sshkey-passphrase <span class="nt">--query</span> value <span class="nt">-o</span> tsv
+ssh-add ~/.ssh/cft-idam <span class="c"># paste the output of the previous command for the passphrase</span>
+</code></pre></div><h4 id="4-open-the-ssh-config-file-create-if-it-doesn-39-t-already-exist-and-add-the-below">4. Open the <code>~/.ssh/config</code> file (create if it doesn&rsquo;t already exist) and add the below:</h4>
 <p><strong>Add your own username to line 3</strong></p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code>Host prodbastion
 HostName bastion-prod.platform.hmcts.net
@@ -392,23 +385,13 @@ DynamicForward 10825
 ForwardAgent <span class="nb">yes
 </span>KeepAlive <span class="nb">yes
 </span>ServerAliveInterval 60
-</code></pre></div>
-<ol>
-<li>Connect to HMCTS <a href="https://portal.platform.hmcts.net/">VPN</a></li>
-</ol>
-<p>Connect with:
-<code>bash
-ssh prodbastion
-</code></p>
-<p>Follow the on-screen instructions to authenticate with yout HMCTS credentials.</p>
-
-<ol>
-<li>Connect to IDAM Jump server
-<code>bash
-ssh devops@idam-bastion.platform.hmcts.net
-</code></li>
-</ol>
-<p><strong>Note:</strong> In the event of an emergency, you can bypass the first bastion server from Step 5 by adding your home IP address to the NSG <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/core-infra-idam-prod2/providers/Microsoft.Network/networkSecurityGroups/core-infra-idam-prod2-jumpbox-nsg/inboundSecurityRules">core-infra-idam-prod2-jumpbox-nsg</a>. You will find the public IP attached to idam-prod2-jumpbox VM in Azure.</p>
+</code></pre></div><h4 id="5-connect-to-hmcts-vpn">5. Connect to HMCTS <a href="https://portal.platform.hmcts.net/">VPN</a></h4>
+<p>Connect with:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>ssh prodbastion
+</code></pre></div><p>Follow the on-screen instructions to authenticate with yout HMCTS credentials.</p>
+<h4 id="6-connect-to-idam-jump-server">6. Connect to IDAM Jump server</h4>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>ssh devops@idam-bastion.platform.hmcts.net
+</code></pre></div><p><strong>Note:</strong> In the event of an emergency, you can bypass the first bastion server from Step 5 by adding your home IP address to the NSG <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/core-infra-idam-prod2/providers/Microsoft.Network/networkSecurityGroups/core-infra-idam-prod2-jumpbox-nsg/inboundSecurityRules">core-infra-idam-prod2-jumpbox-nsg</a>. You will find the public IP attached to idam-prod2-jumpbox VM in Azure.</p>
 <p><strong>Note:</strong> there is a DNS name idam-bastion.platform.hmcts.net, but some people have had issues connecting using it. Local IP is: <code>10.106.79.4</code>.</p>
 <p>The <a href="https://github.com/hmcts/idam-tools">idam-tools</a> repository is checked out in the home directory of the <code>devops</code> user.
 There&rsquo;s useful scripts there.</p>

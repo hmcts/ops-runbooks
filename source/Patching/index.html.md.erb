@@ -40,7 +40,7 @@ consists of rota, server lists and services scheduled for patching per month.
 See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:
 
 ### RHEL
-1.	Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default
+**1.**	Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default
 
 ```
 [root@tamops-rhel ~]# yum install yum-plugin-security
@@ -49,7 +49,7 @@ Package yum-3.4.3-163.el7.noarch already installed and latest version
 Nothing to do
 ```
 
-2. Check for Security Critical Updates (Check for Critical Updates only)
+**2.** Check for Security Critical Updates (Check for Critical Updates only)
 
 ```
 [root@tamops-rhel ~]# yum --security --sec-severity=Critical check-update
@@ -59,7 +59,7 @@ Nothing to do
 No packages needed for security; 14 packages available
 ```
 
-3. List any available Updates
+**3.** List any available Updates
 
 ```
 [root@tamops-rhel ~]# yum updateinfo list
@@ -86,14 +86,14 @@ RHBA-2021:2951 bugfix         redhat-release-server-7.7-12.el7.x86_64
 RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
 ```
 
-4. Run yum update to update RHEL
+**4.** Run yum update to update RHEL
 
 ```
 [root@tamops-rhel ~]# yum update
 ```
 
 ### Ubuntu
-1.	Upgrade
+**1.**	Upgrade
 
 ```
 root@tamops-ubuntu:~# apt-get update
@@ -105,7 +105,7 @@ Get:5 http://azure.archive.ubuntu.com/ubuntu bionic/universe amd64 Packages [857
 Get:6 http://azure.archive.ubuntu.com/ubuntu bionic/universe Translation-en [4941 kB]
 ```
 
-2. Review Security Updates against CVE Dashboard
+**2.** Review Security Updates against CVE Dashboard
 
 ```
 root@tamops-ubuntu:~# apt-get upgrade -s | grep -i security
@@ -126,7 +126,7 @@ Inst xxd [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-upda
 Inst vim-common [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu
 ```
 
-3. Lists any available Updates
+**3.** Lists any available Updates
 
 ```
 root@tamops-ubuntu:~# apt list --upgradable
@@ -139,7 +139,7 @@ linux-azure/bionic-updates,bionic-security 5.4.0.1068.47 amd64 [upgradable from:
 linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47 
 ```
 
-4. Update Ubuntu
+**4.** Update Ubuntu
 
 ```
 root@tamops-ubuntu:~# apt-get upgrade -y

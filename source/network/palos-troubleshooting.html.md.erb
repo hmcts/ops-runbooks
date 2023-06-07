@@ -34,40 +34,29 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
 ### **Troubleshooting tip**
 
-1. Follow the steps in [the connecting guide](connecting.md) and log into one of the Palos in the environment where your changes are failing to apply. 
+1. Follow the steps in [the connecting guide](connecting.md) and log into one of the Palos in the environment where your changes are failing to apply.
 
 2. Once you're logged in you will see a commit button in the top right-hand side of your screen like below:
-    <details> 
+<details> 
     <summary>Commit Button</summary>
-
-    ![Commit Button](images/palo-commit.png)
-   
-    </details>
+    <img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
+</details>
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
-
-    <details> 
+<details> 
     <summary>Validate Button</summary>
+    <img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
+</details>
 
-    ![Validate Button](images/validate-button.png)
-
-    </details>
-
-4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is. 
-
+4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is.
 In this case we can see that the configuration is in fact invalid. 
 The errors tell us that the `log-setting` value `azure_log_analytics_out` is incorrect, after looking through the code the `azure_log_analytics_out` log setting is a nonprod setting that isn't available in Production and just removing the line fixed the issue. 
-
 <details> 
-    
-<summary>Validate Example</summary>
-    
-![Validate Example](images/example-validate.png)
-    
+    <summary>Validate Example</summary>
+    <img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
 </details>
 
 5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
-
 
 
 ## Problem - debugging connectivity issues
@@ -83,11 +72,8 @@ The Palos have a built in traffic monitoring tool that could help you find the i
 6. Make sure you check both Palo Alto's as there's a load balancer in front, traffic could go to either or both.
 
 <details>
-
-<summary>Filtering Example</summary>
-
-<img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
-
+    <summary>Filtering Example</summary>
+    <img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
 </details>
 
 For more information on types of filters you can apply check out [Basics of traffic monitor filtering](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).

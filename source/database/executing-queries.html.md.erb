@@ -10,21 +10,27 @@ You can execute queries in any number of ways, below are some suggestions
 ## Small queries
 
 * Connect to  Postgres by following commands outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production) <br>
+
 * Once in, you can execute provided query
   ```cmd
    psql> paste your query here;
   ```
+
   **Note:** The prompt would most likely be the `DB_NAME` you provided in steps you followed when connecting to the DB
-* Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off  
+
+* Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off
+
 * For small queries with large results, you could do the following to output to file
   ```cmd
   \o <filename>.csv
     <your query here>
   \q
    ```
-  This should create a file called `<filename>.csv` with the output in it. <br>
-  **Note:** the extension could be whatever you choose, here am using `csv` <br>
-  _Example:_<br>
+  This should create a file called `<filename>.csv` with the output in it.
+
+  **Note:** the extension could be whatever you choose, using `csv` in the example below
+
+  **Example:**
   ![Output to file](images/query-output.png)
 
 ## Larger, lengthier queries
@@ -69,8 +75,10 @@ In the in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#pro
 ```cmd
 export PGPASSWORD=<result-from-earlier>
 ```
-Assign to the variable `PGPASSWORD` the token returned from the `az account get-access-token ...` command you ran earlier <br>
-_Example:_<br>
+Assign to the variable `PGPASSWORD` the token returned from the `az account get-access-token ...` command you ran earlier
+
+**Example:**
+
 ![Token to Password](images/assign-to-password-var.png)
 
 ### Some external reference

@@ -41,28 +41,34 @@ The default configuration for an application is two pods on each cluster, but te
 
 Idam is accessed via a bastion server of its own, also known as the idam jump box. Follow the below steps for access via the production bastion server.
 
-1. Request time based access (Automatically approved)
+#### 1. Request time based access (Automatically approved)
 
 Navigate to https://myaccess.microsoft.com/
+
 * Select: Production Bastion Server Access followed by "+ Request Access"
+
 * Select: On-Call policy, no business justification is required.
+
 * Request: For specific period: Enter the period you are on-call for.
+
 * Submit (A green notification will confirm this was successful).
 
-2. Download `devops-sshkey-privatekey` and set permissions
+#### 2. Download `devops-sshkey-privatekey` and set permissions
+
 ```bash
 az keyvault secret download -f ~/.ssh/cft-idam --vault-name idamvaultprod --name devops-ssh-privatekey
 chmod 600 ~/.ssh/cft-idam
 ```
-3. Retrieve passphrase for IDAM SSH key and add RSA identity. 
+#### 3. Retrieve passphrase for IDAM SSH key and add RSA identity. 
+
 ```bash
 az keyvault secret show --vault-name idamvaultprod --name devops-sshkey-passphrase --query value -o tsv
 ssh-add ~/.ssh/cft-idam # paste the output of the previous command for the passphrase
 ```
-4. Open the `~/.ssh/config` file (create if it doesn't already exist) and add the below:
+
+#### 4. Open the `~/.ssh/config` file (create if it doesn't already exist) and add the below:
 
 **Add your own username to line 3**
-
 
 ```bash
 Host prodbastion
@@ -73,16 +79,18 @@ ForwardAgent yes
 KeepAlive yes
 ServerAliveInterval 60
 ```
-5. Connect to HMCTS [VPN](https://portal.platform.hmcts.net/)
+#### 5. Connect to HMCTS [VPN](https://portal.platform.hmcts.net/)
 
 Connect with:
+
 ```bash
 ssh prodbastion
 ```
 
 Follow the on-screen instructions to authenticate with yout HMCTS credentials.
 
-6. Connect to IDAM Jump server
+#### 6. Connect to IDAM Jump server
+
 ```bash
 ssh devops@idam-bastion.platform.hmcts.net
 ```

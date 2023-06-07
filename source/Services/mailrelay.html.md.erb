@@ -10,8 +10,9 @@ This runbook describes how Mailrelay is configured and deployed and the steps th
 
 Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault ([Dev: sds-mailrelay-dev](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets), [Prod: sds-mailrelay-prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview)). The Username will be the service name; the password should be randomly generated and be sufficiently complex.
 
-* Create a new secret in Key Vault and associate a complex password
-* Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
+**1.** Create a new secret in Key Vault and associate a complex password
+
+**2.** Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
 
 The syntax is as follows:
 
@@ -19,8 +20,9 @@ The syntax is as follows:
      - "my-service-user-account"
      - "mailrelay-prod-user"
 ```
-* Create a new pull request and merge into the master branch once approved
-* Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
+**3.** Create a new pull request and merge into the master branch once approved
+
+**4.** Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
 
 ## What is Mailrelay and What is it used for?
 
@@ -48,17 +50,19 @@ The following certificates are installed in the Docker image which is the source
 
 ## Deployment
 
-#### 1. Clone Exim-Relay
+**1.** Clone Exim-Relay
 
-#### 2. After making changes to the Mailrelay configuration have someone review the pull request.
+**2.** After making changes to the Mailrelay configuration have someone review the pull request.
+
    * While making the Pull Request please ensure that the base repo is hmcts/ exim-relay and not luigibk/exim-relay
 
-#### 3. Pipeline
+**3.** Pipeline
+
    * The pipeline will run after making a PR or merging to master and will build an image in the [Azure Container Repository](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-acr-rg/providers/Microsoft.ContainerRegistry/registries/sdshmctspublic/repository)
 
      * The Service connection used for the pipeline is `DTS SS Public Prod`
 
-#### 4. Configuring Shared Services Flux
+**4.** Configuring Shared Services Flux
 
 In order to deploy to your latest image to the Dev or Production environment flux needs to know the image it needs to look for.
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
@@ -76,19 +80,19 @@ After making changes to Exim.conf you may need to test that emails are going thr
 
 ### Test unauthenticated relay
 
-* Spin up a temporary pod in the Kubernetes Cluster
+**1.** Spin up a temporary pod in the Kubernetes Cluster
 
 ```bash
 kubectl run -it --rm --restart=Never -n admin busybox --image=radial/busyboxplus:curl
 ```
 
-* Get the IP address
+**2.** Get the IP address
 
 ```bash
 Kubectl get svc -n <namespace>
 ```
 
-* Send email from pcol to chosen email
+**3.** Send email from pcol to chosen email
 
 ```bash
 telnet <ip:port>

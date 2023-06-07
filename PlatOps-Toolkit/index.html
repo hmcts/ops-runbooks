@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Contribution Guide - HMCTS</title>
+    <title>PlatOps Utilities - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
@@ -14,12 +14,12 @@
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Contribution Guide - HMCTS" />
+      <meta name="twitter:title" content="PlatOps Utilities - HMCTS" />
       <meta name="twitter:url" content="https://hmcts-runbooks.github.io/PlatOps-Toolkit/" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Contribution Guide" />
+      <meta property="og:title" content="PlatOps Utilities" />
       <meta property="og:type" content="object" />
       <meta property="og:url" content="https://hmcts-runbooks.github.io/PlatOps-Toolkit/" />
 
@@ -246,6 +246,22 @@
   <li>
     <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
   </li>
+<li><a href="../PlatOps-Toolkit/index.html"><span>PlatOps Utilities</span></a>
+<ul>
+  <li>
+    <a href="../PlatOps-Toolkit/macbook-utilities.html"><span>Macbook Utilities</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-websites.html"><span>Useful Websites</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
+  </li>
+</ul>
+</li>
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
@@ -312,21 +328,6 @@
   <li>
     <a href="../Patching/index.html"><span>OS Patch Management</span></a>
   </li>
-  <li>
-    <a href="../PlatOps-Toolkit/index.html"><span><%= current_page.data.title %></span></a>
-  </li>
-  <li>
-    <a href="../PlatOps-Toolkit/index.html"><span>MACBOOK UTILITIES</span></a>
-  </li>
-  <li>
-    <a href="../PlatOps-Toolkit/index.html"><span>SECURITY</span></a>
-  </li>
-  <li>
-    <a href="../PlatOps-Toolkit/index.html"><span>WEBSITES</span></a>
-  </li>
-  <li>
-    <a href="../PlatOps-Toolkit/index.html"><span>MICROSOFT’s VS CODE EXTENSIONS</span></a>
-  </li>
 </ul>
 
 
@@ -336,91 +337,20 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="lt-current-page-data-title-gt">&lt;%= current_page.data.title %&gt;</h1>
-<h1 id="macbook-utilities">MACBOOK UTILITIES</h1>
-<h2 id="homebrew">Homebrew</h2>
-<p>https://brew.sh/
-Package manager for macOS (or Linux), installs apps and makes upgrading them simple</p>
-<h2 id="laptop-power-bank">Laptop Power Bank</h2>
-<p>Multi-device fast charging USB-C backup battery, extra time away from mains power</p>
-<h2 id="maccy">Maccy</h2>
-<p>https://maccy.app/
-Clipboard manager for macOS which does one job - keep your copy history at hand. Period</p>
-<h2 id="techsmith-capture-formerly-jing">TechSmith Capture (Formerly Jing)</h2>
-<p>https://www.techsmith.com/jing-tool.html
-TechSmith Capture provides a simple way to take and share images and videos of your screen.</p>
-<h2 id="microsoft-onedrive">Microsoft OneDrive</h2>
-<p>https://onedrive.live.com/about/en-gb/signin/
-A file hosting service operated by Microsoft. (Saves and backs up my work, not already in GitHub)</p>
-<h2 id="oh-my-zsh">Oh My Zsh</h2>
-<p>https://ohmyz.sh/
-A framework for managing your Zsh configuration. It comes bundled with several helpful functions, helpers, plugins, themes, and a few things that make you shout.</p>
-<h2 id="zsh-autosuggestions">zsh-autosuggestions</h2>
-<p>https://github.com/zsh-users/zsh-autosuggestions
-It suggests zsh commands as you type based on history and completions.</p>
-<h2 id="starship-cross-shell-prompt">Starship: Cross-Shell Prompt</h2>
-<p>https://starship.rs/
-Starship is the minimal, blazing fast, and extremely customizable prompt for any shell! Shows the information you need, while staying sleek and minimal.</p>
-<h2 id="tfenv">tfenv</h2>
-<p>https://github.com/tfutils/tfenv
-A simple-to-use open-source command line program that enables you to manage and switch between multiple versions of Terraform</p>
-<h2 id="wireshark">Wireshark</h2>
-<p>https://www.wireshark.org/
-A free and open-source packet analyzer. (Use Azure Network Watcher to get traces)</p>
-<h2 id="azure-data-studio">Azure Data Studio</h2>
-<p>https://learn.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio
-A cross-platform database tool for data professionals who use on-premises and cloud data platforms on Windows, macOS, and Linux.</p>
-<h2 id="azure-storage-explorer">Azure Storage explorer</h2>
-<p>https://azure.microsoft.com/en-gb/products/storage/storage-explorer
-Helps you upload, download, and manage the data you store in Azure Storage.</p>
-<h1 id="security">SECURITY</h1>
-<h2 id="password-pusher">Password Pusher</h2>
-<p>https://pwpush.kainos.com/en
-Password Pusher is an application to securely send passwords over the web. Links to passwords expire after a certain number of views and/or time has passed.</p>
-<h2 id="lastpass">LastPass</h2>
-<p>https://www.lastpass.com/
-Store Passwords, Logins &amp; Digital Records To Your Favorite Sites. Keep Your Logins Secure. One-Click Access: Protect &amp; Manage Your Passwords, Logins &amp; Digital Records</p>
-<h2 id="1password">1Password</h2>
-<p>https://1password.com/
-A password manager, digital vault, form filler and secure digital wallet. (great for the inner techie as it has a CLI)
-<em>Can also use it as an external secrets store for K8s</em></p>
-<h2 id="microsoft-authenticator">Microsoft Authenticator</h2>
-<p>https://www.microsoft.com/en-gb/security/mobile-authenticator-app
-Conveniently and securely sign in to all your online accounts using multifactor authentication, passwordless sign-in</p>
-<h1 id="websites">WEBSITES</h1>
-<h2 id="azure-network-watcher">Azure Network Watcher</h2>
-<p>https://portal.azure.com/#view/Microsoft_Azure_Network/NetworkWatcherMenuBlade/~/overview
-Provides tools to monitor, diagnose, view metrics, and enable or disable logs for resources in an Azure virtual network</p>
-<h2 id="lt">LT</h2>
-<p>https://languagetool.org/
-LanguageTool - Online Grammar, Style &amp; Spell Checker. (Browser plug in)</p>
-<h2 id="diagrams-net-previously-draw-io">diagrams.net (previously draw.io)</h2>
-<p>https://app.diagrams.net/ 
-A free online diagram software for making flowcharts, process diagrams, org charts, UML, ER and network diagrams.</p>
-<h2 id="sublime-text">Sublime Text</h2>
-<p>https://www.sublimetext.com/
-A sophisticated text editor for code, markup and prose.</p>
-<h2 id="gitpod">Gitpod</h2>
-<p>https://github.com/marketplace/gitpod-io
-Is an open-source Kubernetes application for ready-to-code cloud development environments that spins up fresh, automated dev environments for each task</p>
-<h2 id="ip-subnet-calculator">IP Subnet Calculator</h2>
-<p>https://www.calculator.net/ip-subnet-calculator.html
-This IP subnet calculator covers both IPv4 and IPv6 protocols, providing information such as IP address, network address, subnet mask, IP range, and more</p>
-<h2 id="markdow-cheat-sheet">Markdow cheat-sheet</h2>
-<p>https://www.markdownguide.org/cheat-sheet/
-A quick overview of all the Markdown syntax elements.</p>
-<h1 id="microsoft-39-s-vs-code-extensions">MICROSOFT&rsquo;s VS CODE EXTENSIONS</h1>
-<h2 id="terraform-extension-for-visual-studio-code">Terraform Extension for Visual Studio Code</h2>
-<p>Adds editing features for Terraform files such as syntax highlighting, IntelliSense, code navigation, code formatting, module explorer and much more!
-<em>(Don&rsquo;t forget to set the Format on save feature)</em></p>
-<h2 id="indent-rainbow">Indent-Rainbow</h2>
-<p>Extension colorizes the indentation in front of your text, alternating four different colors on each step.</p>
-<h2 id="swissknife">Swissknife</h2>
-<p>A provides a set of features to convert data in the editor, like converting to hex, base64 or to generate new data like current timestamps or random strings, etc.</p>
-<h2 id="rapidapi-client">RapidAPI Client</h2>
-<p>A full-featured HTTP client that lets you test and describes the APIs you build or consume. Designed to work with your VS Code themes, RapidAPI Client makes composing requests, inspecting responses, generating code, and types for application development simple and intuitive.</p>
-<h2 id="code-spell-checker">Code Spell Checker</h2>
-<p>A basic spell checker that works well with code and documents. The goal of this spell checker is to help catch common spelling errors while keeping the number of false positives low.</p>
+            <h1 id="platops-utilities">PlatOps Utilities</h1>
+<h2 id="platops-utilities-recommendations-guides">PlatOps Utilities Recommendations Guides</h2>
+
+<ul>
+<li><a href="macbook-utilities.html">Macbook Utilities</a></li>
+<li><a href="useful-websites.html">Useful Websites</a></li>
+<li><a href="security.html">Security Tools</a></li>
+<li><a href="vs-code-ext.html">Visual Studio Code Extensions</a></li>
+</ul>
+<h2 id="other-resources">Other Resources</h2>
+
+<ul>
+<li><a href="https://github.com/hmcts/platops-setup">Bootstrap a new computer</a></li>
+</ul>
 
             
           </main>
@@ -428,7 +358,7 @@ A quick overview of all the Markdown syntax elements.</p>
           <aside>
               <ul class="contribution-banner">
                 <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/PlatOps-Toolkit/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Contribution+Guide%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPlatOps-Toolkit%2F%29&amp;labels=bug&amp;title=Re%3A+%27Contribution+Guide%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27PlatOps+Utilities%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPlatOps-Toolkit%2F%29&amp;labels=bug&amp;title=Re%3A+%27PlatOps+Utilities%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

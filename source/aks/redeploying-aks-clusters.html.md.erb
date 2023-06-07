@@ -54,9 +54,9 @@ Confirm that the [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts
 
 * Stop the cluster and once the cluster has fully stopped take a snapshot of the disk referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8) and ensure it is placed somewhere safe so that we can re-use this snapshot to re-create the jenkins disk after the cluster has been redeployed.
 
-* Run this [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) to destroy the existing cluster, the environment is **PTLSBOX**.
+* Run this [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766) to destroy the existing cluster, the environment is **PTLSBOX**.
 
-* Run the same [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) again to apply to the cluster, the environment is **PTLSBOX**. 
+* Run the same [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766) again to apply to the cluster, the environment is **PTLSBOX**. 
 
 * Once the pipeline to deploy the cluster has completed, refer to the snapshot previously taken and create a new disk from it named as **jenkins-disk** ensuring it is placed in the location referenced [here](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8).
 
@@ -214,9 +214,9 @@ See https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/pt
 > Hi @here,
 > Due to planned upgrades of AKS, we will be upgrading the management (cftplt-intsvc) cluster at 8am, Monday 26th April. As a result of this, Jenkins will be offline during the upgrade and > unavailable for around one hour.>
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to **PTL** before clicking on **Run**. 
+* Run the [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to **PTL** before clicking on **Run**. 
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483&_a=summary) ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to **PTL** before clicking on **Run**. 
+* Run the [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766) ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to **PTL** before clicking on **Run**. 
 
 #### After deployment of a cluster
 

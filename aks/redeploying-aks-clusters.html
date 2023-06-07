@@ -357,8 +357,8 @@
 
 <ul>
 <li><p>Stop the cluster and once the cluster has fully stopped take a snapshot of the disk referenced <a href="https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8">here</a> and ensure it is placed somewhere safe so that we can re-use this snapshot to re-create the jenkins disk after the cluster has been redeployed.</p></li>
-<li><p>Run this <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> to destroy the existing cluster, the environment is <strong>PTLSBOX</strong>.</p></li>
-<li><p>Run the same <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> again to apply to the cluster, the environment is <strong>PTLSBOX</strong>.</p></li>
+<li><p>Run this <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">Pipeline</a> to destroy the existing cluster, the environment is <strong>PTLSBOX</strong>.</p></li>
+<li><p>Run the same <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">Pipeline</a> again to apply to the cluster, the environment is <strong>PTLSBOX</strong>.</p></li>
 <li><p>Once the pipeline to deploy the cluster has completed, refer to the snapshot previously taken and create a new disk from it named as <strong>jenkins-disk</strong> ensuring it is placed in the location referenced <a href="https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8">here</a>.</p></li>
 </ul>
 <h4 id="after-deployment-of-a-cluster">After deployment of a cluster</h4>
@@ -515,8 +515,8 @@ Due to planned upgrades of AKS, we will be upgrading the management (cftplt-ints
 </blockquote>
 
 <ul>
-<li><p>Run the <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to <strong>PTL</strong> before clicking on <strong>Run</strong>.</p></li>
-<li><p>Run the <a href="https://dev.azure.com/hmcts/CNP/_build?definitionId=483&amp;_a=summary">Pipeline</a> ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to <strong>PTL</strong> before clicking on <strong>Run</strong>.</p></li>
+<li><p>Run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">Pipeline</a> ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to <strong>PTL</strong> before clicking on <strong>Run</strong>.</p></li>
+<li><p>Run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">Pipeline</a> ensuring Action is set to Apply, Cluster is set to cluster you plan to build and Environment is set to <strong>PTL</strong> before clicking on <strong>Run</strong>.</p></li>
 </ul>
 <h4 id="management-cftptl-intsvc-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 <p>After the cluster has been redeployed successfully and hr&rsquo;s / pods are running as expected you need to verify that you can get to the <a href="https://build.platform.hmcts.net">Jenkins web ui</a>, and then comment on the slack channel announcement made previously to advise Jenkins is back up.</p>

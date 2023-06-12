@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Configuring App Attach - HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/AppAttach/prepare_vm.html">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="Configuring App Attach - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/AppAttach/prepare_vm.html" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:title" content="Configuring App Attach" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/AppAttach/prepare_vm.html" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="/">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>Operations Runbooks</span></a>
+  </li>
+<li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
+<ul>
+  <li>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS</span></a>
+<ul>
+  <li>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+  </li>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../monitoring/index.html"><span>Monitoring</span></a>
+<ul>
+  <li>
+    <a href="../monitoring/app-insights.html"><span>Azure Application Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Databases</span></a>
+<ul>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../network/index.html"><span>Networking</span></a>
+<ul>
+  <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+  <li>
+    <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../heritage/index.html"><span>Heritage</span></a>
+<ul>
+  <li>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+  </li>
+  <li>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+  </li>
+  <li>
+    <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
+  </li>
+  <li>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../f5/index.html"><span>F5 VPN</span></a>
+<ul>
+  <li>
+    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+  <li>
+    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Services/index.html"><span>Services</span></a>
+<ul>
+  <li>
+    <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
+  </li>
+  <li>
+    <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+<li><a href="../PlatOps-Toolkit/index.html"><span>PlatOps Utilities</span></a>
+<ul>
+  <li>
+    <a href="../PlatOps-Toolkit/macbook-utilities.html"><span>Macbook Utilities</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-websites.html"><span>Useful Websites</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+<li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
+<ul>
+  <li>
+    <a href="../Change-Requests/How-to-raise-a-Change-request.html"><span>Raise a change request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/ServerAccess.html"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules.html"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall.html"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Security/index.html"><span>Security Operations</span></a>
+<ul>
+  <li>
+    <a href="../Security/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../Security/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+  <li>
+    <a href="../Security/tenable-nessus.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FinOps/index.html"><span>FinOps</span></a>
+<ul>
+  <li>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<ul>
+  <li>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
+  </li>
+  <li>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../AppAttach/index.html"><span>MSIX App Attach for Windows Server</span></a>
+<ul>
+  <li>
+    <a href="../AppAttach/installer_conversion.html"><span>Converting Installer Files to VHDX Images</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/prepare_vm.html"><span>Configuring App Attach</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/appattach_scripts.html"><span>Modified AppAttach Scripts</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../Patching/index.html"><span>OS Patch Management</span></a>
+  </li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="configuring-app-attach">Configuring App Attach</h1>
+<p>App Attaching our created packages on the target VM takes place in two stages: Staging and Registering.</p>
+<p>Staging will involve mounting the VHDX files to a virtual mount point with no drive letter, creating a junction to that virtual mount point and using the Win32 package manager to stage the package in place.</p>
+<p>Registering will involve using <code>Add-AppxPackage</code> to provision that package to specific users.</p>
+<p>This process is automated using a modified version of <a href="https://github.com/RMITBLOG/MSIX_APP_ATTACH/tree/master/VHD%20MSIX%20App%20Attach%20Scripts">four powershell scripts</a> created by <a href="https://ryanmangansitblog.com">Ryan Mangan</a>.</p>
+<p>These scripts rely on a JSON config file to mount, register and provision packages. They have been modified by us to accept the config file from a command-line argument rather than being hardcoded. This allows us to use the same scripts to provision different sets of packages at a time.</p>
+<p>These scripts should be available on the file share, but just in case, we&rsquo;ve <a href="appattach_scripts.html">included them in the runbook</a> as well</p>
+<h2 id="connect-to-the-file-share">Connect to the File Share</h2>
+<p>To make app deployments across multiple VMs easier, we&rsquo;ll download the completed VHDX images from an Azure File Share which we will connect to from our target VM.</p>
+<p>In the case of deploying to the <a href="https://github.com/hmcts/ops-jumpboxes/">ops jumpboxes</a>, we&rsquo;ll be using the <code>hmctsfslogixprodstor</code> storage account for prod and <code>hmctsfslogixnonprodstor</code> for non-prod. Both of these have a file share called &lsquo;MSIX&rsquo; that contain our VHDX files, as well as some powershell scripts. More on those in the next step.</p>
+<p>Since the jumpboxes will be domain joined, we can connect and authenticate using AzureAD credentials. The &lsquo;Connect&rsquo; tab of the file share in the azure portal will provide you a powershell script you can use to connect to the file share.</p>
+<p>In this example, the machine we&rsquo;re using is not domain joined, but the process will be the same. We will be mounting the file share to <code>Z:\</code></p>
+<p><a href="images/StorageAccount0.png" rel="noopener noreferrer"><img src="images/StorageAccount0.png" alt="" /></a></p>
+<h2 id="download-from-the-file-share">Download From the File Share</h2>
+<p>We&rsquo;ll need to download the contents of the file share to a local directory on our machine. There are several reasons for this:</p>
+<p>1) Remote Powershell scripts can&rsquo;t be run unless they&rsquo;re signed first.</p>
+<p>2) The VHDX images will need to be on the same drive if we want to create a junction to them.</p>
+<p>3) The powershell scripts expect to be in the same directory as the VHDX images.</p>
+<p>The following powershell will download everything from the connected file share, assuming it is mounted to <code>Z:\</code>:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">New-Item</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"C:\AppAttach"</span><span class="w"> </span><span class="nt">-ItemType</span><span class="w"> </span><span class="nx">Directory</span><span class="w">
+</span><span class="n">Set-Location</span><span class="w"> </span><span class="s2">"C:\AppAttach"</span><span class="w">
+
+</span><span class="c"># Copy contents of file shre to local directory</span><span class="w">
+</span><span class="c"># powershell scripts will need to be local in order to be ran</span><span class="w">
+</span><span class="c"># MSIX packages will need to be local in order to be mounted</span><span class="w">
+</span><span class="n">Get-ChildItem</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"Z:\"</span><span class="w"> </span><span class="nt">-Recurse</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Copy-Item</span><span class="w"> </span><span class="nt">-Destination</span><span class="w"> </span><span class="s2">"C:\AppAttach"</span><span class="w">
+</span></code></pre></div><p>We will be using the <code>C:\AppAttach</code> directory to keep all our files for this process and the powershell snippets in the following steps will assume you are using it, too.</p>
+<h2 id="installing-the-self-signed-certificate">Installing the Self-Signed Certificate</h2>
+<p>We&rsquo;ll need to install the self-signed certificate we used to sign our MSIX package if we want to provision the package. Copy the <code>.pfx</code> file to the target VM.</p>
+<p>The following powershell will install the exported certificate to the &lsquo;Trusted Root Certification Authorities&rsquo; store.</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="c"># Import certificate to trusted authority</span><span class="w">
+</span><span class="c"># Again, find a way to get the password nicer than this</span><span class="w">
+</span><span class="nv">$certPass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="nt">-String</span><span class="w"> </span><span class="s2">"&lt;My Password&gt;"</span><span class="w"> </span><span class="nt">-Force</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w">
+</span><span class="n">Import-PfxCertificate</span><span class="w"> </span><span class="nt">-FilePath</span><span class="w"> </span><span class="s2">"C:\AppAttach\MSIXSSCert.pfx"</span><span class="w"> </span><span class="nt">-CertStoreLocation</span><span class="w"> </span><span class="s2">"Cert:\LocalMachine\Root"</span><span class="w"> </span><span class="nt">-Password</span><span class="w"> </span><span class="nv">$certPass</span><span class="w">
+</span></code></pre></div><h2 id="creating-a-config-file">Creating a config file</h2>
+<p>Config files are just plain JSON that the scripts read to get a bunch of variables needed to mount our VHDX files. Config files <em>can</em> contain entries to mount multiple VHDX files, but as we&rsquo;ll want to deploy specific software to different users, we&rsquo;ll need to have a config file for every software package and run them on an individual basis.</p>
+<p>For our 7-Zip example, we&rsquo;ll have our config file <code>C:\AppAttach\7Zip_Config.json</code>.</p>
+<p>To figure out what to put in there, first mount the drive by double-clicking in file explorer. This should assign it a drive letter (e.g. <code>F:</code>).</p>
+<p>Open the newly mounted drive in file explorer.</p>
+<h3 id="parentfolder">ParentFolder</h3>
+<p>&ldquo;parentFolder&rdquo; is the first folder you see in the directory structure that contains the folder your package sits in. If you created the VHD using MSIXAACT, this will always be <code>MSIX</code>.</p>
+<h3 id="packagename">PackageName</h3>
+<p>Next, if you enter the <code>MSIX</code> folder, it will contain one folder named after your package. The verbatim name of this folder will be your &ldquo;packageName&rdquo; (e.g. <code>7Zip-test_1.0.0.0_x64__ewnn2f7rh71cc</code>)</p>
+<h3 id="volumeguid">VolumeGuid</h3>
+<p>Next, we&rsquo;ll need to use <code>mountvol</code> to find the &ldquo;volumeGuid&rdquo;. This is distinct from the disk identifier the file assigns itself.</p>
+<p>To find the volume GUID, open powershell and run the following to get your GUID:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">mountvol</span><span class="w"> </span><span class="nx">F:\</span><span class="w"> </span><span class="nx">/L</span><span class="w">
+</span></code></pre></div><p>Replace F: with the drive letter your image is mounted to if it differs. We want the part of the GUID inside the curly braces. (e.g. <code>dfff5b61-ff4d-11ed-8f6a-6045bdcf6bef</code>)</p>
+<p>When you&rsquo;re done, eject the image by right clicking on the drive in file explorer. Disk images can only be mounted to one mount point at a time and staging the image will fail if it&rsquo;s already mounted somewhere else. Alternatively, run:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">Dismount-DiskImage</span><span class="w"> </span><span class="nt">-ImagePath</span><span class="w"> </span><span class="nx">C:\Path\To\Your\DiskImage.vhdx</span><span class="w">
+</span></code></pre></div><h3 id="msixjunction">MsixJunction</h3>
+<p>Leave &ldquo;msixJunction&rdquo; as-is. This is the temporary directory we will be junctioning all our packages to.</p>
+<h3 id="vhdfilename">VhdFilename</h3>
+<p>Finally, &ldquo;vhdFileName&rdquo; is the <em>relative</em> path to the file from where you&rsquo;re running the script from. It&rsquo;s recommended to keep everything all in one directory, so for example if your disk image file is <code>C:\AppAttach\7Zip.vhdx</code> and you&rsquo;re running the script in <code>C:\AppAttach\</code>, <code>vhdFileName</code> should be <code>7Zip.vhdx</code></p>
+<h3 id="example">Example</h3>
+<p>So a full config file would look like this:</p>
+<div class="highlight"><pre class="highlight json" tabindex="0"><code><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"_comment1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example block for a 7Zip image"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"vhdFileName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7zip.vhdx"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"parentFolder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MSIX"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"packageName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7Zip-test_1.0.0.0_x64__ewnn2f7rh71cc"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"volumeGuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dfff5b61-ff4d-11ed-8f6a-6045bdcf6bef"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"msixJunction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"C:</span><span class="se">\\</span><span class="s2">temp</span><span class="se">\\</span><span class="s2">AppAttach"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div><p>It helps to test the staging and registering scripts now. If there&rsquo;s a problem with your config, it&rsquo;s a lot easier to debug it when you can see the output from your script.</p>
+<p>The scripts are invoked as follows:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="o">.</span><span class="n">\AppattachStage.ps1</span><span class="w"> </span><span class="nt">-configFile</span><span class="w"> </span><span class="s2">"C:\AppAttach\7Zip_Config.json"</span><span class="w">
+</span></code></pre></div><p>The order you run the scripts is important, in order, they go: Stage, Register, Deregister, Destage.</p>
+<p><strong>The Staging and Destaging scripts will require administrator privileges to work. The Register and Deregister scripts must be run from the user account you want to provision the package to.</strong></p>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<p>After staging the file, check the integrity of the junction created at <code>C:\Temp\AppAttach</code>. If this junction is corrupt, it means there&rsquo;s a problem with your config file and your <code>volumeGuid</code> is probably incorrect.</p>
+<p><a href="images/Junction0.png" rel="noopener noreferrer"><img src="images/Junction0.png" alt="" /></a>
+<a href="images/Junction1.png" rel="noopener noreferrer"><img src="images/Junction1.png" alt="" /></a></p>
+<p>If you run into a problem mounting the image, check your <code>vhdFileName</code>. Check if you can mount the image by double-clicking in file explorer. If you get an error saying &lsquo;Permission Denied&rsquo;, this means the disk is already mounted. Try running:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">Dismount-DiskImage</span><span class="w"> </span><span class="nt">-ImagePath</span><span class="w"> </span><span class="nx">C:\Path\To\Your\DiskImage.vhdx</span><span class="w">
+</span></code></pre></div><p>If you encounter a certificate problem when registering the package, this means the certificate is likely not installed properly. Refer to <a href="prepare_vm.html#installing-the-self-signed-certificate">the step where we installed the certificate</a>. Open the certificate manager and check you can see your certificate under <code>Local Computer\Trusted Root Certification Authorities\Certificates</code></p>
+<p><a href="images/CertManager.png" rel="noopener noreferrer"><img src="images/CertManager.png" alt="" /></a></p>
+<p>If that fails, consider re-exporting the <code>.pfx</code> file and trying again.</p>
+<h2 id="scheduling-the-scripts">Scheduling the Scripts</h2>
+<p>Now that we have working scripts, we need to automate running them. This can be done in the task scheduler, or through the Win32 API. Both have pros and cons, so we&rsquo;ll cover an example of both.</p>
+<p>We&rsquo;ll want the staging to be done at startup by a system account or someone with administrator privileges. There is a built-in trigger for performing a task on startup.</p>
+<p>Destaging should be done at shutdown, again by a system account someone with administrator privileges. Unfortunately, there is no built-in trigger for performing a task on shutdown. We will have to listen for an event from the event log. Event ID <code>1074</code> with a source of <code>User32</code> occurring in the <code>System</code> log signifies an imminent shutdown.</p>
+<p>Registering should be performed by the user account we want to have access to the application. There is a built-in trigger for connecting to a remote session that we can use to register the package just before they log on.</p>
+<p>Similarly, deregistering should be performed by the same user account. There is a corresponding built-in trigger for disconnecting from a remote session that we can use to de-register the package when they disconnect. It&rsquo;s important to note that this will not deregister the application if the user selects &lsquo;Sign out&rsquo; instead of &lsquo;Disconnect&rsquo; from the start menu. However, seeing as signing out terminates any processes the user is running, we do not anticipate this being a problem.</p>
+<h3 id="win32-api">Win32 API</h3>
+<p>The following example deploys two scheduled tasks to stage 7-Zip on startup and destage it on shutdown.</p>
+<p>If you want to stage/destage multiple packages, simply create another action from the trigger&rsquo;s action group and pass in a different config file.</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="c"># Any documentation needed for task scheduling can be found at or near here:</span><span class="w">
+</span><span class="c"># https://learn.microsoft.com/en-gb/windows/win32/taskschd/taskservice</span><span class="w">
+
+</span><span class="c"># Get the scheduler object and connect to it</span><span class="w">
+</span><span class="nv">$scheduler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-Object</span><span class="w"> </span><span class="nt">-ComObject</span><span class="w"> </span><span class="p">(</span><span class="s2">"Schedule.Service"</span><span class="p">)</span><span class="w">
+</span><span class="nv">$scheduler</span><span class="o">.</span><span class="nf">Connect</span><span class="p">()</span><span class="w">
+
+</span><span class="c"># Create a folder called 'AppAttach' to keep everything in, if it does not exist already.</span><span class="w">
+</span><span class="nv">$rootFolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$scheduler</span><span class="o">.</span><span class="nf">GetFolder</span><span class="p">(</span><span class="s2">"\"</span><span class="p">)</span><span class="w">
+</span><span class="nv">$appAttachFolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$rootFolder</span><span class="o">.</span><span class="nf">GetFolders</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">$_</span><span class="o">.</span><span class="nf">Name</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="s2">"AppAttach"</span><span class="w"> </span><span class="p">}</span><span class="w">
+
+</span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="bp">$null</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="nv">$appAttachFolder</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="nv">$appAttachFolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$rootFolder</span><span class="o">.</span><span class="nf">CreateFolder</span><span class="p">(</span><span class="s2">"AppAttach"</span><span class="p">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="c"># Create a task to stage 7-Zip on startup.</span><span class="w">
+</span><span class="nv">$startupTask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$scheduler</span><span class="o">.</span><span class="nf">NewTask</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w">
+</span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">RegistrationInfo</span><span class="o">.</span><span class="nf">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Stages 7-Zip on Startup"</span><span class="w">
+</span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">Enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">AllowDemandStart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">DisallowStartIfOnBatteries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$False</span><span class="w">
+</span><span class="nv">$startupTrigger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">Triggers</span><span class="o">.</span><span class="nf">Create</span><span class="p">(</span><span class="nx">8</span><span class="p">)</span><span class="w"> </span><span class="c"># Trigger type 8 is on boot</span><span class="w">
+</span><span class="nv">$startupTrigger</span><span class="o">.</span><span class="nf">Enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$startupTrigger</span><span class="o">.</span><span class="nf">Id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"On Startup"</span><span class="w">
+</span><span class="nv">$startupAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$startupTask</span><span class="o">.</span><span class="nf">Actions</span><span class="o">.</span><span class="nf">Create</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w"> </span><span class="c"># Action type 0 is an exec</span><span class="w">
+</span><span class="nv">$startupAction</span><span class="o">.</span><span class="nf">Id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Stage 7Zip MSIX Package"</span><span class="w">
+</span><span class="nv">$startupAction</span><span class="o">.</span><span class="nf">Path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"powershell.exe"</span><span class="w">
+</span><span class="nv">$startupAction</span><span class="o">.</span><span class="nf">Arguments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"-ExecutionPolicy Unrestricted -File C:\AppAttach\AppattachStage.ps1 -configFile C:\AppAttach\7Zip_Config.json"</span><span class="w">
+</span><span class="nv">$startupAction</span><span class="o">.</span><span class="nf">WorkingDirectory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"C:\AppAttach\"</span><span class="w">
+
+</span><span class="c"># What these numbers mean:</span><span class="w">
+</span><span class="c"># https://learn.microsoft.com/en-gb/windows/win32/taskschd/taskfolder-registertaskdefinition</span><span class="w">
+</span><span class="nv">$appAttachFolder</span><span class="o">.</span><span class="nf">RegisterTaskDefinition</span><span class="p">(</span><span class="s2">"Stage 7-Zip Package"</span><span class="p">,</span><span class="w"> </span><span class="nv">$startupTask</span><span class="p">,</span><span class="w"> </span><span class="nx">6</span><span class="p">,</span><span class="w"> </span><span class="s2">"System"</span><span class="p">,</span><span class="w"> </span><span class="bp">$null</span><span class="p">,</span><span class="w"> </span><span class="nx">5</span><span class="p">)</span><span class="w">
+
+</span><span class="nv">$shutdownTask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$scheduler</span><span class="o">.</span><span class="nf">NewTask</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w">
+</span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">RegistrationInfo</span><span class="o">.</span><span class="nf">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Destages 7-Zip on Shutdown"</span><span class="w">
+</span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">Enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">AllowDemandStart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">Settings</span><span class="o">.</span><span class="nf">DisallowStartIfOnBatteries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$False</span><span class="w">
+</span><span class="nv">$shutdownTrigger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">Triggers</span><span class="o">.</span><span class="nf">Create</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w"> </span><span class="c"># Trigger type 0 is on event</span><span class="w">
+</span><span class="nv">$shutdownTrigger</span><span class="o">.</span><span class="nf">Enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$True</span><span class="w">
+</span><span class="nv">$shutdownTrigger</span><span class="o">.</span><span class="nf">Id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"On Shutdown"</span><span class="w">
+</span><span class="nv">$shutdownTrigger</span><span class="o">.</span><span class="nf">Subscription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"&lt;QueryList&gt;&lt;Query Id='0' Path='System'&gt;&lt;Select Path='System'&gt;*[System[Provider[@Name='User32'] and EventID=1074]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;"</span><span class="w">
+</span><span class="nv">$shutdownAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$shutdownTask</span><span class="o">.</span><span class="nf">Actions</span><span class="o">.</span><span class="nf">Create</span><span class="p">(</span><span class="nx">0</span><span class="p">)</span><span class="w"> </span><span class="c"># Action type 0 is an exec</span><span class="w">
+</span><span class="nv">$shutdownAction</span><span class="o">.</span><span class="nf">Id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Destage 7Zip MSIX Package"</span><span class="w">
+</span><span class="nv">$shutdownAction</span><span class="o">.</span><span class="nf">Path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"powershell.exe"</span><span class="w">
+</span><span class="nv">$shutdownAction</span><span class="o">.</span><span class="nf">Arguments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"-ExecutionPolicy Unrestricted -File C:\AppAttach\AppattachDestage.ps1 -configFile C:\AppAttach\7Zip_Config.json"</span><span class="w">
+</span><span class="nv">$shutdownAction</span><span class="o">.</span><span class="nf">WorkingDirectory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"C:\AppAttach\"</span><span class="w">
+
+</span><span class="nv">$appAttachFolder</span><span class="o">.</span><span class="nf">RegisterTaskDefinition</span><span class="p">(</span><span class="s2">"Destage 7-Zip Package"</span><span class="p">,</span><span class="w"> </span><span class="nv">$shutdownTask</span><span class="p">,</span><span class="w"> </span><span class="nx">6</span><span class="p">,</span><span class="w"> </span><span class="s2">"System"</span><span class="p">,</span><span class="w"> </span><span class="bp">$null</span><span class="p">,</span><span class="w"> </span><span class="nx">5</span><span class="p">)</span><span class="w">
+</span></code></pre></div><h3 id="task-scheduler">Task Scheduler</h3>
+<p>Here, we&rsquo;ll go over adding the register and de-register steps for a specific user in the Task Scheduler.</p>
+<p>1) Create a New Task</p>
+<p>Open Task Scheduler and click &lsquo;Create Task&rsquo; in the right-hand panel.</p>
+<p>Fill out a suitable name and description.</p>
+<p>Make sure to specify the user account you&rsquo;ll be registering the package for. If registering for an AD user, you may need to specify the domain they&rsquo;re from. Here, we&rsquo;re using a local user.</p>
+<p><a href="images/Task0.png" rel="noopener noreferrer"><img src="images/Task0.png" alt="" /></a></p>
+<p>2) Specify a Trigger</p>
+<p>Navigate to the &lsquo;Triggers&rsquo; tab and click &lsquo;New&hellip;&rsquo;.</p>
+<p>Select &lsquo;On connection to user session&rsquo; from the drop down menu at the top.</p>
+<p>Select &lsquo;Specific user&rsquo; and specify the user account you&rsquo;ll be registering the package for.</p>
+<p>Click &lsquo;OK&rsquo;.</p>
+<p><a href="images/Task1.png" rel="noopener noreferrer"><img src="images/Task1.png" alt="" /></a></p>
+<p>3) Specify an Action</p>
+<p>Navigate to the &lsquo;Actions&rsquo; tab and click &lsquo;New&hellip;&rsquo;.</p>
+<p>Select &lsquo;Start a program&rsquo; from the drop down menu at the top.</p>
+<p>Type <code>powershell</code> in &lsquo;Program/Script&rsquo;</p>
+<p>Type <code>-ExecutionPolicy Unrestricted -File C:\AppAttach\AppattachRegister.ps1 -configFile C:\AppAttach\7Zip_Config.json</code> in &lsquo;Add Arguments&rsquo;</p>
+<p>Type <code>C:\AppAttach</code> in &lsquo;Start in&rsquo;</p>
+<p>Click &lsquo;OK&rsquo;.</p>
+<p>If you want to register more packages for the user, simply add more actions at this step and pass in a different config file.</p>
+<p>When you&rsquo;ve added all the actions you want, click &lsquo;OK&rsquo;.</p>
+<p><a href="images/Task2.png" rel="noopener noreferrer"><img src="images/Task2.png" alt="" /></a></p>
+<p>4) Create the Deregister Task</p>
+<p>The deregister task will be largely identical to the register task, only you&rsquo;ll want to set the trigger to &lsquo;On disconnect from ser session&rsquo; and specify the &lsquo;AppattachDeregister&rsquo; script in the action arguments.</p>
+<p><a href="images/Task3.png" rel="noopener noreferrer"><img src="images/Task3.png" alt="" /></a></p>
+<h2 id="verify">Verify</h2>
+<p>Run the stage task in the task scheduler manually. If all goes well, you should see &lsquo;The last operation mpleted successfully. (0x0)&rsquo; under the &lsquo;Last Run Result&rsquo; column.</p>
+<p>Check the <code>C:\Temp\AppAttach</code> directory to see if your package junction is present. If it is, this means the staging was successful.</p>
+<p>The user should now see 7-Zip in their start menu the next time they connect:</p>
+<p><a href="images/Start.png" rel="noopener noreferrer"><img src="images/Start.png" alt="" /></a></p>
+
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/AppAttach/prepare_vm.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Configuring+App+Attach%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FAppAttach%2Fprepare_vm.html%29&amp;labels=bug&amp;title=Re%3A+%27Configuring+App+Attach%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

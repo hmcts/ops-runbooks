@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Converting Installer Files to VHDX Images - HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/AppAttach/installer_conversion.html">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="Converting Installer Files to VHDX Images - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/AppAttach/installer_conversion.html" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:title" content="Converting Installer Files to VHDX Images" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/AppAttach/installer_conversion.html" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="/">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>Operations Runbooks</span></a>
+  </li>
+<li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
+<ul>
+  <li>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS</span></a>
+<ul>
+  <li>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+  </li>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Redeploying AKS Clusters Runbook</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../monitoring/index.html"><span>Monitoring</span></a>
+<ul>
+  <li>
+    <a href="../monitoring/app-insights.html"><span>Azure Application Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Databases</span></a>
+<ul>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../network/index.html"><span>Networking</span></a>
+<ul>
+  <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+  <li>
+    <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../heritage/index.html"><span>Heritage</span></a>
+<ul>
+  <li>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+  </li>
+  <li>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+  </li>
+  <li>
+    <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
+  </li>
+  <li>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../f5/index.html"><span>F5 VPN</span></a>
+<ul>
+  <li>
+    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+  <li>
+    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Services/index.html"><span>Services</span></a>
+<ul>
+  <li>
+    <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
+  </li>
+  <li>
+    <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+<li><a href="../PlatOps-Toolkit/index.html"><span>PlatOps Utilities</span></a>
+<ul>
+  <li>
+    <a href="../PlatOps-Toolkit/macbook-utilities.html"><span>Macbook Utilities</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-websites.html"><span>Useful Websites</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+<li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
+<ul>
+  <li>
+    <a href="../Change-Requests/How-to-raise-a-Change-request.html"><span>Raise a change request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/ServerAccess.html"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules.html"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall.html"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Security/index.html"><span>Security Operations</span></a>
+<ul>
+  <li>
+    <a href="../Security/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../Security/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+  <li>
+    <a href="../Security/tenable-nessus.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FinOps/index.html"><span>FinOps</span></a>
+<ul>
+  <li>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<ul>
+  <li>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
+  </li>
+  <li>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../AppAttach/index.html"><span>MSIX App Attach for Windows Server</span></a>
+<ul>
+  <li>
+    <a href="../AppAttach/installer_conversion.html"><span>Converting Installer Files to VHDX Images</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/prepare_vm.html"><span>Configuring App Attach</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/appattach_scripts.html"><span>Modified AppAttach Scripts</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../Patching/index.html"><span>OS Patch Management</span></a>
+  </li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="converting-installer-files-to-vhdx-images">Converting Installer Files to VHDX Images</h1>
+<p>In order to provision an application with App Attach, the application needs to be in the <a href="https://learn.microsoft.com/en-us/windows/msix/overview">MSIX package format</a> and contained in a Virtual Hard Disk file. Very few software vendors publish their packages in the MSIX format. Fortunately, it is possible to convert an installer file such as a <code>.exe</code> or <code>.msi</code> into a MSIX package using the <a href="https://learn.microsoft.com/en-us/windows/msix/packaging-tool/tool-overview">MSIX Packaging Tool</a>.</p>
+<p>This process will involve installing the program on a fresh VM, using the MSIX Packaging Tool to generate an MSIX package from the installed files, signing the MSIX package with a self-signed certificate then converting it to a VHDX file that we can mount.</p>
+<h2 id="standing-up-a-conversion-environment">Standing Up a Conversion Environment</h2>
+<p>According to <a href="https://learn.microsoft.com/en-us/windows/msix/packaging-tool/prepare-your-environment">environment best practices provided by Microsoft</a>, It is recommended to perform installer conversions in a clean environment:</p>
+
+<blockquote>
+<p>A clean machine for conversion is important because during the installation step of the MSIX Packaging Tool, we will be listening to everything in the environment to capture what the installer is doing. A clean machine means that there aren&rsquo;t extraneous apps or services running on your machine that could get captured in your package.</p>
+</blockquote>
+<p>Because of this, we recommend standing up a temporary &lsquo;conversion VM&rsquo; in Azure to create packages for the applications. This can be expedited using the <a href="https://github.com/hmcts/terraform-module-virtual-machine">HMCTS terraform VM module</a> should you wish to configure by code.</p>
+<h3 id="vm-requirements">VM Requirements</h3>
+<p>While Microsoft states that the minimum version of Windows required to use the Packaging Tool is Windows 10 1809, we have not been able to get it working on anything earlier than Windows 10 21H2. Because of this, we recommend setting up your conversion VM with <code>Windows Server 2022 Datacenter</code> as its&rsquo; operating system as that is what we have had success with.</p>
+<h2 id="installing-the-msix-packaging-tool">Installing the MSIX Packaging Tool</h2>
+<p>The MSIX Packaging Tool is normally distributed through the Windows Store, but this is not available on Windows Server operating systems. Thankfully, Microsoft provide a <a href="https://learn.microsoft.com/en-us/windows/msix/packaging-tool/disconnected-environment">direct download link for an offline version</a> that we can use instead. The following powershell script will install and provision the MSIX Packaging Tool:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">New-Item</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"C:\MSIX"</span><span class="w"> </span><span class="nt">-ItemType</span><span class="w"> </span><span class="nx">Directory</span><span class="w">
+</span><span class="n">Set-Location</span><span class="w"> </span><span class="s2">"C:\MSIX"</span><span class="w">
+
+</span><span class="c"># Download MSIX Packaging tool</span><span class="w">
+</span><span class="n">Invoke-WebRequest</span><span class="w"> </span><span class="s2">"https://download.microsoft.com/download/d/0/0/d0043667-b1db-4060-9c82-eaee1fa619e8/493b543c21624db8832da8791ebf98f3.msixbundle"</span><span class="w"> </span><span class="nt">-OutFile</span><span class="w"> </span><span class="nx">MSIXTool.msixbundle</span><span class="w">
+
+</span><span class="c"># Download offline cert</span><span class="w">
+</span><span class="n">Invoke-WebRequest</span><span class="w"> </span><span class="s2">"https://download.microsoft.com/download/d/0/0/d0043667-b1db-4060-9c82-eaee1fa619e8/493b543c21624db8832da8791ebf98f3_License1.xml"</span><span class="w"> </span><span class="nt">-OutFile</span><span class="w"> </span><span class="nx">License.xml</span><span class="w">
+
+</span><span class="c"># Check Sha1 sum of downloaded MSIX Packing Tool. This may change if the file gets updated</span><span class="w">
+</span><span class="kr">if</span><span class="w"> </span><span class="p">((</span><span class="n">Get-FileHash</span><span class="w"> </span><span class="nt">-a</span><span class="w"> </span><span class="nx">sha1</span><span class="w"> </span><span class="o">.</span><span class="nx">\MSIXTool.msixbundle</span><span class="p">)</span><span class="o">.</span><span class="nf">Hash</span><span class="w"> </span><span class="o">-ne</span><span class="w"> </span><span class="s2">"206c958c6e67e229b8b9e883395be1a2514212f3"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kr">exit</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="c"># Sha1 hash is good, install packages</span><span class="w">
+</span><span class="n">Add-AppProvisionedPackage</span><span class="w"> </span><span class="nt">-Online</span><span class="w"> </span><span class="nt">-PackagePath</span><span class="w"> </span><span class="nx">C:\MSIX\MSIXTool.msixbundle</span><span class="w"> </span><span class="nt">-LicensePath</span><span class="w"> </span><span class="nx">C:\MSIX\License.xml</span><span class="w">
+</span></code></pre></div><p>Please note that this script cannot be used to install the packaging tool as a custom script extension or similar. For some reason, provisioning packages in this manor does not appear to work until at least one user logs on to the machine. Therefore, we recommend just logging into the machine and running the script in an administrator powershell window.</p>
+<h2 id="generating-a-self-signed-certificate">Generating a Self-Signed Certificate</h2>
+<p>To create and install an MSIX package, we will need to sign it. If you already have a certificate generated, you can skip this step.</p>
+<p>If creating a self-signed certificate using the powershell below, make sure to change the value of the <code>$certSubject</code> to provide an identifiable common name for the cert.</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="c"># We will use this certificate to sign the MSIX packages we install to the target machine</span><span class="w">
+</span><span class="c"># Change the common name of your certificate:</span><span class="w">
+</span><span class="nv">$certSubject</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"CN=&lt;My Self-Signed Certificate&gt;"</span><span class="w">
+</span><span class="c"># Generate a cert and install it to "Local Computer\Personal"</span><span class="w">
+</span><span class="nv">$cert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SelfSignedCertificate</span><span class="w"> </span><span class="nt">-Type</span><span class="w"> </span><span class="nx">Custom</span><span class="w"> </span><span class="nt">-Subject</span><span class="w"> </span><span class="nv">$certSubject</span><span class="w"> </span><span class="nt">-KeyUsage</span><span class="w"> </span><span class="nx">DigitalSignature</span><span class="w"> </span><span class="nt">-KeyAlgorithm</span><span class="w"> </span><span class="nx">RSA</span><span class="w"> </span><span class="nt">-KeyLength</span><span class="w"> </span><span class="nx">2048</span><span class="w"> </span><span class="nt">-CertStoreLocation</span><span class="w"> </span><span class="s2">"cert:\LocalMachine\My"</span><span class="w">
+</span></code></pre></div><h2 id="exporting-the-pfx-file">Exporting the PFX File</h2>
+<p>We need to export the certificate and its&rsquo; private key to a PFX file to sign the MSIX package. This can be done with the powershell below or in the certificate manager.</p>
+<p>PFX files are password-protected so we must provide one here. Keep the password and <code>.pfx</code> file to hand as we will need to install the pfx file on the target machine later. You may also want to store the password of the certificate in a key vault if you intend to re-use the PFX file in the future.</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="c"># Change this certificate password</span><span class="w">
+</span><span class="nv">$certPass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="nt">-String</span><span class="w"> </span><span class="s2">"&lt;My password&gt;"</span><span class="w"> </span><span class="nt">-Force</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w">
+</span><span class="n">Get-ChildItem</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"Cert:\LocalMachine\My\</span><span class="si">$(</span><span class="nv">$cert</span><span class="o">.</span><span class="nf">Thumbprint</span><span class="si">)</span><span class="s2">"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Export-PfxCertificate</span><span class="w"> </span><span class="nt">-FilePath</span><span class="w"> </span><span class="s2">"C:\MSIX\MySSCert.pfx"</span><span class="w"> </span><span class="nt">-Password</span><span class="w"> </span><span class="nv">$certPass</span><span class="w">
+</span></code></pre></div><h2 id="creating-an-msix-package">Creating an MSIX Package</h2>
+<p>With those prerequisites done, we can now use the MSIX Packaging Tool to generate an MSIX package from an installer.</p>
+<p>We will be using an installer for <a href="https://www.7-zip.org/">7-Zip</a> as an example, but the process will be the same for any installer file.</p>
+<p>1) Open the MSIX Packaging Tool and select &lsquo;Application Package&rsquo; on the Left.</p>
+<p><a href="images/PackagingTool0.png" rel="noopener noreferrer"><img src="images/PackagingTool0.png" alt="" /></a></p>
+<p>2) Select &lsquo;Create package on this computer&rsquo; and click &lsquo;next&rsquo;</p>
+<p><a href="images/PackagingTool1.png" rel="noopener noreferrer"><img src="images/PackagingTool1.png" alt="" /></a></p>
+<p>3) Review any additional preparations to be made before running the installer.</p>
+<p>The first time the MSIX Packaging Tool runs, it will need to install the MSIX Packaging Tool driver. This is normal and should take about a minute to complete. If nothing happens, consider checking for updates in Windows Update.</p>
+<p>If there is a pending restart, consider restarting your machine and start back at step 1.</p>
+<p>The MSIX Packaging Tool will temporarily disable Windows Update while it is running. This is normal. Windows updates will resume when the Packaging Tool is finished.</p>
+<p>If everything looks okay, click &lsquo;Next&rsquo;.</p>
+<p>More information on this step can be found in the <a href="https://learn.microsoft.com/en-us/windows/msix/packaging-tool/create-app-package#prepare-computer">Microsoft Documentation for the MSIX Packaging Tool</a>.</p>
+<p><a href="images/PackagingTool2.png" rel="noopener noreferrer"><img src="images/PackagingTool2.png" alt="" /></a></p>
+<p>4) Select Installer and Signing Options</p>
+<p>Select your installer file in the topmost file select. If any command-line arguments are required for the installer, put them in the text box below.</p>
+<p>For &lsquo;Signing Preference&rsquo;, select &lsquo;Sign with a certificate (.pfx) and locate the PFX file we generated earlier. You will also need to provide the password you used to export it.</p>
+<p>Providing a timestamp server is optional.</p>
+<p><a href="images/PackagingTool3.png" rel="noopener noreferrer"><img src="images/PackagingTool3.png" alt="" /></a></p>
+<p>5) Provide Package Details</p>
+<p>This area is fairly self-explanatory. Provide information so that your package can be easily used and identified. If you&rsquo;re making an updated version of a package, make sure the version number is higher than the previous one.</p>
+<p><a href="images/PackagingTool4.png" rel="noopener noreferrer"><img src="images/PackagingTool4.png" alt="" /></a></p>
+<p>6) Run the Installer</p>
+<p>The installer window will now pop up. Run through the installer like you would for a normal installation. If you are prompted for a restart, click &#39;Restart Machine&rsquo; in the MSIX Packaging Tool, <strong>NOT</strong> the installer or Start Menu. This will ensure the packaging process continues normally after the restart.</p>
+<p>Once the installer has exited, click &lsquo;Next&rsquo;.</p>
+<p><a href="images/PackagingTool5.png" rel="noopener noreferrer"><img src="images/PackagingTool5.png" alt="" /></a></p>
+<p>7) Find Additional Entry Points</p>
+<p>If your installer writes multiple files or executables, there&rsquo;s a good chance the MSIX Packaging Tool has only selected one. Click the &lsquo;Browse&hellip;&rsquo; button to see all the executable files the installer wrote and select everything you want in your package. <strong>Do not add any uninstaller files to your package.</strong></p>
+<p>It helps to run the installed application at this point to capture any services or post-installation tasks that the Packaging Tool didn&rsquo;t pick up.</p>
+<p>When you&rsquo;re happy with what you see, click &lsquo;Next&rsquo;.</p>
+<p><a href="images/PackagingTool6.png" rel="noopener noreferrer"><img src="images/PackagingTool6.png" alt="" /></a></p>
+<p>8) Select Services</p>
+<p>If the MSIX Packaging Tool has detected any services written by the installer, it will show them here and prompt you to select what you want included in the package. In this case, 7-Zip does not stand up any services, so we do not need to worry about them.</p>
+<p>When you&rsquo;re happy with what you see, click &lsquo;Next&rsquo;.</p>
+<p><a href="images/PackagingTool7.png" rel="noopener noreferrer"><img src="images/PackagingTool7.png" alt="" /></a></p>
+<p>9) Create Your package</p>
+<p>Finally, select a save location for your MSIX file and click &lsquo;Create&rsquo;. If all goes well, you&rsquo;ll have an MSIX package you can install and provision. But we&rsquo;re not quite done yet. We still need to convert it to a VHDX file.</p>
+<p><a href="images/PackagingTool8.png" rel="noopener noreferrer"><img src="images/PackagingTool8.png" alt="" /></a></p>
+<h2 id="creating-a-vhdx-file">Creating a VHDX file</h2>
+<p>Once we have an MSIX package we want to deploy, we can convert it to a VHDX file that we can mount on a the target VM.</p>
+<h3 id="hyper-v-optional">Hyper-V (Optional?)</h3>
+<p>You may need <a href="https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/quick-start/enable-hyper-v">Hyper-V</a> enabled to create and read VHDX files. <strong>(This needs confirming. Don&rsquo;t know if it&rsquo;s necessary as we don&rsquo;t need to use the powershell module)</strong> You can enable Hyper-V and its associated PowerShell Module with the following powershell script:</p>
+<div class="highlight"><pre class="highlight powershell" tabindex="0"><code><span class="n">Enable-WindowsOptionalFeature</span><span class="w"> </span><span class="nt">-Online</span><span class="w"> </span><span class="nt">-FeatureName</span><span class="w"> </span><span class="nx">Microsoft-Hyper-V</span><span class="w"> </span><span class="nt">-All</span><span class="w">
+</span><span class="n">Enable-WindowsOptionalFeature</span><span class="w"> </span><span class="nt">-Online</span><span class="w"> </span><span class="nt">-FeatureName</span><span class="w"> </span><span class="nx">Microsoft-Hyper-V-Management-PowerShell</span><span class="w"> </span><span class="nt">-All</span><span class="w">
+</span></code></pre></div><p>This will require a restart to take effect.</p>
+<h3 id="msixaact">MSIXaaCT</h3>
+<p>We use a community tool called <a href="https://ryanmangansitblog.com/2021/03/01/msix-app-attach-community-tooling/">MSIXAACT</a> to convert MSIX packages to VHDX files.</p>
+<p>MSIXAACT is a very temperamental piece of software and it won&rsquo;t tell you when it&rsquo;s failed. Take extra care to heed the steps marked &lsquo;<strong>Important:</strong>&rsquo; or you may find yourself with an empty or corrupt package.</p>
+<p>1) <a href="https://github.com/RMITBLOG/MSIX_APP_ATTACH/blob/master/MSIX%20App%20attach%20Community%20Tooling/MSIXaaCT.msi">Download and install MSIXAACT</a> on the conversion VM.</p>
+<p>2) Click &lsquo;Create MSIXAAImage&rsquo;</p>
+<p><a href="images/MSIXAACT0.png" rel="noopener noreferrer"><img src="images/MSIXAACT0.png" alt="" /></a></p>
+<p>3) Select the MSIX package you want to convert from the file select at the top.</p>
+<p><strong>Important:</strong></p>
+
+<ul>
+<li>Check <strong>only</strong> &lsquo;vhdx&rsquo; in the middle</li>
+<li>Make sure a file at the &lsquo;MSIXAA Image Path&rsquo; <strong>does not</strong> already exist. It will not overwrite the file and MSIXAACT will still say it was successful.</li>
+<li>Make sure you allocate enough space for the VHDX. The default of 1024MB will be more than enough for anything that isn&rsquo;t Google Chrome, but if there&rsquo;s not enough space to write everything, it will corrupt the package and MSIXAACT will still say it was successful. We will show you how to check for this in the next step.</li>
+</ul>
+<p><a href="images/MSIXAACT1.png" rel="noopener noreferrer"><img src="images/MSIXAACT1.png" alt="" /></a></p>
+<p>4) Click &lsquo;Create MSIX Image&rsquo;</p>
+<p>This may take a couple of seconds depending on how big you set the image size to. You will know it is finished when you get the following popup:</p>
+<p><a href="images/MSIXAACT2.png" rel="noopener noreferrer"><img src="images/MSIXAACT2.png" alt="" /></a></p>
+<p>5) Double-Check the VHDX File</p>
+<p>As mentioned above, if MSIXAACT runs out of space in the drive when writing the package, it will fail silently. Thankfully, we can detect this in a few ways.</p>
+<p>Mount the created VHDX file by double clicking it in the file explorer. Take note of the drive letter it mounts to. In this case, it mounted to <code>F:\</code></p>
+<p><a href="images/MSIXAACT3.png" rel="noopener noreferrer"><img src="images/MSIXAACT3.png" alt="" /></a></p>
+<p>In the mounted drive, there should be a folder called <code>MSIX</code> containing another folder named after your package. Check the package folder contains at least the following files:</p>
+
+<ul>
+<li><code>AppxBlockMap.xml</code></li>
+<li><code>AppxManifest.xml</code></li>
+<li><code>AppxSignature.p7x</code></li>
+</ul>
+<p><a href="images/MSIXAACT4.png" rel="noopener noreferrer"><img src="images/MSIXAACT4.png" alt="" /></a></p>
+<p>This is the bare minimum your package should contain. If it does not contain these files, delete it and start again.</p>
+<p>To make sure MSIXAACT did not run out of space elsewhere, go to &lsquo;This PC&rsquo; in file explorer and check the mounted drive. It should have <em>an ample amount</em> of free space remaining and the bar should not be in the red. If this is the case, the VHDX conversion worked.</p>
+<p><a href="images/MSIXAACT5.png" rel="noopener noreferrer"><img src="images/MSIXAACT5.png" alt="" /></a></p>
+<p>Remember to eject the drive when you&rsquo;re done.</p>
+<h2 id="upload-to-file-share">Upload to File Share</h2>
+<p>To make app deployments across multiple VMs easier, we&rsquo;ll upload the completed VHDX image as well as our <code>.pfx</code> certificate to an Azure File Share which we will then connect to from our target VM.</p>
+<p><strong>You may want to store the <code>.pfx</code> certificate in a key vault instead</strong></p>
+<p>In the case of deploying to the <a href="https://github.com/hmcts/ops-jumpboxes/">ops jumpboxes</a>, we&rsquo;ll be using the <code>hmctsfslogixprodstor</code> storage account for prod and <code>hmctsfslogixnonprodstor</code> for non-prod. Both of these have a file share called &lsquo;MSIX&rsquo; that contain our VHDX files, as well as some powershell scripts. More on those in the next chapter.</p>
+
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/AppAttach/installer_conversion.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Converting+Installer+Files+to+VHDX+Images%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FAppAttach%2Finstaller_conversion.html%29&amp;labels=bug&amp;title=Re%3A+%27Converting+Installer+Files+to+VHDX+Images%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

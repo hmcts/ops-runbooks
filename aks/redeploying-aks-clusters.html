@@ -353,6 +353,7 @@
             <h1 id="redeploying-aks-clusters-runbook">Redeploying AKS Clusters Runbook</h1>
 <p>This wiki page documents some tasks that we have to perform when deploying any of the AKS Clusters</p>
 <h2 id="to-create-a-cluster">To create a cluster:</h2>
+<p>When redeploying, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.</p>
 <p>Go to the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">pipeline</a>.</p>
 <p>Click on <strong>Run pipeline</strong> (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to which ever one you want to build and that the environment is selected from the drop down menu.</p>
 <p>Click on <strong>Run</strong> to start the pipeline.</p>

@@ -1,0 +1,26 @@
+---
+title: Workload Identity Migration
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+## Check Workload Identity Migration script
+Script was created to check for required Azure AD Workload Identity label in deployments. As this is required for correct configuration of pods to use the new identites, its presence indicates if a deployment has been migrated or not.
+More information can be found [here](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels)
+
+
+### Pre-requisites
+
+- [`jq`](https://stedolan.github.io/jq/download/). 
+- [`azure-cli`](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Connect to one of the AKS clusters](https://hmcts.github.io/ways-of-working/troubleshooting/) before running the script.
+
+
+### Running the script
+Make sure to run `az login`. To run the script, clone this repository and switch into the `aks/workload identity migration` directory, run `./bin/checkWorkloadIdentityMigration.sh`. The script runs against your current kubectl context.
+Three CSV files are created in the background to collate results: 
+
+- A list of all old Azure Identities remaining on the cluster. After running the script run `./bin/checkWorkloadIdentityMigration.sh view_azureidentities` to view this in your terminal.
+- A list of deployments containing the required workload identity label. After running the script run `./bin/checkWorkloadIdentityMigration.sh view_labelled` to view this in your terminal.
+- A lost of deployments NOT containing the required workload identity lael. After running the script run `./bin/checkWorkloadIdentityMigration.sh view_not_labelled` to view this in your terminal.

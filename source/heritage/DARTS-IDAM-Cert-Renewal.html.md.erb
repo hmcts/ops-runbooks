@@ -1,0 +1,48 @@
+---
+title: Updating the DARTS IDAM certificates
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This document covers the process for renewing the certificates for the DARTS IDAM service on both NLE and Prod.
+
+Initially you will need someone to generate the certificate over at CGI (in previous years this was Tony Talbot) for both NLE and Prod. CGI update the cert on their system in tandem with our change.
+Once received, you will need to convert the PFX into a .crt and .key file. Below are the commands I used:
+
+openssl pkcs12 -in DART-CERTIFICATE.pfx -nocerts -out DART-KEY.key
+
+openssl pkcs12 -in DART-CERTIFICATE.pfx -clcerts -nokeys -out NLE-CRT.crt
+
+And finally, a command to remove the encryption from the key:
+
+openssl rsa -in DART-KEY.key -out DARTS-KEY-NOPASSWORD.key
+
+Once you have everything in place, you will need to connect to the f5 devices the certs are applied on.
+
+Non-prod:
+
+f5-nonprodi-ukwest
+f5-nonprodi-uksouth
+
+Prod:
+
+f5-prod-int-uksouth
+
+Note: there are plans to decomission the UKWest vms, however, if both are still in use for pre-prod both will need updated, or else it will cause issues for the users.
+
+The login credentials are in the keyvault 'hmcts-infra-dmz-nonprodi' and 'hmcts-infra-dmz-prod-int'. Values are loadbalancer-username and loadbalancer-password. You will need to whitelist your IP to be able to connect.
+
+Log onto the f5 device, then go to system > certificate management > traffic certificate management > SSL certificate list
+
+Under here, click the white box in the top right corner, change the partition to 'version1_heritage_prod', select ‘import’ from the right and import the cert and key separately. These will combine once imported.
+
+Go to local traffic > profiles > SSL > Client. In the top right corner, change the ‘Partition’ to version1_heritage_nle and the ‘heritage_client_ssl’ cert will appear. Click into it.
+
+Under configuration, click the certificate key chain and hit ‘edit’
+
+Swap the certificate and key over to use the newly imported resources
+
+Next, click onto Profiles > SSL > Server and apply the change to the key and crt. As with Client, you will need to change the partition.
+
+Now have CGI test they are getting the new cert when accessing the site. They will receive an ‘SEC_ERROR_UNKNOWN_ISSUER’ but this is common for MoJ certs. 

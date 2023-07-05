@@ -263,7 +263,7 @@ It is important to identify applications with underlying issues and allow suffic
 #### After deployment of a cluster
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/582)
 
-Upgrading SDS AKS Clusters
+Upgrading AKS Clusters
 
 ## Pods and HRs Health Checks
 Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs
@@ -279,40 +279,40 @@ Some environments do have some additional requirements/checks that need to confi
 
 # Sandbox
 #### Before deployment of a cluster
-- Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
+- Remove the cluster you are going to redeploying from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 
 #### After deployment of a cluster
-- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/474/files)
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
 
 # Management Sandbox
 N/A
 
 # Demo
 #### Before deployment of a cluster
-- Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
+- Remove the cluster you are going to redeploying from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 
 #### After deployment of a cluster
-- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/474/files)
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
 
 # ITHC, DEV, Perftest, AAT
 #### Before deployment of a cluster
-- Remove the cluster you are going to redeploying from the AGW. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
+- Remove the cluster you are going to redeploying from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
-- Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example here](https://github.com/hmcts/sds-flux-config/pull/2637/files) .
+- Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example for SDS here](https://github.com/hmcts/sds-flux-config/pull/2637/files) / [PR example for CFT here](https://github.com/hmcts/cnp-flux-config/pull/7138/files)
   - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
 #### After deployment of a cluster
-- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/sds-azure-platform/pull/474/files)
-- Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). [Update active jenkins-cluster IP value in DNS](https://github.com/hmcts/azure-private-dns/pull/428/files) and [update existing platform-hmcts-net entries](https://github.com/hmcts/sds-flux-config/pull/2631/files).
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files)/ [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
+
 
 # Upgrade Cluster
 Put a message out into the  #cloud-native-announce channel to notify people which cluster will be upgraded
 Find the cluster you want to upgrade into the portal > Cluster Configuration > Upgrade Version > in the Kubernetes version drop down menu choose the latest GA version > Click Save
-This will trigger the upgrade of the cluster, which will take some time. Once this has finished you need to create a PR in this [repo](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/ptlsbox.tfvars#L3) changing the kubernetes_version value
+This will trigger the upgrade of the cluster, which will take some time. Once this has finished you need to create a PR in the [SDS repo](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/ptlsbox.tfvars#L3) changing the kubernetes_version value
  * Note: The kubernetes_version value only takes major version values, i.e 1.25, 1.26 and so on.
-Once the changes have been reviewed, approved and merged, the [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482) will run. Once completed compare the hrs and pods statuses with the ones you saved for the upgrade took place.
+Once the changes have been reviewed, approved and merged, run the [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482). Once completed compare the hrs and pods statuses with the ones you saved for the upgrade took place.
 
 
 ## Known issues

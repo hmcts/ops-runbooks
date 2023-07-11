@@ -142,6 +142,9 @@
     <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
   </li>
   <li>
+    <a href="../monitoring/monitoring-request.html"><span>Raise a Dynatrace Monitoring Request</span></a>
+  </li>
+  <li>
     <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
   </li>
 </ul>
@@ -203,10 +206,10 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
@@ -369,17 +372,17 @@ should be raised in advance to allow changes to be approved and resources/teams 
 be shut down prior to patching and started after and tested.)</p>
 <p><a href="https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/_layouts/15/Doc.aspx?sourcedoc=%7B97F4A896-AAB7-4CCD-A4D9-B4D158B8071D%7D&amp;file=Patching%20Calendar%20v2.xlsx&amp;action=default&amp;mobileredirect=true">Patching Calendar</a> 
 consists of rota, server lists and services scheduled for patching per month.</p>
-<p><b>High-level patching process:</b>
-* A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
-* Ensure production changes are approved and at the implement status and window and resources have been approved and provided.
-* Prior to patching log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches.
-* Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed.
-* Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching.
-* Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
-* This initial process should be documented if not already.
-* To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
-* Once restarts have been completed, development team to start &amp; test applications.
-* Once the above is successful, the next environment will be patched with similar steps.</p>
+<p><strong>High-level patching process</strong>:
+A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
+Ensure production changes are approved and at the implement status and window and resources have been approved and provided.
+Prior to patching (i.e. the day before) log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches and scheduled backups are successful, etc.
+Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed.
+Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching.
+Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
+This initial process should be documented if not already.
+To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
+Once restarts have been completed, development team to start &amp; test applications.
+Once the above is successful, the next environment will be patched with similar steps.</p>
 <h2 id="os-patching-instructions">OS Patching Instructions</h2>
 <p>See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:</p>
 <h3 id="rhel">RHEL</h3>
@@ -419,6 +422,17 @@ RHBA-2021:2951 bugfix         redhat-release-server-7.7-12.el7.x86_64
 RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
 </code></pre></div><p><strong>4.</strong> Run yum update to update RHEL</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>[root@tamops-rhel ~]# yum update
+</code></pre></div>
+<ol>
+<li>Verify release version</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>cat /etc/os-release
+cat /etc/redhat-release
+</code></pre></div>
+<ol>
+<li>Reboot server</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>reboot
 </code></pre></div><h3 id="ubuntu">Ubuntu</h3>
 <p><strong>1.</strong>  Upgrade</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get update
@@ -456,6 +470,11 @@ linux-azure/bionic-updates,bionic-security 5.4.0.1068.47 amd64 [upgradable from:
 linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47 
 </code></pre></div><p><strong>4.</strong> Update Ubuntu</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>root@tamops-ubuntu:~# apt-get upgrade -y
+</code></pre></div>
+<ol>
+<li>Reboot server</li>
+</ol>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>reboot
 </code></pre></div><h3 id="windows">Windows</h3>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>PS C:\Users\tamops&gt; ((New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher()).Search('IsInstalled=0 and IsHidden=0').updates | Select-Object -Property Title,IsDownloaded,RebootRequired | ft -AutoSize
 
@@ -463,13 +482,7 @@ Title                                                                           
 -----                                                                                                               ------------ --------------
 2021-01 Update for Windows Server 2019 for x64-based Systems (KB4589208)                                                   False          False
 2022-01 Cumulative Update Preview for .NET Framework 3.5, 4.7.2 and 4.8 for Windows Server 2019 for x64 (KB5009823)        False          False
-</code></pre></div><h2 id="automated-patching">Automated Patching</h2>
-<p>There is an automated patching solution for Heritage services.</p>
-<p><b>Walkthrough session:</b>
-<a href="https://justiceuk.sharepoint.com/sites/DTSPlatformOperations/_layouts/15/stream.aspx?id=%2Fsites%2FDTSPlatformOperations%2FShared%20Documents%2FGeneral%2Fknowledge%2Dsharing%2FRedSquadKTSessions%2FPatch%20Management%20solution%20demo%20%28placeholder%29%2D20220816%5F120309%2DMeeting%20Recording%2Emp4&amp;wdLOR=c08271A28%2DB82F%2D5B40%2DB87F%2D69A1E28E545D&amp;ga=1">Walkthrough Session</a></p>
-<p><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=606">Heritage Azure Update Management Pipeline</a></p>
-<p><a href="https://portal.azure.com/?feature.msaljs=true#view/HubsExtension/BrowseResource/resourceType/Microsoft.Automation%2FAutomationAccounts">Automated Accounts</a></p>
-<h2 id="patching-troubleshooting">Patching Troubleshooting</h2>
+</code></pre></div><h2 id="patching-troubleshooting">Patching Troubleshooting</h2>
 <p>This section includes updates of any issues encountered during patching and how to resolve.</p>
 <h3 id="rhel-6-10-not-showing-any-patches-available">RHEL 6.10 not showing any patches available</h3>
 <p>RHEL 6.10 is the latest version for RHEL 6 and is End of Life and not supported - therefore there will be no available patches if previously patched to latest version.</p>

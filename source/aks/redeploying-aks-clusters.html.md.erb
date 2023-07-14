@@ -25,7 +25,7 @@ This order can change; created to give a brief overview of the environments.
 
 Put a message out into the  #cloud-native-announce channel to notify people which cluster will be upgraded.
 
-Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs
+Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:
 
 ```
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status

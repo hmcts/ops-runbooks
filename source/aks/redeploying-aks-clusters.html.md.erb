@@ -9,7 +9,7 @@ This run book documents some tasks that we have to perform when updating any of 
 
 ## Cluster Order of Updating
 
-This is the normal order we use when updating clusters, it doesn't have to exactly follow it:
+This is the normal order we use when updating clusters, it does not have to exactly follow it:
 
 - Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
 - Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)
@@ -43,7 +43,7 @@ Three files will be saved in the directory from which you are running the above 
 
 - For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
 
-- The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
+- The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > take the IP Address.
 
 ##  Environment specifics
 Some environments do have some additional requirements/checks that need to be confirmed prior to upgrading any of its clusters.
@@ -54,7 +54,7 @@ Make an announcement that Jenkins will be briefly unavailable in the cloud-nativ
 This environment is best to be done early in the morning.
 See [Jenkins instances](/jenkins/) to check they are running after upgrades.
 
-### ITHC, DEV, Perftest, AAT
+### DEV/ Preview, AAT/ Staging
 - Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example for SDS here](https://github.com/hmcts/sds-flux-config/pull/2637/files) / [PR example for CFT here](https://github.com/hmcts/cnp-flux-config/pull/7138/files)
 - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
@@ -72,7 +72,7 @@ Once the changes have been reviewed, approved and merged, run the [SDS Pipeline]
 
 ## Re-deploying a cluster
 
- <%= warning_text('Re-building a cluster is only done when absolutely necessary. If an environment is not listed below, the process of preparing the cluster to be re-build is the same as the upgrade steps, with the exception that you will need to delete the cluster from the portal if a rebuild is required')
+ <%= warning_text('Re-building a cluster is only done when absolutely necessary.')
 ### Ptlsbox
 
 #### Before deployment of a cluster
@@ -85,16 +85,16 @@ Once the cluster has been redeployed and Jenkins is back up and running, test th
 
 ### Preview
 
-We have the ability to create another preview cluster on demand. We don't run with two at a time as they're 75 node clusters and that would be quite expensive.
+We have the ability to create another preview cluster on demand. We do not run with two at a time as they are 75 node clusters and that would be quite expensive. Announce preview swap a day in advance in the #cloud-native-announce channel
 
 #### When the build has finished
 
-- Check the system helm releases and pods are up: flux, flux-helm-operator, tunnelfront, coredns, nodelocaldns, - aad-pod-identity, traefik
-- Check an external IP has been assigned: kubectl get service -n admin |awk '$4 ~ /^[0-9]/'
+- Check the system helm releases and pods are up in the namespaces: flux-system, kube-system, admin
+- Check an external IP has been assigned: kubectl get svc traefik -n admin
 - Check OSBA is running, kubectl get pods -n osba, kubectl get pods -n catalog
 
 #### How to test a specific Preview cluster without swapping over
-[cnp-plum-recipe-service](https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files)
+Change the plum service as per the [PR cnp-plum-recipe-service](https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files), do not merge it in, but instead check in Jenkins that the pipeline run has completed without any issues.
 
 [cnp-jenkins-library](https://github.com/hmcts/cnp-jenkins-library/compare/preview01?expand=1)
 
@@ -125,28 +125,28 @@ kubectl delete ingress --all-namespaces -l '!helm.toolkit.fluxcd.io/name,app.kub
 
 * Delete any orphan A records that external-dns might have missed:
 
-_Replace 10.101.159.250 with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup_
+_Replace X.X.X.X with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup_
 
 Private DNS
 
 ```command
-az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.101.159.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
-az network private-dns record-set a list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='10.101.159.250'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+az network private-dns record-set a list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 ```
 
 Public DNS
 
 ```command
-az network dns record-set a list --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?aRecords[0].ipv4Address=='20.90.254.226'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
+az network dns record-set a list --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
 ```
 
 Deletes any txt records pointing to inactive:
 
 ```bash
 # Private DNS
-az network private-dns record-set txt list --zone-name demo.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set txt delete --zone-name demo.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+az network private-dns record-set txt list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set txt delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 # Public DNS
-az network dns record-set txt list --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set txt delete --zone-name demo.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
+az network dns record-set txt list --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set txt delete --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
 ```
 
 Once swap over is fully complete then delete the older cluster,

@@ -49,8 +49,7 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
  - When moving to the `v10.1.x` release then that would be `v10.0.(max) -> v10.1.0 -> v10.1.x`
  - Don't forget there are two regions that's 4 firewall vm's to upgrade. In Panorama this might not be an 
    issue but if doing manually then you'd have to install separately on all four
- - Start with the ukwest firewall vms first and do them one at a time i.e. `vm-1` then `vm-0` as it requires a reboot after installation
-
+ 
 ## Steps
 * ⚠️ Always start with `sbox`, if no issue when complete then chances of issues with `nonprod` and `prod` are very low<br>
    The flow is `sbox` -> `nonprod` -> `prod`

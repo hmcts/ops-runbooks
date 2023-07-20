@@ -88,7 +88,7 @@ This will trigger the upgrade of the cluster, which will take some time. Once th
 Once the changes have been reviewed, approved and merged, run the [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482) / [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766). Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place.
 
 #### Issues Upgrading the Cluster
-If a non-prod cluster upgrade fails due to a pod, which is in a Crashed state, and the team are not using the application, it can be disabled. Example PR [here](https://github.com/hmcts/sds-flux-config/pull/3168/files). Once disabled and the cluster successfully upgrades and is back up and running, you can re-enable the application.
+If a non-prod cluster upgrade fails due to a pod, which is in a Crashed state, and the team are not using the application, it can be disabled. [Example PR](https://github.com/hmcts/sds-flux-config/pull/3168/files). Once disabled and the cluster successfully upgrades and is back up and running, you can re-enable the application.
 
 ## Re-deploying a cluster
 ### Re-building a cluster is only done when absolutely necessary. If an environment is not listed below, the process of preparing the cluster to be re-build is the same as the upgrade steps, with the exception that you will need to delete the cluster from the portal if a rebuild is required

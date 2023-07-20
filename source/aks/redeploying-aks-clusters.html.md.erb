@@ -41,6 +41,8 @@ Three files will be saved in the directory from which you are running the above 
 
 - For pods where images beginning with *pr-* are not found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this [one](https://github.com/hmcts/cnp-flux-config/pull/17115/files) done previously.
 
+- For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
+
 ##  Environment specifics
 Some environments do have some additional requirements/checks that need to be confirmed prior to upgrading any of its clusters.
 

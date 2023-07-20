@@ -369,11 +369,9 @@ Once received, you will need to convert the PFX into a .crt and .key file. Below
 <p>openssl rsa -in DART-KEY.key -out DARTS-KEY-NOPASSWORD.key</p>
 <p>Once you have everything in place, you will need to connect to the f5 devices the certs are applied on.</p>
 <p>Non-prod:</p>
-<p>f5-nonprodi-ukwest
-f5-nonprodi-uksouth</p>
+<p>f5-nonprodi-uksouth</p>
 <p>Prod:</p>
 <p>f5-prod-int-uksouth</p>
-<p>Note: there are plans to decomission the UKWest vms, however, if both are still in use for pre-prod both will need updated, or else it will cause issues for the users.</p>
 <p>The login credentials are in the keyvault &lsquo;hmcts-infra-dmz-nonprodi&rsquo; and &lsquo;hmcts-infra-dmz-prod-int&rsquo;. Values are loadbalancer-username and loadbalancer-password. You will need to whitelist your IP to be able to connect.</p>
 <p>Log onto the f5 device, then go to system &gt; certificate management &gt; traffic certificate management &gt; SSL certificate list</p>
 <p>Under here, click the white box in the top right corner, change the partition to &lsquo;version1_heritage_prod&rsquo;, select ‘import’ from the right and import the cert and key separately. These will combine once imported.</p>

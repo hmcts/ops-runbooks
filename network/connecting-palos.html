@@ -412,48 +412,6 @@ az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-pa
 </ul>
 
 <hr>
-<h2 id="uk-west">UK West</h2>
-<p>The connectivity for the UK West Palos, via the VPN, is not currently set up so connecting to them is slightly different to UK south.
-To access these Palos you will need add a rule to allow connectivity from your IP address to the Palo on port 443.
-You can add a rule by going to the VMs via one of the links below and adding an inbound rule on the Networking tab.</p>
-
-<ol>
-<li>Create the NSG rule to allow your IP on port 443. (Example and links to VMs below)</li>
-<li>Retrieve the url of the Palo VM you want to connect to via the &lsquo;Virtual machines&rsquo; section below.</li>
-<li><p>Retrieve the admin password from the relevant key vault:
-&ldquo;`</p>
-<p>az keyvault secret show &ndash;vault-name ukw-infra-dmz-sbox-int &ndash;name firewall-password &ndash;query value -o tsv</p>
-<p>az keyvault secret show &ndash;vault-name ukw-infra-dmz-nonprodi &ndash;name firewall-password &ndash;query value -o tsv</p>
-<p>az keyvault secret show &ndash;vault-name ukw-infra-dmz-prod-int &ndash;name firewall-password &ndash;query value -o tsv
-&rdquo;`</p></li>
-<li><p>Use the local account <code>localadmin</code></p></li>
-</ol>
-<h3 id="add-nsg-rule">Add NSG rule</h3>
-
-<details>
-    <summary>Example</summary>
-    <img alt="Example NSG Rule" src="images/nsg-rule.png" width="300" height="200">
-</details>
-<p><br>Remember to remove the rule once you no longer need access.</p>
-<h3 id="uk-west-virtual-machines">UK West Virtual machines</h3>
-<h4 id="uk-west-virtual-machines-sandbox">Sandbox</h4>
-
-<ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/UKW-HUB-SBOX-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-sbox-int-palo-vm-0/overview">ukw-hub-sbox-int-palo-vm-0</a> - https://ukw-hub-sbox-int-palo-mgmt-0.ukwest.cloudapp.azure.com</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/UKW-HUB-SBOX-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-sbox-int-palo-vm-1/overview">ukw-hub-sbox-int-palo-vm-1</a> - https://ukw-hub-sbox-int-palo-mgmt-0.ukwest.cloudapp.azure.com</li>
-</ul>
-<h4 id="non-production">Non Production</h4>
-
-<ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-0/overview">ukw-hub-nonprodi-palo-vm-0</a> - https://ukw-hub-nonprodi-palo-mgmt-0.ukwest.cloudapp.azure.com</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/ukw-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/ukw-hub-nonprodi-palo-vm-1/overview">ukw-hub-nonprodi-palo-vm-1</a> - https://ukw-hub-nonprodi-palo-mgmt-0.ukwest.cloudapp.azure.com</li>
-</ul>
-<h4 id="uk-west-virtual-machines-production">Production</h4>
-
-<ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-0/overview">ukw-hub-prod-int-palo-vm-0</a> - https://ukw-hub-prod-int-palo-mgmt-0.ukwest.cloudapp.azure.com</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/UKW-HUB-PROD-INT/providers/Microsoft.Compute/virtualMachines/ukw-hub-prod-int-palo-vm-1/overview">ukw-hub-prod-int-palo-vm-1</a> - https://ukw-hub-prod-int-palo-mgmt-1.ukwest.cloudapp.azure.com</li>
-</ul>
 
             
           </main>

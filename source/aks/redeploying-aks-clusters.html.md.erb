@@ -31,7 +31,7 @@ Before upgrading any of the clusters run the following query on the cluster you 
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
 ```
 
-Three files will be saved in the directory from whihc you are running the above command. 
+Three files will be saved in the directory from which you are running the above command. 
 
 - Investigate failed helm releases and missing pods as required  
 

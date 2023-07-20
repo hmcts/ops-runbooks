@@ -91,7 +91,8 @@ Once the changes have been reviewed, approved and merged, run the [SDS Pipeline]
 If a non-prod cluster upgrade fails due to a pod, which is in a Crashed state, and the team are not using the application, it can be disabled. [Example PR](https://github.com/hmcts/sds-flux-config/pull/3168/files). Once disabled and the cluster successfully upgrades and is back up and running, you can re-enable the application.
 
 ## Re-deploying a cluster
-### Re-building a cluster is only done when absolutely necessary. If an environment is not listed below, the process of preparing the cluster to be re-build is the same as the upgrade steps, with the exception that you will need to delete the cluster from the portal if a rebuild is required
+
+ <%= warning_text('Re-building a cluster is only done when absolutely necessary. If an environment is not listed below, the process of preparing the cluster to be re-build is the same as the upgrade steps, with the exception that you will need to delete the cluster from the portal if a rebuild is required')
 ### Ptlsbox
 
 #### Before deployment of a cluster

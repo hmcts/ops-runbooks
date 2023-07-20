@@ -33,7 +33,7 @@ kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all
 
 Three files will be saved in the directory from which you are running the above command. 
 
-- Investigate failed helm releases and missing pods as required  
+- Investigate failed helm releases and missing pods as required
 
 - For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
 

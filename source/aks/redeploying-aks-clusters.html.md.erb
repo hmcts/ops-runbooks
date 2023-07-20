@@ -43,16 +43,10 @@ Three files will be saved in the directory from which you are running the above 
 
 - For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
 
+- The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
+
 ##  Environment specifics
 Some environments do have some additional requirements/checks that need to be confirmed prior to upgrading any of its clusters.
-
-### Sandbox
-#### Before upgrading of a cluster
-- Remove the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
-
-#### After upgrading of a cluster
-- Add the cluster back into AGW once you have confirmed the upgrade has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
 
 ### Ptlsbox, Ptl
 
@@ -60,23 +54,9 @@ Make an announcement that Jenkins will be briefly unavailable in the cloud-nativ
 This environment is best to be done early in the morning.
 See [Jenkins instances](/jenkins/) to check they are running after upgrades.
 
-### Demo
-#### Before upgrading of a cluster
-- Remove the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
-
-#### After upgrading of a cluster
-- Add the cluster back into AGW once you have confirmed the upgrade has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
-
 ### ITHC, DEV, Perftest, AAT
-#### Before upgrading of a cluster
-- Remove the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer
 - Change Jenkins to use the other cluster that is not going to be redeployed, e.g. [PR example for SDS here](https://github.com/hmcts/sds-flux-config/pull/2637/files) / [PR example for CFT here](https://github.com/hmcts/cnp-flux-config/pull/7138/files)
-  - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
-
-#### After upgrading of a cluster
-- Add the cluster back into AGW once you have confirmed the upgrade has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files)/ [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
+- If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
 ## Upgrading the Cluster
 
@@ -87,8 +67,8 @@ This will trigger the upgrade of the cluster, which will take some time. Once th
 
 Once the changes have been reviewed, approved and merged, run the [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482) / [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766). Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place.
 
-#### Issues Upgrading the Cluster
-If a non-prod cluster upgrade fails due to a pod, which is in a Crashed state, and the team are not using the application, it can be disabled. [Example PR](https://github.com/hmcts/sds-flux-config/pull/3168/files). Once disabled and the cluster successfully upgrades and is back up and running, you can re-enable the application.
+## After upgrading of a cluster
+- Add the cluster back into AGW once you have confirmed the upgrade has been successful. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/474/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
 
 ## Re-deploying a cluster
 
@@ -98,12 +78,6 @@ If a non-prod cluster upgrade fails due to a pod, which is in a Crashed state, a
 #### Before deployment of a cluster
 
 As this environment only tends to be used by IDAM, you need to confirm with Paul Verity that the Sandbox Jenkins instance which sits on this cluster is not being used and that he is ok with the work to go ahead. The Sandbox Jenkins instance can be logged into [CFT Jenkins](https://sandbox-build.platform.hmcts.net/) / [SDS Jenkins](https://sds-sandbox-build.platform.hmcts.net/securityRealm/finishLogin).
-
-Confirm that the service job within Jenkins runs successfully [cnp-plum-recipes-service](https://sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox_CNP/job/cnp-plum-recipes-service/job/master/) /[sds-toffee-recipe-service](https://sds-sandbox-build.platform.hmcts.net/job/HMCTS_Sandbox/job/sds-toffee-recipes-service/).
-
-* Stop the cluster and once the cluster has fully stopped take a snapshot of the disk referenced [CFT](https://github.com/hmcts/cnp-flux-config/blob/85d61449e8633c6a975798c01e7ce155c9861c7e/apps/jenkins/jenkins/sbox-intsvc/disk.yaml#L8) / [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/disk.yaml#L9). 
-
-* After cluster has re-deployed, refer to the snapshot previously taken and create a new disk from it named as **jenkins-disk** ensuring it is placed in the location referenced referenced above.
 
 #### After deployment of a cluster
 

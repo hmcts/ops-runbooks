@@ -125,12 +125,6 @@ az network private-dns record-set a list --zone-name service.core-compute-previe
 az network private-dns record-set a list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 ```
 
-Public DNS
-
-```command
-az network dns record-set a list --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set a delete --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
-```
-
 Deletes any txt records pointing to inactive:
 
 ```bash

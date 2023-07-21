@@ -142,7 +142,7 @@ az network dns record-set txt list --zone-name preview.platform.hmcts.net -g ref
 
 Once swap over is fully complete then delete the old cluster:
 
-* Run the [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766) ensuring Action is set to Destroy, Cluster is set to cluster you plan to destroy and Environment is set to that you intend to run against before clicking on **Run**. 
+* Comment out the inactive preview cluster. [Example PR](https://github.com/hmcts/aks-cft-deploy/pull/485)
 
 ### AAT
 

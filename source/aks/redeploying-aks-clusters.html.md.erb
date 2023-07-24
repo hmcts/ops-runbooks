@@ -69,7 +69,8 @@ This will trigger the upgrade of the cluster, which will take some time. Once th
 - [CFT repo](https://github.com/hmcts/aks-cft-deploy/blob/main/environments/aks/demo.tfvars#L3)
 
 We do this upgrade manually in the portal because it means we don't have terraform state issues when the upgrade times out if there was a failure due to failing pods or some other reason.
-  * Note: The kubernetes_version value only takes major version values, i.e 1.25, 1.26 and so on.
+
+* Note: The `kubernetes_version` value only takes major version values, i.e 1.25, 1.26 and so on.
 
 Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are updating to have terraform update the state
 - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)

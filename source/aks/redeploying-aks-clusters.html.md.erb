@@ -44,10 +44,15 @@ Three files will be saved in the directory from which you are running the above 
 - For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
 
 ## Common Upgrade Steps
+
 The upgrade process begins by removing the cluster you are going to upgrade from the application gateway. 
+
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
-Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+
+Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
+
+[portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
@@ -66,17 +71,21 @@ See [Jenkins instances](/jenkins/) to check they are running after upgrades.
 
 ## Upgrading the Cluster
 
-Find the cluster you want to upgrade into the portal. Cluster Configuration > Upgrade Version > in the Kubernetes version drop down menu choose the latest GA version > Click Save
+Find the cluster you want to upgrade into the portal.
+
+Cluster Configuration > Upgrade Version > in the Kubernetes version drop down menu choose the latest GA version > Click Save
 
 This will trigger the upgrade of the cluster, which will take some time. Once this has finished you need to create a pull request to update the code to match.
+
 - [SDS repo](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/ptlsbox.tfvars#L3)
 - [CFT repo](https://github.com/hmcts/aks-cft-deploy/blob/main/environments/aks/demo.tfvars#L3)
 
 We do this upgrade manually in the portal because it means we don't have terraform state issues when the upgrade times out if there was a failure due to failing pods or some other reason.
 
-* Note: The `kubernetes_version` value only takes major version values, i.e 1.25, 1.26 and so on.
+<%= warning_text('The <code>kubernetes_version</code> value only takes major version values, i.e 1.25, 1.26 and so on.') %>
 
-Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are updating to have terraform update the state
+Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are updating to have terraform update the state:
+
 - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
 
@@ -94,6 +103,7 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 When re-building a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
 
 To re-build the cluster you need to run the pipeline:
+
   - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
   - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 
@@ -109,15 +119,16 @@ We have the ability to create another preview cluster on demand. We do not run w
 #### When the build has finished
 
 - Check the system helm releases and pods are up in the namespaces: flux-system, kube-system, admin
-- Check an external IP has been assigned: kubectl get svc traefik -n admin
+- Check an external IP has been assigned: `kubectl get svc traefik -n admin`
 
 #### How to test a specific Preview cluster without swapping over
-Change the plum service as per the [PR cnp-plum-recipe-service](https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files), do not merge it in, but instead check in Jenkins that the pipeline run has completed without any issues.
 
-[cnp-jenkins-library](https://github.com/hmcts/cnp-jenkins-library/compare/preview01?expand=1)
+Create a branch of the Jenkins library that forces Jenkins to use the cluster that you want to use.
+See this [commit](https://github.com/hmcts/cnp-jenkins-library/commit/a64cfe6919da522780e5cfb1cb4804dd6fa3675a) as an example.
+Do not use an existing branch as it may be missing changes that are required for the preview cluster to work.
 
-This will simulate a repo/setup is using the Preview cluster that has not been swapped, useful to test if required.
-Same PR might not be re-usable when the cluster is swapped to active as DNS record could be invalid. You can verify and manually tweak the records to be able to reuse it.
+Change the plum Jenkinsfile to use the Jenkins library branch you created, [example](https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files), do not merge it in, but instead check in Jenkins that the pipeline run has completed without any issues.
+
 #### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .

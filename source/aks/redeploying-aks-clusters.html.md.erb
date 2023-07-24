@@ -62,7 +62,7 @@ See [Jenkins instances](/jenkins/) to check they are running after upgrades.
 
 ## Upgrading the Cluster
 
-Find the cluster you want to upgrade into the portal > Cluster Configuration > Upgrade Version > in the Kubernetes version drop down menu choose the latest GA version > Click Save
+Find the cluster you want to upgrade into the portal. Cluster Configuration > Upgrade Version > in the Kubernetes version drop down menu choose the latest GA version > Click Save
 
 This will trigger the upgrade of the cluster, which will take some time. Once this has finished you need to create a PR in the [SDS repo](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/aks/ptlsbox.tfvars#L3) / [CFT repo](https://github.com/hmcts/aks-cft-deploy/blob/main/environments/aks/demo.tfvars#L3) changing the kubernetes_version value
   * Note: The kubernetes_version value only takes major version values, i.e 1.25, 1.26 and so on.

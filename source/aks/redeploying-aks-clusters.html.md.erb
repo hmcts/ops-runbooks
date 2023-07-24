@@ -43,9 +43,10 @@ Three files will be saved in the directory from which you are running the above 
 
 - For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
 
-- The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+## Common Upgrade Steps
+The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
-##  Environment specifics
+##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 
 ### Ptlsbox, Ptl
@@ -87,6 +88,17 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 
 <%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
 
+When redeploying a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
+
+To re-build the cluster you need to run the pipeline:
+  - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+  - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
+
+Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu. 
+
+Click on **Run** to start the pipeline.
+
+##  Environment Specific Re-builds
 ### Preview
 
 We have the ability to create another preview cluster on demand. We do not run with two at a time as they are 75 node clusters and that would be quite expensive. Announce preview cluster swap a day in advance in the #cloud-native-announce channel
@@ -95,7 +107,6 @@ We have the ability to create another preview cluster on demand. We do not run w
 
 - Check the system helm releases and pods are up in the namespaces: flux-system, kube-system, admin
 - Check an external IP has been assigned: kubectl get svc traefik -n admin
-- Check OSBA is running, kubectl get pods -n osba, kubectl get pods -n catalog
 
 #### How to test a specific Preview cluster without swapping over
 Change the plum service as per the [PR cnp-plum-recipe-service](https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files), do not merge it in, but instead check in Jenkins that the pipeline run has completed without any issues.
@@ -193,16 +204,6 @@ Scaling to happen just before a cluster has been removed from AGW.
 
 #### After deployment of a cluster
 - Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
-
-## To re-create a cluster:
-
-When redeploying a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
-
-Go to the [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)/ [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482). 
-
-Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to which ever one you want to build and that the environment is selected from the drop down menu. 
-
-Click on **Run** to start the pipeline.
 
 ## Known issues
 

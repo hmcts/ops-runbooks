@@ -46,7 +46,7 @@ Three files will be saved in the directory from which you are running the above 
 - The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
 ##  Environment specifics
-Some environments do have some additional requirements/checks that need to be confirmed prior to upgrading any of its clusters.
+Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 
 ### Ptlsbox, Ptl
 

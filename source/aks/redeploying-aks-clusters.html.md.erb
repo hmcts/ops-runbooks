@@ -44,7 +44,10 @@ Three files will be saved in the directory from which you are running the above 
 - For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade
 
 ## Common Upgrade Steps
-The upgrade process begins by removing the cluster you are going to upgrade from the AGW. [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files); Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+The upgrade process begins by removing the cluster you are going to upgrade from the application gateway. 
+  - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
+  - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
+Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer, by going into the portal > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
@@ -88,7 +91,7 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 
 <%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
 
-When redeploying a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
+When re-building a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
 
 To re-build the cluster you need to run the pipeline:
   - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
@@ -189,7 +192,7 @@ Scaling to happen just before a cluster has been removed from AGW.
 - Merge PR to remove a cluster from AGW
 
 #### After deployment of a cluster
-- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595) / [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
 - Revert merge for scaling pods & merge [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7245)
 - Confirm pods are back to correct numbers after revert
 

@@ -33,7 +33,7 @@ kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all
 
 Three files will be saved in the directory from which you are running the above command. 
 
-- Investigate failed helm releases and pods in CrashLoopBackOff Status. Check if these pods have pod disruption budgets 
+- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. Check if these pods have pod disruption budgets 
 
 ```command
 kubectl get pdb -A

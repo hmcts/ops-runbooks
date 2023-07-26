@@ -382,7 +382,12 @@
 </code></pre></div><p>Three files will be saved in the directory from which you are running the above command.</p>
 
 <ul>
-<li><p>Investigate failed helm releases and missing pods as required</p></li>
+<li>Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. Check if these pods have pod disruption budgets </li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pdb -A
+</code></pre></div>
+<ul>
+<li><p>If there is a pod disruption budget associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade.</p></li>
 <li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release)</p></li>
 <li><p>For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</p></li>
 <li><p>For pods where images beginning with <em>pr-</em> are not found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this <a href="https://github.com/hmcts/cnp-flux-config/pull/17115/files">one</a> done previously.</p></li>

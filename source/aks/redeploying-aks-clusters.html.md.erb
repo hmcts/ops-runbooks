@@ -33,7 +33,12 @@ kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all
 
 Three files will be saved in the directory from which you are running the above command. 
 
-- Investigate failed helm releases and missing pods as required
+- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. Check if these pods have pod disruption budgets 
+
+```command
+kubectl get pdb -A
+```
+- If there is a pod disruption budget associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade.
 
 - For failed helm releases where pods are not deployed, test if rolling back to a previous release `helm rollback` is possible (which helps narrow down issue being specific to current release) 
 

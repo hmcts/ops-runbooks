@@ -5,7 +5,24 @@ weight: 20
 
 # <%= current_page.data.title %>
 
-Known issues encountered during AKS cluster update or rebuild
+Known issues encountered during AKS cluster upgrade or rebuild
+
+## One or more nodes has failed to upgrade
+
+You can track the progress of the upgrade by running 
+
+```bash
+kubectl get nodes
+```
+
+Eventually all nodes will show as running the intended version, in some cases however, one or more nodes may be stuck on the old AKS version, which will block the upgrade. This happens when a given node is unable to be drained before an upgrade, the most likely cause of which is a broken application.
+
+To diagnose why a node has failed to upgrade, head to the AKS cluster in the Azure portal. Navigate to Node Pools > Linux/System/Other > Nodes > Stuck Node Name > Events. From here you will likely see a failed eviction and a reason why - after which you can troubleshoot further with the relevant team / application to unblock the node draining process. If the cluster is in a failed state, or no longer shows as updating in the portal, you will need to hit the update button again.
+
+## Quota limit reached
+
+You may encounter a quota limit during an AKS upgrade due to the provisioning of new nodes during the process. Generally, you can increase these quotas yourself [in the portal](https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade/~/myQuotas) - by selecting the subscription that the AKS cluster is part of, and increasing the Compute quota to the recommended level.
+
 
 ## DaemonSet Failed Scheduling
 

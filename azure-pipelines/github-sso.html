@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Deleting a case from CCD Datastore Database - HMCTS</title>
+    <title>GitHub Single Sign On - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/deleting-cases-from-ccd-datastore.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/azure-pipelines/github-sso.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Deleting a case from CCD Datastore Database - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/deleting-cases-from-ccd-datastore.html" />
+      <meta name="twitter:title" content="GitHub Single Sign On - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/azure-pipelines/github-sso.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Deleting a case from CCD Datastore Database" />
+      <meta property="og:title" content="GitHub Single Sign On" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/deleting-cases-from-ccd-datastore.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/azure-pipelines/github-sso.html" />
 
     
   </head>
@@ -366,89 +366,27 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="deleting-a-case-from-ccd-datastore-database">Deleting a case from CCD Datastore Database</h1>
-<p>This is a 2-stage process that requires you delete the case from the database first and then ssh to the Elastic Search VM to delete the same. Please ensure you have a valid ServiceNow Change Request to do so.</p>
-<h3 id="1-identify-case-in-ccd-data-store-database-ccd-data-store-api-postgres-db-v11-prod-postgres-database-azure-com-and-delete">1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete</h3>
-<p>Hop on to the bastion and run the script below.</p>
-<p>The script calls an external .txt file which contains a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c">#!/bin/bash</span>
-
-<span class="c">## BULK Deletes in CCD Data Store DB</span>
-
-<span class="c">#vARS</span>
-<span class="nv">DB_HOST</span><span class="o">=</span>ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com
-<span class="nv">DB_USER</span><span class="o">=</span><span class="s2">"DTS</span><span class="se">\ </span><span class="s2">Platform</span><span class="se">\ </span><span class="s2">Operations</span><span class="se">\ </span><span class="s2">SC@ccd-data-store-api-postgres-db-v11-prod"</span>
-<span class="nv">DB_NAME</span><span class="o">=</span>ccd_data_store
-<span class="nv">PGPASSWORD</span><span class="o">=</span><span class="si">$(</span>az account get-access-token <span class="nt">--resource-type</span> oss-rdbms <span class="nt">--query</span> accessToken <span class="nt">-o</span> tsv<span class="si">)</span>
-
-
-        <span class="c">#referenceid=1594642772192927;</span>
-        <span class="k">for </span>referenceid <span class="k">in</span> <span class="sb">`</span><span class="nb">cat </span>list_of_CaseReference.txt<span class="sb">`</span><span class="p">;</span>
-
-            <span class="k">do
-
-                </span><span class="nv">QUERY</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
-
-                        BEGIN;
-                            DELETE FROM case_users_audit WHERE case_data_id = (SELECT id FROM case_data WHERE reference = (</span><span class="nv">$referenceid</span><span class="sh">));
-                            DELETE FROM case_users WHERE case_data_id = (SELECT id FROM case_data WHERE reference = (</span><span class="nv">$referenceid</span><span class="sh">));
-                            DELETE FROM case_event_significant_items WHERE case_event_id IN (SELECT id FROM case_event WHERE case_data_id IN (SELECT id FROM case_data WHERE reference = (</span><span class="nv">$referenceid</span><span class="sh">)));
-                            DELETE FROM case_event WHERE case_data_id = (SELECT id FROM case_data WHERE reference = (</span><span class="nv">$referenceid</span><span class="sh">));
-                            DELETE FROM case_data WHERE reference = (</span><span class="nv">$referenceid</span><span class="sh">);
-                        COMMIT;
-</span><span class="no">
-                EOF
-</span>                  <span class="si">)</span>
-
-<span class="c"># Run above query</span>
-psql <span class="s2">"sslmode=require host=</span><span class="k">${</span><span class="nv">DB_HOST</span><span class="k">}</span><span class="s2"> dbname=</span><span class="k">${</span><span class="nv">DB_NAME</span><span class="k">}</span><span class="s2"> user=</span><span class="k">${</span><span class="nv">DB_USER</span><span class="k">}</span><span class="s2"> port=5432 password=</span><span class="k">${</span><span class="nv">PGPASSWORD</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-c</span> <span class="s2">"</span><span class="k">${</span><span class="nv">QUERY</span><span class="k">}</span><span class="s2">"</span>
-
-          <span class="k">done</span>
-</code></pre></div><h3 id="2-on-the-elastic-search-vm-execute-the-script-below-using-the-16-digit-reference-to-identify-the-case">2. On the Elastic Search VM, execute the script below using the <code>16-digit reference</code> to identify the Case</h3>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c">#!/bin/bash</span>
-
-<span class="nv">QUERY</span><span class="o">=</span><span class="si">$(</span>jq <span class="nt">-n</span> <span class="se">\</span>
-<span class="nt">--arg</span> my_val <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span> <span class="se">\</span>
-<span class="s1">'
-{
-  query:{
-    bool:{
-      filter:{
-        term:{
-          "reference.keyword":$my_val
-        }
-      }
-    }
-  }
-}
-'</span><span class="si">)</span>
-
-<span class="nv">RESULT</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> <span class="nt">-X</span> GET <span class="s1">'localhost:9200/_search?pretty'</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="nt">-d</span> <span class="s2">"</span><span class="k">${</span><span class="nv">QUERY</span><span class="k">}</span><span class="s2">"</span><span class="si">)</span>
-
-<span class="nv">CASE_ID</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$RESULT</span><span class="s2">"</span> | jq <span class="nt">-r</span> <span class="s1">'.hits.hits[0]._id'</span><span class="si">)</span>
-<span class="nv">INDEX_ID</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$RESULT</span><span class="s2">"</span> | jq <span class="nt">-r</span> <span class="s1">'.hits.hits[0]._source.index_id'</span><span class="si">)</span>
-
-<span class="nb">echo</span> <span class="s2">"Case ID: </span><span class="nv">$CASE_ID</span><span class="s2">, Index ID: </span><span class="nv">$INDEX_ID</span><span class="s2">"</span>
-
-<span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$INDEX_ID</span><span class="s2">"</span> <span class="o">!=</span> <span class="s2">"null"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
-  </span><span class="nv">CASE</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> <span class="nt">-X</span> GET <span class="s2">"localhost:9200/</span><span class="nv">$INDEX_ID</span><span class="s2">/_doc/</span><span class="nv">$CASE_ID</span><span class="s2">"</span> | jq .<span class="si">)</span>
-  curl <span class="nt">-s</span> <span class="nt">-X</span> DELETE <span class="s2">"localhost:9200/</span><span class="nv">$INDEX_ID</span><span class="s2">/_doc/</span><span class="nv">$CASE_ID</span><span class="s2">"</span> | jq <span class="nb">.</span>
-
-<span class="k">else
-  </span><span class="nb">date
-  echo</span> <span class="s2">"No valid index was found."</span>
-<span class="k">fi</span>
-</code></pre></div><p>e.g.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  ./find_case_id_by_reference.sh `&lt;16-digit reference&gt;`
-</code></pre></div><p>and follow the screen prompt</p>
+            <h1 id="github-single-sign-on">GitHub Single Sign On</h1>
+<p>Azure pipelines may sometimes be required to perform an action in GitHub, for example, creating a new release as is the case with <a href="https://github.com/hmcts/jenkins-packer">hmcts/jenkins-packer</a>.</p>
+<p>Because we utilise single sign on (SSO) to GitHub with our Azure Active Directory, personal access tokens (PATs) must be authorised with SSO.</p>
+<h2 id="why-is-this-important">Why is this important?</h2>
+<p>You may come across an error in an Azure Pipeline like the following:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>##[error]Error: Resource protected by organization SAML enforcement. You must grant your Personal Access token access to this organization.
+</code></pre></div><p>If you do get this error, this means you need to authorise the PAT for use with SSO.</p>
+<p>GitHub have an official guide on how to do this which can be found <a href="https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on">here</a>.</p>
+<h2 id="which-account-are-pats-created-under">Which account are PATs created under?</h2>
+<p>We have a central account that we use to create PATs that will be used by multiple pipelines within the Azure DevOps organisation.</p>
+<p>The sign in details for this account can be found in the <code>rpe-prod</code> Azure Key Vault.</p>
+<p>Search for <code>github-bot-owner-sso</code> and you will find the relevant details.</p>
+<p>Once you get signed into GitHub with this account, follow the linked procedure for authorising PATs and the error should be corrected.</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/deleting-cases-from-ccd-datastore.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Deleting+a+case+from+CCD+Datastore+Database%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Fdeleting-cases-from-ccd-datastore.html%29&amp;labels=bug&amp;title=Re%3A+%27Deleting+a+case+from+CCD+Datastore+Database%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/azure-pipelines/github-sso.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27GitHub+Single+Sign+On%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fazure-pipelines%2Fgithub-sso.html%29&amp;labels=bug&amp;title=Re%3A+%27GitHub+Single+Sign+On%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

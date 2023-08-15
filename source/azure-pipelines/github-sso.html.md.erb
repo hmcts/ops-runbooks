@@ -1,0 +1,32 @@
+---
+title: GitHub Single Sign On
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Azure pipelines may sometimes be required to perform an action in GitHub, for example, creating a new release as is the case with [hmcts/jenkins-packer](https://github.com/hmcts/jenkins-packer).
+
+Because we utilise single sign on (SSO) to GitHub with our Azure Active Directory, personal access tokens (PATs) must be authorised with SSO.
+
+## Why is this important?
+
+You may come across an error in an Azure Pipeline like the following:
+
+```
+##[error]Error: Resource protected by organization SAML enforcement. You must grant your Personal Access token access to this organization.
+```
+
+If you do get this error, this means you need to authorise the PAT for use with SSO.
+
+GitHub have an official guide on how to do this which can be found [here](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
+
+## Which account are PATs created under?
+
+We have a central account that we use to create PATs that will be used by multiple pipelines within the Azure DevOps organisation.
+
+The sign in details for this account can be found in the `rpe-prod` Azure Key Vault.
+
+Search for `github-bot-owner-sso` and you will find the relevant details.
+
+Once you get signed into GitHub with this account, follow the linked procedure for authorising PATs and the error should be corrected.

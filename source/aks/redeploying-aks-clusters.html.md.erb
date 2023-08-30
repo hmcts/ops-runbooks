@@ -116,8 +116,9 @@ Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure tha
 
 Click on **Run** to start the pipeline.
 
-When cluster is rebuild, make sure Issuer URL is updated for specific cluster in [cnp-flux-config](https://github.com/hmcts/cnp-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13). 
+When cluster is rebuild, make sure Issuer URL is updated for specific cluster in [cnp-flux-config](https://github.com/hmcts/cnp-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13) and in [sds-flux-config](https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13)
 Issuer URL can be obtained using `az aks show -n myAKSCluster -g myResourceGroup --query "oidcIssuerProfile.issuerUrl" -otsv`
+e.g. `az aks show -n ss-SBOX-00-aks -g ss-SBOX-00-rg --subscription DTS-SHAREDSERVICES-SBOX --query "oidcIssuerProfile.issuerUrl" -otsv`
 
 ##  Environment Specific Re-builds
 ### Preview

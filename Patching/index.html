@@ -524,7 +524,31 @@ rm -rf rhui-rhel-7-server-rhui-eus-supplementary-rpms
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>yum clean all
 yum repolist enabled
 yum updateinfo list
-</code></pre></div>
+</code></pre></div><h3 id="errors">Errors</h3>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>Transaction check error:
+  file /etc/cron.daily/rhui-update-client from install of rhui-azure-rhel7-2.2-606.noarch conflicts with file from package rhui-azure-rhel7-eus-2.2-491.noarch
+Error Summary
+-------------
+</code></pre></div><p>The file might have a different title, but the fix is the same. To resolve the above delete the offending file with:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>yum remove rhui-azure-rhel7-eus-2.2-491.noarch
+</code></pre></div><div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>Transaction check error:
+  installing package clamav-data-0.103.9-1.el7.noarch needs 17MB on the /var filesystem
+Error Summary
+-------------
+Disk Requirements:
+  At least 17MB more space needed on the /var filesystem.
+</code></pre></div><p>To clean up some disk space try the following:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>cd /var/opt/microsoft/omsconfig
+cat /dev/null &gt; omsconfigdetailed.log
+cat /dev/null &gt; omsconfig.log
+</code></pre></div><h3 id="high-cpu-or-memory">High CPU or memory</h3>
+<p>To see which processes are using the most CPU/Memory run</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>top
+ps -ef |grep aide
+</code></pre></div><p>which will return a list of the aide processes. If CPU/ Memory usage is very high try terminating some of the aide processes by taking the PID Numbers from the list and running the below</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kill -9 1211 2376
+</code></pre></div><p>where the numbers are the PIDs, replace as required.</p>
+
             
           </main>
 

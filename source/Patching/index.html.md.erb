@@ -241,3 +241,51 @@ yum clean all
 yum repolist enabled
 yum updateinfo list
 ```
+
+### Errors
+
+```
+Transaction check error:
+  file /etc/cron.daily/rhui-update-client from install of rhui-azure-rhel7-2.2-606.noarch conflicts with file from package rhui-azure-rhel7-eus-2.2-491.noarch
+Error Summary
+-------------
+```
+
+The file might have a different title, but the fix is the same. To resolve the above delete the offending file with:
+
+```command
+yum remove rhui-azure-rhel7-eus-2.2-491.noarch
+```
+
+```
+Transaction check error:
+  installing package clamav-data-0.103.9-1.el7.noarch needs 17MB on the /var filesystem
+Error Summary
+-------------
+Disk Requirements:
+  At least 17MB more space needed on the /var filesystem.
+```
+
+To clean up some disk space try the following:
+
+```command
+cd /var/opt/microsoft/omsconfig
+cat /dev/null > omsconfigdetailed.log
+cat /dev/null > omsconfig.log
+```
+
+### High CPU or memory 
+
+To see which processes are using the most CPU/Memory run
+
+```command
+top
+ps -ef |grep aide
+```
+which will return a list of the aide processes. If CPU/ Memory usage is very high try terminating some of the aide processes by taking the PID Numbers from the list and running the below
+
+```command
+kill -9 1211 2376
+```
+
+where the numbers are the PIDs, replace as required.

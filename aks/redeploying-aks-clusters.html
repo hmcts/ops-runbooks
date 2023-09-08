@@ -467,6 +467,15 @@ See <a href="/jenkins/">Jenkins instances</a> to check they are running after up
   <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
   <strong class="govuk-warning-text__text">
     <span class="govuk-warning-text__assistive">Warning</span>
+    When cluster is rebuilt, make sure Issuer URL is updated for specific cluster in <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13">cnp-flux-config</a> and in <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13)">sds-flux-config</a>.
+  </strong>
+</div>
+<p>The issuer URL can be obtained using <code>az aks show -n myAKSCluster -g myResourceGroup --query &quot;oidcIssuerProfile.issuerUrl&quot; -otsv</code></p>
+
+<div class="govuk-warning-text">
+  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+  <strong class="govuk-warning-text__text">
+    <span class="govuk-warning-text__assistive">Warning</span>
     Re-building a cluster is only done when absolutely necessary.
   </strong>
 </div>
@@ -479,9 +488,6 @@ See <a href="/jenkins/">Jenkins instances</a> to check they are running after up
 </ul>
 <p>Click on <strong>Run pipeline</strong> (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.</p>
 <p>Click on <strong>Run</strong> to start the pipeline.</p>
-<p>When cluster is rebuild, make sure Issuer URL is updated for specific cluster in <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13">cnp-flux-config</a> and in <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13">sds-flux-config</a>
-Issuer URL can be obtained using <code>az aks show -n myAKSCluster -g myResourceGroup --query &quot;oidcIssuerProfile.issuerUrl&quot; -otsv</code>
-e.g. <code>az aks show -n ss-SBOX-00-aks -g ss-SBOX-00-rg --subscription DTS-SHAREDSERVICES-SBOX --query &quot;oidcIssuerProfile.issuerUrl&quot; -otsv</code></p>
 <h2 id="environment-specific-re-builds">Environment Specific Re-builds</h2>
 <h3 id="preview">Preview</h3>
 <p>We have the ability to create another preview cluster on demand. We do not run with two at a time as they are 75 node clusters and that would be quite expensive. Announce preview cluster swap a day in advance in the #cloud-native-announce channel</p>

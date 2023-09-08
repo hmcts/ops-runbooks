@@ -123,7 +123,7 @@
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
   </li>
   <li>
-    <a href="../aks/redeploying-aks-clusters.html"><span>Updating AKS Clusters</span></a>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
@@ -367,7 +367,14 @@
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="aks-known-issues">AKS Known Issues</h1>
-<p>Known issues encountered during AKS cluster update or rebuild</p>
+<p>Known issues encountered during AKS cluster upgrade or rebuild</p>
+<h2 id="one-or-more-nodes-has-failed-to-upgrade">One or more nodes has failed to upgrade</h2>
+<p>You can track the progress of the upgrade by running</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get nodes
+</code></pre></div><p>Eventually all nodes will show as running the intended version, in some cases however, one or more nodes may be stuck on the old AKS version, which will block the upgrade. This happens when a given node is unable to be drained before an upgrade, the most likely cause of which is a broken application.</p>
+<p>To diagnose why a node has failed to upgrade, head to the AKS cluster in the Azure portal. Navigate to Node Pools &gt; Linux/System/Other &gt; Nodes &gt; Stuck Node Name &gt; Events. From here you will likely see a failed eviction and a reason why - after which you can troubleshoot further with the relevant team / application to unblock the node draining process. If the cluster is in a failed state, or no longer shows as updating in the portal, you will need to hit the update button again.</p>
+<h2 id="quota-limit-reached">Quota limit reached</h2>
+<p>You may encounter a quota limit during an AKS upgrade due to the provisioning of new nodes during the process. Generally, you can increase these quotas yourself <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade/~/myQuotas">in the portal</a> - by selecting the subscription that the AKS cluster is part of, and increasing the Compute quota to the recommended level.</p>
 <h2 id="daemonset-failed-scheduling">DaemonSet Failed Scheduling</h2>
 <p>For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.</p>
 <p>An error similar to the below may be seen in the cluster events log:</p>

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Updating AKS Clusters - HMCTS</title>
+    <title>Upgrading AKS Clusters - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
@@ -14,12 +14,12 @@
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Updating AKS Clusters - HMCTS" />
+      <meta name="twitter:title" content="Upgrading AKS Clusters - HMCTS" />
       <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/redeploying-aks-clusters.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Updating AKS Clusters" />
+      <meta property="og:title" content="Upgrading AKS Clusters" />
       <meta property="og:type" content="object" />
       <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/redeploying-aks-clusters.html" />
 
@@ -123,7 +123,7 @@
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
   </li>
   <li>
-    <a href="../aks/redeploying-aks-clusters.html"><span>Updating AKS Clusters</span></a>
+    <a href="../aks/redeploying-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
@@ -366,10 +366,10 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="updating-aks-clusters">Updating AKS Clusters</h1>
-<p>This run book documents some tasks that we have to perform when updating any of the AKS Clusters</p>
-<h2 id="cluster-order-of-updating">Cluster Order of Updating</h2>
-<p>This is the normal order we use when updating clusters, it does not have to exactly follow it:</p>
+            <h1 id="upgrading-aks-clusters">Upgrading AKS Clusters</h1>
+<p>This run book documents some tasks that we have to perform when upgrading any of the AKS Clusters</p>
+<h2 id="cluster-order-of-upgrading">Cluster Order of Upgrading</h2>
+<p>This is the normal order we use when upgrading clusters, it does not have to exactly follow it:</p>
 
 <ul>
 <li>Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)</li>
@@ -444,13 +444,23 @@ See <a href="/jenkins/">Jenkins instances</a> to check they are running after up
     The <code>kubernetes_version</code> value only takes major version values, i.e 1.25, 1.26 and so on.
   </strong>
 </div>
-<p>Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are updating to have terraform update the state:</p>
+<p>Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are upgrading to have terraform update the state:</p>
 
 <ul>
 <li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482">SDS Pipeline</a></li>
 <li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">CFT Pipeline</a></li>
 </ul>
 <p>Once completed compare the <code>hrs</code> and pods statuses with the ones you saved before the upgrade took place.</p>
+
+<div class="govuk-warning-text">
+  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+  <strong class="govuk-warning-text__text">
+    <span class="govuk-warning-text__assistive">Warning</span>
+    Issues during an AKS Upgrade
+  </strong>
+</div>
+<p><a href="known-issues.html">Troublehsooting upgrade failures</a></p>
+<p>If a cluster is in a failed state and you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.</p>
 <h2 id="after-upgrading-of-a-cluster">After upgrading of a cluster</h2>
 
 <ul>
@@ -617,7 +627,7 @@ Reason for this CCD and IDAM will auto-scale the number of running pods when a c
           <aside>
               <ul class="contribution-banner">
                 <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/redeploying-aks-clusters.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Updating+AKS+Clusters%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fredeploying-aks-clusters.html%29&amp;labels=bug&amp;title=Re%3A+%27Updating+AKS+Clusters%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Upgrading+AKS+Clusters%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fredeploying-aks-clusters.html%29&amp;labels=bug&amp;title=Re%3A+%27Upgrading+AKS+Clusters%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

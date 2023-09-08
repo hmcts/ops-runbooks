@@ -1,15 +1,15 @@
 ---
-title: Updating AKS Clusters
+title: Upgrading AKS Clusters
 weight: 30
 ---
 
 # <%= current_page.data.title %>
 
-This run book documents some tasks that we have to perform when updating any of the AKS Clusters
+This run book documents some tasks that we have to perform when upgrading any of the AKS Clusters
 
-## Cluster Order of Updating
+## Cluster Order of Upgrading
 
-This is the normal order we use when updating clusters, it does not have to exactly follow it:
+This is the normal order we use when upgrading clusters, it does not have to exactly follow it:
 
 - Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
 - Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)
@@ -89,12 +89,17 @@ We do this upgrade manually in the portal because it means we don't have terrafo
 
 <%= warning_text('The <code>kubernetes_version</code> value only takes major version values, i.e 1.25, 1.26 and so on.') %>
 
-Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are updating to have terraform update the state:
+Once the changes have been reviewed, approved and merged, run the pipeline for the environment you are upgrading to have terraform update the state:
 
 - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
 
 Once completed compare the `hrs` and pods statuses with the ones you saved before the upgrade took place.
+
+<%= warning_text('Issues during an AKS Upgrade')%>
+[Troublehsooting upgrade failures](known-issues.html)
+
+If a cluster is in a failed state and you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.
 
 ## After upgrading of a cluster
 - Add the cluster back into the application gateway once you have confirmed the upgrade has been successful.

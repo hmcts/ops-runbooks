@@ -108,10 +108,6 @@ If a cluster is in a failed state and you are unable to complete the cluster upg
 
 ## Re-building a cluster
 
-<%= warning_text('When cluster is rebuilt, make sure Issuer URL is updated for specific cluster in <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13">cnp-flux-config</a> and in <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/00/kustomize.yaml#L13)">sds-flux-config</a>.') %>
-The issuer URL can be obtained using `az aks show -n myAKSCluster -g myResourceGroup --query "oidcIssuerProfile.issuerUrl" -otsv`
-
-
 <%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
 When re-building a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
 

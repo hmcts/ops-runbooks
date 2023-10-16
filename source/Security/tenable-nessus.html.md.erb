@@ -46,8 +46,7 @@ The agent is deployed using terraform bootstrap module  [terraform-module-vm-boo
 
 #### Steps to setup deployment:
 
-- Call the terraform-bootstrap-module from the [oracle-azure-infrastructure-terraform-modules](https://github.com/hmcts/oracle-azure-infrastructure-terraform-modules) , a working sample code has been provided below 
-
+- Call the terraform-bootstrap-module from the [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap)
 ```
 module "vm-bootstrap" {
   count  = var.install_splunk_uf == true || var.nessus_install == true ? var.vm_count : 0

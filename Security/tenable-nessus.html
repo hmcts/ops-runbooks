@@ -397,13 +397,13 @@ resource group.</p>
 <h4 id="steps-to-setup-deployment">Steps to setup deployment:</h4>
 
 <ul>
-<li>Call the terraform-bootstrap-module from the <a href="https://github.com/hmcts/oracle-azure-infrastructure-terraform-modules">oracle-azure-infrastructure-terraform-modules</a> , a working sample code has been provided below </li>
+<li>Call the terraform-bootstrap-module from the <a href="https://github.com/hmcts/terraform-module-vm-bootstrap">terraform-module-vm-bootstrap</a>
+&ldquo;`
+module &quot;vm-bootstrap&rdquo; {
+count  = var.install_splunk_uf == true || var.nessus_install == true ? var.vm_count : 0
+source = &ldquo;git::https://github.com/hmcts/terraform-module-vm-bootstrap.git?ref=master&rdquo;</li>
 </ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>module "vm-bootstrap" {
-  count  = var.install_splunk_uf == true || var.nessus_install == true ? var.vm_count : 0
-  source = "git::https://github.com/hmcts/terraform-module-vm-bootstrap.git?ref=master"
-
-  virtual_machine_type         = "vm"
+<p>virtual_machine_type         = &ldquo;vm&rdquo;
   virtual_machine_id           = azurerm_virtual_machine.general_purpose_vm[count.index].id
   os_type                      = local.os_type
   nessus_server                = var.nessus_server
@@ -412,7 +412,8 @@ resource group.</p>
   install_dynatrace_oneagent   = false
   install_azure_monitor        = false
 }
-</code></pre></div>
+&ldquo;`</p>
+
 <ul>
 <li>Add all the required variables </li>
 </ul>

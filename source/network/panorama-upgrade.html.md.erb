@@ -1,29 +1,29 @@
 ---
 title: Panorama - Software Updates
 weight: 100
-last_reviewed_on: 2023-08-05
+last_reviewed_on: 2023-10-17
 review_in: 4 months
 ---
 # <%= current_page.data.title %>
 
-The current Panorama, Log Collectors and Firewall version is `10.1.5-h1`, `h` stands for Hotfix.
+The current Panorama, Log Collectors and Firewall version is `11.0.2`.
 We aim to be as close as possible with Palo Alto software releases on both the Panorama management servers and the firewall servers.
 
 ### Current Estate
 We have infrastructure in UKSouth listed below
-- 2 `sbox` Panorama servers in Panorama mode (1 in each region)
-- 4 `prod` Panorama servers in HA mode (2 in each region)
-- 2 Log collectors (1 in each region)
+- 1 `sbox` Panorama servers in Panorama mode (1 in UKSouth)
+- 2 `prod` Panorama servers in HA mode (in UKSouth)
+- 1 Log collector (in UKSouth)
 
 ### Update Process
 To update the Panorama servers is straight forward and there are already documented steps to 
-follow in the [Upgrade Panorama with an Internet Connection](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-internet-connection) documentation.
+follow in the [Upgrade Panorama with an Internet Connection](https://docs.paloaltonetworks.com/pan-os/11-0/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-internet-connection) documentation.
 
-For the prod Panorama's in HA mode please follow the [Upgrade Panorama in an HA Configuration](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-ha-configuration) guide.
+For the prod Panorama's in HA mode please follow the [Upgrade Panorama in an HA Configuration](https://docs.paloaltonetworks.com/pan-os/11-0/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-ha-configuration) guide.
 
 ### Updates via Panorama
-There is an extensive guide, [Deploy Upgrades to Firewalls, Log Collectors, and WildFire Appliances Using Panorama](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama) with steps 
-on how to use Panorama to update other resources and the [Firewalls](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama/upgrade-firewalls-when-panorama-is-internet-connected#id7434b9a4-90ca-4842-a5db-2afb4033753a).
+There is an extensive guide, [Deploy Upgrades to Firewalls, Log Collectors, and WildFire Appliances Using Panorama](https://docs.paloaltonetworks.com/pan-os/11-0/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama) with steps 
+on how to use Panorama to update other resources and the [Firewalls](https://docs.paloaltonetworks.com/pan-os/11-0/pan-os-upgrade/upgrade-panorama/deploy-updates-to-firewalls-log-collectors-and-wildfire-appliances-using-panorama/upgrade-firewalls-when-panorama-is-internet-connected).
 
 Log in details for UKSouth Panorama management servers requires only your HMCTS account as SSO has been setup, if you need elevated privileges e.g. to reboot the vm then log in using the admin details mentioned below.
 

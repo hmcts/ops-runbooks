@@ -384,24 +384,56 @@
 </ul>
 <h2 id="pods-and-hrs-health-checks">Pods and HRs Health Checks</h2>
 <p>Put a message out into the #cloud-native-announce channel to notify people which cluster will be upgraded (do not use @here as this is a notification not an announcement).</p>
-<p>Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:</p>
+<p>Ensure your logged into the correct cluster.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl config current-context
+</code></pre></div><p>Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -A | wc -l &gt; pods_total_count &amp;&amp; kubectl get pods -A &gt; pods_all_status &amp;&amp; kubectl get pods -A | awk '!/(Running|Succeeded)/' &gt; pods_not_running_or_succeeded &amp;&amp; kubectl get hr -A &gt; hr_all_status
-</code></pre></div><p>Three files will be saved in the directory from which you are running the above command.</p>
+</code></pre></div><p>Three files will be saved in the directory from which you are running the above command and &ldquo;ll&rdquo; in the cli to display the files.</p>
 
 <ul>
-<li>Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. Check if these pods have pod disruption budgets </li>
+<li>Check if pluto needs updating on the cluster</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pluto detect-helm -owide --target-versions k8s=v1.26 --only-show-removed
+</code></pre></div>
+<ul>
+<li>Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. </li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get helm --all-namespaces / kubectl get pods --all-namespaces
+</code></pre></div>
+<ul>
+<li>Check if these pods have pod disruption budgets </li>
 </ul>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pdb -A
 </code></pre></div>
 <ul>
 <li><p>If there is a pod disruption budget associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade.</p></li>
-<li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous release <code>helm rollback</code> is possible (which helps narrow down issue being specific to current release)</p></li>
-<li><p>For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</p></li>
-<li><p>For pods where images beginning with <em>pr-</em> are not found (has been seen quite a few times on previous cluster rebuilds) this is often due to the image no longer existing in the ACR. In these instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this <a href="https://github.com/hmcts/cnp-flux-config/pull/17115/files">one</a> done previously.</p></li>
-<li><p>For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade</p></li>
+<li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).</p></li>
+<li><p>To list all failed helm releases</p></li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr --all-namespaces | grep False
+</code></pre></div>
+<ul>
+<li>To view helm chart history</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>helm history &lt;chart name&gt; -n &lt;namespace&gt;
+</code></pre></div>
+<ul>
+<li>To roll back helm chart to a prior version or specific version</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>helm rollback &lt;chart name&gt; -n &lt;namespace&gt; / helm rollback &lt;chart name&gt; &lt;version number&gt; -n &lt;namespace&gt;
+</code></pre></div>
+<ul>
+<li>For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)</li>
+</ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>helm rollback &lt;chart name&gt; -n &lt;namespace&gt; / helm rollback &lt;chart name&gt;  &lt;version number&gt; -n &lt;namespace&gt;
+</code></pre></div>
+<ul>
+<li><p>For pods where images beginning with pr- are not found this is often due to the image no longer existing in the ACR. In these, instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this <a href="https://github.com/hmcts/cnp-flux-config/pull/17115/files">one</a> done previously.</p></li>
+<li><p>To find by an app team, search this <a href="https://github.com/hmcts/cnp-jenkins-config/blob/master/team-config.yml">file</a> with the name of the namespace the pod is in. Under the &ldquo;contact_channel&rdquo;, you will find the app teams slack channel for you to reach out on.</p></li>
+<li><p>For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade, like the following <a href="https://github.com/hmcts/cnp-flux-config/blob/8b049088445ee0ac282bb85eb3d28d94f202c252/clusters/ithc/base/kustomization.yaml#L14C2-L14C2">example</a>.</p></li>
 </ul>
 <h2 id="common-upgrade-steps">Common Upgrade Steps</h2>
-<p>The upgrade process begins by removing the cluster you are going to upgrade from the application gateway.</p>
+<p>The upgrade process begins by removing the cluster you are going to upgrade from the application gateway. This is step is not required for single clusters.</p>
 
 <ul>
 <li><a href="https://github.com/hmcts/sds-azure-platform/pull/473/files">PR example for SDS here</a></li>

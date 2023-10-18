@@ -586,29 +586,14 @@ az network dns record-set txt list <span class="nt">--zone-name</span> preview.p
 </ul>
 <h3 id="production">Production</h3>
 <h4 id="before-deployment-of-a-cluster">Before deployment of a cluster</h4>
-<p>Every Production change which involves taking down a cluster is supposed to include scaling up of the apps (these can change). CFT ONLY:</p>
 
 <ul>
-<li>idam-api (scale from 4 to 8)</li>
-<li>ccd-data-store-api (scale from 15 to 30)</li>
-<li>ccd-definition-store-api (scale from 4 to 8)</li>
-<li>dm-store (scale from 7 to 14)</li>
-</ul>
-<p><em>(idam-api requires 8 pods to be split up across 2 clusters and handle the load.  If we are bringing a cluster down then we need to ensure the other cluster has 8 pods for idam-api)</em></p>
-<p>This scaling is done via a <a href="https://github.com/hmcts/cnp-flux-config/pull/7245">PR</a></p>
-<p>Scaling to happen just before a cluster has been removed from AGW.</p>
-
-<ul>
-<li>Create PR to scale apps and merge. </li>
-<li>Check cluster that will not be removed to confirm pods have scaled</li>
 <li>Merge PR to remove a cluster from AGW</li>
 </ul>
 <h4 id="production-after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
 <li>Add the cluster back into AGW once you have confirmed deployment has been successful. <a href="https://github.com/hmcts/azure-platform-terraform/pull/595">PR example here</a>.</li>
-<li>Revert merge for scaling pods &amp; merge <a href="https://github.com/hmcts/cnp-flux-config/pull/7245">PR example here</a></li>
-<li>Confirm pods are back to correct numbers after revert</li>
 </ul>
 <h3 id="perftest">Perftest</h3>
 <h4 id="perftest-before-deployment-of-a-cluster">Before deployment of a cluster</h4>

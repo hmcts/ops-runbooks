@@ -237,27 +237,11 @@ Once swap over is fully complete then delete the old cluster:
 
 #### Before deployment of a cluster
 
-Every Production change which involves taking down a cluster is supposed to include scaling up of the apps (these can change). CFT ONLY:
-
-- idam-api (scale from 4 to 8)
-- ccd-data-store-api (scale from 15 to 30)
-- ccd-definition-store-api (scale from 4 to 8)
-- dm-store (scale from 7 to 14)
-
-*(idam-api requires 8 pods to be split up across 2 clusters and handle the load.  If we are bringing a cluster down then we need to ensure the other cluster has 8 pods for idam-api)*
-
-This scaling is done via a [PR](https://github.com/hmcts/cnp-flux-config/pull/7245)
-
-Scaling to happen just before a cluster has been removed from AGW. 
-
-- Create PR to scale apps and merge. 
-- Check cluster that will not be removed to confirm pods have scaled
 - Merge PR to remove a cluster from AGW
 
 #### After deployment of a cluster
+
 - Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
-- Revert merge for scaling pods & merge [PR example here](https://github.com/hmcts/cnp-flux-config/pull/7245)
-- Confirm pods are back to correct numbers after revert
 
 ### Perftest
 

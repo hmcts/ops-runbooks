@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>F5 VPN - HMCTS</title>
+    <title>List of F5 Admins - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/f5/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/network/accounts.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="F5 VPN - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta name="twitter:title" content="List of F5 Admins - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/network/accounts.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="F5 VPN" />
+      <meta property="og:title" content="List of F5 Admins" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/f5/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/network/accounts.html" />
 
     
   </head>
@@ -111,13 +111,20 @@
   </li>
 </ul>
 </li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
-    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -127,13 +134,6 @@
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
-<ul>
-  <li>
-    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
   </li>
 </ul>
 </li>
@@ -191,7 +191,13 @@
 <li><a href="../network/index.html"><span>Networking</span></a>
 <ul>
   <li>
-    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+    <a href="../network/F5AdminPortal.html"><span>F5 Admin Portal</span></a>
+  </li>
+  <li>
+    <a href="../network/accounts.html"><span>List of F5 Admins</span></a>
+  </li>
+  <li>
+    <a href="../network/VPN-routing-config.html"><span>F5 VPN Config</span></a>
   </li>
   <li>
     <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
@@ -200,7 +206,13 @@
     <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
   <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
     <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/MyCloudGateway_ops.html"><span>MyCloudGateway - Operations Guide</span></a>
   </li>
   <li>
     <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
@@ -213,26 +225,16 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
   </li>
   <li>
     <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../f5/index.html"><span>F5 VPN</span></a>
-<ul>
-  <li>
-    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
-  </li>
-  <li>
-    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
   </li>
 </ul>
 </li>
@@ -366,37 +368,38 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="f5-vpn">F5 VPN</h1>
-<h2 id="useful-links">Useful links</h2>
+            <h1 id="list-of-f5-admins">List of F5 Admins</h1>
+<p>List of users with admin access to the F5 portal, if you need to gain access</p>
 
 <ul>
-<li><a href="https://github.com/hmcts/azure-vpn-f5">GitHub Repository</a> (not live yet, automation is in progress)</li>
-<li><a href="accounts.md">User Accounts</a></li>
+<li>abance</li>
+<li>arahman</li>
+<li>benn</li>
+<li>bhiggins</li>
+<li>chriso</li>
+<li>dbromwich</li>
+<li>hannahs</li>
+<li>jordanb</li>
+<li>louiseh</li>
+<li>matts</li>
+<li>mohanay</li>
+<li>taherk</li>
+<li>thomast</li>
+<li>timja</li>
+<li>tkimber</li>
+<li>zoec</li>
+<li>skareem</li>
+<li>kjohnson</li>
+<li>swilson</li>
 </ul>
-<h2 id="guides">Guides</h2>
-
-<ul>
-<li><a href="VPN-routing-config.html">Setup access to internal apps</a></li>
-</ul>
-<h2 id="common-issues">Common Issues</h2>
-
-<ul>
-<li>Failed HDD encryption check: Likely means that FileVault is turned off if it&rsquo;s Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.</li>
-<li>User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person</li>
-<li>Failed to open tunnel, Tunnel server already launched: Find the svpn process id: <code>ps alx | grep svpn</code>, on the result process ID use the kill command: <code>kill -9 [the process id from the ps command]</code>, and or restart the machine.</li>
-</ul>
-<p>If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you&rsquo;ll need the F5 serial number / Registration key.<br>
-To get this, you need to access the command line by <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview">SSHing into the VPN</a></p>
-<p>There you can run this command: <code>show sys license</code>.</p>
-<p>The registration key will show in the output and you can then initiate the support request.</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/f5/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+VPN%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Ff5%2F%29&amp;labels=bug&amp;title=Re%3A+%27F5+VPN%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/network/accounts.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27List+of+F5+Admins%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fnetwork%2Faccounts.html%29&amp;labels=bug&amp;title=Re%3A+%27List+of+F5+Admins%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

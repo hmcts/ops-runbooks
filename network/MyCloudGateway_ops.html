@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>F5 VPN Config - HMCTS</title>
+    <title>MyCloudGateway - Operations Guide - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/f5/VPN-routing-config.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/network/MyCloudGateway_ops.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="F5 VPN Config - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/f5/VPN-routing-config.html" />
+      <meta name="twitter:title" content="MyCloudGateway - Operations Guide - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/network/MyCloudGateway_ops.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="F5 VPN Config" />
+      <meta property="og:title" content="MyCloudGateway - Operations Guide" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/f5/VPN-routing-config.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/network/MyCloudGateway_ops.html" />
 
     
   </head>
@@ -111,13 +111,20 @@
   </li>
 </ul>
 </li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
-    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -127,13 +134,6 @@
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
-<ul>
-  <li>
-    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
   </li>
 </ul>
 </li>
@@ -191,7 +191,13 @@
 <li><a href="../network/index.html"><span>Networking</span></a>
 <ul>
   <li>
-    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+    <a href="../network/F5AdminPortal.html"><span>F5 Admin Portal</span></a>
+  </li>
+  <li>
+    <a href="../network/accounts.html"><span>List of F5 Admins</span></a>
+  </li>
+  <li>
+    <a href="../network/VPN-routing-config.html"><span>F5 VPN Config</span></a>
   </li>
   <li>
     <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
@@ -200,7 +206,13 @@
     <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
   <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
     <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/MyCloudGateway_ops.html"><span>MyCloudGateway - Operations Guide</span></a>
   </li>
   <li>
     <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
@@ -213,26 +225,16 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
   </li>
   <li>
     <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../f5/index.html"><span>F5 VPN</span></a>
-<ul>
-  <li>
-    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
-  </li>
-  <li>
-    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
   </li>
 </ul>
 </li>
@@ -366,68 +368,48 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="f5-vpn-config">F5 VPN Config</h1>
-<p>This document details the steps to configure routing to make internal apps available over the vpn.</p>
+            <h1 id="mycloudgateway-operations-guide">MyCloudGateway - Operations Guide</h1>
+<p>The My Cloud Gateway service provides wide area networking between MoJ office, data centres and public cloud providers.</p>
+<h2 id="portal">Portal</h2>
+<p>Once you have a login and have registered your mobile phone, connect to the portal via https://my.cloudgateway.co.uk/login and enter the OTP code you have just been texted.</p>
+<h2 id="firewall-rules">Firewall Rules</h2>
+<p>https://my.cloudgateway.co.uk/protect</p>
+<p>Select the Protect tab to see the existing firewall rule. New rules and modifications are managed via service requests.</p>
 <h2 id="routing">Routing</h2>
+<p>My Cloud Gateway manage all routes, any routes created in Azure Virtual WAN, will have to be imported by My Cloud Gateway, via a service request.</p>
+<h2 id="nat">NAT</h2>
+<p>Network address transition is used to minimise IP routing complexity from Azure.  VIP address on MyCloudGateway enable Azure to reach MoJ offices, without knowing the full routing table.</p>
+<h2 id="monitoring">Monitoring</h2>
+<p>https://my.cloudgateway.co.uk/inspect/traffic-logs</p>
+<p>The Inspect tab can be used to gain access to the live traffic logs.  Important to use filters, such as source or destination IP, as the logs are very busy.
+Export logs to CSV, is more reliable than the live logs feature. Plus the file can be emailed to 3rd parties, enabling team work, on problem sloving.</p>
+<h2 id="service-requests">Service Requests</h2>
+<p>https://my.cloudgateway.co.uk/support/service-requests</p>
+<p>When something has stopped working, an incident needs to be logged. To add or modify My Cloud Gateway, log a service request.</p>
+<p>Service requests are chargable, so consider creating a single large request, if you need multiple tasks completing.</p>
 
-<ol>
-<li>Connect to the <a href="https://portal.platform.hmcts.net">VPN</a></li>
-<li><p>Login to <a href="https://vpn.platform.hmcts.net/">https://vpn.platform.hmcts.net/</a>.
-If you are accessing the F5 portal for the first time, submit a pull request to the <a href="accounts.md">user accounts</a> file in this repo and ask someone with existing access to create your account.
-If you lose your login details, a person with existing access can provide you with new credentials.</p></li>
-<li><p>For making the changes to the ACL: click &lsquo;Access → &#39;Access Control Lists&rsquo; → &lsquo;acl_vpn_reform&rsquo;, <a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform">direct link</a></p></li>
-<li><p>You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click &lsquo;Add&rsquo; for your new one. Copy the required details from the existing one to the new one.
-Note: If using Firefox then the search function probably won&rsquo;t find the IP address you type in.</p></li>
-<li><p>You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
-<img src=images/properties.png  width="400"></p></li>
-</ol>
-<h2 id="access-policy">Access Policy</h2>
+              <div data-module='page-expiry' data-last-reviewed-on="2024-04-23">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 23 October 2023.
 
-<ol>
-<li><p>Navigate to Connectivity profiles to make a corresponding change to the routing.\
-<a href="https://vpn.platform.hmcts.net/tmui/tmui/util/ajax/app.jsp?appId=apps.AccessPolicy.perclientpolicy">Connectivity Profiles</a></p></li>
-<li><p>Add the new CIDR range under IPV4 and IPV6 . After verification, click on the <code>Apply Access policy</code> on the top left corner of the portal to propagate the routing changes.\
-<a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/remconnectivity/nwaccessresources/l2_settings.jsp?name=/Common/netacl_mojvpn&amp;type=1">VPN ACL</a></p></li>
-<li><p>Logout of your current F5 VPN session (<a href="https://portal.platform.hmcts.net">https://portal.platform.hmcts.net</a>) and log back in to validate if the routing table update has taken place for the new network address space as shown below:</p></li>
-</ol>
+        It needs to be reviewed again on 23 April 2024
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
 
-<p float="left">
-<img src=images/VPN_Routing_table.png  width="400" />
-<img src=images/Routing_Change.png  width="400" />
-</p>
-<h2 id="apply-access-policy">Apply Access Policy</h2>
-<p>Once you have made a change to F5, you are required to Apply Access Policy.</p>
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 23 April 2024
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
 
-<ul>
-<li>When a change has been made, you need to Apply Access Policy before change is effective on F5. You will notice this in top left of the F5 Portal when you have made a change.</li>
-</ul>
-<p>Select Apply Access Policy</p>
-<p><img src=images/apply_access_policy.png  width="400"></p>
-
-<ul>
-<li>Review Access profile &amp; ensure option prof_portal.platform.hmcts.net is ticked</li>
-</ul>
-<p>Select Apply</p>
-<p><img src=images/apply_access_profile.png  width="400"></p>
-
-<ul>
-<li>Access profile policies are then shown, it should already be ticked for all.</li>
-</ul>
-<p>Select Apply</p>
-<p><img src=images/apply_access_profile_all.png  width="400"></p>
-
-<ul>
-<li>Once successful apply, all access profiles should be green</li>
-</ul>
-<p><img src=images/apply_access_policy_review.png  width="400"></p>
-
-            
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/f5/VPN-routing-config.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+VPN+Config%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Ff5%2FVPN-routing-config.html%29&amp;labels=bug&amp;title=Re%3A+%27F5+VPN+Config%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/network/MyCloudGateway_ops.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27MyCloudGateway+-+Operations+Guide%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fnetwork%2FMyCloudGateway_ops.html%29&amp;labels=bug&amp;title=Re%3A+%27MyCloudGateway+-+Operations+Guide%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

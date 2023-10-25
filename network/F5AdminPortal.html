@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>List of users with admin access to the F5 portal - HMCTS</title>
+    <title>F5 Admin Portal - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/f5/accounts.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/network/F5AdminPortal.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="List of users with admin access to the F5 portal - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/f5/accounts.html" />
+      <meta name="twitter:title" content="F5 Admin Portal - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/network/F5AdminPortal.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="List of users with admin access to the F5 portal" />
+      <meta property="og:title" content="F5 Admin Portal" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/f5/accounts.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/network/F5AdminPortal.html" />
 
     
   </head>
@@ -111,13 +111,20 @@
   </li>
 </ul>
 </li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
-    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -127,13 +134,6 @@
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
-<ul>
-  <li>
-    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
   </li>
 </ul>
 </li>
@@ -191,7 +191,13 @@
 <li><a href="../network/index.html"><span>Networking</span></a>
 <ul>
   <li>
-    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+    <a href="../network/F5AdminPortal.html"><span>F5 Admin Portal</span></a>
+  </li>
+  <li>
+    <a href="../network/accounts.html"><span>List of F5 Admins</span></a>
+  </li>
+  <li>
+    <a href="../network/VPN-routing-config.html"><span>F5 VPN Config</span></a>
   </li>
   <li>
     <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
@@ -200,7 +206,13 @@
     <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
   </li>
   <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
     <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/MyCloudGateway_ops.html"><span>MyCloudGateway - Operations Guide</span></a>
   </li>
   <li>
     <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
@@ -213,26 +225,16 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
   </li>
   <li>
     <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../f5/index.html"><span>F5 VPN</span></a>
-<ul>
-  <li>
-    <a href="../f5/VPN-routing-config.html"><span>F5 VPN Config</span></a>
-  </li>
-  <li>
-    <a href="../f5/accounts.html"><span>List of users with admin access to the F5 portal</span></a>
   </li>
 </ul>
 </li>
@@ -366,37 +368,82 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="list-of-users-with-admin-access-to-the-f5-portal">List of users with admin access to the F5 portal</h1>
+            <h1 id="f5-admin-portal">F5 Admin Portal</h1>
+<h2 id="uk-south">UK South</h2>
+<p>You can connect to the Palo VMs via the HMCTS VPN by following the following steps:</p>
+<h3 id="sandbox">Sandbox</h3>
+
+<ol>
+<li>Create the NSG rule to allow your IP on port 443. (Example and links to VMs below).</li>
+<li>Retrieve the url of the Palo VM you want to connect to via the &lsquo;Virtual machines&rsquo; section below.</li>
+<li>(skip in production which is SSO enabled) Retrieve the admin password from the sandbox key vault:
+<code>
+az keyvault secret show --vault-name hmcts-infra-dmz-sbox-int --name firewall-password --query value -o tsv
+</code></li>
+<li>Use the local account <code>localadmin</code> to log in.</li>
+</ol>
+<h4 id="sandbox-virtual-machines">Sandbox Virtual Machines</h4>
 
 <ul>
-<li>abance</li>
-<li>arahman</li>
-<li>benn</li>
-<li>bhiggins</li>
-<li>chriso</li>
-<li>dbromwich</li>
-<li>hannahs</li>
-<li>jordanb</li>
-<li>louiseh</li>
-<li>matts</li>
-<li>mohanay</li>
-<li>taherk</li>
-<li>thomast</li>
-<li>timja</li>
-<li>tkimber</li>
-<li>zoec</li>
-<li>skareem</li>
-<li>kjohnson</li>
-<li>swilson</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview">hmcts-hub-sbox-int-palo-vm-0</a> - https://hmcts-hub-sbox-int-palo-mgmt-0.uksouth.cloudapp.azure.com</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview">hmcts-hub-sbox-int-palo-vm-1</a> - https://hmcts-hub-sbox-int-palo-mgmt-1.uksouth.cloudapp.azure.com</li>
+</ul>
+<h3 id="non-prod">Non-prod</h3>
+
+<ol>
+<li>Connect to the <a href="https://portal.platform.hmcts.net/">HMCTS VPN</a>.</li>
+<li>Retrieve the url of the Palo VM you want to connect to via the &lsquo;Virtual machines&rsquo; section below.<br></li>
+<li><p>Retrieve the admin password from the relevant key vault:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code># Non production
+az keyvault secret show --vault-name hmcts-infra-dmz-nonprodi --name firewall-password --query value -o tsv
+</code></pre></div></li>
+<li><p>Use the local account <code>localadmin</code></p></li>
+</ol>
+<h4 id="non-prod-virtual-machines">Non-prod virtual machines</h4>
+
+<ul>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview">hmcts-hub-nonprodi-palo-vm-0</a> - https://hmcts-hub-nonprodi-palo-mgmt-0.uksouth.cloudapp.azure.com</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview">hmcts-hub-nonprodi-palo-vm-1</a> - https://hmcts-hub-nonprodi-palo-mgmt-1.uksouth.cloudapp.azure.com</li>
+</ul>
+<h3 id="production">Production</h3>
+
+<ol>
+<li>Connect to the <a href="https://portal.platform.hmcts.net/">HMCTS VPN</a>.</li>
+<li>Retrieve the url of the Palo VM you want to connect to via the &lsquo;Virtual machines&rsquo; section below.<br></li>
+<li>Click &lsquo;Use Single Sign-On&rsquo;.</li>
+<li>Press &lsquo;Continue&rsquo; leaving the first text box prompt empty.</li>
+</ol>
+<h4 id="prod-virtual-machines">Prod Virtual machines</h4>
+
+<ul>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview">hmcts-hub-prod-int-palo-vm-0</a> - https://uksouth-prod-palo-0.platform.hmcts.net</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview">hmcts-hub-prod-int-palo-vm-1</a> - https://uksouth-prod-palo-1.platform.hmcts.net</li>
 </ul>
 
-            
+<hr>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2024-04-24">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 24 October 2023.
+
+        It needs to be reviewed again on 24 April 2024
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 24 April 2024
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/f5/accounts.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27List+of+users+with+admin+access+to+the+F5+portal%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Ff5%2Faccounts.html%29&amp;labels=bug&amp;title=Re%3A+%27List+of+users+with+admin+access+to+the+F5+portal%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/network/F5AdminPortal.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+Admin+Portal%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fnetwork%2FF5AdminPortal.html%29&amp;labels=bug&amp;title=Re%3A+%27F5+Admin+Portal%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

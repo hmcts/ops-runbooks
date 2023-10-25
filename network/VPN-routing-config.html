@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Security Operations - HMCTS</title>
+    <title>F5 VPN Config - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Security/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/network/VPN-routing-config.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Security Operations - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Security/" />
+      <meta name="twitter:title" content="F5 VPN Config - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/network/VPN-routing-config.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Security Operations" />
+      <meta property="og:title" content="F5 VPN Config" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Security/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/network/VPN-routing-config.html" />
 
     
   </head>
@@ -368,27 +368,79 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="security-operations">Security Operations</h1>
-<p>This space is for any guides relating to work with the SOC team.</p>
-<h2 id="splunk-infrastructure-low-level-configuration"> Splunk infrastructure low-level configuration:</h2>
+            <h1 id="f5-vpn-config">F5 VPN Config</h1>
+<p>This document details the steps to configure routing to make internal apps available over the vpn.</p>
+<h2 id="routing">Routing</h2>
+
+<ol>
+<li>Connect to the <a href="https://portal.platform.hmcts.net">VPN</a></li>
+<li><p>Login to <a href="https://vpn.platform.hmcts.net/">https://vpn.platform.hmcts.net/</a>.
+If you are accessing the F5 portal for the first time, submit a pull request to the <a href="accounts.md">user accounts</a> file in this repo and ask someone with existing access to create your account.
+If you lose your login details, a person with existing access can provide you with new credentials.</p></li>
+<li><p>For making the changes to the ACL: click &lsquo;Access → &#39;Access Control Lists&rsquo; → &lsquo;acl_vpn_reform&rsquo;, <a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform">direct link</a></p></li>
+<li><p>You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click &lsquo;Add&rsquo; for your new one. Copy the required details from the existing one to the new one.
+Note: If using Firefox then the search function probably won&rsquo;t find the IP address you type in.</p></li>
+<li><p>You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
+<img src=images/properties.png  width="400"></p></li>
+</ol>
+<h2 id="access-policy">Access Policy</h2>
+
+<ol>
+<li><p>Navigate to Connectivity profiles to make a corresponding change to the routing.\
+<a href="https://vpn.platform.hmcts.net/tmui/tmui/util/ajax/app.jsp?appId=apps.AccessPolicy.perclientpolicy">Connectivity Profiles</a></p></li>
+<li><p>Add the new CIDR range under IPV4 and IPV6 . After verification, click on the <code>Apply Access policy</code> on the top left corner of the portal to propagate the routing changes.\
+<a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/remconnectivity/nwaccessresources/l2_settings.jsp?name=/Common/netacl_mojvpn&amp;type=1">VPN ACL</a></p></li>
+<li><p>Logout of your current F5 VPN session (<a href="https://portal.platform.hmcts.net">https://portal.platform.hmcts.net</a>) and log back in to validate if the routing table update has taken place for the new network address space as shown below:</p></li>
+</ol>
+
+<p float="left">
+<img src=images/VPN_Routing_table.png  width="400" />
+<img src=images/Routing_Change.png  width="400" />
+</p>
+<h2 id="apply-access-policy">Apply Access Policy</h2>
+<p>Once you have made a change to F5, you are required to Apply Access Policy.</p>
 
 <ul>
-<li><a href="datadisk-config-notes.html">Splunk Data disk configuration notes</a></li>
-<li><a href="server-access.html">Splunk Server Access</a></li>
+<li>When a change has been made, you need to Apply Access Policy before change is effective on F5. You will notice this in top left of the F5 Portal when you have made a change.</li>
 </ul>
-<h2 id="tenable-nessus">Tenable Nessus</h2>
+<p>Select Apply Access Policy</p>
+<p><img src=images/apply_access_policy.png  width="400"></p>
 
 <ul>
-<li><a href="tenable-nessus.html">Tenable Nessus</a></li>
+<li>Review Access profile &amp; ensure option prof_portal.platform.hmcts.net is ticked</li>
 </ul>
+<p>Select Apply</p>
+<p><img src=images/apply_access_profile.png  width="400"></p>
+
+<ul>
+<li>Access profile policies are then shown, it should already be ticked for all.</li>
+</ul>
+<p>Select Apply</p>
+<p><img src=images/apply_access_profile_all.png  width="400"></p>
+
+<ul>
+<li>Once successful apply, all access profiles should be green</li>
+</ul>
+<p><img src=images/apply_access_policy_review.png  width="400"></p>
+<h2 id="common-issues">Common Issues</h2>
+
+<ul>
+<li>Failed HDD encryption check: Likely means that FileVault is turned off if it&rsquo;s Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.</li>
+<li>User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person</li>
+<li>Failed to open tunnel, Tunnel server already launched: Find the svpn process id: <code>ps alx | grep svpn</code>, on the result process ID use the kill command: <code>kill -9 [the process id from the ps command]</code>, and or restart the machine.</li>
+</ul>
+<p>If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you&rsquo;ll need the F5 serial number / Registration key.<br>
+To get this, you need to access the command line by <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview">SSHing into the VPN</a></p>
+<p>There you can run this command: <code>show sys license</code>.</p>
+<p>The registration key will show in the output and you can then initiate the support request.</p>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Security/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Security+Operations%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FSecurity%2F%29&amp;labels=bug&amp;title=Re%3A+%27Security+Operations%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/network/VPN-routing-config.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27F5+VPN+Config%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fnetwork%2FVPN-routing-config.html%29&amp;labels=bug&amp;title=Re%3A+%27F5+VPN+Config%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

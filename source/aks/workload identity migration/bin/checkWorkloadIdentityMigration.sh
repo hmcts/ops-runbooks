@@ -102,5 +102,5 @@ if [ $# -eq 0 ]; then
     echo script has finished executing
     echo \'workload_identity_checker.sh view_labelled\' to view labelled deployments/cronJobs
     echo \'workload_identity_checker.sh view_not_labelled\' to view deployments/cronJobs without workload identity label
-    echo \'workload_identity_checker.sh view_azureidentities\' to view remaining old  identities and bindings
+    echo \'workload_identity_checker.sh view_azureidentities\' to view remaining old azure identities and bindings
 fi

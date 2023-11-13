@@ -111,20 +111,13 @@
   </li>
 </ul>
 </li>
-<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
-<ul>
-  <li>
-    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
-  </li>
-</ul>
-</li>
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -134,6 +127,13 @@
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
   </li>
 </ul>
 </li>
@@ -225,10 +225,10 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
@@ -371,7 +371,7 @@
             <h1 id="on-call">On Call</h1>
 <p>This folder describes access requirements and how to do common tasks when a person is on-call.</p>
 <p>It is required that you go through this document before going on-call, and verify you have access to all components.</p>
-<h2 id="azure-active-directory-groups">Azure Active Directory Groups</h2>
+<h2 id="microsoft-entra-id-groups">Microsoft Entra ID Groups</h2>
 <p>You must be in the following groups:</p>
 
 <ul>
@@ -387,7 +387,7 @@ az aks get-credentials <span class="nt">--resource-group</span> cft-prod-00-rg <
 az aks get-credentials <span class="nt">--resource-group</span> cft-prod-01-rg <span class="nt">--name</span> cft-prod-01-aks <span class="nt">--subscription</span> DCD-CFTAPPS-PROD <span class="nt">--overwrite</span>
 
 kubectl get pods <span class="nt">-n</span> admin
-<span class="c"># this will prompt you to login via Azure Active Directory</span>
+<span class="c"># this will prompt you to login via Microsoft Entra ID</span>
 <span class="c"># after your login verify you can restart a pod, e.g. fluxcloud (admin notifying service, downtime doesn't matter)</span>
 kubectl delete pod <span class="nt">-n</span> admin <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>fluxcloud
 </code></pre></div><p>The default configuration for an application is two pods on each cluster, but teams may have more.</p>

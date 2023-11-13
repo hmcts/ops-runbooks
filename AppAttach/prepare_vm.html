@@ -111,20 +111,13 @@
   </li>
 </ul>
 </li>
-<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
-<ul>
-  <li>
-    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
-  </li>
-</ul>
-</li>
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
   </li>
   <li>
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
@@ -134,6 +127,13 @@
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
   </li>
 </ul>
 </li>
@@ -225,10 +225,10 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
@@ -378,7 +378,7 @@
 <h2 id="connect-to-the-file-share">Connect to the File Share</h2>
 <p>To make app deployments across multiple VMs easier, we&rsquo;ll download the completed VHDX images from an Azure File Share which we will connect to from our target VM.</p>
 <p>In the case of deploying to the <a href="https://github.com/hmcts/ops-jumpboxes/">ops jumpboxes</a>, we&rsquo;ll be using the <code>hmctsfslogixprodstor</code> storage account for prod and <code>hmctsfslogixnonprodstor</code> for non-prod. Both of these have a file share called &lsquo;MSIX&rsquo; that contain our VHDX files, as well as some powershell scripts. More on those in the next step.</p>
-<p>Since the jumpboxes will be domain joined, we can connect and authenticate using AzureAD credentials. The &lsquo;Connect&rsquo; tab of the file share in the azure portal will provide you a powershell script you can use to connect to the file share.</p>
+<p>Since the jumpboxes will be domain joined, we can connect and authenticate using Microsoft Entra credentials. The &lsquo;Connect&rsquo; tab of the file share in the azure portal will provide you a powershell script you can use to connect to the file share.</p>
 <p>In this example, the machine we&rsquo;re using is not domain joined, but the process will be the same. We will be mounting the file share to <code>Z:\</code></p>
 <p><a href="images/StorageAccount0.png" rel="noopener noreferrer"><img src="images/StorageAccount0.png" alt="" /></a></p>
 <h2 id="download-from-the-file-share">Download From the File Share</h2>

@@ -23,7 +23,7 @@ To make app deployments across multiple VMs easier, we'll download the completed
 
 In the case of deploying to the [ops jumpboxes](https://github.com/hmcts/ops-jumpboxes/), we'll be using the `hmctsfslogixprodstor` storage account for prod and `hmctsfslogixnonprodstor` for non-prod. Both of these have a file share called 'MSIX' that contain our VHDX files, as well as some powershell scripts. More on those in the next step.
 
-Since the jumpboxes will be domain joined, we can connect and authenticate using AzureAD credentials. The 'Connect' tab of the file share in the azure portal will provide you a powershell script you can use to connect to the file share.
+Since the jumpboxes will be domain joined, we can connect and authenticate using Microsoft Entra credentials. The 'Connect' tab of the file share in the azure portal will provide you a powershell script you can use to connect to the file share.
 
 In this example, the machine we're using is not domain joined, but the process will be the same. We will be mounting the file share to `Z:\`
 

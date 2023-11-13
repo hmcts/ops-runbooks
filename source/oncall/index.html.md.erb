@@ -8,7 +8,7 @@ This folder describes access requirements and how to do common tasks when a pers
 
 It is required that you go through this document before going on-call, and verify you have access to all components. 
 
-## Azure Active Directory Groups
+## Microsoft Entra ID Groups
 
 You must be in the following groups:
 
@@ -30,7 +30,7 @@ az aks get-credentials --resource-group cft-prod-00-rg --name cft-prod-00-aks --
 az aks get-credentials --resource-group cft-prod-01-rg --name cft-prod-01-aks --subscription DCD-CFTAPPS-PROD --overwrite
 
 kubectl get pods -n admin
-# this will prompt you to login via Azure Active Directory
+# this will prompt you to login via Microsoft Entra ID
 # after your login verify you can restart a pod, e.g. fluxcloud (admin notifying service, downtime doesn't matter)
 kubectl delete pod -n admin -l app=fluxcloud
 ```

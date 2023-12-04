@@ -135,8 +135,6 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 <%= warning_text('Issues during an AKS Upgrade')%>
 [Troublehsooting upgrade failures](known-issues.html)
 
-If a cluster is in a failed state and you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.
-
 ## After upgrading of a cluster
 - Add the cluster back into the application gateway once you have confirmed the upgrade has been successful.
   - [SDS example](https://github.com/hmcts/sds-azure-platform/pull/474/files)

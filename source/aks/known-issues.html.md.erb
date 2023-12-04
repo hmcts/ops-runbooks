@@ -7,6 +7,8 @@ weight: 20
 
 Known issues encountered during AKS cluster upgrade or rebuild
 
+If a cluster is in a failed state and even after troubleshooting you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.
+
 ## One or more nodes has failed to upgrade
 
 You can track the progress of the upgrade by running 

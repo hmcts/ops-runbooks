@@ -1,0 +1,67 @@
+---
+title: Rebuilding AKS Clusters
+weight: 35
+---
+
+# <%= current_page.data.title %>
+
+
+## Re-building a cluster
+
+<%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
+When re-building a cluster, remove the given cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
+
+To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:
+
+  - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+  - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
+
+Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu. 
+
+Click on **Run** to start the pipeline.
+
+## Common Steps
+
+#### Before deployment of a cluster
+
+- Merge PR to remove a cluster from AGW
+
+#### After deployment of a cluster
+
+- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
+
+## Environment Specific
+
+### Dev/Preview, AAT/Staging
+- Change Jenkins to use the other cluster that is not going to be rebuilt
+  - [SDS example](https://github.com/hmcts/sds-flux-config/pull/2637)
+  - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/7138)
+- If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
+
+#### After deployment of a cluster
+- Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). [Update active jenkins-cluster IP value in DNS](https://github.com/hmcts/azure-private-dns/pull/428/files) and [update existing platform-hmcts-net entries](https://github.com/hmcts/azure-private-dns/pull/430/files).
+
+### Perftest
+
+#### Before deployment of a cluster
+
+- Confirm that the environment is not being used with Nickin Sitaram before starting. 
+- Use slack channel pertest-cluster for communication.
+- Scale the number of active nodes, increase by 5 nodes if removing a custer. 
+  Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.
+
+#### After deployment of a cluster
+- Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
+
+## Known issues
+
+### Neuvector
+
+1. `admission webhook "neuvector-validating-admission-webhook.neuvector.svc" denied the request:`, these alerts can be seen on `aks-neuvector-<env>` slack channels
+   - This happens when neuvector is broken. 
+   - Check events and status of neuvector helm release. 
+   - Delete Neuvector Helm release to see if it comes back fine.
+2. Neuvector fails to install.
+   - Check if all enforcers come up in time, they could fail to come if nodes are full.
+   - If they keep failing with race conditions, it could be due to backups being corrupt.
+   - Usually `policy.backup` and `admission_control.backup` are the ones you need to delete from Azure file share if they are corrupt.

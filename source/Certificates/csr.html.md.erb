@@ -5,12 +5,7 @@ weight: 20
 
 # <%= current_page.data.title %>
 
-Two things are required when requesting new Certs: 
-- A completed SSL Form - attached as SSL-Certificate-Request-Form.docx, a blank one has been added so that developers may fill in a new form:
-[SSL Certificate Request Form](forms/SSL-Certificate-Request-Form.docx).
-This form is only required for new SSLs and is not needed for renewal requests.
-
-- A newly generated CSR request. The CSR's can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file): 
+Firstly you will need a newly generated Certificate Signing Request (CSR). A CSR's can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file): 
 
 Example Csr.yml files can be found on the openssl-mac-branch branch
 
@@ -51,11 +46,22 @@ The certificate requests will be output to the archive_csr/<date> folder
 
 The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.
 
-Once the csr has been generated, feel free to send the csr and the ssl form to opsconfman@hmcts.net.
+### Submit request form
+
+Once you have generated a CSR, you can raise a request with the HMCTS OPS Procurement team via [ServiceNow](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=8d7207ce1b1d6d1049c38732f54bcb20).
+
+You'll be asked to provide the following information:
+
+- Certificate Common Name (CN)
+- Certificate Subject Alternative Names (SANs) _if multiple domains are required_
+- Certificate Validity Period (typically 1 to 2 years)
+- Project Manager
+- Project Name/Programme Name
+- Your name & contact information
 
 ### Pointing the DNS
   
-You will receive an email back asking you to point the DNS, this email will look something like:
+Once you have submitted the service now request, you will receive an email asking you to point the DNS. The email will contain an instruction similar to this:
 `"Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."`
   

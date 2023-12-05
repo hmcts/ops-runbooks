@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Executing Queries - HMCTS</title>
+    <title>Rebuilding AKS Clusters - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/executing-queries.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/rebuilding-aks-clusters.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Executing Queries - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/executing-queries.html" />
+      <meta name="twitter:title" content="Rebuilding AKS Clusters - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/rebuilding-aks-clusters.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Executing Queries" />
+      <meta property="og:title" content="Rebuilding AKS Clusters" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/executing-queries.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/rebuilding-aks-clusters.html" />
 
     
   </head>
@@ -371,92 +371,94 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="executing-queries">Executing Queries</h1>
-<p>You can execute queries in any number of ways, below are some suggestions</p>
-<h2 id="small-queries">Small queries</h2>
+            <h1 id="rebuilding-aks-clusters">Rebuilding AKS Clusters</h1>
+<h2 id="re-building-a-cluster">Re-building a cluster</h2>
+
+<div class="govuk-warning-text">
+  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+  <strong class="govuk-warning-text__text">
+    <span class="govuk-warning-text__assistive">Warning</span>
+    Re-building a cluster is only done when absolutely necessary.
+  </strong>
+</div>
+<p>When re-building a cluster, remove the given cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal. You will have to remove the lock on resource group if applied.</p>
+<p>To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:</p>
 
 <ul>
-<li><p>Connect to  Postgres by following commands outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> <br></p></li>
-<li><p>Once in, you can execute provided query
-<code>cmd
-psql&gt; paste your query here;
-</code></p></li>
+<li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">CFT Pipeline</a></li>
+<li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482">SDS Pipeline</a></li>
 </ul>
-<p><strong>Note:</strong> The prompt would most likely be the <code>DB_NAME</code> you provided in steps you followed when connecting to the DB</p>
+<p>Click on <strong>Run pipeline</strong> (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.</p>
+<p>Click on <strong>Run</strong> to start the pipeline.</p>
+<h2 id="common-steps">Common Steps</h2>
+<h4 id="before-deployment-of-a-cluster">Before deployment of a cluster</h4>
 
 <ul>
-<li><p>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off</p></li>
-<li><p>For small queries with large results, you could do the following to output to file
-<code>cmd
-\o &lt;filename&gt;.csv
-&lt;your query here&gt;
-\q
-</code>
-This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it.</p></li>
+<li>Merge PR to remove a cluster from AGW</li>
 </ul>
-<p><strong>Note:</strong> the extension could be whatever you choose, using <code>csv</code> in the example below</p>
-<p><strong>Example:</strong>
-  <a href="images/query-output.png" rel="noopener noreferrer"><img src="images/query-output.png" alt="Output to file" /></a></p>
-<h2 id="larger-lengthier-queries">Larger, lengthier queries</h2>
+<h4 id="after-deployment-of-a-cluster">After deployment of a cluster</h4>
 
 <ul>
-<li>Connect to Postgres as described in above step</li>
-<li>Create a new file, for example
-<code>cmd
-vi &lt;ticket-number&gt;-&lt;any-extras-labeling&gt;.sql
-</code>
-You could use <code>nano</code> as well. Just replace <code>vi</code> with <code>nano</code></li>
-<li>Copy/paste query and save it
-<code>cmd 
-:wq!
-</code>
-If using <code>nano</code> then use it&rsquo;s equivalent</li>
-<li>Once file is saved you could run the command passing the file as input to Postgres.
-<code>cmd 
-psql &quot;sslmode=require host=${POSTGRES_HOST} dbname=${DB_NAME} user=${DB_USER}&quot; -o DTSPO-2766-result.csv &lt; DTSPO-2766-get-case-data.sql
-</code>
-<em>Here <code>DTSPO-2766-result.csv</code> is where I want the results saved and <code>DTSPO-2766-get-case-data.sql</code> is the file with provided sql query</em></li>
-<li>If no errors, you can <code>cat</code> the output file for a quick eye-balling 👀
-<code>cmd 
-cat &lt;output-file&gt;.csv
-</code></li>
+<li>Add the cluster back into AGW once you have confirmed deployment has been successful. <a href="https://github.com/hmcts/azure-platform-terraform/pull/595">PR example here</a>.</li>
 </ul>
-<h2 id="bringing-query-file-home">Bringing query file home</h2>
-<p>You can use any <code>sftp</code> tool of your choice to connect to bastion or follow below steps</p>
+<h2 id="environment-specific">Environment Specific</h2>
+<h3 id="dev-preview-aat-staging">Dev/Preview, AAT/Staging</h3>
 
 <ul>
-<li>Log out of your ssh terminal by exiting</li>
-<li>Copy the file from the bastion server right from your terminal
-<code>cmd 
-scp user.name@hmcts.net@bastion-devops-prod.platform.hmcts.net:/home/user.name/DTSPO-2766-result.csv /Users/&lt;location-of-choice&gt;
-</code>
-<code>/Users/&lt;location-of-choice&gt;</code> being a path on your file system, here is an example using a MAC</li>
-<li>You can now send the file(s) to authorised recipient(s) or share as instructed in the ticket.<br> 
-If unclear, confirm with team members.</li>
+<li>Change Jenkins to use the other cluster that is not going to be rebuilt
+
+<ul>
+<li><a href="https://github.com/hmcts/sds-flux-config/pull/2637">SDS example</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/7138">CFT example</a></li>
+</ul></li>
+<li>If the configuration doesn&rsquo;t update after your pull request has been merged, you can change it manually in the <a href="https://build.platform.hmcts.net/configure">Jenkins Configuration</a></li>
 </ul>
-<p>If you run into any other issues please feel free to reach out to team members.</p>
-<h3 id="notes">Notes</h3>
-<p>In the in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> documentation
-<code>cmd
-export PGPASSWORD=&lt;result-from-earlier&gt;
-</code>
-Assign to the variable <code>PGPASSWORD</code> the token returned from the <code>az account get-access-token ...</code> command you ran earlier</p>
-<p><strong>Example:</strong></p>
-<p><a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="images/assign-to-password-var.png" alt="Token to Password" /></a></p>
-<h3 id="some-external-reference">Some external reference</h3>
-<p>You can have a quick peak for some <code>psql</code> info that may be useful
-* <a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a>
-* <a href="https://kb.objectrocket.com/postgresql/how-to-run-an-sql-file-in-postgres-846">How to run an SQL file in Postgres</a>
-  - Run a SQL file in Postgres using the ‘psql’ command 
-  - Connect to PostgreSQL and then run a SQL file using ‘psql’</p>
+<h4 id="dev-preview-aat-staging-after-deployment-of-a-cluster">After deployment of a cluster</h4>
+
+<ul>
+<li>Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). <a href="https://github.com/hmcts/azure-private-dns/pull/428/files">Update active jenkins-cluster IP value in DNS</a> and <a href="https://github.com/hmcts/azure-private-dns/pull/430/files">update existing platform-hmcts-net entries</a>.</li>
+</ul>
+<h3 id="perftest">Perftest</h3>
+<h4 id="perftest-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
+
+<ul>
+<li>Confirm that the environment is not being used with Nickin Sitaram before starting. </li>
+<li>Use slack channel pertest-cluster for communication.</li>
+<li>Scale the number of active nodes, increase by 5 nodes if removing a custer. 
+Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.</li>
+</ul>
+<h4 id="perftest-after-deployment-of-a-cluster">After deployment of a cluster</h4>
+
+<ul>
+<li>Check all pods are deployed and running. Compare with pods status reference taken pre-deployment</li>
+</ul>
+<h2 id="known-issues">Known issues</h2>
+<h3 id="neuvector">Neuvector</h3>
+
+<ol>
+<li><code>admission webhook &quot;neuvector-validating-admission-webhook.neuvector.svc&quot; denied the request:</code>, these alerts can be seen on <code>aks-neuvector-&lt;env&gt;</code> slack channels
+
+<ul>
+<li>This happens when neuvector is broken. </li>
+<li>Check events and status of neuvector helm release. </li>
+<li>Delete Neuvector Helm release to see if it comes back fine.</li>
+</ul></li>
+<li>Neuvector fails to install.
+
+<ul>
+<li>Check if all enforcers come up in time, they could fail to come if nodes are full.</li>
+<li>If they keep failing with race conditions, it could be due to backups being corrupt.</li>
+<li>Usually <code>policy.backup</code> and <code>admission_control.backup</code> are the ones you need to delete from Azure file share if they are corrupt.</li>
+</ul></li>
+</ol>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/executing-queries.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Executing+Queries%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Fexecuting-queries.html%29&amp;labels=bug&amp;title=Re%3A+%27Executing+Queries%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/rebuilding-aks-clusters.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Rebuilding+AKS+Clusters%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Frebuilding-aks-clusters.html%29&amp;labels=bug&amp;title=Re%3A+%27Rebuilding+AKS+Clusters%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

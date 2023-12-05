@@ -9,19 +9,19 @@
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/redeploying-aks-clusters.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/upgrading-aks-clusters.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta name="twitter:title" content="Upgrading AKS Clusters - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/redeploying-aks-clusters.html" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/upgrading-aks-clusters.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
       <meta property="og:title" content="Upgrading AKS Clusters" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/redeploying-aks-clusters.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/upgrading-aks-clusters.html" />
 
     
   </head>
@@ -123,7 +123,10 @@
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
   </li>
   <li>
-    <a href="../aks/redeploying-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
+    <a href="../aks/upgrading-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
+  </li>
+  <li>
+    <a href="../aks/rebuilding-aks-clusters.html"><span>Rebuilding AKS Clusters</span></a>
   </li>
   <li>
     <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
@@ -369,7 +372,7 @@
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="upgrading-aks-clusters">Upgrading AKS Clusters</h1>
-<p>This run book documents some tasks that we have to perform when upgrading any of the AKS Clusters</p>
+<p>This run book documents some tasks that we have to perform when upgrading any of the AKS Clusters.  If you need to rebuild a cluster, please refer to the <a href="rebuilding-aks-clusters.html">rebuild guide</a></p>
 <h2 id="cluster-order-of-upgrading">Cluster Order of Upgrading</h2>
 <p>This is the normal order we use when upgrading clusters, it does not have to exactly follow it:</p>
 
@@ -444,24 +447,14 @@
 <p>Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer:</p>
 <p><a href="https://portal.azure.com">portal.azure.com</a> &gt; Load Balancer &gt; search for &lsquo;kubernetes-internal&rsquo; &gt; filter by the Resource Group &gt; click on the load balancer returned by the search &gt; click on Frontend IP Configuration &gt; the IP Address is the one you need</p>
 <h2 id="environment-specific-steps">Environment Specific Steps</h2>
-<p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.</p>
+<p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
+We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren&rsquo;t building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.</p>
 <h3 id="ptlsbox-ptl">Ptlsbox, Ptl</h3>
-<p>Make an announcement that Jenkins will be briefly unavailable in the cloud-native-announce slack channel. 
+<p>Make an announcement that Jenkins may be briefly unavailable in the cloud-native-announce slack channel. 
 This environment is best to be done early in the morning.
 See <a href="/jenkins/">Jenkins instances</a> to check they are running after upgrades.</p>
-<h3 id="dev-preview-aat-staging">Dev/Preview, AAT/Staging</h3>
-
-<ul>
-<li>Change Jenkins to use the other cluster that is not going to be redeployed
-
-<ul>
-<li><a href="https://github.com/hmcts/sds-flux-config/pull/2637">SDS example</a></li>
-<li><a href="https://github.com/hmcts/cnp-flux-config/pull/7138">CFT example</a></li>
-</ul></li>
-<li>If the configuration doesn&rsquo;t update after your pull request has been merged, you can change it manually in the <a href="https://build.platform.hmcts.net/configure">Jenkins Configuration</a></li>
-</ul>
 <h2 id="upgrading-the-cluster">Upgrading the Cluster</h2>
-<p>Find the cluster you want to upgrade into the portal.</p>
+<p>Find the cluster you want to upgrade into the portal, which should have been removed from app gateway.</p>
 <p>Cluster Configuration &gt; Upgrade Version &gt; in the Kubernetes version drop down menu choose the latest GA version &gt; Click Save</p>
 <p>This will trigger the upgrade of the cluster, which will take some time. Once this has finished you need to create a pull request to update the code to match.</p>
 
@@ -494,7 +487,6 @@ See <a href="/jenkins/">Jenkins instances</a> to check they are running after up
   </strong>
 </div>
 <p><a href="known-issues.html">Troublehsooting upgrade failures</a></p>
-<p>If a cluster is in a failed state and you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.</p>
 <h2 id="after-upgrading-of-a-cluster">After upgrading of a cluster</h2>
 
 <ul>
@@ -505,139 +497,14 @@ See <a href="/jenkins/">Jenkins instances</a> to check they are running after up
 <li><a href="https://github.com/hmcts/azure-platform-terraform/pull/595/files">CFT example</a></li>
 </ul></li>
 </ul>
-<h2 id="re-building-a-cluster">Re-building a cluster</h2>
-
-<div class="govuk-warning-text">
-  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-  <strong class="govuk-warning-text__text">
-    <span class="govuk-warning-text__assistive">Warning</span>
-    Re-building a cluster is only done when absolutely necessary.
-  </strong>
-</div>
-<p>When re-building a cluster, delete the cluster manually in portal. You will have to remove the lock on resource group if applied.</p>
-<p>To re-build the cluster you need to run the pipeline:</p>
-
-<ul>
-<li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">CFT Pipeline</a></li>
-<li><a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482">SDS Pipeline</a></li>
-</ul>
-<p>Click on <strong>Run pipeline</strong> (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.</p>
-<p>Click on <strong>Run</strong> to start the pipeline.</p>
-<h2 id="environment-specific-re-builds">Environment Specific Re-builds</h2>
-<h3 id="preview">Preview</h3>
-<p>We have the ability to create another preview cluster on demand. We do not run with two at a time as they are 75 node clusters and that would be quite expensive. Announce preview cluster swap a day in advance in the #cloud-native-announce channel</p>
-<h4 id="when-the-build-has-finished">When the build has finished</h4>
-
-<ul>
-<li>Check the system helm releases and pods are up in the namespaces: flux-system, kube-system, admin</li>
-<li>Check an external IP has been assigned: <code>kubectl get svc traefik -n admin</code></li>
-</ul>
-<h4 id="how-to-test-a-specific-preview-cluster-without-swapping-over">How to test a specific Preview cluster without swapping over</h4>
-<p>Create a branch of the Jenkins library that forces Jenkins to use the cluster that you want to use.
-See this <a href="https://github.com/hmcts/cnp-jenkins-library/commit/a64cfe6919da522780e5cfb1cb4804dd6fa3675a">commit</a> as an example.
-Do not use an existing branch as it may be missing changes that are required for the preview cluster to work.</p>
-<p>Change the plum Jenkinsfile to use the Jenkins library branch you created, <a href="https://github.com/hmcts/cnp-plum-recipes-service/pull/379/files">example</a>, do not merge it in, but instead check in Jenkins that the pipeline run has completed without any issues.</p>
-<h4 id="after-deployment-of-a-cluster">After deployment of a cluster</h4>
-
-<ul>
-<li>Change Jenkins to use the other cluster, e.g. <a href="https://github.com/hmcts/cnp-flux-config/pull/19886/files">cnp-flux-config#19886</a> .
-
-<ul>
-<li>If not updated, you can change manually providing PR has been approved and merged <a href="https://build.platform.hmcts.net/configure">View Jenkins Configuration</a></li>
-</ul></li>
-<li>Swap external DNS active cluster, e.g. <a href="https://github.com/hmcts/cnp-flux-config/pull/19889">cnp-flux-config#19889</a> </li>
-<li>Create a test PR, normally we just make a README change to <a href="https://github.com/hmcts/rpe-pdf-service">rpe-pdf-service</a> . <a href="https://github.com/hmcts/rpe-pdf-service/pull/318">example PR</a>
-
-<ul>
-<li>Check this PR in Jenkins has successfully ran through stage <a href="https://build.platform.hmcts.net/job/HMCTS_Platform/job/rpe-pdf-service/view/change-requests/job/PR-318/">AKS deploy - preview</a></li>
-</ul></li>
-<li>Update the charts for jobs and steps pointing to the new preview <a href="https://github.com/hmcts/cnp-azuredevops-libraries/pull/127/files">cnp-azuredevops-pipelines#127</a></li>
-<li>Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example annoucenment:-</li>
-</ul>
-<p>Hi all, Preview cluster has been swapped cft-preview-00-aks.
-Login using:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
-</code></pre></div>
-<ul>
-<li>Delete all ingress on the old cluster to ensure external-dns deletes its existing records:</li>
-</ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl delete ingress --all-namespaces -l '!helm.toolkit.fluxcd.io/name,app.kubernetes.io/managed-by=Helm'
-</code></pre></div>
-<ul>
-<li>Delete any orphan A records that external-dns might have missed:</li>
-</ul>
-<p><em>Replace X.X.X.X with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup</em></p>
-<p>Private DNS</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
-az network private-dns record-set a list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
-</code></pre></div><p>Deletes any txt records pointing to inactive:</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c"># Private DNS</span>
-az network private-dns record-set txt list <span class="nt">--zone-name</span> preview.platform.hmcts.net <span class="nt">-g</span> core-infra-intsvc-rg <span class="nt">--subscription</span> DTS-CFTPTL-INTSVC <span class="nt">--query</span> <span class="s2">"[?contains(txtRecords[0].value[0], 'inactive')].[name]"</span> <span class="nt">-o</span> tsv | xargs <span class="nt">-I</span> <span class="o">{}</span> <span class="nt">-n</span> 1 <span class="nt">-P</span> 8 az network private-dns record-set txt delete <span class="nt">--zone-name</span> preview.platform.hmcts.net <span class="nt">-g</span> core-infra-intsvc-rg <span class="nt">--subscription</span> DTS-CFTPTL-INTSVC <span class="nt">--yes</span> <span class="nt">--name</span> <span class="o">{}</span>
-<span class="c"># Public DNS</span>
-az network dns record-set txt list <span class="nt">--zone-name</span> preview.platform.hmcts.net <span class="nt">-g</span> reformmgmtrg <span class="nt">--subscription</span> Reform-CFT-Mgmt <span class="nt">--query</span> <span class="s2">"[?contains(txtRecords[0].value[0], 'inactive')].[name]"</span> <span class="nt">-o</span> tsv | xargs <span class="nt">-I</span> <span class="o">{}</span> <span class="nt">-n</span> 1 <span class="nt">-P</span> 8 az network dns record-set txt delete <span class="nt">--zone-name</span> preview.platform.hmcts.net <span class="nt">-g</span> reformmgmtrg <span class="nt">--subscription</span> Reform-CFT-Mgmt <span class="nt">--yes</span> <span class="nt">--name</span> <span class="o">{}</span>
-</code></pre></div><p>Once swap over is fully complete then delete the old cluster:</p>
-
-<ul>
-<li>Comment out the inactive preview cluster. <a href="https://github.com/hmcts/aks-cft-deploy/pull/485">Example PR</a>. Once PR has been approved and merged run <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766">this pipeline</a></li>
-</ul>
-<h3 id="aat">AAT</h3>
-<h4 id="aat-after-deployment-of-a-cluster">After deployment of a cluster</h4>
-
-<ul>
-<li>Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). <a href="https://github.com/hmcts/azure-private-dns/pull/428/files">Update active jenkins-cluster IP value in DNS</a> and <a href="https://github.com/hmcts/azure-private-dns/pull/430/files">update existing platform-hmcts-net entries</a>.</li>
-</ul>
-<h3 id="production">Production</h3>
-<h4 id="before-deployment-of-a-cluster">Before deployment of a cluster</h4>
-
-<ul>
-<li>Merge PR to remove a cluster from AGW</li>
-</ul>
-<h4 id="production-after-deployment-of-a-cluster">After deployment of a cluster</h4>
-
-<ul>
-<li>Add the cluster back into AGW once you have confirmed deployment has been successful. <a href="https://github.com/hmcts/azure-platform-terraform/pull/595">PR example here</a>.</li>
-</ul>
-<h3 id="perftest">Perftest</h3>
-<h4 id="perftest-before-deployment-of-a-cluster">Before deployment of a cluster</h4>
-
-<ul>
-<li>Confirm that the environment is not being used with Nickin Sitaram before starting. </li>
-<li>Use slack channel pertest-cluster for communication.</li>
-<li>Scale the number of active nodes, increase by 5 nodes if removing a custer. 
-Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.</li>
-</ul>
-<h4 id="perftest-after-deployment-of-a-cluster">After deployment of a cluster</h4>
-
-<ul>
-<li>Check all pods are deployed and running. Compare with pods status reference taken pre-deployment</li>
-</ul>
-<h2 id="known-issues">Known issues</h2>
-<h3 id="neuvector">Neuvector</h3>
-
-<ol>
-<li><code>admission webhook &quot;neuvector-validating-admission-webhook.neuvector.svc&quot; denied the request:</code>, these alerts can be seen on <code>aks-neuvector-&lt;env&gt;</code> slack channels
-
-<ul>
-<li>This happens when neuvector is broken. </li>
-<li>Check events and status of neuvector helm release. </li>
-<li>Delete Neuvector Helm release to see if it comes back fine.</li>
-</ul></li>
-<li>Neuvector fails to install.
-
-<ul>
-<li>Check if all enforcers come up in time, they could fail to come if nodes are full.</li>
-<li>If they keep failing with race conditions, it could be due to backups being corrupt.</li>
-<li>Usually <code>policy.backup</code> and <code>admission_control.backup</code> are the ones you need to delete from Azure file share if they are corrupt.</li>
-</ul></li>
-</ol>
 
             
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/redeploying-aks-clusters.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Upgrading+AKS+Clusters%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fredeploying-aks-clusters.html%29&amp;labels=bug&amp;title=Re%3A+%27Upgrading+AKS+Clusters%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/upgrading-aks-clusters.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Upgrading+AKS+Clusters%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fupgrading-aks-clusters.html%29&amp;labels=bug&amp;title=Re%3A+%27Upgrading+AKS+Clusters%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

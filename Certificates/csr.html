@@ -372,14 +372,7 @@
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="requesting-ssl-certificates">Requesting SSL Certificates</h1>
-<p>Two things are required when requesting new Certs: 
-- A completed SSL Form - attached as SSL-Certificate-Request-Form.docx, a blank one has been added so that developers may fill in a new form:
-<a href="forms/SSL-Certificate-Request-Form.docx">SSL Certificate Request Form</a>.
-This form is only required for new SSLs and is not needed for renewal requests.</p>
-
-<ul>
-<li>A newly generated CSR request. The CSR&rsquo;s can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file): </li>
-</ul>
+<p>Firstly you will need a Certificate Signing Request (CSR). A CSR can be generated through a csr.yml file following the guidance in this repo (wildcard certs are generated with a different syntax within the csr.yml file):</p>
 <p>Example Csr.yml files can be found on the openssl-mac-branch branch</p>
 
 <ul>
@@ -418,9 +411,20 @@ Note: this can configuring by changing the subscription + vault in the generate_
 <p>The certificate requests will be output to the archive_csr/<date> folder
 (wildcard CSRs e.g. *.platform.hmcts.net are generated as wildcard-platform-hmcts-net in the archive folder)</p>
 <p>The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.</p>
-<p>Once the csr has been generated, feel free to send the csr and the ssl form to opsconfman@hmcts.net.</p>
+<h3 id="submit-request-form">Submit request form</h3>
+<p>Once you have generated a CSR, you can raise a request with the HMCTS OPS Procurement team via <a href="https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&amp;sys_id=8d7207ce1b1d6d1049c38732f54bcb20">ServiceNow</a>.</p>
+<p>You&rsquo;ll be asked to provide the following information:</p>
+
+<ul>
+<li>Certificate Common Name (CN)</li>
+<li>Certificate Subject Alternative Names (SANs) <em>if multiple domains are required</em></li>
+<li>Certificate Validity Period (typically 1 to 2 years)</li>
+<li>Project Manager</li>
+<li>Project Name/Programme Name</li>
+<li>Your name &amp; contact information</li>
+</ul>
 <h3 id="pointing-the-dns">Pointing the DNS</h3>
-<p>You will receive an email back asking you to point the DNS, this email will look something like:
+<p>Once you have submitted the service now request, you will receive an email asking you to point the DNS. The email will contain an instruction similar to this:
 <code>&quot;Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.&quot;</code></p>
 <p>There&rsquo;s some changes to make to these instructions before raising a PR:</p>

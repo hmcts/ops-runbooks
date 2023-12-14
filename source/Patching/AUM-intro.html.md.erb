@@ -1,17 +1,32 @@
 ---
 title: Azure Update Manager - Operations Guide
 weight: 255
-last_reviewed_on: 2023-12-06
+last_reviewed_on: 2023-12-14
 review_in: 6 months
 ---
 # <%= current_page.data.title %>
 
-Azure Update Manager is a unified service, tightly intergrated into the Azure Portal, enabling the operating system patching of Windows and Linux virtual machinces.
+Azure Update Manager is a unified service, tightly integrated into the Azure Portal, simplifying the patching of Windows and Linux operating systems.
 
-### BEWARE
-*Azure Update Manager (AUM) is a different service to the similar service, Update Management in Azure Automation*
+**BEWARE**
+*Azure Update Manager (AUM) is a different service to the similarly service, Update Management in Azure Automation. This can create confusion when searching for help within the Azure documentation.*
 
+### Azure Update Manager documentation
+[Link to MS docs](https://learn.microsoft.com/en-us/azure/update-manager/)
 
-## Support matrix for Azure Update Manager
+### Support matrix for Azure Update Manager
 
 Only supported configurations will recieve patches [Supported Operating Systems](https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems).
+
+## Getting Started
+---
+
+Using the Azure portal, browse to the VM to be protected. Select **Updates** then **Update Settings**
+
+![Update_Settings](images/AUM_Update_Settings.png)
+
+For HMCTS maintence configurations, set the *Periodic assessment* as **Enable** and *Patch orchestration* as **Customer Managed Schedules**
+
+![Configuration_Settings](images/AUM_VM_UpdateSettings.png)
+
+Various problems described in the troubleshooting section are the result, of not setting these values correctly.

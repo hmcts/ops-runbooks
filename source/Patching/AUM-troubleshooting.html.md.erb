@@ -1,0 +1,17 @@
+---
+title: Troubleshooting Azure Update Manager
+weight: 259
+last_reviewed_on: 2023-12-14
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+Azure Update Manager uses an agent which is included with supported Azure Marketplace images.
+[Windows VM Agent](https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-windows)
+[Linux VM Agent](https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-linux)
+
+HMCTS legacy Ubuntu VMs didn't patch due to the waagent.conf file, not having the **AutoUpdate.Enabled=y** configured.
+[Linux Agent Configuration](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/update-linux-agent?tabs=ubuntu)
+
+
+![Maintenance_Configuration_Error1](images/AUM_Schedule_Error1.png)

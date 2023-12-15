@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Adding Pages - HMCTS</title>
+    <title>Troubleshooting Azure Update Manager - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Patching/AUM-troubleshooting.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Adding Pages - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta name="twitter:title" content="Troubleshooting Azure Update Manager - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Patching/AUM-troubleshooting.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Adding Pages" />
+      <meta property="og:title" content="Troubleshooting Azure Update Manager" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Patching/AUM-troubleshooting.html" />
 
     
   </head>
@@ -378,59 +378,58 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="adding-pages">Adding Pages</h1>
-<p>These pages are written in the Markdown, lightweight markup language and stored with a github repo.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+            <h1 id="troubleshooting-azure-update-manager">Troubleshooting Azure Update Manager</h1>
+<p>When troubleshhoting patching issues, remember that Azure Update Manager only orchestrates the process by triggering the operating systems own patching features. 
+If these services are faulty, AUM will be unable to resolve the issue and only has limited ability to report issues, via the Azure Portal.</p>
+<p><strong>Troubleshooting OS Patching Problems</strong></p>
+<p>a). Try turning it off and on again&hellip;</p>
 
-<ul>
-<li>Basic knowledge of using markdown to create documents</li>
-<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
-</ul>
-<h2 id="documentation">Documentation</h2>
-<p>Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb</p>
-<h2 id="index-page">Index Page</h2>
-<p>The first page in every folder should be called <strong>index.html.md.erb</strong> and start with these <strong>7 lines of code</strong>.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>---
-title: Contribution Guide
-weight: 5
----
+<ol>
+<li><p>Confirm OS patching operates correctly via local console on VM.</p></li>
+<li><p>Run One-time update for just the problem VM</p></li>
+<li><p>If problem VM is selected via Dynamic scope, change to Resourses and vice versa, in the Maintenance Configuration</p></li>
+</ol>
+<h3 id="be-patient">Be Patient</h3>
+<p>It has been noted in testing that status updates and progress are not frequently refreshed.  Allow time 15 minutes for processes to complete. The operating system update features need to report thier status to AUM.
+The recommended updates screen does not refresh multiple times within an hour and over night might be required, for all activities to be reported correctly.</p>
+<p>Error - &ldquo;The following packages have been kept back&rdquo; Error while updating your system 
+Ubuntu (Canonical) phases updates, which require time for package changes to propagate. Overnight, resolved this issue and</p>
+<h3 id="agents">Agents</h3>
+<p>Azure Update Manager uses an agent which is included with supported Azure Marketplace images.</p>
+<p><a href="https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-windows">Windows VM Agent</a></p>
+<p><a href="https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-linux">Linux VM Agent</a></p>
+<p>HMCTS legacy Ubuntu VMs do not patch due to the waagent.conf file, not having the <strong>AutoUpdate.Enabled=y</strong> configured.</p>
+<p><a href="https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/update-linux-agent?tabs=ubuntu">Linux Agent Configuration</a></p>
+<h3 id="azure-maintenance-configuration-errors">Azure Maintenance Configuration Errors</h3>
+<p>When creating or updating the Maintenance Configuration, the portal may flash and display &ldquo;The renderComponetIntoRoot component encountered an error while loading&rdquo;</p>
+<p><a href="/Users/brendon.higgins/Desktop/AUM_Maintenance_Configuration_Error1.png" rel="noopener noreferrer"><img src="../Users/brendon.higgins/Desktop/AUM_Maintenance_Configuration_Error1.png" alt="Maintenance_Configuration_Error1" /></a></p>
+<p>You may also see this error
+<a href="images/AUM_Schedule_Error1.png" rel="noopener noreferrer"><img src="images/AUM_Schedule_Error1.png" alt="Maintenance_Configuration_Error2" /></a></p>
+<p>This is because the VM Update Setting have not been configured correctly. 
+<a href="images/AUM_VM_UpdateSettings.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings.png" alt="Configuration_Settings" /></a></p>
 
-# &lt;%= current_page.data.title %&gt;
-</code></pre></div><p><strong>Weight</strong> is used to control the pages possition in the master index.  With low numbers at the top.  Where possible <strong>increment the count by 10</strong>.</p>
-<h2 id="well-written-pages">Well Written Pages</h2>
+              <div data-module='page-expiry' data-last-reviewed-on="2024-06-14">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 14 December 2023.
 
-<ul>
-<li>Prerequisite Section at top</li>
-<li>Diagrams (A good diagram, tells the story)</li>
-<li>Admin Tools
+        It needs to be reviewed again on 14 June 2024
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
 
-<ul>
-<li>Admin portal (URL or IP address)</li>
-<li>Instructions to download, install and configure</li>
-<li>Describe with text, how to navigate within the system</li>
-</ul></li>
-<li>Follow house style guide
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 14 June 2024
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
 
-<ul>
-<li>Use emply template for new products and applications</li>
-<li>When section is empty, leave it in place but add the word blank to show it is not relivent</li>
-</ul></li>
-<li>Core sections
-
-<ul>
-<li>Introduction or Description (What is it)</li>
-<li>Prerequisites (Can it be made to work by reader)</li>
-<li>Location (Links, URLs, IP addresses or pointers)</li>
-</ul></li>
-</ul>
-
-            
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/addingpages.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Adding+Pages%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Faddingpages.html%29&amp;labels=bug&amp;title=Re%3A+%27Adding+Pages%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/AUM-troubleshooting.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Troubleshooting+Azure+Update+Manager%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPatching%2FAUM-troubleshooting.html%29&amp;labels=bug&amp;title=Re%3A+%27Troubleshooting+Azure+Update+Manager%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

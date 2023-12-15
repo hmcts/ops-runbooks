@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Adding Pages - HMCTS</title>
+    <title>Azure Update Manager - Operations Guide - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Patching/AUM-intro.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Adding Pages - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta name="twitter:title" content="Azure Update Manager - Operations Guide - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Patching/AUM-intro.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Adding Pages" />
+      <meta property="og:title" content="Azure Update Manager - Operations Guide" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Patching/AUM-intro.html" />
 
     
   </head>
@@ -378,59 +378,45 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="adding-pages">Adding Pages</h1>
-<p>These pages are written in the Markdown, lightweight markup language and stored with a github repo.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+            <h1 id="azure-update-manager-operations-guide">Azure Update Manager - Operations Guide</h1>
+<p>Azure Update Manager is a unified service, tightly integrated into the Azure Portal, simplifying the patching of Windows and Linux operating systems.</p>
+<p><strong>BEWARE</strong>
+<em>Azure Update Manager (AUM) is a different service to the similarly named service, Update Management in Azure Automation. This can create confusion when searching for help within the Azure documentation.</em></p>
+<h3 id="azure-update-manager-documentation">Azure Update Manager documentation</h3>
+<p><a href="https://learn.microsoft.com/en-us/azure/update-manager/">Link to MS docs</a></p>
+<h3 id="support-matrix-for-azure-update-manager">Support matrix for Azure Update Manager</h3>
+<p>Only supported configurations will recieve patches <a href="https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems">Supported Operating Systems</a>.</p>
+<h2 id="getting-started">Getting Started</h2>
 
-<ul>
-<li>Basic knowledge of using markdown to create documents</li>
-<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
-</ul>
-<h2 id="documentation">Documentation</h2>
-<p>Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb</p>
-<h2 id="index-page">Index Page</h2>
-<p>The first page in every folder should be called <strong>index.html.md.erb</strong> and start with these <strong>7 lines of code</strong>.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>---
-title: Contribution Guide
-weight: 5
----
+<hr>
+<p>Using the Azure portal, browse to the VM to be protected. Select <strong>Updates</strong> then <strong>Update Settings</strong></p>
+<p><a href="images/AUM_Update_Settings.png" rel="noopener noreferrer"><img src="images/AUM_Update_Settings.png" alt="Update_Settings" /></a></p>
+<p>For HMCTS maintence configurations, set the <em>Periodic assessment</em> as <strong>Enable</strong> and <em>Patch orchestration</em> as <strong>Customer Managed Schedules</strong></p>
+<p><a href="images/AUM_VM_UpdateSettings.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings.png" alt="Configuration_Settings" /></a></p>
+<p>Various problems described in the troubleshooting section are the result, of not setting these values correctly.</p>
 
-# &lt;%= current_page.data.title %&gt;
-</code></pre></div><p><strong>Weight</strong> is used to control the pages possition in the master index.  With low numbers at the top.  Where possible <strong>increment the count by 10</strong>.</p>
-<h2 id="well-written-pages">Well Written Pages</h2>
+              <div data-module='page-expiry' data-last-reviewed-on="2024-06-14">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 14 December 2023.
 
-<ul>
-<li>Prerequisite Section at top</li>
-<li>Diagrams (A good diagram, tells the story)</li>
-<li>Admin Tools
+        It needs to be reviewed again on 14 June 2024
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
 
-<ul>
-<li>Admin portal (URL or IP address)</li>
-<li>Instructions to download, install and configure</li>
-<li>Describe with text, how to navigate within the system</li>
-</ul></li>
-<li>Follow house style guide
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 14 June 2024
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
 
-<ul>
-<li>Use emply template for new products and applications</li>
-<li>When section is empty, leave it in place but add the word blank to show it is not relivent</li>
-</ul></li>
-<li>Core sections
-
-<ul>
-<li>Introduction or Description (What is it)</li>
-<li>Prerequisites (Can it be made to work by reader)</li>
-<li>Location (Links, URLs, IP addresses or pointers)</li>
-</ul></li>
-</ul>
-
-            
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/addingpages.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Adding+Pages%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Faddingpages.html%29&amp;labels=bug&amp;title=Re%3A+%27Adding+Pages%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/AUM-intro.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Azure+Update+Manager+-+Operations+Guide%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FPatching%2FAUM-intro.html%29&amp;labels=bug&amp;title=Re%3A+%27Azure+Update+Manager+-+Operations+Guide%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

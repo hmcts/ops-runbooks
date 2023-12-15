@@ -5,13 +5,45 @@ last_reviewed_on: 2023-12-14
 review_in: 6 months
 ---
 # <%= current_page.data.title %>
+When troubleshhoting patching issues, remember that Azure Update Manager only orchestrates the process by triggering the operating systems own patching features. 
+If these services are faulty, AUM will be unable to resolve the issue and only has limited ability to report issues, via the Azure Portal.
 
+**Troubleshooting OS Patching Problems**
+
+a). Try turning it off and on again...
+
+1. Confirm OS patching operates correctly via local console on VM.
+
+2. Run One-time update for just the problem VM
+
+3. If problem VM is selected via Dynamic scope, change to Resourses and vice versa, in the Maintenance Configuration
+
+### Be Patient
+It has been noted in testing that status updates and progress are not frequently refreshed.  Allow time 15 minutes for processes to complete. The operating system update features need to report thier status to AUM.
+The recommended updates screen does not refresh multiple times within an hour and over night might be required, for all activities to be reported correctly.
+
+Error - "The following packages have been kept back" Error while updating your system 
+Ubuntu (Canonical) phases updates, which require time for package changes to propagate. Overnight, resolved this issue and 
+
+
+### Agents
 Azure Update Manager uses an agent which is included with supported Azure Marketplace images.
+
 [Windows VM Agent](https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-windows)
+
 [Linux VM Agent](https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-linux)
 
-HMCTS legacy Ubuntu VMs didn't patch due to the waagent.conf file, not having the **AutoUpdate.Enabled=y** configured.
+HMCTS legacy Ubuntu VMs do not patch due to the waagent.conf file, not having the **AutoUpdate.Enabled=y** configured.
+
 [Linux Agent Configuration](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/update-linux-agent?tabs=ubuntu)
 
+### Azure Maintenance Configuration Errors 
+When creating or updating the Maintenance Configuration, the portal may flash and display "The renderComponetIntoRoot component encountered an error while loading"
 
-![Maintenance_Configuration_Error1](images/AUM_Schedule_Error1.png)
+![Maintenance_Configuration_Error1](/Users/brendon.higgins/Desktop/AUM_Maintenance_Configuration_Error1.png)
+
+You may also see this error
+![Maintenance_Configuration_Error2](images/AUM_Schedule_Error1.png)
+
+This is because the VM Update Setting have not been configured correctly. 
+![Configuration_Settings](images/AUM_VM_UpdateSettings.png)

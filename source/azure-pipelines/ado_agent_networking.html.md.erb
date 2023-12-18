@@ -1,0 +1,30 @@
+---
+title: Agent Pool Networking
+weight: 30
+---
+
+# <%= current_page.data.title %>
+ADO pipelines, agent pools are containers hosted by Azure Kubernetes services for HMCTS. 
+
+Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
+If the agent is actually a Kubernetes container, it will also state the Kubernetes_Port, with HMCTS being 10.0.0.1:443.
+![Agent_Capabilities](images/ADO-Agent-Capabilities.png)
+
+### Connectivity
+These are examples of some of the 
+| Agent Pool | Virtual network | subnet| IPv4 |
+| - | - | - | - |
+| hmcts-ss-ptl | ss-ptl-vnet | aks-00 | 10.147.64.0/20 |
+| hmcts-ss-ptl |  ss-ptl-vnet | aks-01 | 10.147.80.0/20 |
+| hmcts-ss-ptlsbox |  ss-ptlsbox-vnet | aks-00 | 10.147.0.0/20 |
+| hmcts-ss-ptlsbox |  ss-ptlsbox-vnet | aks-01 | 10.147.16.0/20 |
+
+### Private DNS Zones and Private End Points
+To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.
+[Azure-Private-DNS](https://github.com/hmcts/azure-private-dns)
+
+Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets
+
+[Azure-Private-DNS-Private-Link](https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink)
+
+

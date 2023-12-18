@@ -1,0 +1,28 @@
+---
+title: ADO Pipeline Agents
+weight: 25
+---
+
+# <%= current_page.data.title %>
+ADO can run pipelines on private Azure VMs owned by HMCTS, multiple VMs are grouped into Agent Pools.  It is these VMs which connect to the resources in HMCTS Azure environments. See (ADO Networking)
+
+### Used Agent Pool
+Agents will be assigned in the azure-pipeline.yaml (maybe something else, edit pipeline to confirm file name) file, as the 'agentPool' with a value like 'hmcts-sds-ptlsbox'. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
+
+When the pipeline runs, the agent used is displayed on the 1st tab of each stage, in the pipeline.
+![Agent_Used](images/ADO-Agent-assigned.png)
+
+### Service Principle, Agent's User Account
+The agent pool computer needs an account to communitate with Azure resources and a service principle is used, via the pipelines service connections. Select "Manage Service Principal" to view the details.
+backendServiceArm is used within the pipelines code to assign the Service connection.
+
+Service Principals are displayed in the Azure Portal as both Enterprise Applications (Service Principal) and Applications
+![SP_Details](images/ADO-Service-Principal.png)
+
+**API Permissions**
+To increase the configured permissions assigned to a service principle, edit the [Azure-Enterprise](https://github.com/hmcts/azure-enterprise) repo.
+Add a additional_api_permissions property to the subscription definition in the *.tfvars file
+
+## Which account are PATs created under?
+
+

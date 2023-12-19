@@ -1,0 +1,41 @@
+---
+title: ADO Pipeline Agents
+weight: 25
+---
+
+# <%= current_page.data.title %>
+ADO can run pipelines on either Windows or Linux operating systems owned by HMCTS, these systems are grouped into **Agent Pools**.  It is one of these agent pool systems that connect to the resources in HMCTS Azure environments. See [ADO Networking](ado_agent_networking.html)
+
+### Used Agent Pool
+Agents maybe be assigned in the pipeline, typically called *azure-pipeline.yaml* but can be something else.  Right click on the pipeline in the ADO portal and select edit to open the configuration.
+Look for the *agentPool* within the file and value will be something like *hmcts-sds-ptlsbox*. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
+
+When the pipeline runs, the agent used is displayed on the 1st tab of each stage, in the pipeline.
+![Agent_Used](images/ADO-Agent-assigned.png)
+
+### Service Principle, Agent's User Account
+The agent pool computer needs an account to communitate with Azure resources and a service principle is used, via the pipelines service connections. Select *Manage Service Principal* to view the details.
+backendServiceArm is used within the pipelines code to assign the Service connection.
+
+**Service Principals** are displayed in the Azure Portal as both Enterprise Applications (Service Principal) and Applications
+![SP_Details](images/ADO-Service-Principal.png)
+
+**API Permissions**
+To increase the configured permissions assigned to a service principle, edit the [Azure-Enterprise](https://github.com/hmcts/azure-enterprise) repo.
+Add a additional_api_permissions property to the subscription definition in the *.tfvars file
+
+### Example
+
+The example below will add API permissions for Microsoft Purview to the `DTS-SHAREDSERVICES-DEV` service principal.
+
+```terraform
+DTS-SHAREDSERVICES-DEV = {
+  deploy_acme = true
+  additional_api_permissions = {
+    "73c2949e-da2d-457a-9607-fcc665198967" = {
+      "817468d0-81dd-4cb5-94ac-07ca133fbbf6" = "Scope"
+    }
+  }
+}
+```
+

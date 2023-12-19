@@ -4,10 +4,10 @@ weight: 25
 ---
 
 # <%= current_page.data.title %>
-ADO can run pipelines on private Azure VMs owned by HMCTS, multiple VMs are grouped into **Agent Pools**.  It is these VMs which connect to the resources in HMCTS Azure environments. See (ADO Networking)
+ADO can run pipelines on either Windows or Linux operating systems owned by HMCTS, these systems are grouped into **Agent Pools**.  It is one of these agent pool systems that connect to the resources in HMCTS Azure environments. See [ADO Networking](ado_agent_networking.html)
 
 ### Used Agent Pool
-Agents will be assigned in the azure-pipeline.yaml (maybe something else, edit pipeline to confirm file name) file, as the *agentPool* with a value like *hmcts-sds-ptlsbox*. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
+Agents will be assigned in the azure-pipeline.yaml file, as the *agentPool* with a value like *hmcts-sds-ptlsbox*. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
 
 When the pipeline runs, the agent used is displayed on the 1st tab of each stage, in the pipeline.
 ![Agent_Used](images/ADO-Agent-assigned.png)
@@ -23,5 +23,18 @@ backendServiceArm is used within the pipelines code to assign the Service connec
 To increase the configured permissions assigned to a service principle, edit the [Azure-Enterprise](https://github.com/hmcts/azure-enterprise) repo.
 Add a additional_api_permissions property to the subscription definition in the *.tfvars file
 
+### Example
 
+The example below will add API permissions for Microsoft Purview to the `DTS-SHAREDSERVICES-DEV` service principal.
+
+```terraform
+DTS-SHAREDSERVICES-DEV = {
+  deploy_acme = true
+  additional_api_permissions = {
+    "73c2949e-da2d-457a-9607-fcc665198967" = {
+      "817468d0-81dd-4cb5-94ac-07ca133fbbf6" = "Scope"
+    }
+  }
+}
+```
 

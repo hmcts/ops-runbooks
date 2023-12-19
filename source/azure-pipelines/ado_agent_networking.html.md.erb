@@ -8,10 +8,12 @@ ADO pipelines, agent pools are containers hosted by Azure Kubernetes services fo
 
 Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
 If the agent is actually a Kubernetes container, it will also state the Kubernetes_Port, with HMCTS being 10.0.0.1:443.
-![Agent_Capabilities](images/ADO-Agent-Capabilities.png)
 
-### Connectivity
-These are examples of some of the 
+![Agent_Capabilities](images/ADO-Agent-Capabilities.png )
+
+### Virtual Networks
+These are examples of some of the agent pool and vNet names
+
 | Agent Pool | Virtual network | subnet| IPv4 |
 | - | - | - | - |
 | hmcts-ss-ptl | ss-ptl-vnet | aks-00 | 10.147.64.0/20 |
@@ -19,12 +21,73 @@ These are examples of some of the
 | hmcts-ss-ptlsbox |  ss-ptlsbox-vnet | aks-00 | 10.147.0.0/20 |
 | hmcts-ss-ptlsbox |  ss-ptlsbox-vnet | aks-01 | 10.147.16.0/20 |
 
+### Palo Alto Firewalls
+Traffic from the agent pool to the Azure resource, flows through the Palo Alto if the infrastructure has been correctly configured.
+
+![Firewall_Monitor](images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png)
+
+Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet secuirty rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
+If the traffic is coming into Azure from the agent pool, use Azure portal Network Watch to troubleshoot.
+
 ### Private DNS Zones and Private End Points
 To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.
+
 [Azure-Private-DNS](https://github.com/hmcts/azure-private-dns)
 
 Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets
 
 [Azure-Private-DNS-Private-Link](https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink)
 
+## Public Network Services or Private
+Azure resources can be configured as either public or private, with private creating additional requirements for agent access.
 
+![Resource_Firewall](images/ADO-Resource-Firewall.png)
+
+**Example of private storage account**
+
+Pipeline will fail with an AuthorizationFailure error if only private network access is configured and access has not been granted. 
+
+![Resource_Firewall](images/ADO-Storage-Error.png)
+
+**RAW Error Message***
+```
+2023-07-25T16:31:31.0612142Z Error: containers.Client#GetProperties: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailure" Message="This request is not authorized to perform this operation.\nRequestId:19ad4843-f01e-007b-3515-bfe0bc000000\nTime:2023-07-25T16:31:30.6786267Z"
+2023-07-25T16:31:31.0613295Z
+2023-07-25T16:31:31.0613887Z  with module.sftp_cft_storage.azurerm_storage_container.container["dlrm"],
+2023-07-25T16:31:31.0615351Z  on .terraform/modules/sftp_cft_storage/containers.tf line 2, in resource "azurerm_storage_container" "container":
+2023-07-25T16:31:31.0616205Z   2: resource "azurerm_storage_container" "container" 
+2023-07-25T16:31:31.0616683Z
+```
+
+![Resource_vNet_Permissions](images/ADO-SA-vNet.png)
+
+https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf
+
+```terraform
+module "storage" {
+    for_each = { for account in local.flattened_storage_accounts : "${account.key}-${account.account_key}" => account }
+    source   = "github.com/hmcts/cnp-module-storage-account?ref=master"
+  
+    env                        = var.env
+    storage_account_name       = "${each.value.account_key}${var.env}stor"
+    resource_group_name        = azurerm_resource_group.this[each.value.key].name
+    location                   = azurerm_resource_group.this[each.value.key].location
+    account_kind               = "StorageV2"
+    account_tier               = each.value.account.tier
+    account_replication_type   = each.value.account.replication_type
+    enable_hns                 = each.value.account.enable_hns
+    enable_sftp                = each.value.account.enable_sftp
+    enable_nfs                 = each.value.account.enable_nfs
+    private_endpoint_subnet_id = "/subscriptions/${data.azurerm_subscription.this.subscription_id}/resourceGroups/${data.azurerm_resource_group.vnet_rg.name}/providers/Microsoft.Network/virtualNetworks/${data.azurerm_virtual_network.vnet.name}/subnets/${module.networking[each.value.key].subnet_names["${data.azurerm_virtual_network.vnet.name}-${each.value.key}"]}"
+    containers                 = each.value.account.containers
+  
+    sa_subnets = [
+      data.azurerm_subnet.ssptl-00.id,
+      data.azurerm_subnet.ssptl-01.id
+    ]
+  
+    team_name    = "Platform Operations"
+    team_contact = "#dtspo-orange"
+    common_tags  = module.ctags.common_tags
+  }
+  ```

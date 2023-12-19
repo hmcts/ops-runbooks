@@ -7,7 +7,8 @@ weight: 25
 ADO can run pipelines on either Windows or Linux operating systems owned by HMCTS, these systems are grouped into **Agent Pools**.  It is one of these agent pool systems that connect to the resources in HMCTS Azure environments. See [ADO Networking](ado_agent_networking.html)
 
 ### Used Agent Pool
-Agents will be assigned in the azure-pipeline.yaml file, as the *agentPool* with a value like *hmcts-sds-ptlsbox*. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
+Agents maybe be assigned in the pipeline, typically called *azure-pipeline.yaml* but can be something else.  Right click on the pipeline in the ADO portal and select edit to open the configuration.
+Look for the *agentPool* within the file and value will be something like *hmcts-sds-ptlsbox*. Depending on the written code, multiple agents can be described, then assigned to a specific environment.
 
 When the pipeline runs, the agent used is displayed on the 1st tab of each stage, in the pipeline.
 ![Agent_Used](images/ADO-Agent-assigned.png)

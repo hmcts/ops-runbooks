@@ -39,7 +39,7 @@ Traffic will also have to be enabled between the agent pool vNet and the private
 [Azure-Private-DNS-Private-Link](https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink)
 
 ## Public Network Services or Private
-Azure resources can be configured as either public or private, with private creating additional requirements for agent access.
+Azure resources can be configured as either public or private, with private creating additional requirements for agent pool access.
 
 ![Resource_Firewall](images/ADO-Resource-Firewall.png)
 
@@ -50,6 +50,7 @@ Pipeline will fail with an AuthorizationFailure error if only private network ac
 ![Resource_Firewall](images/ADO-Storage-Error.png)
 
 **RAW Error Message***
+
 ```
 2023-07-25T16:31:31.0612142Z Error: containers.Client#GetProperties: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailure" Message="This request is not authorized to perform this operation.\nRequestId:19ad4843-f01e-007b-3515-bfe0bc000000\nTime:2023-07-25T16:31:30.6786267Z"
 2023-07-25T16:31:31.0613295Z
@@ -60,6 +61,8 @@ Pipeline will fail with an AuthorizationFailure error if only private network ac
 ```
 
 ![Resource_vNet_Permissions](images/ADO-SA-vNet.png)
+
+Terraform code that adds agent pool vNets to the storage account.
 
 https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf
 

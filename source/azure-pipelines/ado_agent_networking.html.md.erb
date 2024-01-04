@@ -35,10 +35,23 @@ If your pipeline is reporting network errors and you are not observing ADO traff
 
 ![Azure_WAN_Connections](images/ADO-Agent-Connections.png)
 
+### Agent Routing ###
+If you vNET is new, you may need to update the route table aks-ptl-route-table, to enable the agents in K8s to reach your resources.
+
+[Azure-Private-DNS](https://github.com/hmcts/azure-private-dns)
+
+environment / 01-network / 
+
+
+
 ### Private DNS Zones and Private End Points
 To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.
 
-[Azure-Private-DNS](https://github.com/hmcts/azure-private-dns)
+[aks-sds-deploy Repo](https://github.com/hmcts/aks-sds-deploy)
+
+Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the "stages to run" option.
+Besure you have selected the correct **Environment** for your ADO agent network. 
+
 
 Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets
 

@@ -419,9 +419,15 @@ If the traffic is coming into Azure from the agent pool, use Azure portal Networ
 <p>HMCTS operates 3 main Azure environments (SBOX, NONPROD and PROD), which are isolated from each other. ADO agent pools are connected to only ONE of these environments.
 If your pipeline is reporting network errors and you are not observing ADO traffic in the Palo Alto.  First suspect the wrong agent pool has been selected. Then start investigating the other links in the chain.</p>
 <p><a href="images/ADO-Agent-Connections.png" rel="noopener noreferrer"><img src="images/ADO-Agent-Connections.png" alt="Azure_WAN_Connections" /></a></p>
+<h3 id="agent-routing">Agent Routing</h3>
+<p>If you vNET is new, you may need to update the route table aks-ptl-route-table, to enable the agents in K8s to reach your resources.</p>
+<p><a href="https://github.com/hmcts/azure-private-dns">Azure-Private-DNS</a></p>
+<p>environment / 01-network /</p>
 <h3 id="private-dns-zones-and-private-end-points">Private DNS Zones and Private End Points</h3>
 <p>To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.</p>
-<p><a href="https://github.com/hmcts/azure-private-dns">Azure-Private-DNS</a></p>
+<p><a href="https://github.com/hmcts/aks-sds-deploy">aks-sds-deploy Repo</a></p>
+<p>Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the &ldquo;stages to run&rdquo; option.
+Besure you have selected the correct <strong>Environment</strong> for your ADO agent network.</p>
 <p>Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets</p>
 <p><a href="https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink">Azure-Private-DNS-Private-Link</a></p>
 <h2 id="public-network-services-or-private">Public Network Services or Private</h2>

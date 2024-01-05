@@ -1,0 +1,93 @@
+---
+title: Use GitRepository in Flux to test charts from a branch
+weight: 20
+---
+# <%= current_page.data.title %>
+
+Flux contains a number of repositories which are sources for deploying Helm charts, its possible to create different types of Repositories based on the source e.g. Azure Container Registry or Docker Hub
+
+One type of source is the GitRepository resource type and this can be used to deploy a chart from a git branch for testing purposes.
+
+## Why would you want to do this?
+
+The main reason is speed of testing, if you are making changes, testing and deploying via the existing method it requires multiple PRs, reviews, deployments, pipelines etc and this adds a lot of time and overhead to changes.
+
+Of course you wouldn't do this for any important environments and it is primarily for the lowest environments to test new configuration, test theories or bugfix quickly.
+
+## Creating a GitRepository resource in Flux
+
+Within the flux config repository (CNP and SDS) there exists configuration specifically for Flux under
+
+```text
+apps/flux-system/base
+```
+
+This folder contains existing repository types such as HMCTS-Charts which is a git repository or HMCTS Public which is an Azure Container Registry.
+
+To add a temporary GitRepository pointing to the repo you want to test from:
+
+* Create a new file with the name of the repository, for mine I used hmcts-plum-frontend.yaml
+* Within this file you can create the configuration using the following as a template:
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: plum-frontend
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/hmcts/cnp-plum-frontend
+  ref:
+    branch: marty/DTSPO-16054-topologySpreadConstraints
+  ignore: |
+    # exclude all
+    /*
+    # include charts directory
+    !/charts/
+```
+
+Notice that I have a branch as a reference, this is my branch containing my own changes to the chart within, this will scan the repository every minute (1m) for changes so you should be able to make changes now and push to your branch and Flux should deploy them for you.
+
+⚠️ Also pay attention to the last line `!/charts/`, this instructs the Flux resource to **include** only the charts folder within the repository (it seems counterintuitive to use `!` to include and not exclude but this is the syntax required).
+
+## Update App to reference the new repository
+With the GitRepository in place its now possible to add new values to your environment file so that it now uses this new repository resource for your chart:
+
+```text
+apps/cnp/plum-frontend/sbox.yaml 
+```
+
+```yaml
+metadata:
+  name: plum-frontend
+spec:
+  chart:
+    spec:
+      chart: ./charts/plum-frontend
+      sourceRef:
+        kind: GitRepository
+        name: plum-frontend
+        namespace: flux-system
+      interval: 1m
+```
+
+Here you can see that in my `sbox.yaml` file I have added the chart spec which overrides the `plum-frontend.yaml` file that points to a different repository for deployments, by doing this I can ensure that I only deploy these changes to sbox.
+
+This new spec points to my newly created GitRepository, the charts folder within and uses the plum-frontend chart found in the repository at that path.
+
+## Caveats
+
+Its very possible that with such fast paced changes Flux will get stuck or fail to deploy them in a timely manner so its possible to remove and redeploy the chart and it will still use the temporary repository as created above.
+
+```shell
+kubectl -n cnp delete hr plum-frontend
+```
+
+This command would remove the `Helm Release`for `plum-frontend` within the `cnp` namespace.
+
+Flux will eventually redeploy this as its in the configuration files and it will contain the most recent version of the chart within your branch.
+
+P.S.
+
+This is a pull request showing the above code snippets and how this was achieved previously: [link](https://github.com/hmcts/cnp-flux-config/commit/caf24b12e4f12e0be5e08af41fc3366936e3227b)

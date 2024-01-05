@@ -1,0 +1,20 @@
+---
+title: Security tools
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+## [Kubernetes Config Injector](https://github.com/hmcts/k8s-env-injector)
+
+* The config injector will allow administrators to inject new configuration into pod dpeloyments, It will also override matching existing configuration where the keys are matching but the values are not. Available configurations are:
+    * Environment Variables 
+    * DNS Options
+    * Tolerations
+    * Required and Preferred node affinity
+    * Toplogy Spread Constraints
+
+## [Multi-gitter](https://github.com/lindell/multi-gitter)
+
+* Multi-gitter is a simple CLI tool that will allow adminstrators to make mass changes to git repositories. Example use might be:
+    * A setting change is required across many Apps, multi-gitter can create the PR containing the change required on every repository with a consistent change and message.

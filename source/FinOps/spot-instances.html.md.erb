@@ -1,0 +1,73 @@
+---
+title: Using Spot instances with deployments
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+AKS Spot instances provide a massive cost saving where acceptable interruptions are possible e.g. non production environments, well designed application deployments etc.
+Its possible to use spot instances within applications and the templates and code required for this are available via the Chart-Library.
+
+To make use of spot instances for an application the following value must be set in values.yaml for any given Helm chart:
+
+```yaml
+spotInstances:
+  enabled: true
+```
+
+## Simulating VMSS evictions
+
+If there are concerned with how an application will be affected by using Spot instance types its possible to test what will happen when Azure recover their capacity and a spot instance goes offline.
+You can manually evict an AKS node from the node pool in the same way that Azure will do this when a spot instance is removed.
+The following script is an example showing how to evict an instance from VMSS pools on multiple AKS clusters. The script will simply pick the first node from the list so you will need to ensure your apps are on this node otherwise the test is pointless.
+You can however change the script to be more targeted to achieve the desired testing.
+
+<details>
+  <summary>eviction script</summary>
+
+```bash
+#!/bin/bash
+
+resourceGroup00=<add resource group name>
+resourceGroup01=<add resource group name>
+
+echo "Getting VMSS Pool Names"
+vmssId00=$(az vmss list -g $resourceGroup00 --query '[?tags."aks-managed-poolName" == `spotinstance`].{VMSS_Name:name}' -o tsv)
+vmssId01=$(az vmss list -g $resourceGroup01 --query '[?tags."aks-managed-poolName" == `spotinstance`].{VMSS_Name:name}' -o tsv)
+
+echo "VMSS 00 =  $vmssId00"
+echo "VMSS 01 =  $vmssId01"
+echo "----------------------"
+echo 
+echo "Getting VMSS Instance Names"
+instanceId00=$(az vmss list-instances -g $resourceGroup00 --name $vmssId00  --query "[].[instanceId][0]" -o tsv)
+instanceId01=$(az vmss list-instances -g $resourceGroup01 --name $vmssId01  --query "[].[instanceId][0]" -o tsv)
+
+echo "instance 00 =  $instanceId00"
+echo "instance 01 =  $instanceId01"
+echo "----------------------"
+
+echo "Evicting VMSS Instance from pool"
+az vmss simulate-eviction --resource-group $resourceGroup00 --name $vmssId00 --instance-id $instanceId00
+az vmss simulate-eviction --resource-group $resourceGroup01 --name $vmssId01 --instance-id $instanceId01
+```
+
+</details>
+
+## Further Reading
+
+AKS Spot Instances
+* https://learn.microsoft.com/en-us/azure/aks/spot-node-pool
+* https://techcommunity.microsoft.com/t5/azure-architecture-blog/optimize-azure-kubernetes-service-node-cost-by-combining/ba-p/3751787
+* https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-orchestration-modes
+* https://learn.microsoft.com/en-us/azure/virtual-machines/spot-vms
+* https://learn.microsoft.com/en-us/azure/architecture/guide/spot/spot-eviction#understand-interruptible-workloads
+* https://cast.ai/blog/topology-spread-constraints-for-increased-cluster-availability-and-efficiency-and-a-much-better-cost/
+* https://www.linkedin.com/pulse/running-critical-workloads-using-spot-instances-aks-deenar-toraskar-1e
+
+Topology Spread Constraints
+* https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+* https://pauldally.medium.com/the-most-common-reason-your-topologyspreadconstraint-isnt-working-fb9ce25297cd
+* https://mby.io/blog/topology-spread-constraints/
+* https://medium.com/wise-engineering/avoiding-kubernetes-pod-topology-spread-constraint-pitfalls-d369bb04689e
+* https://techcommunity.microsoft.com/t5/azure-architecture-blog/optimize-azure-kubernetes-service-node-cost-by-combining/ba-p/3751787

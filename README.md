@@ -64,6 +64,13 @@ For example, `source/about.html.md` will be accessible on <http://localhost:4567
 
 ## Preview
 
+There are 2 options to preview changes:
+
+* Using the bundle middleman server to start up a web server and access it via a browser as it would be normally
+* Using a markdown extension in your code editor to preview the html.md.erb files whilst editing.
+
+### Middleman Server
+
 Whilst writing documentation we can run a middleman server to preview how the
 published version will look in the browser. After saving a change the preview in
 the browser will automatically refresh.
@@ -87,6 +94,24 @@ If all goes well something like the following output will be displayed:
 ```
 
 You should now be able to view a live preview at http://localhost:4567.
+
+### Local preview
+
+To view the markdown files locally you can add a markdown preview extension/add-on to your code editor.
+
+For example VSCode has one built in that allows you to preview markdown (.md) files by right clicking on the file name and selecting `preview`
+
+However this only works when the file suffix is `*.md` but for this repository the files are `.md.erb` so VSCode does not automatically pick these up.
+
+The fix for this is to add an association in settings so that VSCode will offer the preview option.
+
+Set the association in preferences:
+<img src="images/markdownAssociation.png" alt="markdown association setting" height="250"/>
+
+Right click on files to see the preview option:
+<img src="images/previewOption.png" alt="preview option" height="150"/>
+
+Whilst the local preview offers the fastest feedback it is still a good idea to use the Middleman server as a final confirmation when all changes have been made and you are ready to push to Github.
 
 ## Build
 

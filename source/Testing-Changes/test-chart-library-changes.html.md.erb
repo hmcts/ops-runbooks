@@ -1,0 +1,144 @@
+---
+title: Use Helm Template to test chart library changes
+weight: 20
+---
+# <%= current_page.data.title %>
+
+This is some additional information about testing the Chart-Library templates using pre-releases (please read this first: Create a draft release for testing purposes)
+
+When you need to test Chart-Library changes you can create a pre-release containing the changes as detailed in the link and this can be used in upstream charts such as `chart-nodejs` , `chart-function`  etc.
+
+Whilst its very possible to test upstream charts with the latest library as detailed here: [Use GitRepository in Flux to test charts from a branch](temporary-flux-gitrepository.html)
+
+This should be unnecessary and deployments themselves should not be required to test templating, using chart-nodejs  I can test the Helm templating locally via the Helm template  command.
+
+Clone the repository for the chart you want to test with and update the chart.yaml to the version of the chart-library you create a pre-release for:
+
+```yaml
+apiVersion: v2
+description: A Helm chart for HMCTS nodejs apps
+name: nodejs
+# This is the chart version. This doesn't need to be incremented on every change.
+# It is managed by release pipeline based on Github tag
+version: 0.1.0 # Do not change
+appVersion: 0.1.0 # Do not change
+keywords:
+  - node
+  - javascript
+  - nodejs
+sources:
+  - https://github.com/hmcts/chart-nodejs
+icon: https://nodejs.org/static/images/logos/nodejs-new-pantone-black.png
+dependencies:
+  - name: library
+    version: 2.1.1-alpha
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+```
+
+Here I've updated to use a `2.1.1-alpha` pre-release version (this must exist and have been built already).
+
+With this in place run the following command to download the dependency locally:
+
+```shell
+helm dependency build nodejs
+```
+
+Nodejs in this case refers to the folder name containing the chart within the repository
+
+<img src="images/nodejschart.png" alt="nodejs chart" height="150"/>
+
+This should download the pr-release version of the Chart-Library files
+
+```shell
+> helm dependency build nodejs
+Getting updates for unmanaged Helm repositories...
+...Successfully got an update from the "https://hmctspublic.azurecr.io/helm/v1/repo/" chart repository
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "ingress-nginx" chart repository
+...Successfully got an update from the "aad-pod-identity" chart repository
+...Successfully got an update from the "nginx-stable" chart repository
+...Successfully got an update from the "keda" chart repository
+Update Complete. ⎈Happy Helming!⎈
+Saving 1 charts
+Downloading library from repo https://hmctspublic.azurecr.io/helm/v1/repo/
+Deleting outdated charts
+```
+
+Now you can run the template command:
+
+```shell
+helm template nodejs
+```
+
+This will either output a fully templated Helm chart based on the values.yaml file within the chart using the templates found in Chart-Library 
+
+**| OR |**
+
+It will fail in the case of nodejs  because some values are missing from the values.yaml file that the chart requires.
+
+In my case there was no image value supplied so it needed to be added to values.yaml or supplied at the CLI:
+
+```shell
+Error: execution error at (nodejs/charts/library/templates/v2/_deployment.tpl:15:3): An image must be supplied to the chart
+```
+
+The easiest fix is to add `image: test` to the `values.yaml` file and re-run the command, which worked for me, and output a valid templated Helm Chart.
+
+Now that this works its important to add or remove any values from the values.yaml file or add any new templates to the templates/ folder if you need to test them.
+
+Remember we want to test the changes made to Chart-Library so its important to trigger them e.g. 
+
+📣 **NOTE:** 
+> If you added new configuration that requires a value to be set then you need to add that key:value to the values.yaml file or the template wouldnt actually attempt to create the templated configuration.
+
+Run the template command:
+
+```shell
+helm template nodejs
+```
+
+The output should be similar to this:
+
+```yaml
+---
+# Source: nodejs/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name:  release-name-nodejs-pdb 
+  labels:
+    app.kubernetes.io/name: release-name-nodejs
+    helm.sh/chart: nodejs-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: RELEASE-NAME
+spec:
+  maxUnavailable: 50%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: release-name-nodejs
+---
+# Source: nodejs/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-nodejs 
+  labels:
+    app.kubernetes.io/name: release-name-nodejs
+    helm.sh/chart: nodejs-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: RELEASE-NAME
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: release-name-nodejs
+```
+
+Please note that some charts are very large and outputting this way can be difficult to read so you can pipe the output to another tool to help with reading such as less , more or even save it to a file by appending this to the end of the template command:
+
+```shell
+helm template nodejs > output.yaml
+```

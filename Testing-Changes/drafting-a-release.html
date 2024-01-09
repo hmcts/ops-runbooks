@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Create a draft release for testing purposes - HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Testing-Changes/drafting-a-release.html">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="Create a draft release for testing purposes - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Testing-Changes/drafting-a-release.html" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:title" content="Create a draft release for testing purposes" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Testing-Changes/drafting-a-release.html" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="../">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>Operations Runbooks</span></a>
+  </li>
+<li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
+<ul>
+  <li>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
+  </li>
+  <li>
+    <a href="../azure-pipelines/ado_pipeline_agents.html"><span>ADO Pipeline Agents</span></a>
+  </li>
+  <li>
+    <a href="../azure-pipelines/ado_agent_networking.html"><span>Agent Pool Networking</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS</span></a>
+<ul>
+  <li>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+  </li>
+  <li>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+  </li>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
+    <a href="../aks/upgrading-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
+  </li>
+  <li>
+    <a href="../aks/rebuilding-aks-clusters.html"><span>Rebuilding AKS Clusters</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../monitoring/index.html"><span>Monitoring</span></a>
+<ul>
+  <li>
+    <a href="../monitoring/app-insights.html"><span>Azure Application Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/monitoring-request.html"><span>Raise a Dynatrace Monitoring Request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Databases</span></a>
+<ul>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../network/index.html"><span>Networking</span></a>
+<ul>
+  <li>
+    <a href="../network/F5AdminPortal.html"><span>F5 Admin Portal</span></a>
+  </li>
+  <li>
+    <a href="../network/accounts.html"><span>List of F5 Admins</span></a>
+  </li>
+  <li>
+    <a href="../network/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+  <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/MyCloudGateway_ops.html"><span>MyCloudGateway - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../heritage/index.html"><span>Heritage</span></a>
+<ul>
+  <li>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+  </li>
+  <li>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+  </li>
+  <li>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+  </li>
+  <li>
+    <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
+  </li>
+  <li>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Services/index.html"><span>Services</span></a>
+<ul>
+  <li>
+    <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
+  </li>
+  <li>
+    <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+<li><a href="../PlatOps-Toolkit/index.html"><span>PlatOps Utilities</span></a>
+<ul>
+  <li>
+    <a href="../PlatOps-Toolkit/macbook-utilities.html"><span>Macbook Utilities</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-websites.html"><span>Useful Websites</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+<li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
+<ul>
+  <li>
+    <a href="../Change-Requests/How-to-raise-a-Change-request.html"><span>Raise a change request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/ServerAccess.html"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules.html"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall.html"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Security/index.html"><span>Security Operations</span></a>
+<ul>
+  <li>
+    <a href="../Security/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../Security/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+  <li>
+    <a href="../Security/tenable-nessus.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FinOps/index.html"><span>FinOps</span></a>
+<ul>
+  <li>
+    <a href="../FinOps/spot-instances.html"><span>Using Spot instances with deployments</span></a>
+  </li>
+  <li>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<ul>
+  <li>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
+  </li>
+  <li>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Testing-Changes/index.html"><span>Testing Changes</span></a>
+<ul>
+  <li>
+    <a href="../Testing-Changes/drafting-a-release.html"><span>Create a draft release for testing purposes</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/test-chart-library-changes.html"><span>Use Helm Template to test chart library changes</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/temporary-flux-gitrepository.html"><span>Use GitRepository in Flux to test charts from a branch</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../AppAttach/index.html"><span>MSIX App Attach for Windows Server</span></a>
+<ul>
+  <li>
+    <a href="../AppAttach/installer_conversion.html"><span>Converting Installer Files to VHDX Images</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/prepare_vm.html"><span>Configuring App Attach</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/appattach_scripts.html"><span>Modified AppAttach Scripts</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
+<ul>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
+  </li>
+</ul>
+</li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="create-a-draft-release-for-testing-purposes">Create a draft release for testing purposes</h1>
+<h2 id="intro">Intro</h2>
+<p>There are a number of core charts in HMCTS that will have an effect on upstream users so its difficult to make changes without causing unexpected outcomes.</p>
+<p>To mitigate this there is the option to create pre-release which allows you to create the required changes, build via the existing methods and deploy via Flux as normal, this guide will show how this can be carried out without impacting others.</p>
+<p>For this guide I will be using the chart-Library  which is the most central repository to all Helm charts as it contains all templates for the project: <a href="https://github.com/hmcts/chart-library">link</a></p>
+<p>The following steps cover what will be shown in this guide:</p>
+
+<ul>
+<li>Clone the repository, create a branch for your work</li>
+<li>Make your changes locally and commit when ready</li>
+<li>Push to Github so it exists remotely</li>
+<li>Create a pre-release with your branch as the source and a new tag </li>
+<li>Monitor Azure DevOps pipeline to ensure everything completes successfully</li>
+<li>Update upstream chart to make use of the pre-release for testing purposes</li>
+</ul>
+<p>Clone the repository, create a branch for your work, make changes and commit and finally push to Github
+This is a well documented area so I will be linking to existing documentation for some steps:</p>
+
+<ul>
+<li>Clone a repo: <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository">link</a></li>
+<li>Create your branch locally: <a href="https://www.git-tower.com/learn/git/faq/create-branch">link</a></li>
+</ul>
+<p>Make your desired changed to the code locally, you can see which files have changed by running <code>git status</code></p>
+<p>When ready to commit your changes you can following these steps to commit and push your code:</p>
+
+<ul>
+<li>Commit: <a href="https://docs.gitlab.com/ee/tutorials/make_first_git_commit/#create-a-branch-and-make-changes">link</a></li>
+<li>Push: <a href="https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository">link</a></li>
+</ul>
+<p>📣 <strong>NOTE:</strong>
+You should NEVER push to main/master as shown in the link and all repositories should have protection to stop this.
+Once all of these steps are complete you are ready to create a pre-release.</p>
+<h2 id="create-a-pre-release-with-your-branch-as-the-source-and-a-new-tag">Create a pre-release with your branch as the source and a new tag</h2>
+<p>In Github navigate to the repository, you should see a releases section on the main page:</p>
+<p><a href="images/latest-release.png" rel="noopener noreferrer"><img src="images/latest-release.png" alt="Alt text" /></a></p>
+<p>Click on releases to show all releases for this repository so far, take note of the most recent release version number as we will need this later.</p>
+<p>At the top of the new page you will see the option to draft a new release and you should click this:</p>
+<p><a href="images/draft-release.png" rel="noopener noreferrer"><img src="images/draft-release.png" alt="Alt text" /></a></p>
+<h3 id="release-details">Release details</h3>
+<p>The release page requires some specific details, the most important is the target, this is your branch containing your changes and should be selected here.
+For the Tag drop down, you need to create a new tag for your work, using the most recent version number we can create a new tag
+e.g. v2.1.2-alpha (we add alpha here because 2.1.2 would be the final tag when your work is completed and alpha tells others this is still in progress).</p>
+<p><a href="images/release-details.png" rel="noopener noreferrer"><img src="images/release-details.png" alt="Alt text" /></a></p>
+<p>For the Title you can use the tag again and you can ignore the description as this is only required for the final release to allow users to know what changed.
+The final and very important change is to select the check box for Set as a pre-release this option ensures that the release does not trigger anything upstream and is not picked up by Renovate for updates to upstream charts or services.</p>
+<p><img src="images/pre-release.png" alt="pre-release" height="400"/></p>
+<p>Once complete and all settings are in place you can publish the release.
+When the release is published it will appear on the releases page with the tag you supplied:</p>
+<p><a href="images/alpha-release.png" rel="noopener noreferrer"><img src="images/alpha-release.png" alt="Alt text" /></a></p>
+<h2 id="monitor-azure-devops-pipeline-to-ensure-everything-completes-successfully">Monitor Azure DevOps pipeline to ensure everything completes successfully</h2>
+<p>Once the release has been completed it will trigger the Azure DevOps pipeline to build the release.
+For Chart-Library this pipeline is an example of a pre-release build: <a href="https://dev.azure.com/hmcts/PlatformOperations/_build/results?buildId=491266&amp;view=results">link</a>
+You can see the branch/tag being used by ADO is an alpha version:</p>
+<p><a href="images/ado-branchtag-version.png" rel="noopener noreferrer"><img src="images/ado-branchtag-version.png" alt="Alt text" /></a></p>
+<h2 id="update-upstream-chart-to-make-use-of-the-pre-release-for-testing-purposes">Update upstream chart to make use of the pre-release for testing purposes</h2>
+<p>If the build completes successfully there is now a version of your changes available for testing.
+In my example here I can update one of the base charts that depend on the Chart-Library to use my new version:</p>
+<p><a href="images/chart-dependencies.png" rel="noopener noreferrer"><img src="images/chart-dependencies.png" alt="Alt text" /></a></p>
+<h2 id="summary">Summary</h2>
+<p>This is the process to create a single pre-release for a single repository and this can ensure I do not impact any teams or services whilst still getting the benefits of all test and build processes that already exist.</p>
+<h3 id="additional">Additional</h3>
+<p>In my case I am now able to test my templates on a chart using the <a href="test-chart-library-changes.html">Helm template</a> command without needing to deploy the chart.</p>
+<p>If your changes are being made on a chart itself you can use the new version of the chart you&rsquo;ve just released as a version within Flux to deploy it to AKS.</p>
+<p>To find the new version the HMCTS Public repository you can search the HMCTS Public repository via Helm.</p>
+<p>Check you&rsquo;ve got the repository installed using the list command:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>╰─<span class="nv">$ </span>helm repo list                                                                                                                                        130 ↵
+NAME            URL                                        
+hmcts-public    https://hmctspublic.azurecr.io/helm/v1/repo/
+</code></pre></div><p>If not you&rsquo;ll need to install it first:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm repo add hmcts-public https://hmctspublic.azurecr.io/helm/v1/repo/
+</code></pre></div><p>Once installed you can now search the repository for the chart you&rsquo;ve built an alpha version of:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm search repo hmcts-public/nodejs <span class="nt">-l</span> <span class="nt">--devel</span>
+</code></pre></div><p>This will search your Helm repos for the nodejs chart listing all available versions including development versions i.e. those containing the alpha build created in this guide.</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>╰─<span class="nv">$ </span>helm search repo hmcts-public/nodejs <span class="nt">-l</span> <span class="nt">--devel</span>
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                      
+hmcts-public/nodejs     3.0.3-alpha.5   3.0.3-alpha.5   A Helm chart <span class="k">for </span>HMCTS nodejs apps
+hmcts-public/nodejs     3.0.3-alpha.4   3.0.3-alpha.4   A Helm chart <span class="k">for </span>HMCTS nodejs apps
+hmcts-public/nodejs     3.0.3-alpha.3   3.0.3-alpha.3   A Helm chart <span class="k">for </span>HMCTS nodejs apps
+hmcts-public/nodejs     3.0.3-alpha.2   3.0.3-alpha.2   A Helm chart <span class="k">for </span>HMCTS nodejs apps
+</code></pre></div><p>Once you&rsquo;ve got the version number from the repository you can add this to Flux for the environment you wish to test your changes.
+This is an example of the plum-frontend  app using a chart version based on the above alpha build version numbers:</p>
+<div class="highlight"><pre class="highlight yaml" tabindex="0"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">helm.toolkit.fluxcd.io/v2beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">HelmRelease</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">plum-frontend</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">chart</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">version</span><span class="pi">:</span> <span class="s">3.0.3-alpha.5</span>
+  <span class="na">values</span><span class="pi">:</span>
+    <span class="na">nodejs</span><span class="pi">:</span>
+      <span class="na">ingressHost</span><span class="pi">:</span> <span class="s">plum.sandbox.platform.hmcts.net</span>
+</code></pre></div><p>Commit, push, PR and have your changed reviewed and merged into the Flux repository and Flux will deploy the new chart version to the AKS cluster as normal.</p>
+
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Testing-Changes/drafting-a-release.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Create+a+draft+release+for+testing+purposes%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FTesting-Changes%2Fdrafting-a-release.html%29&amp;labels=bug&amp;title=Re%3A+%27Create+a+draft+release+for+testing+purposes%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

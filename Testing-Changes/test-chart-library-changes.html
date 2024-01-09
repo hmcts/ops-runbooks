@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Use Helm Template to test chart library changes - HMCTS</title>
+
+    <link href="../stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Testing-Changes/test-chart-library-changes.html">
+
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
+      <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta name="twitter:title" content="Use Helm Template to test chart library changes - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Testing-Changes/test-chart-library-changes.html" />
+
+      <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
+      <meta property="og:site_name" content="HMCTS" />
+      <meta property="og:title" content="Use Helm Template to test chart library changes" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Testing-Changes/test-chart-library-changes.html" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://github.com/hmcts" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          HMCTS
+        </span>
+      </a>
+        <strong class="govuk-tag">Live</strong>
+    </div>
+    <div class="govuk-header__content">
+      <nav class="govuk-header__navigation govuk-header__navigation--end" aria-label="Menu">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu">Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://hmcts-dts.slack.com/app_redirect?channel=platops-help">Support</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="../">Documentation</a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="https://github.com/hmcts">GitHub</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <button type="button" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </button>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents" tabindex="-1" aria-label="Table of contents" role="dialog">
+              <div class="search" data-module="search" data-path-to-site-root="../">
+  <form action="https://www.google.co.uk/search" method="get" role="search" class="search__form govuk-!-margin-bottom-4">
+    <input type="hidden" name="as_sitesearch" value="https://hmcts-runbooks.github.io"/>
+    <label class="govuk-label search__label" for="search" aria-hidden="true">
+      Search (via Google)
+    </label>
+    <input
+      type="text"
+      id="search" name="q"
+      class="govuk-input govuk-!-margin-bottom-0 search__input"
+      aria-controls="search-results"
+      placeholder="Search">
+    <button type="submit" class="search__button">Search</button>
+  </form>
+</div>
+
+              <button type="button" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></button>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="../index.html"><span>Operations Runbooks</span></a>
+  </li>
+<li><a href="../Contribution-Guide/index.html"><span>Contribution Guide</span></a>
+<ul>
+  <li>
+    <a href="../Contribution-Guide/addingpages.html"><span>Adding Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/editingpages.html"><span>Editing Pages</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/testing.html"><span>Testing Changes</span></a>
+  </li>
+  <li>
+    <a href="../Contribution-Guide/troubleshooting.html"><span>Troubleshooting</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../azure-pipelines/index.html"><span>Azure Pipelines</span></a>
+<ul>
+  <li>
+    <a href="../azure-pipelines/github-sso.html"><span>GitHub Single Sign On</span></a>
+  </li>
+  <li>
+    <a href="../azure-pipelines/ado_pipeline_agents.html"><span>ADO Pipeline Agents</span></a>
+  </li>
+  <li>
+    <a href="../azure-pipelines/ado_agent_networking.html"><span>Agent Pool Networking</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../aks/index.html"><span>AKS</span></a>
+<ul>
+  <li>
+    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+  </li>
+  <li>
+    <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
+  </li>
+  <li>
+    <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
+  </li>
+  <li>
+    <a href="../aks/upgrading-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
+  </li>
+  <li>
+    <a href="../aks/rebuilding-aks-clusters.html"><span>Rebuilding AKS Clusters</span></a>
+  </li>
+  <li>
+    <a href="../aks/switching-PTL-cluster.html"><span>How to switch PTL Clusters Runbook</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../monitoring/index.html"><span>Monitoring</span></a>
+<ul>
+  <li>
+    <a href="../monitoring/app-insights.html"><span>Azure Application Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/appinsights-setup.html"><span>Setting Up Application Insights Reporting</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
+  </li>
+  <li>
+    <a href="../monitoring/monitoring-request.html"><span>Raise a Dynatrace Monitoring Request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Certificates/index.html"><span>Certificates</span></a>
+<ul>
+  <li>
+    <a href="../Certificates/letsencrypt.html"><span>How to Create or Renew SSL Certificates using Let’s Encrypt</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/csr.html"><span>Requesting SSL Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/gandi.html"><span>Manually Generated Certificates</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/newacme.html"><span>How to add the ACME Function App to a new subscription</span></a>
+  </li>
+  <li>
+    <a href="../Certificates/managed.html"><span>Managed certificates</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../database/index.html"><span>Databases</span></a>
+<ul>
+  <li>
+    <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
+  </li>
+  <li>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+  </li>
+  <li>
+    <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../network/index.html"><span>Networking</span></a>
+<ul>
+  <li>
+    <a href="../network/F5AdminPortal.html"><span>F5 Admin Portal</span></a>
+  </li>
+  <li>
+    <a href="../network/accounts.html"><span>List of F5 Admins</span></a>
+  </li>
+  <li>
+    <a href="../network/VPN-routing-config.html"><span>F5 VPN Config</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-troubleshooting.html"><span>Palo Alto Troubleshooting</span></a>
+  </li>
+  <li>
+    <a href="../network/palos-upgrade.html"><span>Palo Alto Software Upgrade</span></a>
+  </li>
+  <li>
+    <a href="../network/connecting-palos.html"><span>Connecting to a Palo Alto firewall</span></a>
+  </li>
+  <li>
+    <a href="../network/panorama-upgrade.html"><span>Panorama - Software Updates</span></a>
+  </li>
+  <li>
+    <a href="../network/MyCloudGateway_ops.html"><span>MyCloudGateway - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../network/netbox.html"><span>Using Netbox to get available address space</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../heritage/index.html"><span>Heritage</span></a>
+<ul>
+  <li>
+    <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
+  </li>
+  <li>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+  </li>
+  <li>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+  </li>
+  <li>
+    <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
+  </li>
+  <li>
+    <a href="../heritage/accessing_extsvc_vm.html"><span>Accessing Heritage EXTSVC Virtual Machines</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../jenkins/index.html"><span>Jenkins</span></a>
+<ul>
+  <li>
+    <a href="../jenkins/builds-starting-slowly.html"><span>Troubleshooting builds starting slowly</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Services/index.html"><span>Services</span></a>
+<ul>
+  <li>
+    <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
+  </li>
+  <li>
+    <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
+  </li>
+  <li>
+    <a href="../Services/docmosis.html"><span>Updating Docmosis Variables</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../onboarding/index.html"><span>Onboarding Checklist</span></a>
+  </li>
+<li><a href="../PlatOps-Toolkit/index.html"><span>PlatOps Utilities</span></a>
+<ul>
+  <li>
+    <a href="../PlatOps-Toolkit/macbook-utilities.html"><span>Macbook Utilities</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-websites.html"><span>Useful Websites</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+  </li>
+  <li>
+    <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../oncall/index.html"><span>On Call</span></a>
+  </li>
+<li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
+<ul>
+  <li>
+    <a href="../Change-Requests/How-to-raise-a-Change-request.html"><span>Raise a change request</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../BAIS/index.html"><span>BAIS</span></a>
+<ul>
+  <li>
+    <a href="../BAIS/ServerAccess.html"><span>BAIS Server Access</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-NSG-Rules.html"><span>BAIS NSG Rules</span></a>
+  </li>
+  <li>
+    <a href="../BAIS/BAIS-Windows-Firewall.html"><span>BAIS NWindows Firewall Rules</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Security/index.html"><span>Security Operations</span></a>
+<ul>
+  <li>
+    <a href="../Security/datadisk-config-notes.html"><span>Splunk datadisk configuration</span></a>
+  </li>
+  <li>
+    <a href="../Security/server-access.html"><span>Splunk Server Access</span></a>
+  </li>
+  <li>
+    <a href="../Security/tenable-nessus.html"><span>Tenable Nessus</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FinOps/index.html"><span>FinOps</span></a>
+<ul>
+  <li>
+    <a href="../FinOps/spot-instances.html"><span>Using Spot instances with deployments</span></a>
+  </li>
+  <li>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+  </li>
+</ul>
+</li>
+  <li>
+    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+  </li>
+<li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
+<ul>
+  <li>
+    <a href="../Domain-Services/DNS-Changes.html"><span>DNS Records</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<ul>
+  <li>
+    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
+  </li>
+  <li>
+    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Testing-Changes/index.html"><span>Testing Changes</span></a>
+<ul>
+  <li>
+    <a href="../Testing-Changes/drafting-a-release.html"><span>Create a draft release for testing purposes</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/test-chart-library-changes.html"><span>Use Helm Template to test chart library changes</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/temporary-flux-gitrepository.html"><span>Use GitRepository in Flux to test charts from a branch</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../AppAttach/index.html"><span>MSIX App Attach for Windows Server</span></a>
+<ul>
+  <li>
+    <a href="../AppAttach/installer_conversion.html"><span>Converting Installer Files to VHDX Images</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/prepare_vm.html"><span>Configuring App Attach</span></a>
+  </li>
+  <li>
+    <a href="../AppAttach/appattach_scripts.html"><span>Modified AppAttach Scripts</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
+<ul>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
+  </li>
+</ul>
+</li>
+</ul>
+
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="use-helm-template-to-test-chart-library-changes">Use Helm Template to test chart library changes</h1>
+<p>This is some additional information about testing the Chart-Library templates using pre-releases (please read this first: Create a draft release for testing purposes)</p>
+<p>When you need to test Chart-Library changes you can create a pre-release containing the changes as detailed in the link and this can be used in upstream charts such as <code>chart-nodejs</code> , <code>chart-function</code>  etc.</p>
+<p>Whilst its very possible to test upstream charts with the latest library as detailed here: <a href="temporary-flux-gitrepository.html">Use GitRepository in Flux to test charts from a branch</a></p>
+<p>This should be unnecessary and deployments themselves should not be required to test templating, using chart-nodejs  I can test the Helm templating locally via the Helm template  command.</p>
+<p>Clone the repository for the chart you want to test with and update the chart.yaml to the version of the chart-library you create a pre-release for:</p>
+<div class="highlight"><pre class="highlight yaml" tabindex="0"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v2</span>
+<span class="na">description</span><span class="pi">:</span> <span class="s">A Helm chart for HMCTS nodejs apps</span>
+<span class="na">name</span><span class="pi">:</span> <span class="s">nodejs</span>
+<span class="c1"># This is the chart version. This doesn't need to be incremented on every change.</span>
+<span class="c1"># It is managed by release pipeline based on Github tag</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s">0.1.0</span> <span class="c1"># Do not change</span>
+<span class="na">appVersion</span><span class="pi">:</span> <span class="s">0.1.0</span> <span class="c1"># Do not change</span>
+<span class="na">keywords</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">node</span>
+  <span class="pi">-</span> <span class="s">javascript</span>
+  <span class="pi">-</span> <span class="s">nodejs</span>
+<span class="na">sources</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">https://github.com/hmcts/chart-nodejs</span>
+<span class="na">icon</span><span class="pi">:</span> <span class="s">https://nodejs.org/static/images/logos/nodejs-new-pantone-black.png</span>
+<span class="na">dependencies</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">library</span>
+    <span class="na">version</span><span class="pi">:</span> <span class="s">2.1.1-alpha</span>
+    <span class="na">repository</span><span class="pi">:</span> <span class="s">https://hmctspublic.azurecr.io/helm/v1/repo/</span>
+</code></pre></div><p>Here I&rsquo;ve updated to use a <code>2.1.1-alpha</code> pre-release version (this must exist and have been built already).</p>
+<p>With this in place run the following command to download the dependency locally:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm dependency build nodejs
+</code></pre></div><p>Nodejs in this case refers to the folder name containing the chart within the repository</p>
+<p><img src="images/nodejschart.png" alt="nodejs chart" height="150"/></p>
+<p>This should download the pr-release version of the Chart-Library files</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="o">&gt;</span> helm dependency build nodejs
+Getting updates <span class="k">for </span>unmanaged Helm repositories...
+...Successfully got an update from the <span class="s2">"https://hmctspublic.azurecr.io/helm/v1/repo/"</span> chart repository
+Hang tight <span class="k">while </span>we grab the latest from your chart repositories...
+...Successfully got an update from the <span class="s2">"ingress-nginx"</span> chart repository
+...Successfully got an update from the <span class="s2">"aad-pod-identity"</span> chart repository
+...Successfully got an update from the <span class="s2">"nginx-stable"</span> chart repository
+...Successfully got an update from the <span class="s2">"keda"</span> chart repository
+Update Complete. ⎈Happy Helming!⎈
+Saving 1 charts
+Downloading library from repo https://hmctspublic.azurecr.io/helm/v1/repo/
+Deleting outdated charts
+</code></pre></div><p>Now you can run the template command:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm template nodejs
+</code></pre></div><p>This will either output a fully templated Helm chart based on the values.yaml file within the chart using the templates found in Chart-Library</p>
+<p><strong>| OR |</strong></p>
+<p>It will fail in the case of nodejs  because some values are missing from the values.yaml file that the chart requires.</p>
+<p>In my case there was no image value supplied so it needed to be added to values.yaml or supplied at the CLI:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>Error: execution error at <span class="o">(</span>nodejs/charts/library/templates/v2/_deployment.tpl:15:3<span class="o">)</span>: An image must be supplied to the chart
+</code></pre></div><p>The easiest fix is to add <code>image: test</code> to the <code>values.yaml</code> file and re-run the command, which worked for me, and output a valid templated Helm Chart.</p>
+<p>Now that this works its important to add or remove any values from the values.yaml file or add any new templates to the templates/ folder if you need to test them.</p>
+<p>Remember we want to test the changes made to Chart-Library so its important to trigger them e.g.</p>
+<p>📣 <strong>NOTE:</strong></p>
+
+<blockquote>
+<p>If you added new configuration that requires a value to be set then you need to add that key:value to the values.yaml file or the template wouldnt actually attempt to create the templated configuration.</p>
+</blockquote>
+<p>Run the template command:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm template nodejs
+</code></pre></div><p>The output should be similar to this:</p>
+<div class="highlight"><pre class="highlight yaml" tabindex="0"><code><span class="nn">---</span>
+<span class="c1"># Source: nodejs/templates/pdb.yaml</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PodDisruptionBudget</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span>  <span class="s">release-name-nodejs-pdb</span> 
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app.kubernetes.io/name</span><span class="pi">:</span> <span class="s">release-name-nodejs</span>
+    <span class="na">helm.sh/chart</span><span class="pi">:</span> <span class="s">nodejs-0.1.0</span>
+    <span class="na">app.kubernetes.io/managed-by</span><span class="pi">:</span> <span class="s">Helm</span>
+    <span class="na">app.kubernetes.io/instance</span><span class="pi">:</span> <span class="s">RELEASE-NAME</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">maxUnavailable</span><span class="pi">:</span> <span class="s">50%</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app.kubernetes.io/name</span><span class="pi">:</span> <span class="s">release-name-nodejs</span>
+<span class="nn">---</span>
+<span class="c1"># Source: nodejs/templates/service.yaml</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">release-name-nodejs</span> 
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app.kubernetes.io/name</span><span class="pi">:</span> <span class="s">release-name-nodejs</span>
+    <span class="na">helm.sh/chart</span><span class="pi">:</span> <span class="s">nodejs-0.1.0</span>
+    <span class="na">app.kubernetes.io/managed-by</span><span class="pi">:</span> <span class="s">Helm</span>
+    <span class="na">app.kubernetes.io/instance</span><span class="pi">:</span> <span class="s">RELEASE-NAME</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">80</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">3000</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app.kubernetes.io/name</span><span class="pi">:</span> <span class="s">release-name-nodejs</span>
+</code></pre></div><p>Please note that some charts are very large and outputting this way can be difficult to read so you can pipe the output to another tool to help with reading such as less , more or even save it to a file by appending this to the end of the template command:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm template nodejs <span class="o">&gt;</span> output.yaml
+</code></pre></div>
+            
+          </main>
+
+          <aside>
+              <ul class="contribution-banner">
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Testing-Changes/test-chart-library-changes.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Use+Helm+Template+to+test+chart+library+changes%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FTesting-Changes%2Ftest-chart-library-changes.html%29&amp;labels=bug&amp;title=Re%3A+%27Use+Helm+Template+to+test+chart+library+changes%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
+              </ul>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+      <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-170132988-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'displayFeaturesTask', null);
+  ga('set', 'transport', 'beacon');
+  ga('set', 'page', location.pathname+location.search+location.hash);
+  ga('send', 'pageview');
+  </script>
+
+    <script src="../javascripts/application.js"></script>
+  </body>
+</html>

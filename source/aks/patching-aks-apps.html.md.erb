@@ -1,0 +1,105 @@
+---
+title: Upgrading AKS Clusters
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+This run book documents some tasks that we have to perform when patching apps on the AKS Clusters. This runbook will use Traefik as an example throughout.
+
+**Note: steps may differ depending on the application being patched.**
+
+## App Patchign Schedule
+
+Patching is shared across the Platform Operations team, review the patching rota to view which app is due and who it is assigned to.
+
+[patching rota](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/Shared%20Documents/General/Patching%20Calendar%202024%20v1.xlsx?d=w72761ec6e128433f8b676893edd8be59&csf=1&web=1&e=2Ewqzn)
+
+## Patching order by Environment
+
+Typically app patching is split into 3 segments, based on environment. This is the normal order we use to apply patches:
+
+SDS is a good place to start, as any issues will have a small impact as this is a smaller platform.
+
+### Sandbox
+- Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
+- Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)
+
+### Non Prod
+- ITHC             - (cft-ithc-00-aks, cft-ithc-01-aks/ ss-ithc-00-aks, ss-ithc-01-aks)
+- Preview          - (cft-preview-01-aks/ ss-dev-01-aks)
+- Demo             - (cft-demo-00-aks, cft-demo-01-aks/ ss-demo-00-aks, ss-demo-01-aks)
+- Perftest         - (cft-perftest-00-aks, cft-perftest-01-aks/ ss-test-00-aks, ss-test-01-aks)
+- AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)
+
+### Production
+- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
+- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
+
+## Research the App version
+
+It is important to understand what changes are in the versin upgrade, especially if there are any breaking changes.
+
+For this example, the latest version in v26 and our existing version was v23.1.0
+
+The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attendion to any breaking changes.
+
+After performing a search in GitHub, there was no impact from the breaking changes in our configuration.
+
+## Test existing configuration
+
+Ensure your logged into the correct cluster
+```command
+kubectl config current-context
+```
+
+Use desired cluster
+```command
+kubectl config use-context ss-sbox-00-aks
+```
+
+In SDS, check traefik pods are running
+```command
+kubectl get pods -n admin | grep traefik
+```
+
+Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible.
+
+Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
+
+## Updating
+
+In order to allow patching of sbox only, a new directory was created for the updates crd URLs.
+
+```filepath
+apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
+```
+&
+```filepath
+apps/admin/traefik2/sbox/00-traefik2.yaml
+```
+
+This enables us to target specific enviornments at this new crd version.
+
+With the new crds version now available, a version selector block can be added to the [sbox 00 config](https://github.com/hmcts/sds-flux-config/blob/954443a9f3aea6de4b6b2c6a84f5a7c440e3d29b/apps/admin/traefik2/sbox/00-traefik2.yaml)
+
+Example:
+
+```code block
+chart:
+spec:
+  chart: traefik
+  # update the crd version in traefik-crds when updating this
+  version: 26.0.0
+  sourceRef:
+    kind: HelmRepository
+    name: traefik
+    namespace: admin
+```
+
+Update the cluster kustomization file pointing to the new crd directory created earlier - see pr below
+
+[example pr](https://github.com/hmcts/sds-flux-config/pull/4147/files)
+
+## Common Upgrade Steps
+

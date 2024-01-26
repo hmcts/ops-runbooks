@@ -41,6 +41,7 @@ Before upgrading any of the clusters run the following query on the cluster you 
 ```command
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
 ```
+Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place.
 
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
 

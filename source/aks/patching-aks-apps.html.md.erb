@@ -49,17 +49,17 @@ After performing a search in GitHub, there was no impact from the breaking chang
 ## Test existing configuration
 
 Ensure your logged into the correct cluster
-```command
+```
 kubectl config current-context
 ```
 
 Use desired cluster
-```command
+```
 kubectl config use-context ss-sbox-00-aks
 ```
 
 In SDS, check traefik pods are running
-```command
+```
 kubectl get pods -n admin | grep traefik
 ```
 
@@ -71,11 +71,12 @@ Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmc
 
 In order to allow patching of sbox only, a new directory was created for the updates crd URLs.
 
-```filepath
+```
 apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
 ```
 &
-```filepath
+
+```
 apps/admin/traefik2/sbox/00-traefik2.yaml
 ```
 
@@ -85,7 +86,7 @@ With the new crds version now available, a version selector block can be added t
 
 Example:
 
-```code block
+```
 chart:
 spec:
   chart: traefik

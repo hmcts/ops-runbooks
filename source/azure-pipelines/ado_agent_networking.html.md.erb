@@ -1,9 +1,12 @@
 ---
 title: Agent Pool Networking
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 30
 ---
 
 # <%= current_page.data.title %>
+
 ADO pipelines, agent pools are most likley to be containers hosted by Azure Kubernetes services for HMCTS. 
 
 Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
@@ -11,7 +14,8 @@ If the agent is actually a Kubernetes container, it will also state the Kubernet
 
 ![Agent_Capabilities](images/ADO-Agent-Capabilities.png )
 
-### Virtual Networks
+## Virtual Networks
+
 These are examples of some of the agent pool and vNet names
 
 | Agent Pool | Virtual network |
@@ -21,7 +25,8 @@ These are examples of some of the agent pool and vNet names
 | hmcts-ss-ptlsbox |  ss-ptlsbox-vnet |
 | hmcts-ss-ptlsbox |  ss-ptlsbox-vnet |
 
-### Palo Alto Firewalls
+## Palo Alto Firewalls
+
 Traffic from the agent pool to the Azure resource, flows through the Palo Alto if the infrastructure has been correctly configured.
 
 ![Firewall_Monitor](images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png)
@@ -29,22 +34,25 @@ Traffic from the agent pool to the Azure resource, flows through the Palo Alto i
 Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet secuirty rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
 If the traffic is coming into Azure from the agent pool, use Azure portal Network Watch to troubleshoot.
 
-### ADO Connections to HMCTS Environments
+## ADO Connections to HMCTS Environments
+
 HMCTS operates 3 main Azure environments (SBOX, NONPROD and PROD), which are isolated from each other. ADO agent pools are connected to only ONE of these environments.
 If your pipeline is reporting network errors and you are not observing ADO traffic in the Palo Alto.  First suspect the wrong agent pool has been selected. Then start investigating the other links in the chain.
 
 ![Azure_WAN_Connections](images/ADO-Agent-Connections.png)
 
-### Agent Routing ###
+## Agent Routing
+
 If you vNET is new, you may need to update the route table aks-ptl-route-table, to enable the agents in K8s to reach your resources.
 
 [Azure-Private-DNS](https://github.com/hmcts/azure-private-dns)
 
-environment / 01-network / 
+```text
+environment / 01-network /
+```
 
+## Private DNS Zones and Private End Points
 
-
-### Private DNS Zones and Private End Points
 To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.
 
 [aks-sds-deploy Repo](https://github.com/hmcts/aks-sds-deploy)
@@ -52,25 +60,25 @@ To enable ADO agents to resolve private DNS zones, each zone needs to be linked 
 Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the "stages to run" option.
 Besure you have selected the correct **Environment** for your ADO agent network. 
 
-
 Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets
 
 [Azure-Private-DNS-Private-Link](https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink)
 
 ## Public Network Services or Private
+
 Some Azure resources (Storage Accounts, Databases, Purview, etc) can be configured as either public or private, with private creating additional requirements for agent pool access.
 
 ![Resource_Firewall](images/ADO-Resource-Firewall.png)
 
-**Example of private storage account**
+### Example of private storage account
 
 Pipeline will fail with an AuthorizationFailure error if only private network access is configured and access has not been granted. 
 
 ![Resource_Firewall](images/ADO-Storage-Error.png)
 
-**RAW Error Message***
+### RAW Error Message
 
-```
+```log
 2023-07-25T16:31:31.0612142Z Error: containers.Client#GetProperties: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailure" Message="This request is not authorized to perform this operation.\nRequestId:19ad4843-f01e-007b-3515-bfe0bc000000\nTime:2023-07-25T16:31:30.6786267Z"
 2023-07-25T16:31:31.0613295Z
 2023-07-25T16:31:31.0613887Z  with module.sftp_cft_storage.azurerm_storage_container.container["dlrm"],
@@ -81,9 +89,7 @@ Pipeline will fail with an AuthorizationFailure error if only private network ac
 
 ![Resource_vNet_Permissions](images/ADO-SA-vNet.png)
 
-Terraform code that adds agent pool vNets to the storage account.
-
-https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf
+Terraform code that adds agent pool vNets to the storage account: [link](https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf)
 
 ```terraform
 module "storage" {
@@ -113,3 +119,4 @@ module "storage" {
     common_tags  = module.ctags.common_tags
   }
   ```
+  

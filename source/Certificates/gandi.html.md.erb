@@ -1,5 +1,7 @@
 ---
 title: Manually Generated Certificates
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 30
 ---
 
@@ -15,15 +17,16 @@ This article describes the process for issuing or renewing an SSL certificate th
 
 We have a certificate tracker which is populated a month in advance by the Operations team with certs that are expiring soon, view it on [sharepoint](https://cjscommonplatform-my.sharepoint.com/:x:/r/personal/zoe_cope_hmcts_net/_layouts/15/Doc.aspx?sourcedoc=%7B6C8A9500-4D9D-45EA-8CC7-D75F3DDFF133%7D&file=Cert%20Tracker.xlsx&action=default&mobileredirect=true), you may need to request access.
 
+## Step-by-step guide
 
-## Step-by-step guide:
 There are 3 key stages to the renewal process:
 
-- [Generate the CSR and request form](#Step-1:-Generate-the-CSR-and-request-form)
-- [Point the DNS](#Step-2:-Point-the-DNS)
-- [Upload the certificate to Azure](#Step-3:-Upload-the-certificate-to-Azure)
+- [Generate the CSR and request form](#step-1-generate-the-csr-and-request-form)
+- [Point the DNS](#step-2-point-the-dns)
+- [Upload the certificate to Azure](#step-3-upload-the-certificate-to-azure)
 
-#### Note:
+### Note
+
 If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
 You can do this by going on [mxtoolbox](https://mxtoolbox.com/) and running a DNS Check.
 If there are no results, you should contact the requester and get them to create the domain and DNS zone.
@@ -35,31 +38,26 @@ For service.gov.uk domains, you need to contact Government Digital Service (GDS)
 
 ### Step 1: Generate the CSR and request form
 
-
 This section is described in detail on the [Requesting SSL Certificates](csr.md) guide.
 
 Once the CSR and form has been generated, they are sent via email to Ops Config Management (opsconfman@hmcts.net).
 
 ### Step 2: Point the DNS
 
-
 Ops then return the validation instructions for pointing the DNS, for example:
 
-```
+```text
 "Please add the following DNS record: _EBCEA3AAA604EE544AFE2171A1C19D4A.decree-absolute.apply-divorce.service.gov.uk. 10800 IN CNAME 
 CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com."
 ```
 
 Pointing the DNS is done in [azure-public-dns](https://github.com/hmcts/azure-public-dns)
 
-
-
 With the example above, the address would belong in the "apply-divorce-service-gov-uk.yml" file.
 
 These are some of the domains, but make sure you search the repo for the domain to find the one you are after:
 
-
-![](images/envfiles.png)
+![envfiles](images/envfiles.png)
 _*Addresses which do not fall into any of these domains may be managed using a different service (eg legacy AWS dns zone)._
 
 The format for pointing the DNS, using the example described in the validation instructions above, is as follows:
@@ -74,8 +72,7 @@ This is the DNS pointings when seen in the pull request:
 ![](images/pullrequest.png)
 Broken down, the changes made to the validation instructions to achieve the correct format are:
 
-
-**1. Add the name:**
+#### **1. Add the name:**
 
 - Remove `.apply-divorce.service.gov.uk`, since this is added automatically.
 E.g:
@@ -85,10 +82,11 @@ _becomes_
 
 \- name: `_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute`
 
-**2. Add a time to live**
+#### **2. Add a time to live**
+
 - any number would work, we use 300 seconds (5 minutes), e.g. `ttl: 300`.
 
-**3. Add the record**
+#### **3. Add the record**
 
 Remember to keep the full-stop at the end of the CNAME.
 `CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.`

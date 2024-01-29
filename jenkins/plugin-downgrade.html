@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>FinOps - HMCTS</title>
+    <title>How to downgrade a Jenkins plugin - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/FinOps/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/jenkins/plugin-downgrade.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="FinOps - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/FinOps/" />
+      <meta name="twitter:title" content="How to downgrade a Jenkins plugin - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/jenkins/plugin-downgrade.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="FinOps" />
+      <meta property="og:title" content="How to downgrade a Jenkins plugin" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/FinOps/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/jenkins/plugin-downgrade.html" />
 
     
   </head>
@@ -406,19 +406,28 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="finops">FinOps</h1>
-<h2 id="finops-related-guides">FinOps related Guides</h2>
+            <h1 id="how-to-downgrade-a-jenkins-plugin">How to downgrade a Jenkins plugin</h1>
+<p>Plugin versions are managed from within <a href="https://github.com/hmcts/cnp-jenkins-docker">cnp-jenkins-docker</a>.</p>
+<p>Renovate checks plugin versions and <a href="https://github.com/hmcts/cnp-jenkins-docker/blob/master/.github/renovate.json">automatically upgrades them each morning</a></p>
+<p>If an issue has arisen with a new version of a plugin and it needs to be downgraded:</p>
 
 <ul>
-<li><a href="manual-tagging.html">Tagging Resources Manually</a></li>
+<li><a href="https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/plugins.txt">Downgrade it</a> in the image</li>
+<li><p>Deploy the <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml">new image on CFT</a> and <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml">on SDS</a></p></li>
+<li><p>Jenkins may run into issues when downgrading plugins, if this is the case:</p></li>
 </ul>
-<h2 id="other-finops-related-resources">Other FinOps related Resources</h2>
+<p>Wipe the plugins folder
+<code>bash
+kubectl exec -it jenkins-0 -c jenkins -- rm -rf /var/jenkins_home/plugins/
+</code>
+Then restart Jenkins
+<code>bash
+kubectl delete pod jenkins-0
+</code></p>
 
 <ul>
-<li><a href="https://tools.hmcts.net/confluence/display/DTSPO/Tagging+v1">Tagging Documentation</a></li>
-<li><a href="https://github.com/hmcts/aks-auto-shutdown">AKS Auto Shutdown</a></li>
-<li><a href="https://github.com/hmcts/sandbox-auto-cleardown">Sandbox Auto Cleardown</a></li>
-<li><a href="https://github.com/hmcts/dtspo-orphan-resources-cleanup">Orphaned Resources Cleardown</a></li>
+<li>Make the maintainers of the plugin aware of the issue</li>
+<li>Temporarily freeze renovate for that particular plugin (add to <code>ignoreDeps</code>)</li>
 </ul>
 
             
@@ -426,8 +435,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FinOps/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27FinOps%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FFinOps%2F%29&amp;labels=bug&amp;title=Re%3A+%27FinOps%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/jenkins/plugin-downgrade.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27How+to+downgrade+a+Jenkins+plugin%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fjenkins%2Fplugin-downgrade.html%29&amp;labels=bug&amp;title=Re%3A+%27How+to+downgrade+a+Jenkins+plugin%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

@@ -65,3 +65,23 @@ Click on **Run** to start the pipeline.
    - Check if all enforcers come up in time, they could fail to come if nodes are full.
    - If they keep failing with race conditions, it could be due to backups being corrupt.
    - Usually `policy.backup` and `admission_control.backup` are the ones you need to delete from Azure file share if they are corrupt.
+
+### Dynatrace oneagent pods not deployed or failing to start
+
+**NOTE:** The issue described here need to be validated if still applies when the updated [Dynatrace Operator](https://tools.hmcts.net/jira/browse/DTSPO-6187) is rolled out.
+
+For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
+
+Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not part of the existing Flux config.
+
+Run the below command on the cluster. An empty result confirms CRDs are not installed. 
+
+`kubectl get crds | grep oneagent`
+
+To fix, run the below command to apply CRDs to the cluster:
+
+`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml`  
+
+`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
+
+**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7

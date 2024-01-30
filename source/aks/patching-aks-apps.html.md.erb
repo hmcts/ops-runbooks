@@ -13,13 +13,13 @@ This run book documents some tasks that we have to perform when patching apps on
 
 Patching is shared across the Platform Operations team, review the patching rota to view which app is due and who it is assigned to.
 
-[patching rota](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/Shared%20Documents/General/Patching%20Calendar%202024%20v1.xlsx?d=w72761ec6e128433f8b676893edd8be59&csf=1&web=1&e=2Ewqzn)
+[Patching Rota](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/Shared%20Documents/General/Patching%20Calendar%202024%20v1.xlsx?d=w72761ec6e128433f8b676893edd8be59&csf=1&web=1&e=2Ewqzn)
 
 ## Patching order by Environment
 
 Typically app patching is split into 3 segments, based on environment. This is the normal order we use to apply patches:
 
-SDS is a good place to start, as any issues will have a small impact as this is a smaller platform.
+SDS is a good place to start, as any issues will have a smaller impact due to the size of the platform.
 
 ### Sandbox
 - Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
@@ -35,14 +35,12 @@ SDS is a good place to start, as any issues will have a small impact as this is 
 ### Production
 - Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
 - Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
-
 ## Research the App version
-
-It is important to understand what changes are in the versin upgrade, especially if there are any breaking changes.
+It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
 
 For this example, the latest version in v26 and our existing version was v23.1.0
 
-The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attendion to any breaking changes.
+The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attention to any breaking changes.
 
 After performing a search in GitHub, there was no impact from the breaking changes in our configuration.
 
@@ -69,7 +67,7 @@ Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmc
 
 ## Updating
 
-In order to allow patching of sbox only, a new directory was created for the updates crd URLs.
+In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
 
 ```
 apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
@@ -82,7 +80,7 @@ apps/admin/traefik2/sbox/00-traefik2.yaml
 
 This enables us to target specific enviornments at this new crd version.
 
-With the new crds version now available, a version selector block can be added to the [sbox 00 config](https://github.com/hmcts/sds-flux-config/blob/954443a9f3aea6de4b6b2c6a84f5a7c440e3d29b/apps/admin/traefik2/sbox/00-traefik2.yaml)
+With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
 Example:
 
@@ -100,7 +98,7 @@ spec:
 
 Update the cluster kustomization file pointing to the new crd directory created earlier - see pr below
 
-[example pr](https://github.com/hmcts/sds-flux-config/pull/4147/files)
+See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
 Once the PR has been raised and the checks have been reviewed for errors - merge the PR.
 
@@ -116,7 +114,7 @@ kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
 
 Review pods for any new errors:
 ```
-kubectl logs traefik-6d648cbf4f-fslch -n admin -f
+kubectl logs {pod-name} -n admin -f
 ```
 
 Check test sites are accessible
@@ -137,7 +135,7 @@ kubectl delete hr toffee-recipe-backend -n toffee
 kubectl delete hr toffee-frontend -n toffee
 ```
 
-Ensure to monitor the ststus for the HRs and pods to ensure they come back successfully.
+Ensure to monitor the status for the HRs and pods to ensure they come back successfully.
 
 Repeat steps in CFT
 

@@ -10,32 +10,32 @@ If you come across a failed AKS resource or you have pushed in breaking changes 
 
 If [upgrading](upgrading-aks-clusters.html) or [re-building](rebuilding-aks-clusters.html) the AKS Clusters most of the times the process will go on without any issues if the steps in the respective guides have been followed thoroughly.
 
-The most common AKS cluster-related infrastructure issues and resolution steps have been covered in the Troubleshooting page [here](https://hmcts.github.io/ops-runbooks/aks/known-issues.html). If you come across a problem with the AKS Cluster that has not been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
+The most common AKS cluster-related issues and resolution steps have been covered in the Troubleshooting page [here](https://hmcts.github.io/ops-runbooks/aks/known-issues.html). If you come across a problem with the AKS Cluster that has not been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
 
-For common incidents with AKS resources refer to the [Common Incidents and Resolution Steps] at the bottom of this page. If you come across a problem with the AKS Cluster resources that hasn't been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
+For common incidents with AKS resources refer to the [Common Incidents and Resolution Steps](#common-incidents-and-resolution-steps) section. If you come across a problem with an AKS resource that hasn't been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
 
-In cases where the issue isn't covered in the troubleshooting guide or the resolution guidance has not helped, reach out to the rest of the members on your squad for guidance. A lot of the time someone will have some ideas on where/ what the issue is and how to fix it. If that isn't the case, the issue can be escalated to the wider community by posting in the slack channel platform-operations stating the ticket number you are working on, any error messages and what you have so far tried to resolve the issue. For any high priority problems that affect the Production environment or having an impact on multiple teams inform Karthik Chinnareddyvari and Noel Connolly so they are aware of the situation.
+In cases where the issue isn't covered in the troubleshooting guide or the resolution guidance has not helped, reach out to the rest of the members on your squad for guidance. A lot of the time someone will have some ideas on where/ what the issue is and how to fix it. If that isn't the case, the issue can be escalated to the wider community by posting in the slack channel platform-operations stating the ticket number you are working on, error messages and what you have so far tried to resolve the issue. For any high priority problems that affect the Production environment or having an impact on multiple teams inform Karthik Chinnareddyvari and Noel Connolly so they are aware of the situation.
 
 ## Common Incidents and Resolution Steps
 
 ### Debug Application Startup issues in AKS
 
-- There could be many reasons why applications could fail to startup like :
+There could be many reasons why applications could fail to startup like:
 - A secret referred in helm chart is missing in keyvaults
 - Pod identity is not able to pull keyvault secrets due to missing permissions
 - There is not enough space in the cluster to fit in a new pod.
 - Pod is scheduled, but fails to pass readiness (`/health/readiness`) or  liveness (`/health/liveness`) checks.
 - A misconfigured environment variable, example - incorrect URL of a dependent service.
 
-- Below are some handy kubectl commands to debug the issues
+Below are some handy kubectl commands to debug the issues
 
-To check latest events on your namespace:
+- To check latest events on your namespace:
 
 ```shell
 kubectl get events -n <your-namespace>
 ```
 
-To check status of pods:
+- To check status of pods:
 
 ```shell
 kubectl get pods -n <your-namespace> | grep <helm-release-name>
@@ -45,13 +45,13 @@ kubectl get pods -n <your-namespace> | grep <helm-release-name>
 # kubectl get pods -n ccd | grep pr-123
 ```
 
-To check status of a specific pod which is not running
+- To check status of a specific pod which is not running
 
 ```shell
 kubectl describe pod <pod-name> -n <your-namespace>
 ```
 
-To check logs of pods which is not starting
+- To check logs of pods which is not starting
 
 ```shell
 kubectl logs <pod-name> -n <your-namespace>
@@ -111,6 +111,7 @@ kubectl logs -n flux-system -l app=image-automation-controller
 kubectl logs -n flux-system -l app=image-automation-controller | grep <Release Name>
 ```
 
+
 #### Updated HelmRelease is not deployed to cluster
 
 - Helm operator queues all the updates, so it could take up to 20 minutes sometimes to be picked up.
@@ -131,7 +132,7 @@ kubectl delete hr <helm-release-name> -n <namespace>
 ```
 - In most cases, helm release gets timed out with an error in log similar to ` failed: timed out waiting for the condition`. This usually means application pods didn't startup in time and you need to look at your pods to know more.
 
-Check the latest status on helm release and if it has already been rolled back to previous release.
+- Check the latest status on helm release and if it has already been rolled back to previous release.
 
 ```shell
 kubectl describe hr <helm-release-name> -n <your-namespace>

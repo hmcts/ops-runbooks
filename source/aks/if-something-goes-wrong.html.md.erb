@@ -1,0 +1,169 @@
+---
+title: If Something Goes Wrong
+weight: 50
+last_reviewed_on: 2024-01-30
+review_in: 6 months
+---
+
+# <%= current_page.data.title %>
+
+
+If you come across a failed AKS resource or you have pushed in breaking changes that have caused failures in AKS, you may find the below guidance helpful in resolving the issues. 
+
+If [upgrading](upgrading-aks-clusters.html) or [re-building](rebuilding-aks-clusters.html) the AKS Clusters most of the times the process will go on without any issues if the steps in the respective guides have been followed thoroughly.
+
+The most common AKS cluster-related issues and resolution steps have been covered in the Troubleshooting page [here](known-issues.html). If you come across a problem with the AKS Cluster that has not been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
+
+For common incidents with AKS resources refer to the [Common Incidents and Resolution Steps](#common-incidents-and-resolution-steps) section. If you come across a problem with an AKS resource that hasn't been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.
+
+In cases where the issue isn't covered in the troubleshooting guide or the resolution guidance has not helped, reach out to the rest of the members on your squad for guidance. A lot of the time someone will have some ideas on where/ what the issue is and how to fix it. If that isn't the case, the issue can be escalated to the wider community by posting in the slack channel platform-operations stating the ticket number you are working on, error messages and what you have so far tried to resolve the issue. For any high priority problems that affect the Production environment or having an impact on multiple teams inform Karthik Chinnareddyvari and Noel Connolly so they are aware of the situation.
+
+## Common Incidents and Resolution Steps
+
+### Debug Application Startup issues in AKS
+
+There could be many reasons why applications could fail to startup like:
+- A secret referred in helm chart is missing in keyvaults
+- Pod identity is not able to pull keyvault secrets due to missing permissions
+- There is not enough space in the cluster to fit in a new pod.
+- Pod is scheduled, but fails to pass readiness (`/health/readiness`) or  liveness (`/health/liveness`) checks.
+- A misconfigured environment variable, example - incorrect URL of a dependent service.
+
+Below are some handy kubectl commands to debug the issues
+
+- To check latest events on your namespace:
+
+```shell
+kubectl get events -n <your-namespace>
+```
+
+- To check status of pods:
+
+```shell
+kubectl get pods -n <your-namespace> | grep <helm-release-name>
+
+#Examples
+# kubectl get pods -n ccd | grep ccd-data-store-api
+# kubectl get pods -n ccd | grep pr-123
+```
+
+- To check status of a specific pod which is not running
+
+```shell
+kubectl describe pod <pod-name> -n <your-namespace>
+```
+
+- To check logs of pods which is not starting
+
+```shell
+kubectl logs <pod-name> -n <your-namespace>
+
+#To follow logs
+kubectl logs <pod-name> -n <your-namespace> -f
+
+# To check previous pod logs if its restarting
+kubectl logs <pod-name> -n <your-namespace> -p
+
+```
+
+### Flux / Gitops
+
+> Always check __why__ your release or pod has failed in the first instance.
+> Although you may have permissions to delete a helm release or pod in a non-production environment, use this privilege wisely as you could be _hiding a potential bug_ which could also _occur in production_.
+
+#### Latest image is not updated in cluster
+
+- Start with checking [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) to make sure flux has updated/ committed the image.
+- If image hasn't been committed to Github, see [ Flux did not commit latest image to Github](#flux-did-not-commit-latest-image-to-github).
+- If flux has committed the new image to Github, check if the `HelmRelease` has been updated by Flux. Run below command and check that the image tag has been updated in the output
+
+```shell
+kubectl get hr -n <your-namespace> <your-helm-release-name> -o yaml
+```
+- If Image is not updated in above, [Change in git is not applied to cluster](#change-in-git-is-not-applied-to-cluster).
+- If the image tag is updated and still application pods are not deployed, see [Updated HelmRelease is not deployed to cluster](#updated-helmrelease-is-not-deployed-to-cluster)
+
+### Flux did not commit latest image to Github
+
+- Image automation is run from management cluster (CFTPTL). Please login to cftptl cluster before further troubleshooting.
+- Image reflector controller keeps polling ACR for new images, but it should generally update the new image in 10 minutes.
+- Check status of `imagerepositories` and verify the last scan.
+
+```shell
+kubectl get imagerepositories -n flux-system  <repository name(usually helm release name)>
+```
+- If the last scan doesn't update, check image reflector controller logs to see if there any logs related to the helm repo.
+
+```shell
+kubectl logs -n flux-system -l app=image-reflector-controller --tail=-1
+# search for specific image
+kubectl logs -n flux-system -l app=image-reflector-controller --tail=-1 | grep <Release Name>
+```
+- If the last scan is latest, check `imagepolicy` status to verify that the image returned matches the expectation.
+
+```shell
+kubectl get imagepolicies -n flux-system <policy name(usually helm release name)>
+```
+- If it doesn't match the expected tag, verify image reflector controller logs as described above.
+- If the `imagepolicy` object returned shows the expected image, but it didn't commit to Github, check image automation controller logs.
+
+```shell
+kubectl logs -n flux-system -l app=image-automation-controller
+# search for specific image
+kubectl logs -n flux-system -l app=image-automation-controller | grep <Release Name>
+```
+
+
+#### Updated HelmRelease is not deployed to cluster
+
+- Helm operator queues all the updates, so it could take up to 20 minutes sometimes to be picked up.
+- Check HelmRelease status to see the status.
+
+```shell
+kubectl get hr -n <namespace> <Release Name>
+```
+- Look at helm operator logs to see if there are any errors specific to your helm release
+
+```shell
+kubectl logs -n flux-system -l app=helm-controller --tail=1000 | grep <Release Name>
+```
+- If you see any errors like, `status 'pending-install' of release does not allow a safe upgrade"`. You need to delete `HelmRelease` for fixing this.
+
+```shell
+kubectl delete hr <helm-release-name> -n <namespace>
+```
+- In most cases, helm release gets timed out with an error in log similar to ` failed: timed out waiting for the condition`. This usually means application pods didn't startup in time and you need to look at your pods to know more.
+
+- Check the latest status on helm release and if it has already been rolled back to previous release.
+
+```shell
+kubectl describe hr <helm-release-name> -n <your-namespace>
+```
+- If you are looking at pods after a long time, `HelmRelease` might have been rolled back and you won't have failed pods. Easiest way is to add a simple change like a dummy environment variable in flux-config to re-trigger the release and debug the issue when it occurs.
+
+- If your old pods are still running when you check, follow [Debug Application Startup issues in AKS](#debug-application-startup-issues-in-aks) to troubleshoot further.
+
+####  Change in git is not applied to cluster
+
+- To check if latest github commit has been downloaded by checking status
+
+```shell
+kubectl get gitrepositories flux-config -n flux-system
+```
+- If the commit doesn't match latest id, verify source controller logs to see any related errors
+
+```shell
+kubectl logs -n flux-system -l app=source-controller
+```
+- If commit id is recent, verify status of flux kustomization for your namespace to get the version of git applied.
+
+```shell
+kubectl get kustomizations.kustomize.toolkit.fluxcd.io -n flux-system <namespace>
+```
+- If the above status doesn't show latest commit/ show any error , see kustomize controller logs to find relevant errors.
+
+```shell
+kubectl logs -n flux-system -l app=kustomize-controller
+# search for specific image
+kubectl logs -n flux-system -l app=kustomize-controller | grep <namespace>
+```

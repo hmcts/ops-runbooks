@@ -102,5 +102,49 @@ Update the cluster kustomization file pointing to the new crd directory created 
 
 [example pr](https://github.com/hmcts/sds-flux-config/pull/4147/files)
 
-## Common Upgrade Steps
+Once the PR has been raised and the checks have been reviewed for errors - merge the PR.
+
+Review cluster pods for Traefik have come back up:
+```
+kubectl get pods -n admin | grep traefik
+```
+
+Check pods have the correct chart version:
+```
+kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
+```
+
+Review pods for any new errors:
+```
+kubectl logs traefik-6d648cbf4f-fslch -n admin -f
+```
+
+Check test sites are accessible
+
+Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible.
+
+Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
+
+In sandbox, delete Toffee / Plum HRs to test
+```
+kubectl get hr -n toffee
+```
+
+```
+kubectl delete hr toffee-recipe-backend -n toffee
+```
+```
+kubectl delete hr toffee-frontend -n toffee
+```
+
+Ensure to monitor the ststus for the HRs and pods to ensure they come back successfully.
+
+Repeat steps in CFT
+
+## Ready to move onto Non-prod enviornments.
+
+
+
+
+
 

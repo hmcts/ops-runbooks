@@ -42,6 +42,8 @@ kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all
 ```
 Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place using the above command. Cross reference the statuses for the pods and hrs to ensure they match, before and after the upgrade on each cluster. Only proceed to the next cluster upgrade if they match.
 
+If discrepancies are found, investigate by checking logs and error messages from the upgrade. If errors are detected, consider rolling back to the previous working version for a quick restoration. Collaborate with relevant teams or communities for insights and potential solutions to similar issues.
+
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
 
 - Check if pluto needs updating on the cluster

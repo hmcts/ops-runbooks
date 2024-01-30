@@ -1,5 +1,7 @@
 ---
 title: F5 VPN Config
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 12
 ---
 
@@ -20,7 +22,8 @@ If you lose your login details, a person with existing access can provide you wi
 Note: If using Firefox then the search function probably won't find the IP address you type in.
 
 5. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
-<img src=images/properties.png  width="400">
+
+    <img src=images/properties.png  width="400">
 
 ## Access Policy
 
@@ -65,9 +68,9 @@ Select Apply
 
 ## Common Issues
 
-- Failed HDD encryption check: Likely means that FileVault is turned off if it's Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.
-- User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person
-- Failed to open tunnel, Tunnel server already launched: Find the svpn process id: `ps alx | grep svpn`, on the result process ID use the kill command: `kill -9 [the process id from the ps command]`, and or restart the machine.
+* Failed HDD encryption check: Likely means that FileVault is turned off if it's Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.
+* User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person
+* Failed to open tunnel, Tunnel server already launched: Find the svpn process id: `ps alx | grep svpn`, on the result process ID use the kill command: `kill -9 [the process id from the ps command]`, and or restart the machine.
 
 If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you'll need the F5 serial number / Registration key.  
 To get this, you need to access the command line by [SSHing into the VPN](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview) 

@@ -1,5 +1,7 @@
 ---
 title: Restoring a Single Server Azure PostgreSQL Database
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 30
 ---
 
@@ -9,60 +11,56 @@ This really depends on the nature of the database to be restored. The example be
 
 ## The Database restore steps
 
-* Execute the restore command
+### Execute the restore command
 
 From your local machine, execute commands below:
 
-*Source:* am-role-assignment-service-postgres-db-v11-demo<br>
-*Target:* am-role-assignment-service-postgres-db-v11-demo-restore
+  *Source:* am-role-assignment-service-postgres-db-v11-demo
 
-  ```cmd
-az account set --subscription "DCD-CNP-DEV";
-az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-demo -n am-role-assignment-service-postgres-db-v11-demo-restore --restore-point-in-time 2022-07-13T17:00:01Z -s am-role-assignment-service-postgres-db-v11-demo;
-  ```
-  **Note:** Note the new hostname with `-restore` suffix at the end.
-
-* Export data out of newly restored database
-
+  *Target:* am-role-assignment-service-postgres-db-v11-demo-restore
 
 ```cmd
+az account set --subscription "DCD-CNP-DEV";
+az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-demo -n am-role-assignment-service-postgres-db-v11-demo-restore --restore-point-in-time 2022-07-13T17:00:01Z -s am-role-assignment-service-postgres-db-v11-demo;
+```
 
+**Note:** Note the new hostname with `-restore` suffix at the end.
+
+### Export data out of newly restored database
+
+```cmd
 pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment > role_assignment_demo.sql 
-   ```
+ ```
 
-  
-  This should create a file called `role_assignment_demo.sql` with the binary output in it.
+This should create a file called `role_assignment_demo.sql` with the binary output in it.
 
-  **Note:** a switch of `-Fc` was used in the export cmd. Ensure you restore using the `pg_restore` command
- 
-* Clean out corrupted database (Source) using drop table commands
+**Note:** a switch of `-Fc` was used in the export cmd. Ensure you restore using the `pg_restore` command
+
+### Clean out corrupted database (Source) using drop table commands
 
 This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault
 
--- Connect to DB <br>
+#### Connect to DB
 
-psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment
+`psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment`
 
  ```cmd
-
 drop table  actor_cache_control cascade;
 drop table  audit_faults cascade;
 drop table  backup_role_assignment cascade ;
 ......
 ......
-   ```
+```
 
-* Restore the exported database into the out-of-sync DB
+### Restore the exported database into the out-of-sync DB
 
 ```cmd
-
 pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment < role_assignment_demo.sql
-   ```
+```
 
-* The output from the above command will look like this ....
+#### The output from the above command will look like this ....
 
-  ```cmd
-
+```cmd
 pg_restore: connecting to database for restore<br>
 Password:<br>
 pg_restore: creating EXTENSION "dblink"<br>
@@ -74,18 +72,17 @@ pg_restore: creating TABLE "public.batch_job_execution_params"<br>
 pg_restore: creating SEQUENCE "public.batch_job_execution_seq"<br>
 .......<br>
 .......<br>
-    ```
+```
 
-* Run Analyse on the newly restored Database
+### Run Analyse on the newly restored Database
 
 ANALYZE collects statistics about the contents of tables in the database, and stores the results in the `pg_statistic` system catalog. Subsequently, the query planner uses these statistics to help determine the most efficient execution plans for queries.
 
 ```cmd
 analyse;
-   ```
+```
 
-### Some external references
+## Some external references
 
 * [Database Backups](https://www.postgresqltutorial.com/postgresql-administration/postgresql-backup-database/)
 * [Database Restore](https://www.postgresqltutorial.com/postgresql-administration/postgresql-restore-database/)
- 

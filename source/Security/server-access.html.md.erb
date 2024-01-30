@@ -1,5 +1,7 @@
 ---
 title: Splunk Server Access
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 20
 ---
 # <%= current_page.data.title %>
@@ -17,18 +19,24 @@ This document describes how to get access to the Splunk servers for operational 
 
 1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net).
 
-2. Request JIT access to HMCTS Bastion Server - https://myaccess.microsoft.com/
-```text
- SecOps Sandbox Bastion Server Access OR SecOps Production Bastion Server Access
-```
-4. SSH on to bastion secops server
+2. Request JIT access to HMCTS Bastion Server - <https://myaccess.microsoft.com/>
+
+    ```text
+    SecOps Sandbox Bastion Server Access OR SecOps Production Bastion Server Access
+    ```
+
+3. SSH on to bastion secops server
 See here for a steps on how to do this: [HMCTS Confluence bastion access](https://tools.hmcts.net/confluence/display/RD/Bastion)
 
-5. SSH on to required Splunk server via the SecOps bastion you're now logged into. You should be be able to login using your Azure Active Directory account details (assuming you've been added to the JIT groups above).
+4. SSH on to required Splunk server via the SecOps bastion you're now logged into. You should be be able to login using your Azure Active Directory account details (assuming you've been added to the JIT groups above).
 **Follow the instructions output from the SSH command**
 
 ## Additional notes
+
 ### Access package configuration
+
 The access packages 'SecOps Sandbox Bastion Server Access' and 'SecOps Production Bastion Server Access' can be found in the Azure Portal under 'Identity Governance', any updates and amendments to this should be made here.
+
 ### VM authentication
+
 User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension 'AADLoginForLinux'; this saves us having to retrieve and exchange SSH keys. The VMs have not been joined to the HMCTS domain.

@@ -1,5 +1,7 @@
 ---
 title: Databases
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 60
 ---
 # <%= current_page.data.title %>  
@@ -9,25 +11,29 @@ Other teams sometimes need certain pieces of information from the production DB 
 a ticket, providing their sql query and requesting PlatOps run these against
 production Db as they don't have access to this.
 
-*Note:* there's a [self service](https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+Database) process that should be used by the team if they have an SC person on their team instead.
+*Note:* there's a [self service](https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+-+Database) process that should be used by the team if they have an SC person on their team instead.
 
 To fulfill one of these request, you can follow the steps below.
 
 ## Prerequisites 💥
+
 * **Important:** Verify you are all setup as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)
-* Grant yourself access to production Bastion as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document <br>
-  **Note:** If not on call then just one day is sufficient, you could also customize how long you want access for.
+* Grant yourself access to production Bastion as outlined in [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production), in the `Steps to access` section of the document
+  * **Note:** If not on call then just one day is sufficient, you could also customize how long you want access for.
 
 ## Suggested Steps
 
-* Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on [Azure](https://portal.azure.com/#home) <br>
-* Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥 <br>
-  Sometimes typos or misplaced variables are easy to spot
-* Jump on to the production bastion, steps on how to do this are in the [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)  documentation <br>
-  _Example:_<br>
+* Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on [Azure](https://portal.azure.com/#home)
+* Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥
+  * Sometimes typos or misplaced variables are easy to spot
+* Jump on to the production bastion, steps on how to do this are in the [cnp-module-postgres](https://github.com/hmcts/cnp-module-postgres#production)  documentation
+  
+_Example_
+
   ![Connecting to DB](images/connecting.png)
 
 ## Guides
-- [Connecting to a Database](executing-queries.html)
-- [Deleting cases from CCD Datastore Database](deleting-cases-from-ccd-datastore.html)
-- [Restoring a Database](restoring-an-azure-single-server-database.html)
+
+* [Connecting to a Database](executing-queries.html)
+* [Deleting cases from CCD Datastore Database](deleting-cases-from-ccd-datastore.html)
+* [Restoring a Database](restoring-an-azure-single-server-database.html)

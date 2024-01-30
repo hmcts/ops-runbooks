@@ -1,8 +1,11 @@
 ---
-title: MailRelay
+title: Mailrelay Essentials
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 50
 ---
-# Mailrelay Essentials
+
+# <%= current_page.data.title %>
 
 This runbook describes how Mailrelay is configured and deployed and the steps that are necessary to on-board new clients. The Mailrelay configuration can be found in the repo [exim-relay](https://github.com/hmcts/exim-relay).
 
@@ -12,7 +15,7 @@ Each service will require a username and password to utilise the Mailrelay servi
 
 **1.** Create a new secret in Key Vault and associate a complex password
 
-**2.** Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
+**2.** Branch off the [Flux](https://github.com/hmcts/sds-flux-config) repo, edit the configuration file [mailrelay2.yaml](https://github.com/hmcts/sds-flux-config/blob/master/apps/mailrelay2/mailrelay2/mailrelay2.yaml) then append the new service account to the section authKeyVaultSecrets.
 
 The syntax is as follows:
 
@@ -20,6 +23,7 @@ The syntax is as follows:
      - "my-service-user-account"
      - "mailrelay-prod-user"
 ```
+
 **3.** Create a new pull request and merge into the master branch once approved
 
 **4.** Test access and connectivity as described in the section below [Testing Mailrelay](#testing-mailrelay)
@@ -40,7 +44,7 @@ The [exim.conf](https://github.com/hmcts/exim-relay/blob/master/exim.conf) file 
 
 #### Authentication Mechanisms
 
-Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](https://github.com/hmcts/ops-runbooks/tree/master/Certificates)
+Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the [ACME Function App](../Certificates/letsencrypt.html)
 
 The following certificates are installed in the Docker image which is the source of the mailrelay container:
 
@@ -68,7 +72,7 @@ In order to deploy to your latest image to the Dev or Production environment flu
 In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
 
 * Clone the sds-flux-config [repo](https://github.com/hmcts/sds-flux-config)
-* change the tag to the latest tag number in the [patches file](https://github.com/hmcts/sds-flux-config/tree/master/k8s/release/mailrelay/mailrelay/patches)  
+* change the tag to the latest tag number in the [patches file](https://github.com/hmcts/sds-flux-config/blob/master/apps/mailrelay2/prod/01/kustomization.yaml#L8)  
 * Add and Commit changes  
 * Review as required
 * Merge branch with Master.
@@ -153,7 +157,7 @@ Pre requisites
 * The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool
 * The [exim exporter](https://github.com/hmcts/exim_exporter) is used to read and send exim relay metrics to Prometheus server
 * The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels.
-* The [Prometheus alerts](https://github.com/hmcts/sds-flux-config/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated
+* The [Prometheus alerts](https://github.com/hmcts/sds-flux-config/blob/master/apps/monitoring/kube-prometheus-stack/mailrelay2-alerts-rules.yaml) for mailrelay can be updated if current alerts needs to be updated
 
 <!--
 ### Grafana

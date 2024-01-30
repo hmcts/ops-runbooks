@@ -1,5 +1,7 @@
 ---
 title: Rebuilding AKS Clusters
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 35
 ---
 
@@ -13,8 +15,8 @@ When re-building a cluster, remove the given cluster from application gateway if
 
 To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:
 
-  - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
-  - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
+- [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+- [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 
 Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu. 
 
@@ -22,7 +24,7 @@ Click on **Run** to start the pipeline.
 
 ## Common Steps
 
-#### Before deployment of a cluster
+### Before deployment of a cluster
 
 - Merge PR to remove a cluster from AGW
 
@@ -33,24 +35,27 @@ Click on **Run** to start the pipeline.
 ## Environment Specific
 
 ### Dev/Preview, AAT/Staging
+
 - Change Jenkins to use the other cluster that is not going to be rebuilt
   - [SDS example](https://github.com/hmcts/sds-flux-config/pull/2637)
   - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/7138)
 - If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
 #### After deployment of a cluster
+
 - Update Civil DNS entries to point to the active Jenkins cluster (until they switch to using platform-hmcts-net). [Update active jenkins-cluster IP value in DNS](https://github.com/hmcts/azure-private-dns/pull/428/files) and [update existing platform-hmcts-net entries](https://github.com/hmcts/azure-private-dns/pull/430/files).
 
 ### Perftest
 
-#### Before deployment of a cluster
+### Before deployment of a cluster
 
 - Confirm that the environment is not being used with Nickin Sitaram before starting. 
 - Use slack channel pertest-cluster for communication.
 - Scale the number of active nodes, increase by 5 nodes if removing a custer. 
   Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.
 
-#### After deployment of a cluster
+### After deployment of a cluster
+
 - Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
 
 ## Known issues

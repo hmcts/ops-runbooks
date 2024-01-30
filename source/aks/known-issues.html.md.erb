@@ -1,5 +1,7 @@
 ---
 title: AKS Known Issues
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 20
 ---
 
@@ -10,9 +12,10 @@ Known issues encountered during AKS cluster upgrade or rebuild
 If a cluster is in a failed state and even after troubleshooting you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.
 
 ## Upgrade failed in the portal
+
 If the upgrade is showing as failed in the portal, you need to restart it by running a command on the cluster you are trying to upgrade. You can find the full resource ID in the portal too.
 
-```
+```bash
 az resource update --ids <aks-resource-id>
 ```
 
@@ -32,14 +35,13 @@ To diagnose why a node has failed to upgrade, head to the AKS cluster in the Azu
 
 You may encounter a quota limit during an AKS upgrade due to the provisioning of new nodes during the process. Generally, you can increase these quotas yourself [in the portal](https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade/~/myQuotas) - by selecting the subscription that the AKS cluster is part of, and increasing the Compute quota to the recommended level.
 
-
 ## DaemonSet Failed Scheduling
 
 For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.  
 
 An error similar to the below may be seen in the cluster events log:  
 
-![](Images/oneagent_scheduling_error.png)
+![oneagent_scheduling_error](Images/oneagent_scheduling_error.png)
 
 - This happens when there is a capacity issue on specific cluster nodes
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state
@@ -67,7 +69,7 @@ To fix, run the below command to apply CRDs to the cluster:
 
 `kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml`  
 
-`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
+`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml`
 
 **Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7
 

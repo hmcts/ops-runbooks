@@ -1,5 +1,7 @@
 ---
 title: Tenable Nessus
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 200
 ---
 # <%= current_page.data.title %>
@@ -8,12 +10,12 @@ Tenable Nessus is a proprietary vulnerability scanner developed by Tenable. The 
 to scan devices and check them against the nessus database that contains thousands of known vulnerabilities
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
 and the agents. This runbook will cover the following
+
 - Tenable anvironments 
 - Deploying agents
 - Verifiying agent installation. 
 
 This runbook does not cover the finer details of the Terraform bootstrap module.
-
 
 ## Environments
 
@@ -21,6 +23,7 @@ There are three environments, Prod, Non-Prod and Sbox, the non-prod VM scalesets
 resource group.
 
 ### Production and Non-Production 
+
 <b>Subscription:</b> HMCTS-SOC-PROD
 
 <b>Resource Group:</b> soc-tenable-prod-rg
@@ -30,6 +33,7 @@ resource group.
 <b>VM ScaleSets:</b> nessus-scanners-prod / nessus-scanners-nonprod
 
 ### Sbox
+
 <b>Subscription:</b> soc-tenable-sbox-rg
 
 <b>Resource Group:</b> HMCTS-SOC-SBOX
@@ -38,16 +42,17 @@ resource group.
 
 <b>VM ScaleSets:</b> nessus-scanners-sbox
 
-## Deploying Agents 
+## Deploying Agents
 
 The agent is deployed using terraform bootstrap module  [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap). The module is designed to install to Linux and Windows machines.
 
 > The example given below is specific to the Heritage environemnt.
 
-#### Steps to setup deployment:
+#### Steps to setup deployment
 
 - Call the terraform-bootstrap-module from the [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap)
-```
+
+```terraform
 module "vm-bootstrap" {
   count  = var.install_splunk_uf == true || var.nessus_install == true ? var.vm_count : 0
   source = "git::https://github.com/hmcts/terraform-module-vm-bootstrap.git?ref=master"
@@ -65,7 +70,7 @@ module "vm-bootstrap" {
 
 - Add all the required variables 
 
-```
+```terraform
 variable "nessus_install" {
 default = false
 }
@@ -105,17 +110,20 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 
 - Ensure you have JIT access and you are connected to the VPN 
 - Get the SSH config from Azure (valid for 1 hour)
-```
+
+```bash
 az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
 ```
+
 - Start port-forwading/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
 
-```
+```bash
 ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
 ```
+
 - Go to browser https://localhost:5000
 
-## Troubleshooting Agents 
+## Troubleshooting Agents
 
 ### Prerequisites
 
@@ -124,16 +132,19 @@ ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
 
 ### Linux Agents 
 
-Check if the agent has deployed correctly 
-```
+Check if the agent has deployed correctly
+
+```bash
 systemctl status 
 ```
 
-Remove agent from server 
-```
+Remove agent from server
+
+```bash
 rpm -qa | grep -i NessusAgent
 ```
-```
+
+```bash
 rpm -e NessusAgent-10.1.3-es7.x86_64
 ```
 

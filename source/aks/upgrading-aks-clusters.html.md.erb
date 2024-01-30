@@ -40,7 +40,7 @@ Before upgrading any of the clusters run the following query on the cluster you 
 ```command
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
 ```
-Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place.
+Once completed compare the hrs and pods statuses with the ones you saved before the upgrade took place using the above command. Cross reference the statuses for the pods and hrs to ensure they match, before and after the upgrade on each cluster. Only proceed to the next cluster upgrade if they match.
 
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
 
@@ -110,7 +110,7 @@ Some environments do have some additional requirements / checks that need to be 
 We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 
 ### Ptlsbox, Ptl
-Make an announcement that Jenkins may be briefly unavailable in the #cloud-native-announce slack channel. This environment is best to be done early in the morning.
+It is recommended to issue this announcement early in the morning, that Jenkins may be briefly unavailable on the #cloud-native-announce slack channel.
 Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
 
 ## Upgrading the Cluster

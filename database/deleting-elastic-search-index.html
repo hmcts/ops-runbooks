@@ -415,7 +415,8 @@
             <h1 id="how-to-delete-elastic-search-index">How to delete Elastic Search Index</h1>
 <p>This provides instructions on how to delete Elastic Search index.  Civil cases will be used as an example.</p>
 <p>A change request should be raised for Production, which will be scheduled for out of hours.  As part of the change get Get confirmation on the case type.</p>
-<p>Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings)</p>
+<p>Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings) &amp; Implementation plan: https://tools.hmcts.net/confluence/x/QwaHa</p>
+<p>Some changes may include both AAT &amp; Production environments.</p>
 <p>For non-production environments use non-prod Bastion and the prod Bastion for production</p>
 <p>1) Request JIT access for non-prod or prod Bastion servers (https://myaccess.microsoft.com/)</p>
 <p>2) Make sure you are logged into the F5 VPN</p>
@@ -457,13 +458,21 @@ ssh bastion-prod.platform.hmcts.net
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl -XDELETE localhost:9200/civil_cases-000001;
 </code></pre></div><p>9) Application team will Merge CCD Definition File and creating new index.</p>
 <p>10) Re-trigger the indexing of old cases</p>
+<p>If AAT is included in the same change then do this first before proceeding to production.</p>
 <p>Connect to ccd_data_store DB via Bastion</p>
 <p>For example civil:</p>
 <p>Create temp table - the example below is civil_tmp_<date>:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>create table civil_tmp_&lt;date&gt; as select id from case_data where case_type_id = 'CIVIL' and marked_by_logstash = true;
 </code></pre></div><p>Re-trigger index by increasing the offset by 10000 each time:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 0 limit 10000);
-UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 10000 limit 10000);
+
+</code></pre></div><p>Once the batch of 10000 completes check the status:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+curl localhost:9200/_cat/indices?v |grep civil_cases
+</code></pre></div><p>or</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+</code></pre></div><p>Start the next batch once all cross check have been done - increasing the offset by 10000 each time:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 10000 limit 10000);
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 20000 limit 10000);
 </code></pre></div><p>.. etc</p>
 <p>Keep increasing the offset until completed.</p>

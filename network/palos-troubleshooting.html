@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -417,33 +417,36 @@ Each run a firewall rule is added to allow the Azure DevOps agent to connect to 
 <h2 id="problem-ansible-has-failed-to-apply-the-palo-configuration">Problem - Ansible has failed to apply the palo configuration</h2>
 <p>This error is usually caused by the Palo&rsquo;s XML config not applying due to malformed xml or incorrect references to objects etc.</p>
 <h3 id="problem-ansible-has-failed-to-apply-the-palo-configuration-example-error"><strong>Example error</strong></h3>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): fatal: [51.11.xxx.xxx]: FAILED! =&gt; {
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>module.hub-infra.module.firewall.null_resource.ansible-runs <span class="o">(</span>remote-exec<span class="o">)</span>: fatal: <span class="o">[</span>51.11.xxx.xxx]: FAILED! <span class="o">=&gt;</span> <span class="o">{</span>
 ...
 ...
 ...
-module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec):     "msg": "Failed commit: Commit failed"
-module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
+module.hub-infra.module.firewall.null_resource.ansible-runs <span class="o">(</span>remote-exec<span class="o">)</span>:     <span class="s2">"msg"</span>: <span class="s2">"Failed commit: Commit failed"</span>
+module.hub-infra.module.firewall.null_resource.ansible-runs <span class="o">(</span>remote-exec<span class="o">)</span>: <span class="o">}</span>
 </code></pre></div><h3 id="problem-ansible-has-failed-to-apply-the-palo-configuration-troubleshooting-tip"><strong>Troubleshooting tip</strong></h3>
 
 <ol>
-<li><p>Follow the steps in <a href="connecting.md">the connecting guide</a> and log into one of the Palos in the environment where your changes are failing to apply.</p></li>
-<li><p>Once you&rsquo;re logged in you will see a commit button in the top right-hand side of your screen like below:
-<details> 
-<summary>Commit Button</summary>
-<img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
-</details></p></li>
-<li><p>A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit. 
-<details> 
-<summary>Validate Button</summary>
-<img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
-</details></p></li>
-<li><p>This will run for a few seconds, once it&rsquo;s complete you&rsquo;ll be presented with a status page giving you a clearer idea of what the problem is.
-In this case we can see that the configuration is in fact invalid. 
-The errors tell us that the <code>log-setting</code> value <code>azure_log_analytics_out</code> is incorrect, after looking through the code the <code>azure_log_analytics_out</code> log setting is a nonprod setting that isn&rsquo;t available in Production and just removing the line fixed the issue. 
-<details> 
-<summary>Validate Example</summary>
-<img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
-</details></p></li>
+<li><p>Follow the steps in <a href="connecting-palos.html">the connecting guide</a> and log into one of the Palos in the environment where your changes are failing to apply.</p></li>
+<li><p>Once you&rsquo;re logged in you will see a commit button in the top right-hand side of your screen like below:</p>
+
+<details>
+    <summary>Commit Button</summary>
+    <img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
+</details></li>
+<li><p>A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit.</p>
+
+<details>
+    <summary>Validate Button</summary>
+    <img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
+</details></li>
+<li><p>This will run for a few seconds, once it&rsquo;s complete you&rsquo;ll be presented with a status page giving you a clearer idea of what the problem is.</p>
+<p>In this case we can see that the configuration is in fact invalid.
+The errors tell us that the <code>log-setting</code> value <code>azure_log_analytics_out</code> is incorrect, after looking through the code the <code>azure_log_analytics_out</code> log setting is a nonprod setting that isn&rsquo;t available in Production and just removing the line fixed the issue.</p>
+
+<details>
+    <summary>Validate Example</summary>
+    <img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
+</details></li>
 <li><p>Make your changes in the rdo-terraform-hub-dmz repository and run the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&amp;_a=summary">pipeline</a> again.</p></li>
 </ol>
 <h2 id="problem-debugging-connectivity-issues">Problem - debugging connectivity issues</h2>
@@ -465,17 +468,17 @@ The errors tell us that the <code>log-setting</code> value <code>azure_log_analy
 </details>
 <p>For more information on types of filters you can apply check out <a href="https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK">Basics of traffic monitor filtering</a>.</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2024-02-01">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-07-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 1 August 2023.
+      This page was last reviewed on 26 January 2024.
 
-        It needs to be reviewed again on 1 February 2024
+        It needs to be reviewed again on 26 July 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 1 February 2024
+      This page was set to be reviewed before 26 July 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

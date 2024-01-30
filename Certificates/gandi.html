@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -416,15 +416,15 @@
 <li>A certificate in need of renewal (either a notification from Ops or a Jira ticket)</li>
 </ul>
 <p>We have a certificate tracker which is populated a month in advance by the Operations team with certs that are expiring soon, view it on <a href="https://cjscommonplatform-my.sharepoint.com/:x:/r/personal/zoe_cope_hmcts_net/_layouts/15/Doc.aspx?sourcedoc=%7B6C8A9500-4D9D-45EA-8CC7-D75F3DDFF133%7D&amp;file=Cert%20Tracker.xlsx&amp;action=default&amp;mobileredirect=true">sharepoint</a>, you may need to request access.</p>
-<h2 id="step-by-step-guide">Step-by-step guide:</h2>
+<h2 id="step-by-step-guide">Step-by-step guide</h2>
 <p>There are 3 key stages to the renewal process:</p>
 
 <ul>
-<li><a href="#Step-1:-Generate-the-CSR-and-request-form">Generate the CSR and request form</a></li>
-<li><a href="#Step-2:-Point-the-DNS">Point the DNS</a></li>
-<li><a href="#Step-3:-Upload-the-certificate-to-Azure">Upload the certificate to Azure</a></li>
+<li><a href="#step-1-generate-the-csr-and-request-form">Generate the CSR and request form</a></li>
+<li><a href="#step-2-point-the-dns">Point the DNS</a></li>
+<li><a href="#step-3-upload-the-certificate-to-azure">Upload the certificate to Azure</a></li>
 </ul>
-<h4 id="note">Note:</h4>
+<h3 id="note">Note</h3>
 <p>If someone has requested for a new SSL certificate to be ordered, you should check if Azure has delegation of the domain (assuming it is being hosted in Azure). 
 You can do this by going on <a href="https://mxtoolbox.com/">mxtoolbox</a> and running a DNS Check.
 If there are no results, you should contact the requester and get them to create the domain and DNS zone.
@@ -442,7 +442,7 @@ CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe
 </code></pre></div><p>Pointing the DNS is done in <a href="https://github.com/hmcts/azure-public-dns">azure-public-dns</a></p>
 <p>With the example above, the address would belong in the &ldquo;apply-divorce-service-gov-uk.yml&rdquo; file.</p>
 <p>These are some of the domains, but make sure you search the repo for the domain to find the one you are after:</p>
-<p><a href="images/envfiles.png" rel="noopener noreferrer"><img src="images/envfiles.png" alt="" /></a>
+<p><a href="images/envfiles.png" rel="noopener noreferrer"><img src="images/envfiles.png" alt="envfiles" /></a>
 <em>*Addresses which do not fall into any of these domains may be managed using a different service (eg legacy AWS dns zone).</em></p>
 <p>The format for pointing the DNS, using the example described in the validation instructions above, is as follows:</p>
 <div class="highlight"><pre class="highlight yaml" tabindex="0"><code> <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute"</span>
@@ -451,7 +451,7 @@ CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe
 </code></pre></div><p>This is the DNS pointings when seen in the pull request:
 <a href="images/pullrequest.png" rel="noopener noreferrer"><img src="images/pullrequest.png" alt="" /></a>
 Broken down, the changes made to the validation instructions to achieve the correct format are:</p>
-<p><strong>1. Add the name:</strong></p>
+<h4 id="1-add-the-name"><strong>1. Add the name:</strong></h4>
 
 <ul>
 <li>Remove <code>.apply-divorce.service.gov.uk</code>, since this is added automatically.
@@ -460,9 +460,12 @@ E.g:
 </ul>
 <p><em>becomes</em></p>
 <p>- name: <code>_ebcea3aaa604ee544afe2171a1c19d4a.decree-absolute</code></p>
-<p><strong>2. Add a time to live</strong>
-- any number would work, we use 300 seconds (5 minutes), e.g. <code>ttl: 300</code>.</p>
-<p><strong>3. Add the record</strong></p>
+<h4 id="2-add-a-time-to-live"><strong>2. Add a time to live</strong></h4>
+
+<ul>
+<li>any number would work, we use 300 seconds (5 minutes), e.g. <code>ttl: 300</code>.</li>
+</ul>
+<h4 id="3-add-the-record"><strong>3. Add the record</strong></h4>
 <p>Remember to keep the full-stop at the end of the CNAME.
 <code>CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.</code></p>
 <p>Becomes record: <code>CFBF67E5860E17571AFAFDC7492F6BA1.142AB2C674199D39D63BC25392096FBF.38b2baf94efabe47b94f.comodoca.com.</code></p>
@@ -551,7 +554,22 @@ Run from the makepfx folder:</li>
 </tr>
         </table>
       </div>
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

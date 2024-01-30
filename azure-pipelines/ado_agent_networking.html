@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -411,7 +411,7 @@
 <p>Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
 If the agent is actually a Kubernetes container, it will also state the Kubernetes_Port, with HMCTS being 10.0.0.1:443.</p>
 <p><a href="images/ADO-Agent-Capabilities.png" rel="noopener noreferrer"><img src="images/ADO-Agent-Capabilities.png" alt="Agent_Capabilities" /></a></p>
-<h3 id="virtual-networks">Virtual Networks</h3>
+<h2 id="virtual-networks">Virtual Networks</h2>
 <p>These are examples of some of the agent pool and vNet names</p>
 <div class="table-container">
         <table>
@@ -432,20 +432,20 @@ If the agent is actually a Kubernetes container, it will also state the Kubernet
 <td>ss-ptlsbox-vnet</td>
 </tr>
         </table>
-      </div><h3 id="palo-alto-firewalls">Palo Alto Firewalls</h3>
+      </div><h2 id="palo-alto-firewalls">Palo Alto Firewalls</h2>
 <p>Traffic from the agent pool to the Azure resource, flows through the Palo Alto if the infrastructure has been correctly configured.</p>
 <p><a href="images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png" rel="noopener noreferrer"><img src="images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png" alt="Firewall_Monitor" /></a></p>
 <p>Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet secuirty rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
 If the traffic is coming into Azure from the agent pool, use Azure portal Network Watch to troubleshoot.</p>
-<h3 id="ado-connections-to-hmcts-environments">ADO Connections to HMCTS Environments</h3>
+<h2 id="ado-connections-to-hmcts-environments">ADO Connections to HMCTS Environments</h2>
 <p>HMCTS operates 3 main Azure environments (SBOX, NONPROD and PROD), which are isolated from each other. ADO agent pools are connected to only ONE of these environments.
 If your pipeline is reporting network errors and you are not observing ADO traffic in the Palo Alto.  First suspect the wrong agent pool has been selected. Then start investigating the other links in the chain.</p>
 <p><a href="images/ADO-Agent-Connections.png" rel="noopener noreferrer"><img src="images/ADO-Agent-Connections.png" alt="Azure_WAN_Connections" /></a></p>
-<h3 id="agent-routing">Agent Routing</h3>
+<h2 id="agent-routing">Agent Routing</h2>
 <p>If you vNET is new, you may need to update the route table aks-ptl-route-table, to enable the agents in K8s to reach your resources.</p>
 <p><a href="https://github.com/hmcts/azure-private-dns">Azure-Private-DNS</a></p>
-<p>environment / 01-network /</p>
-<h3 id="private-dns-zones-and-private-end-points">Private DNS Zones and Private End Points</h3>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>environment / 01-network /
+</code></pre></div><h2 id="private-dns-zones-and-private-end-points">Private DNS Zones and Private End Points</h2>
 <p>To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.</p>
 <p><a href="https://github.com/hmcts/aks-sds-deploy">aks-sds-deploy Repo</a></p>
 <p>Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the &ldquo;stages to run&rdquo; option.
@@ -455,10 +455,10 @@ Besure you have selected the correct <strong>Environment</strong> for your ADO a
 <h2 id="public-network-services-or-private">Public Network Services or Private</h2>
 <p>Some Azure resources (Storage Accounts, Databases, Purview, etc) can be configured as either public or private, with private creating additional requirements for agent pool access.</p>
 <p><a href="images/ADO-Resource-Firewall.png" rel="noopener noreferrer"><img src="images/ADO-Resource-Firewall.png" alt="Resource_Firewall" /></a></p>
-<p><strong>Example of private storage account</strong></p>
+<h3 id="example-of-private-storage-account">Example of private storage account</h3>
 <p>Pipeline will fail with an AuthorizationFailure error if only private network access is configured and access has not been granted.</p>
 <p><a href="images/ADO-Storage-Error.png" rel="noopener noreferrer"><img src="images/ADO-Storage-Error.png" alt="Resource_Firewall" /></a></p>
-<p><strong>RAW Error Message</strong>*</p>
+<h3 id="raw-error-message">RAW Error Message</h3>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>2023-07-25T16:31:31.0612142Z Error: containers.Client#GetProperties: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailure" Message="This request is not authorized to perform this operation.\nRequestId:19ad4843-f01e-007b-3515-bfe0bc000000\nTime:2023-07-25T16:31:30.6786267Z"
 2023-07-25T16:31:31.0613295Z
 2023-07-25T16:31:31.0613887Z  with module.sftp_cft_storage.azurerm_storage_container.container["dlrm"],
@@ -466,8 +466,7 @@ Besure you have selected the correct <strong>Environment</strong> for your ADO a
 2023-07-25T16:31:31.0616205Z   2: resource "azurerm_storage_container" "container" 
 2023-07-25T16:31:31.0616683Z
 </code></pre></div><p><a href="images/ADO-SA-vNet.png" rel="noopener noreferrer"><img src="images/ADO-SA-vNet.png" alt="Resource_vNet_Permissions" /></a></p>
-<p>Terraform code that adds agent pool vNets to the storage account.</p>
-<p>https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf</p>
+<p>Terraform code that adds agent pool vNets to the storage account: <a href="https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf">link</a></p>
 <div class="highlight"><pre class="highlight terraform" tabindex="0"><code><span class="k">module</span> <span class="s2">"storage"</span> <span class="p">{</span>
     <span class="nx">for_each</span> <span class="p">=</span> <span class="p">{</span> <span class="nx">for</span> <span class="nx">account</span> <span class="nx">in</span> <span class="kd">local</span><span class="p">.</span><span class="nx">flattened_storage_accounts</span> <span class="err">:</span> <span class="s2">"</span><span class="k">${</span><span class="nx">account</span><span class="p">.</span><span class="nx">key</span><span class="k">}</span><span class="s2">-</span><span class="k">${</span><span class="nx">account</span><span class="p">.</span><span class="nx">account_key</span><span class="k">}</span><span class="s2">"</span> <span class="p">=</span><span class="err">&gt;</span> <span class="nx">account</span> <span class="p">}</span>
     <span class="nx">source</span>   <span class="p">=</span> <span class="s2">"github.com/hmcts/cnp-module-storage-account?ref=master"</span>
@@ -495,7 +494,22 @@ Besure you have selected the correct <strong>Environment</strong> for your ADO a
     <span class="nx">common_tags</span>  <span class="p">=</span> <span class="k">module</span><span class="p">.</span><span class="nx">ctags</span><span class="p">.</span><span class="nx">common_tags</span>
   <span class="p">}</span>
 </code></pre></div>
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -408,7 +408,7 @@
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="deleting-a-case-from-ccd-datastore-database">Deleting a case from CCD Datastore Database</h1>
 <p>This is a 2-stage process that requires you delete the case from the database first and then ssh to the Elastic Search VM to delete the same. Please ensure you have a valid ServiceNow Change Request to do so.</p>
-<h3 id="1-identify-case-in-ccd-data-store-database-ccd-data-store-api-postgres-db-v11-prod-postgres-database-azure-com-and-delete">1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete</h3>
+<h2 id="1-identify-case-in-ccd-data-store-database-ccd-data-store-api-postgres-db-v11-prod-postgres-database-azure-com-and-delete">1. Identify case in CCD Data Store Database [ccd-data-store-api-postgres-db-v11-prod.postgres.database.azure.com] and delete</h2>
 <p>Hop on to the bastion and run the script below.</p>
 <p>The script calls an external .txt file which contains a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c">#!/bin/bash</span>
@@ -444,7 +444,7 @@
 psql <span class="s2">"sslmode=require host=</span><span class="k">${</span><span class="nv">DB_HOST</span><span class="k">}</span><span class="s2"> dbname=</span><span class="k">${</span><span class="nv">DB_NAME</span><span class="k">}</span><span class="s2"> user=</span><span class="k">${</span><span class="nv">DB_USER</span><span class="k">}</span><span class="s2"> port=5432 password=</span><span class="k">${</span><span class="nv">PGPASSWORD</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-c</span> <span class="s2">"</span><span class="k">${</span><span class="nv">QUERY</span><span class="k">}</span><span class="s2">"</span>
 
           <span class="k">done</span>
-</code></pre></div><h3 id="2-on-the-elastic-search-vm-execute-the-script-below-using-the-16-digit-reference-to-identify-the-case">2. On the Elastic Search VM, execute the script below using the <code>16-digit reference</code> to identify the Case</h3>
+</code></pre></div><h2 id="2-on-the-elastic-search-vm-execute-the-script-below-using-the-16-digit-reference-to-identify-the-case">2. On the Elastic Search VM, execute the script below using the <code>16-digit reference</code> to identify the Case</h2>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c">#!/bin/bash</span>
 
 <span class="nv">QUERY</span><span class="o">=</span><span class="si">$(</span>jq <span class="nt">-n</span> <span class="se">\</span>
@@ -482,7 +482,22 @@ psql <span class="s2">"sslmode=require host=</span><span class="k">${</span><spa
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  ./find_case_id_by_reference.sh `&lt;16-digit reference&gt;`
 </code></pre></div><p>and follow the screen prompt</p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

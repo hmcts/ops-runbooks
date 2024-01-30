@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>MailRelay - HMCTS</title>
+    <title>Mailrelay Essentials - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
@@ -14,12 +14,12 @@
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="MailRelay - HMCTS" />
+      <meta name="twitter:title" content="Mailrelay Essentials - HMCTS" />
       <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Services/mailrelay.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="MailRelay" />
+      <meta property="og:title" content="Mailrelay Essentials" />
       <meta property="og:type" content="object" />
       <meta property="og:url" content="https://hmcts-runbooks.github.io/Services/mailrelay.html" />
 
@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -411,7 +411,7 @@
 <h2 id="how-to-on-board-clients">How to On-board Clients</h2>
 <p>Each service will require a username and password to utilise the Mailrelay service and these will be stored in Key Vault (<a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/867a878b-cb68-4de5-9741-361ac9e178b6/resourceGroups/sds-mailrelay-dev-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-dev/secrets">Dev: sds-mailrelay-dev</a>, <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/sds-mailrelay-prod-rg/providers/Microsoft.KeyVault/vaults/sds-mailrelay-prod/overview">Prod: sds-mailrelay-prod</a>). The Username will be the service name; the password should be randomly generated and be sufficiently complex.</p>
 <p><strong>1.</strong> Create a new secret in Key Vault and associate a complex password</p>
-<p><strong>2.</strong> Branch off the <a href="https://github.com/hmcts/sds-flux-config">Flux</a> repo, edit the configuration file <a href="https://github.com/hmcts/sds-flux-config/blob/master/k8s/release/mailrelay/mailrelay2/patches/prod/cluster-00/mailrelay2.yaml">mailrelay2.yaml</a> then append the new service account to the section authKeyVaultSecrets.</p>
+<p><strong>2.</strong> Branch off the <a href="https://github.com/hmcts/sds-flux-config">Flux</a> repo, edit the configuration file <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/mailrelay2/mailrelay2/mailrelay2.yaml">mailrelay2.yaml</a> then append the new service account to the section authKeyVaultSecrets.</p>
 <p>The syntax is as follows:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>     - "my-service-user-account"
      - "mailrelay-prod-user"
@@ -425,7 +425,7 @@
 <h4 id="modifying-the-exim-conf-file">Modifying the exim.conf File</h4>
 <p>The <a href="https://github.com/hmcts/exim-relay/blob/master/exim.conf">exim.conf</a> file specifies the configuration and behaviour of the mailrelay service in terms of security (hosts that can use the system to route mail, authentication), DNS settings (domain names, routing), protocols and many other settings.  It&rsquo;s created with makefile which collects together a group of related actions into a single build file that when executed compiles or performs some processing to create artifacts.  Read more about makefile here: <a href="https://makefiletutorial.com/">makefile tutorial</a>.</p>
 <h4 id="authentication-mechanisms">Authentication Mechanisms</h4>
-<p>Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the <a href="https://github.com/hmcts/ops-runbooks/tree/master/Certificates">ACME Function App</a></p>
+<p>Client applications use TLS to authenticate to the Mailrelay server to be able to send emails. The server has inbound and outbound certs. Certificates are generated using the <a href="../Certificates/letsencrypt.html">ACME Function App</a></p>
 <p>The following certificates are installed in the Docker image which is the source of the mailrelay container:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>dev-mailrelay-platform-hmcts-net
 prod-mailrelay-platform-hmcts-net
@@ -452,7 +452,7 @@ In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=4
 
 <ul>
 <li>Clone the sds-flux-config <a href="https://github.com/hmcts/sds-flux-config">repo</a></li>
-<li>change the tag to the latest tag number in the <a href="https://github.com/hmcts/sds-flux-config/tree/master/k8s/release/mailrelay/mailrelay/patches">patches file</a><br></li>
+<li>change the tag to the latest tag number in the <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/mailrelay2/prod/01/kustomization.yaml#L8">patches file</a><br></li>
 <li>Add and Commit changes<br></li>
 <li>Review as required</li>
 <li>Merge branch with Master.</li>
@@ -517,7 +517,7 @@ test test test</span>
 <li>The Prometheus server (Monitoring Namespace) is used to obtain metrics from the exim server and exports them using the Exim-Exporter tool</li>
 <li>The <a href="https://github.com/hmcts/exim_exporter">exim exporter</a> is used to read and send exim relay metrics to Prometheus server</li>
 <li>The Alert Manager (Monitoring Namespace) takes these metrics and sends it to specified Slack Channels.</li>
-<li>The <a href="https://github.com/hmcts/sds-flux-config/blob/master/k8s/namespaces/monitoring/kube-prometheus-stack/patches/dev/cluster-00/mailrelay-alerts-rules.yaml">Prometheus alerts</a> for mailrelay can be updated if current alerts needs to be updated</li>
+<li>The <a href="https://github.com/hmcts/sds-flux-config/blob/master/apps/monitoring/kube-prometheus-stack/mailrelay2-alerts-rules.yaml">Prometheus alerts</a> for mailrelay can be updated if current alerts needs to be updated</li>
 </ul>
 
 <!--
@@ -553,13 +553,28 @@ kubectl logs <span class="nt">-f</span> <span class="nt">-c</span> alertmanager 
 <li><p><a href="https://prometheus.io/docs/instrumenting/exporters/">https://prometheus.io/docs/instrumenting/exporters/</a></p></li>
 </ul>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>
               <ul class="contribution-banner">
                 <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Services/mailrelay.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27MailRelay%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FServices%2Fmailrelay.html%29&amp;labels=bug&amp;title=Re%3A+%27MailRelay%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Mailrelay+Essentials%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FServices%2Fmailrelay.html%29&amp;labels=bug&amp;title=Re%3A+%27Mailrelay+Essentials%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

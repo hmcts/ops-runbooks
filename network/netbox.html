@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -418,46 +418,61 @@
 <p>Check for the addresses marked as available and not active for the required address range (i.e. /28)</p>
 <h3 id="run-the-curl-commands-to-verify-the-address-space-is-not-in-use">Run the curl commands to verify the address space is not in use</h3>
 <p>Note - this uses the jq command.  If you don&rsquo;t have this then run:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>brew install jq
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>brew <span class="nb">install </span>jq
 </code></pre></div><p>Run the following command to check that the address space is not in use (using 10.50.11.16/28 as an example):</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>➜  ~ curl -X GET -k https://netbox.platform.hmcts.net:443/api/ipam/prefixes/\?within\=10.50.11.16%2F28 -H "accept: application/json" | jq .
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>➜  ~ curl <span class="nt">-X</span> GET <span class="nt">-k</span> https://netbox.platform.hmcts.net:443/api/ipam/prefixes/<span class="se">\?</span>within<span class="se">\=</span>10.50.11.16%2F28 <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> | jq <span class="nb">.</span>
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100    52  100    52    0     0     11      0  0:00:04  0:00:04 --:--:--    12
-{
-  "count": 0,
-  "next": null,
-  "previous": null,
-  "results": []
-}
+100    52  100    52    0     0     11      0  0:00:04  0:00:04 <span class="nt">--</span>:--:--    12
+<span class="o">{</span>
+  <span class="s2">"count"</span>: 0,
+  <span class="s2">"next"</span>: null,
+  <span class="s2">"previous"</span>: null,
+  <span class="s2">"results"</span>: <span class="o">[]</span>
+<span class="o">}</span>
 </code></pre></div><p>The following is an example when an address space is in use and can&rsquo;t be used:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>➜  ~ curl -X GET -k https://netbox.platform.hmcts.net:443/api/ipam/prefixes/\?within\=10.50.0.0%2F16 -H "accept: application/json" | jq .
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>➜  ~ curl <span class="nt">-X</span> GET <span class="nt">-k</span> https://netbox.platform.hmcts.net:443/api/ipam/prefixes/<span class="se">\?</span>within<span class="se">\=</span>10.50.0.0%2F16 <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> | jq <span class="nb">.</span>
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100 13084  100 13084    0     0  16499      0 --:--:-- --:--:-- --:--:-- 16478
-{
-  "count": 17,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 82,
-      "url": "http://netbox.platform.hmcts.net/api/ipam/prefixes/82/",
-      "display": "10.50.10.0/28",
-      "family": {
-        "value": 4,
-        "label": "IPv4"
-      },
+100 13084  100 13084    0     0  16499      0 <span class="nt">--</span>:--:-- <span class="nt">--</span>:--:-- <span class="nt">--</span>:--:-- 16478
+<span class="o">{</span>
+  <span class="s2">"count"</span>: 17,
+  <span class="s2">"next"</span>: null,
+  <span class="s2">"previous"</span>: null,
+  <span class="s2">"results"</span>: <span class="o">[</span>
+    <span class="o">{</span>
+      <span class="s2">"id"</span>: 82,
+      <span class="s2">"url"</span>: <span class="s2">"http://netbox.platform.hmcts.net/api/ipam/prefixes/82/"</span>,
+      <span class="s2">"display"</span>: <span class="s2">"10.50.10.0/28"</span>,
+      <span class="s2">"family"</span>: <span class="o">{</span>
+        <span class="s2">"value"</span>: 4,
+        <span class="s2">"label"</span>: <span class="s2">"IPv4"</span>
+      <span class="o">}</span>,
       ........
-  ]
-}
+  <span class="o">]</span>
+<span class="o">}</span>
 </code></pre></div><p>Please also reference the following GitHub repo link for more information regarding Netbox:</p>
 <p>https://github.com/hmcts/rdo-netbox/blob/master/README.md</p>
 <h3 id="azure-devops-pipeline">Azure DevOps Pipeline</h3>
 <p>The following Azure DevOps pipeline is run daily at 7:00 AM and can be manually run to get the latest available address spaces:</p>
 <p>https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=345&amp;_a=summary</p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

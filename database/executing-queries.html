@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -421,14 +421,12 @@ psql&gt; paste your query here;
 
 <ul>
 <li><p>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off</p></li>
-<li><p>For small queries with large results, you could do the following to output to file
-<code>cmd
-\o &lt;filename&gt;.csv
-&lt;your query here&gt;
-\q
-</code>
-This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it.</p></li>
+<li><p>For small queries with large results, you could do the following to output to file</p></li>
 </ul>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  \o &lt;filename&gt;.csv
+    &lt;your query here&gt;
+  \q
+</code></pre></div><p>This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it.</p>
 <p><strong>Note:</strong> the extension could be whatever you choose, using <code>csv</code> in the example below</p>
 <p><strong>Example:</strong>
   <a href="images/query-output.png" rel="noopener noreferrer"><img src="images/query-output.png" alt="Output to file" /></a></p>
@@ -479,13 +477,34 @@ Assign to the variable <code>PGPASSWORD</code> the token returned from the <code
 <p><strong>Example:</strong></p>
 <p><a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="images/assign-to-password-var.png" alt="Token to Password" /></a></p>
 <h3 id="some-external-reference">Some external reference</h3>
-<p>You can have a quick peak for some <code>psql</code> info that may be useful
-* <a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a>
-* <a href="https://kb.objectrocket.com/postgresql/how-to-run-an-sql-file-in-postgres-846">How to run an SQL file in Postgres</a>
-  - Run a SQL file in Postgres using the ‘psql’ command 
-  - Connect to PostgreSQL and then run a SQL file using ‘psql’</p>
+<p>You can have a quick peak for some <code>psql</code> info that may be useful</p>
 
-            
+<ul>
+<li><a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a></li>
+<li><a href="https://www.warp.dev/terminus/psql-run-sql-file">How to run an SQL file in Postgres</a>
+
+<ul>
+<li>Run a SQL file in Postgres using the ‘psql’ command </li>
+<li>Connect to PostgreSQL and then run a SQL file using ‘psql’</li>
+</ul></li>
+</ul>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -411,25 +411,31 @@
 Other teams sometimes need certain pieces of information from the production DB and would raise
 a ticket, providing their sql query and requesting PlatOps run these against
 production Db as they don&rsquo;t have access to this.</p>
-<p><em>Note:</em> there&rsquo;s a <a href="https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+Database">self service</a> process that should be used by the team if they have an SC person on their team instead.</p>
+<p><em>Note:</em> there&rsquo;s a <a href="https://tools.hmcts.net/confluence/display/DTSPO/%5BSelf-Service%5D+-+Database">self service</a> process that should be used by the team if they have an SC person on their team instead.</p>
 <p>To fulfill one of these request, you can follow the steps below.</p>
 <h2 id="prerequisites">Prerequisites 💥</h2>
 
 <ul>
 <li><strong>Important:</strong> Verify you are all setup as outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a></li>
-<li>Grant yourself access to production Bastion as outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a>, in the <code>Steps to access</code> section of the document <br>
-<strong>Note:</strong> If not on call then just one day is sufficient, you could also customize how long you want access for.</li>
+<li>Grant yourself access to production Bastion as outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a>, in the <code>Steps to access</code> section of the document
+
+<ul>
+<li><strong>Note:</strong> If not on call then just one day is sufficient, you could also customize how long you want access for.</li>
+</ul></li>
 </ul>
 <h2 id="suggested-steps">Suggested Steps</h2>
 
 <ul>
-<li>Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on <a href="https://portal.azure.com/#home">Azure</a> <br></li>
-<li>Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥 <br>
-Sometimes typos or misplaced variables are easy to spot</li>
-<li>Jump on to the production bastion, steps on how to do this are in the <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a>  documentation <br>
-<em>Example:</em><br>
-<a href="images/connecting.png" rel="noopener noreferrer"><img src="images/connecting.png" alt="Connecting to DB" /></a></li>
+<li>Confirm the database connection host. This should be in the ticket, but you can also confirm by searching it in the portal on <a href="https://portal.azure.com/#home">Azure</a></li>
+<li>Sanity check the query provided in the ticket, not that you are expected to know any sql 🤥
+
+<ul>
+<li>Sometimes typos or misplaced variables are easy to spot</li>
+</ul></li>
+<li>Jump on to the production bastion, steps on how to do this are in the <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a>  documentation</li>
 </ul>
+<p><em>Example</em></p>
+<p><a href="images/connecting.png" rel="noopener noreferrer"><img src="images/connecting.png" alt="Connecting to DB" /></a></p>
 <h2 id="guides">Guides</h2>
 
 <ul>
@@ -438,7 +444,22 @@ Sometimes typos or misplaced variables are easy to spot</li>
 <li><a href="restoring-an-azure-single-server-database.html">Restoring a Database</a></li>
 </ul>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -410,31 +410,58 @@
 <h2 id="overview">Overview</h2>
 <p>The purpose of this documentation is to provide engineers with some additional details on how the data disk configuration has been setup in the splunk infrastructure, where the configuration of this can seem obscure to those who havent worked in this space before.</p>
 <p>You can find all code related to the splunk infrastructure in the <a href="https://github.com/hmcts/soc">hmcts/soc</a> repository, the terraform for this lives side-by-side with Tenable nessus scanner and EventHub configurations.</p>
-<p>Files related to the data-disk configuration:
-- <a href="#mountfssh">mountfs.sh</a>
-- <a href="#datadiskstf">datadisks.tf</a>
-- <a href="#localtf">local.tf</a></p>
+<p>Files related to the data-disk configuration:</p>
+
+<ul>
+<li><a href="#mountfssh">mountfs.sh</a></li>
+<li><a href="#datadiskstf">datadisks.tf</a></li>
+<li><a href="#localtf">local.tf</a></li>
+</ul>
 <h2 id="mountfs-sh">mountfs.sh</h2>
 <p>The <a href="https://github.com/hmcts/soc/blob/master/components/splunk/mountfs.sh">mountfs.sh</a> script is used to format and mount data disks attached to splunk VMs to the /splunkdata and /splunkcolddata directories. The decision logic looks at the size of the datadisk attached to the VM and mounts it to the directories accordingly.</p>
-<p>Notes:
-- The script is executed as a Custom Script Extension.
-- /splunkdata for disk sizes &lt; 1 TB, 2 TB or 15.6 TB in size.
-- /splunkcolddata for disk sizes 3.9T or 12.7 TB.
-- Sizes are read from fdisk command, this is incase the LUN numbers arent always consistent between the datadisks.
-- Disk size has to match exactly that from fdisk in order for this to work.
-- Disks are created within logical volume groups, so you could technically mount more than one disk a to given directory.
-- If a disk is already matched and mounted to a directory, then the script will bypass doing anything (i.e. it wont modify any existing configurations).</p>
+<p>Notes:</p>
+
+<ul>
+<li>The script is executed as a Custom Script Extension.</li>
+<li>/splunkdata for disk sizes &lt; 1 TB, 2 TB or 15.6 TB in size.</li>
+<li>/splunkcolddata for disk sizes 3.9T or 12.7 TB.</li>
+<li>Sizes are read from fdisk command, this is incase the LUN numbers arent always consistent between the datadisks.</li>
+<li>Disk size has to match exactly that from fdisk in order for this to work.</li>
+<li>Disks are created within logical volume groups, so you could technically mount more than one disk a to given directory.</li>
+<li>If a disk is already matched and mounted to a directory, then the script will bypass doing anything (i.e. it wont modify any existing configurations).</li>
+</ul>
 <h2 id="local-tf">local.tf</h2>
 <p>The <a href="https://github.com/hmcts/soc/blob/master/components/splunk/local.tf">local.tf</a> file contains a number of objects related to the splunk data disk configurations.</p>
-<p>Notes:
-- Object &lsquo;vmdisks&rsquo; is where disks configurations should be placed, or referenced from the sbox.tfvars | prod.tfvars file.
-- Object &lsquo;disk_list&rsquo; parases the vmdisks object into a map, such that it can be read by the terraform resource in datadisks.tf, without the need for complicated logic.</p>
+<p>Notes:</p>
+
+<ul>
+<li>Object &lsquo;vmdisks&rsquo; is where disks configurations should be placed, or referenced from the sbox.tfvars | prod.tfvars file.</li>
+<li>Object &lsquo;disk_list&rsquo; parases the vmdisks object into a map, such that it can be read by the terraform resource in datadisks.tf, without the need for complicated logic.</li>
+</ul>
 <h2 id="datadisks-tf">datadisks.tf</h2>
 <p>The file <a href="https://github.com/hmcts/soc/blob/master/components/splunk/datadisks.tf">datadisks.tf</a> contains the terraform resources for sorting data disk definitions and attachments applied to a VM.</p>
-<p>Notes:
-- The resources will read properties from &lsquo;local.disk_list&rsquo;.</p>
+<p>Notes:</p>
 
-            
+<ul>
+<li>The resources will read properties from &lsquo;local.disk_list&rsquo;.</li>
+</ul>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

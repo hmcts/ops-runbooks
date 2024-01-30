@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -411,7 +411,7 @@
 <p>If a cluster is in a failed state and even after troubleshooting you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.</p>
 <h2 id="upgrade-failed-in-the-portal">Upgrade failed in the portal</h2>
 <p>If the upgrade is showing as failed in the portal, you need to restart it by running a command on the cluster you are trying to upgrade. You can find the full resource ID in the portal too.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az resource update --ids &lt;aks-resource-id&gt;
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az resource update <span class="nt">--ids</span> &lt;aks-resource-id&gt;
 </code></pre></div><h2 id="one-or-more-nodes-has-failed-to-upgrade">One or more nodes has failed to upgrade</h2>
 <p>You can track the progress of the upgrade by running</p>
 <div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get nodes
@@ -422,7 +422,7 @@
 <h2 id="daemonset-failed-scheduling">DaemonSet Failed Scheduling</h2>
 <p>For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.</p>
 <p>An error similar to the below may be seen in the cluster events log:</p>
-<p><a href="Images/oneagent_scheduling_error.png" rel="noopener noreferrer"><img src="Images/oneagent_scheduling_error.png" alt="" /></a></p>
+<p><a href="Images/oneagent_scheduling_error.png" rel="noopener noreferrer"><img src="Images/oneagent_scheduling_error.png" alt="oneagent_scheduling_error" /></a></p>
 
 <ul>
 <li>This happens when there is a capacity issue on specific cluster nodes</li>
@@ -448,7 +448,22 @@
 <p><code>waiting for update of Node Pool &quot;msnode&quot; (Kubernetes Cluster &quot;ss-sbox-00-aks&quot; / Resource Group &quot;ss-sbox-00-rg&quot;): Code=&quot;ReconcileVMSSAgentPoolFailed&quot; Message=&quot;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&quot; Message=\&quot;Cannot add network interface &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode&#39; with accelerated networking to an existing virtual machine &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0&#39;</code></p>
 <p>We&rsquo;ve seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.</p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

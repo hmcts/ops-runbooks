@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -408,21 +408,39 @@
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="managed-certificates">Managed certificates</h1>
 <p>Microsoft documentation for managed certs are specific to each product, here&rsquo;s the <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#option-1-default-use-a-certificate-managed-by-front-door">FrontDoor documentation</a>.</p>
-<h4 id="when-to-use-managed-certificates">When to use Managed Certificates</h4>
-<p>If you are using one of the following services:
-- Frontdoor
-- CDN
-- App Service</p>
-<h4 id="frontdoor-managed-certificate-limitations">FrontDoor managed certificate limitations</h4>
+<h2 id="when-to-use-managed-certificates">When to use Managed Certificates</h2>
+<p>If you are using one of the following services:</p>
+
+<ul>
+<li>Frontdoor</li>
+<li>CDN</li>
+<li>App Service</li>
+</ul>
+<h2 id="frontdoor-managed-certificate-limitations">FrontDoor managed certificate limitations</h2>
 <p><em>Other services may have these limitations too, not verified</em></p>
 
 <ul>
 <li><a href="https://www.quora.com/What-is-an-apex-domain">Apex domains</a> do not work with managed certificates, e.g. <code>hmcts-access.service.gov.uk</code></li>
 <li>Domains using <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain#map-the-temporary-afdverify-subdomain">afdverify</a> only and not direct validation do not work</li>
 </ul>
-<p>You should use <a href="letsencrypt.md">Let’s encrypt certificates</a> in the above scenarios.</p>
+<p>You should use <a href="newacme.html">Let’s encrypt certificates</a> in the above scenarios.</p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -420,10 +420,9 @@
 
 <ol>
 <li><p>Connect to the <a href="https://portal.platform.hmcts.net">HMCTS VPN</a>.</p></li>
-<li><p>Request JIT access to HMCTS Bastion Server - https://myaccess.microsoft.com/
-<code>text
-SecOps Sandbox Bastion Server Access OR SecOps Production Bastion Server Access
-</code></p></li>
+<li><p>Request JIT access to HMCTS Bastion Server - <a href="https://myaccess.microsoft.com/">https://myaccess.microsoft.com/</a></p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>SecOps Sandbox Bastion Server Access OR SecOps Production Bastion Server Access
+</code></pre></div></li>
 <li><p>SSH on to bastion secops server
 See here for a steps on how to do this: <a href="https://tools.hmcts.net/confluence/display/RD/Bastion">HMCTS Confluence bastion access</a></p></li>
 <li><p>SSH on to required Splunk server via the SecOps bastion you&rsquo;re now logged into. You should be be able to login using your Azure Active Directory account details (assuming you&rsquo;ve been added to the JIT groups above).
@@ -435,7 +434,22 @@ See here for a steps on how to do this: <a href="https://tools.hmcts.net/conflue
 <h3 id="vm-authentication">VM authentication</h3>
 <p>User access to splunk VMs are provided by Azure Active Directory (AAD) login, which is provisioned onto the VMs during deployment via the VM extension &lsquo;AADLoginForLinux&rsquo;; this saves us having to retrieve and exchange SSH keys. The VMs have not been joined to the HMCTS domain.</p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

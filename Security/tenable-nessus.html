@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -410,10 +410,13 @@
 <p>Tenable Nessus is a proprietary vulnerability scanner developed by Tenable. The scanner allows the security team
 to scan devices and check them against the nessus database that contains thousands of known vulnerabilities
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
-and the agents. This runbook will cover the following
-- Tenable anvironments 
-- Deploying agents
-- Verifiying agent installation.</p>
+and the agents. This runbook will cover the following</p>
+
+<ul>
+<li>Tenable anvironments </li>
+<li>Deploying agents</li>
+<li>Verifiying agent installation. </li>
+</ul>
 <p>This runbook does not cover the finer details of the Terraform bootstrap module.</p>
 <h2 id="environments">Environments</h2>
 <p>There are three environments, Prod, Non-Prod and Sbox, the non-prod VM scalesets reside within the prod 
@@ -434,50 +437,49 @@ resource group.</p>
 <blockquote>
 <p>The example given below is specific to the Heritage environemnt.</p>
 </blockquote>
-<h4 id="steps-to-setup-deployment">Steps to setup deployment:</h4>
+<h4 id="steps-to-setup-deployment">Steps to setup deployment</h4>
 
 <ul>
-<li>Call the terraform-bootstrap-module from the <a href="https://github.com/hmcts/terraform-module-vm-bootstrap">terraform-module-vm-bootstrap</a>
-&ldquo;`
-module &quot;vm-bootstrap&rdquo; {
-count  = var.install_splunk_uf == true || var.nessus_install == true ? var.vm_count : 0
-source = &ldquo;git::https://github.com/hmcts/terraform-module-vm-bootstrap.git?ref=master&rdquo;</li>
+<li>Call the terraform-bootstrap-module from the <a href="https://github.com/hmcts/terraform-module-vm-bootstrap">terraform-module-vm-bootstrap</a></li>
 </ul>
-<p>virtual_machine_type         = &ldquo;vm&rdquo;
-  virtual_machine_id           = azurerm_virtual_machine.general_purpose_vm[count.index].id
-  os_type                      = local.os_type
-  nessus_server                = var.nessus_server
-  nessus_key                   = var.nessus_key
-  nessus_groups                = var.nessus_groups
-  install_dynatrace_oneagent   = false
-  install_azure_monitor        = false
-}
-&ldquo;`</p>
+<div class="highlight"><pre class="highlight terraform" tabindex="0"><code><span class="k">module</span> <span class="s2">"vm-bootstrap"</span> <span class="p">{</span>
+  <span class="nx">count</span>  <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">install_splunk_uf</span> <span class="p">==</span> <span class="kc">true</span> <span class="err">||</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_install</span> <span class="p">==</span> <span class="kc">true</span> <span class="err">?</span> <span class="kd">var</span><span class="p">.</span><span class="nx">vm_count</span> <span class="err">:</span> <span class="mi">0</span>
+  <span class="nx">source</span> <span class="p">=</span> <span class="s2">"git::https://github.com/hmcts/terraform-module-vm-bootstrap.git?ref=master"</span>
 
+  <span class="nx">virtual_machine_type</span>         <span class="p">=</span> <span class="s2">"vm"</span>
+  <span class="nx">virtual_machine_id</span>           <span class="p">=</span> <span class="nx">azurerm_virtual_machine</span><span class="p">.</span><span class="nx">general_purpose_vm</span><span class="p">[</span><span class="nx">count</span><span class="p">.</span><span class="nx">index</span><span class="p">].</span><span class="nx">id</span>
+  <span class="nx">os_type</span>                      <span class="p">=</span> <span class="kd">local</span><span class="p">.</span><span class="nx">os_type</span>
+  <span class="nx">nessus_server</span>                <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_server</span>
+  <span class="nx">nessus_key</span>                   <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_key</span>
+  <span class="nx">nessus_groups</span>                <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_groups</span>
+  <span class="nx">install_dynatrace_oneagent</span>   <span class="p">=</span> <span class="kc">false</span>
+  <span class="nx">install_azure_monitor</span>        <span class="p">=</span> <span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div>
 <ul>
 <li>Add all the required variables </li>
 </ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>variable "nessus_install" {
-default = false
-}
+<div class="highlight"><pre class="highlight terraform" tabindex="0"><code><span class="k">variable</span> <span class="s2">"nessus_install"</span> <span class="p">{</span>
+<span class="nx">default</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="p">}</span>
 
-variable "nessus_server" {}
+<span class="k">variable</span> <span class="s2">"nessus_server"</span> <span class="p">{}</span>
 
-variable "nessus_key_name" {
-default = null
-}
+<span class="k">variable</span> <span class="s2">"nessus_key_name"</span> <span class="p">{</span>
+<span class="nx">default</span> <span class="p">=</span> <span class="kc">null</span>
+<span class="p">}</span>
 
-variable "nessus_groups" {
-default = null
-}
+<span class="k">variable</span> <span class="s2">"nessus_groups"</span> <span class="p">{</span>
+<span class="nx">default</span> <span class="p">=</span> <span class="kc">null</span>
+<span class="p">}</span>
 
-data "azurerm_key_vault_secret" "nessus_key" {
-count    = var.nessus_install ? 1 : 0
-provider = azurerm.soc
+<span class="k">data</span> <span class="s2">"azurerm_key_vault_secret"</span> <span class="s2">"nessus_key"</span> <span class="p">{</span>
+<span class="nx">count</span>    <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_install</span> <span class="err">?</span> <span class="mi">1</span> <span class="err">:</span> <span class="mi">0</span>
+<span class="k">provider</span> <span class="p">=</span> <span class="nx">azurerm</span><span class="p">.</span><span class="nx">soc</span>
 
-name         = var.nessus_key_name
-key_vault_id = data.azurerm_key_vault.soc_vault[0].id
-}
+<span class="nx">name</span>         <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">nessus_key_name</span>
+<span class="nx">key_vault_id</span> <span class="p">=</span> <span class="k">data</span><span class="p">.</span><span class="nx">azurerm_key_vault</span><span class="p">.</span><span class="nx">soc_vault</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span>
+<span class="p">}</span>
 </code></pre></div>
 <ul>
 <li>Run associated Heritage VM <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=433">pipeline</a> on Azure DevOps</li>
@@ -493,13 +495,14 @@ configuration, please contact Ian Knight from SecOps to verify that the agent ca
 
 <ul>
 <li>Ensure you have JIT access and you are connected to the VPN </li>
-<li>Get the SSH config from Azure (valid for 1 hour)
-<code>
-az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
-</code></li>
+<li>Get the SSH config from Azure (valid for 1 hour)</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az ssh config <span class="nt">--resource-group</span> bastion-prod-rg <span class="nt">--vm-name</span> bastion-prod <span class="nt">--prefer-private-ip</span> <span class="nt">--file</span> ./sshconfig Paste into ~/.ssh/config
+</code></pre></div>
+<ul>
 <li>Start port-forwading/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. </li>
 </ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>ssh -L 5000:&lt;VM-PRIVATE-IP&gt;:8834 bastion-prod-rg-bastion-prod
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>ssh <span class="nt">-L</span> 5000:&lt;VM-PRIVATE-IP&gt;:8834 bastion-prod-rg-bastion-prod
 </code></pre></div>
 <ul>
 <li>Go to browser https://localhost:5000</li>
@@ -512,18 +515,12 @@ az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-p
 <li>Connect to <a href="https://portal.platform.hmcts.net">F5</a>.</li>
 </ul>
 <h3 id="linux-agents">Linux Agents</h3>
-<p>Check if the agent has deployed correctly 
-<code>
-systemctl status 
-</code></p>
-<p>Remove agent from server 
-<code>
-rpm -qa | grep -i NessusAgent
-</code>
-<code>
-rpm -e NessusAgent-10.1.3-es7.x86_64
-</code></p>
-<h3 id="windows-agents">Windows Agents</h3>
+<p>Check if the agent has deployed correctly</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>systemctl status 
+</code></pre></div><p>Remove agent from server</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>rpm <span class="nt">-qa</span> | <span class="nb">grep</span> <span class="nt">-i</span> NessusAgent
+</code></pre></div><div class="highlight"><pre class="highlight shell" tabindex="0"><code>rpm <span class="nt">-e</span> NessusAgent-10.1.3-es7.x86_64
+</code></pre></div><h3 id="windows-agents">Windows Agents</h3>
 <p>Commands to check Machine connectivity
 <code>
 tnc nessus-scanners-nonprod000005.platform.hmcts.net
@@ -554,7 +551,22 @@ Last connection attempt: 1655998378
 <li><p>https://docs.tenable.com/nessus/Content/RemoveNessusAgentLinux.htm</p></li>
 </ul>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

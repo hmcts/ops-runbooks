@@ -288,7 +288,7 @@
     <a href="../PlatOps-Toolkit/security.html"><span>Security tools</span></a>
   </li>
   <li>
-    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Security tools</span></a>
+    <a href="../PlatOps-Toolkit/useful-tools.html"><span>Useful tools</span></a>
   </li>
   <li>
     <a href="../PlatOps-Toolkit/vs-code-ext.html"><span>Microsoft VS Code Extensions</span></a>
@@ -414,7 +414,7 @@
 <li><p><a href="https://github.com/hmcts/rdo-ssl-creation/tree/openssl-mac-branch">Mac Users: RDO SSL Creation</a></p></li>
 <li><p><a href="https://github.com/hmcts/rdo-ssl-creation/tree/master">Linux Users: RDO SSL Creation</a></p></li>
 </ul>
-<h3 id="running-the-csr-generator">Running the CSR generator</h3>
+<h2 id="running-the-csr-generator">Running the CSR generator</h2>
 <p>Ensure you are logged into the azurecli</p>
 
 <blockquote>
@@ -443,10 +443,10 @@ Note: this can configuring by changing the subscription + vault in the generate_
 <blockquote>
 <p>./generate_csr</p>
 </blockquote>
-<p>The certificate requests will be output to the archive_csr/<date> folder
+<p>The certificate requests will be output to the archive_csr/&lt;date&gt; folder
 (wildcard CSRs e.g. *.platform.hmcts.net are generated as wildcard-platform-hmcts-net in the archive folder)</p>
 <p>The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.</p>
-<h3 id="submit-request-form">Submit request form</h3>
+<h2 id="submit-request-form">Submit request form</h2>
 <p>Once you have generated a CSR, you can raise a request with the HMCTS OPS Procurement team via <a href="https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&amp;sys_id=8d7207ce1b1d6d1049c38732f54bcb20">ServiceNow</a>.</p>
 <p>You&rsquo;ll be asked to provide the following information:</p>
 
@@ -484,8 +484,8 @@ After the PR is merged and the build finishes, check the DNS has propagated succ
 
 <ul>
 <li>For this step, clone <a href="https://github.com/hmcts/rdo-ssl-creation">rdo-ssl-creation</a> repository locally, <strong>make sure you&rsquo;re on the correct branch by checking the readme</strong>. For example Mac users should check out to the openssl-mac-branch.</li>
-<li><p>Convert the .txt cert file to .p7b with this command:<code>openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b</code></p></li>
-<li><p>Then you can navigate to the Azure Portal and find the relevant certificate in the &ldquo;infra-cert-prod&rdquo; vault, in this example it&rsquo;s &ldquo;decree-absolute-apply-divorce-service-gov-uk&rdquo;. Click Certificate Operation &gt; Merge Signed Request, and then upload the .p7b file created in the previous instruction. After this merge show status as complete, you&rsquo;ve successfully renewed/procured the certificate.</p></li>
+<li>Convert the .txt cert file to .p7b with this command:<code>openssl crl2pkcs7 -nocrl -certfile decree-absolute.apply-divorce.service.gov.uk.crt.txt -certfile cert-chain -out decree-absolute.apply-divorce.service.gov.uk.p7b</code></li>
+<li>Then you can navigate to the Azure Portal and find the relevant certificate in the &ldquo;infra-cert-prod&rdquo; vault, in this example it&rsquo;s &ldquo;decree-absolute-apply-divorce-service-gov-uk&rdquo;. Click Certificate Operation &gt; Merge Signed Request, and then upload the .p7b file created in the previous instruction. After this merge show status as complete, you&rsquo;ve successfully renewed/procured the certificate.</li>
 </ul>
 <h3 id="send-a-certificate-to-be-used-by-a-3rd-party">Send a certificate to be used by a 3rd Party</h3>
 <p>This step is only required if the certificate is being placed elsewhere or being used by a 3rd Party.</p>
@@ -509,7 +509,22 @@ After the PR is merged and the build finishes, check the DNS has propagated succ
 <h3 id="appendix">Appendix</h3>
 <p><a href="https://cjscommonplatform.sharepoint.com/sites/cftdevops/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2Fcftdevops%2FShared%20Documents%2FSSL%20Creation%20Video%2Emp4&amp;parent=%2Fsites%2Fcftdevops%2FShared%20Documents">SSL Creation Video</a></p>
 
-            
+              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+    <div class='page-expiry--not-expired'>
+      This page was last reviewed on 26 January 2024.
+
+        It needs to be reviewed again on 26 January 2025
+        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
+        .
+    </div>
+
+    <div class='page-expiry--expired'>
+      This page was set to be reviewed before 26 January 2025
+       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
+      This might mean the content is out of date.
+    </div>
+  </div>
+
           </main>
 
           <aside>

@@ -20,13 +20,20 @@ For non-production environments use non-prod Bastion and the prod Bastion for pr
 2) Make sure you are logged into the F5 VPN
 
 3) Connect to the non-prod or prod Bastion server
+
+```
 az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
 
+Non-prod:
+```
 ssh bastion-nonprod.platform.hmcts.net
+```
 
-or
-
+Prod:
+```
 ssh bastion-prod.platform.hmcts.net
+```
 
 4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
 
@@ -118,6 +125,7 @@ Keep increasing the offset until completed.
 For example civil:
 
 Check progress:
+
 ```
 SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
 curl localhost:9200/_cat/indices?v |grep civil_cases

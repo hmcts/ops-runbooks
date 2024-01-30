@@ -1,5 +1,7 @@
 ---
 title: Upgrading AKS Clusters
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 30
 last_reviewed_on: 2024-01-24
 review_in: 6 months
@@ -144,6 +146,15 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 [Troublehsooting upgrade failures](known-issues.html)
 
 ## After upgrading of a cluster
+
 - Add the cluster back into the application gateway once you have confirmed the upgrade has been successful.
   - [SDS example](https://github.com/hmcts/sds-azure-platform/pull/474/files)
   - [CFT example](https://github.com/hmcts/azure-platform-terraform/pull/595/files)
+
+## Known Issues
+
+### Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\"
+
+`waiting for update of Node Pool "msnode" (Kubernetes Cluster "ss-sbox-00-aks" / Resource Group "ss-sbox-00-rg"): Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\" Message=\"Cannot add network interface '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode' with accelerated networking to an existing virtual machine '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0'`
+
+We've seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.

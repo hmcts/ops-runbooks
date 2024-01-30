@@ -1,5 +1,7 @@
 ---
 title: Using Netbox to get available address space
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 160
 ---
 
@@ -29,14 +31,13 @@ Check for the addresses marked as available and not active for the required addr
 
 Note - this uses the jq command.  If you don't have this then run:
 
-```
+```bash
 brew install jq
 ```
 
-
 Run the following command to check that the address space is not in use (using 10.50.11.16/28 as an example):
 
-```
+```bash
 ➜  ~ curl -X GET -k https://netbox.platform.hmcts.net:443/api/ipam/prefixes/\?within\=10.50.11.16%2F28 -H "accept: application/json" | jq .
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -51,7 +52,7 @@ Run the following command to check that the address space is not in use (using 1
 
 The following is an example when an address space is in use and can't be used:
 
-```
+```bash
 ➜  ~ curl -X GET -k https://netbox.platform.hmcts.net:443/api/ipam/prefixes/\?within\=10.50.0.0%2F16 -H "accept: application/json" | jq .
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed

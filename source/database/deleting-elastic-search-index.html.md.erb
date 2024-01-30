@@ -117,6 +117,7 @@ Re-trigger index by increasing the offset by 10000 each time:
 
 ```
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 0 limit 10000);
+
 ```
 
 Once the batch of 10000 completes check the status:

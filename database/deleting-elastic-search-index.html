@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Adding Pages - HMCTS</title>
+    <title>How to delete Elastic Search Index - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/deleting-elastic-search-index.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Adding Pages - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta name="twitter:title" content="How to delete Elastic Search Index - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/deleting-elastic-search-index.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Adding Pages" />
+      <meta property="og:title" content="How to delete Elastic Search Index" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/addingpages.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/deleting-elastic-search-index.html" />
 
     
   </head>
@@ -412,51 +412,101 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="adding-pages">Adding Pages</h1>
-<p>These pages are written in the Markdown, lightweight markup language and stored with a github repo.</p>
-<h2 id="prerequisites">Prerequisites</h2>
-
-<ul>
-<li>Basic knowledge of using markdown to create documents</li>
-<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
-</ul>
-<h2 id="documentation">Documentation</h2>
-<p>Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb</p>
-<h2 id="index-page">Index Page</h2>
-<p>The first page in every folder should be called <strong>index.html.md.erb</strong> and start with these <strong>7 lines of code</strong>.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>---
-title: Contribution Guide
-weight: 5
----
-
-# &lt;%= current_page.data.title %&gt;
-</code></pre></div><p><strong>Weight</strong> is used to control the pages possition in the master index.  With low numbers at the top.  Where possible <strong>increment the count by 10</strong>.</p>
-<h2 id="well-written-pages">Well Written Pages</h2>
-
-<ul>
-<li>Prerequisite Section at top</li>
-<li>Diagrams (A good diagram, tells the story)</li>
-<li>Admin Tools
-
-<ul>
-<li>Admin portal (URL or IP address)</li>
-<li>Instructions to download, install and configure</li>
-<li>Describe with text, how to navigate within the system</li>
-</ul></li>
-<li>Follow house style guide
-
-<ul>
-<li>Use emply template for new products and applications</li>
-<li>When section is empty, leave it in place but add the word blank to show it is not relivent</li>
-</ul></li>
-<li>Core sections
-
-<ul>
-<li>Introduction or Description (What is it)</li>
-<li>Prerequisites (Can it be made to work by reader)</li>
-<li>Location (Links, URLs, IP addresses or pointers)</li>
-</ul></li>
-</ul>
+            <h1 id="how-to-delete-elastic-search-index">How to delete Elastic Search Index</h1>
+<p>This provides instructions on how to delete Elastic Search index.  Civil cases will be used as an example.</p>
+<p>A change request should be raised for Production, which will be scheduled for out of hours.  As part of the change get Get confirmation on the case type.</p>
+<p>Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings)</p>
+<p>For non-production environments use non-prod Bastion and the prod Bastion for production</p>
+<p>1) Request JIT access for non-prod or prod Bastion servers (https://myaccess.microsoft.com/)</p>
+<p>2) Make sure you are logged into the F5 VPN</p>
+<p>3) Connect to the non-prod or prod Bastion server
+az ssh config &ndash;ip *.platform.hmcts.net &ndash;file ~/.ssh/config</p>
+<p>ssh bastion-nonprod.platform.hmcts.net</p>
+<p>or</p>
+<p>ssh bastion-prod.platform.hmcts.net</p>
+<p>4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:</p>
+<p>For a list of IP addresses for each env, go to:</p>
+<p>DEMO:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces</p>
+<p>PERFTEST:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces</p>
+<p>AAT:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces</p>
+<p>Production:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces</p>
+<p>Connect to Elastic Search node:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>ssh -p22  elkadmin@&lt;ip address&gt; -i &lt;logstash ssh key&gt;
+</code></pre></div><p>5) Appliction team may shutter the service</p>
+<p>6) List all indices prior to deletion</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl localhost:9200/_cat/indices?v
+</code></pre></div><p>To do via a specific service for example civil_cases:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl localhost:9200/_cat/indices?v |grep civil_cases*
+</code></pre></div><p>or</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+</code></pre></div><p>7) Check overall DB count prior to deletion</p>
+<p>Connect to ccd-data-store DB from Bastion server</p>
+<p>For example civil:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
+</code></pre></div><p>8) Delete the Index</p>
+<p>For exampole civil:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl -XDELETE localhost:9200/civil_cases-000001;
+</code></pre></div><p>9) Application team will Merge CCD Definition File and creating new index.</p>
+<p>10) Re-trigger the indexing of old cases</p>
+<p>Connect to ccd_data_store DB via Bastion</p>
+<p>For example civil:</p>
+<p>Create temp table - the example below is civil_tmp_<date>:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>create table civil_tmp_&lt;date&gt; as select id from case_data where case_type_id = 'CIVIL' and marked_by_logstash = true;
+</code></pre></div><p>Re-trigger index by increasing the offset by 10000 each time:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 0 limit 10000);
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 10000 limit 10000);
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_&lt;date&gt; order by 1 offset 20000 limit 10000);
+</code></pre></div><p>.. etc</p>
+<p>Keep increasing the offset until completed.</p>
+<p>11) Check the progress of the indexing and overall counts to confirm completion - using another session</p>
+<p>For example civil:</p>
+<p>Check progress:
+<code>
+SELECT count(*) FROM case_data WHERE case_type_id = &#39;CIVIL&#39; and marked_by_logstash = &#39;false&#39;;
+curl localhost:9200/_cat/indices?v |grep civil_cases
+</code></p>
+<p>or</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+</code></pre></div><p>The overall indexing count should be approximatley the same as the overall DB count to confirm when completed:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
+</code></pre></div><p>If the progress is taking too long check to see if the logstash pods are running on the CCD namespace for CFT AKS cluster and has not crashed with OOM and restarted.
+Check the pod status and logs.</p>
+<p>The limits applied above should prevent this from happening so not too many cases are beingn ingested at once.</p>
+<p>For example - ccd-logstash-logstash-0. This is an example where the logstash pod crashed due to OOM:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>Containers:
+  logstash:
+    Container ID:   containerd://c1b4368adf07b060534329240b03d87c1a72b265144997ea77a671fe2563a270
+    Image:          hmctspublic.azurecr.io/imported/logstash/logstash:7.16.1
+    Image ID:       hmctspublic.azurecr.io/imported/logstash/logstash@sha256:8b55dd0bcf34783e5653a26da577cec14980a8ecf838cf3ab309329ebe0c124c
+    Port:           9600/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 09 Nov 2023 22:01:28 +0000
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Thu, 09 Nov 2023 06:38:07 +0000
+      Finished:     Thu, 09 Nov 2023 22:01:27 +0000
+</code></pre></div><p>AKS commands to check logstash pods on CFT AKS cluster (check how long it has been running to determine if it crashed):</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>Kubectl get pods -n ccd |grep logstash
+ccd-logstash-cmc-logstash-0                        1/1     Running     0               7d7h
+ccd-logstash-divorce-logstash-0                    1/1     Running     0               7d7h
+ccd-logstash-ethos-logstash-0                      1/1     Running     0               7d7h
+ccd-logstash-logstash-0                            1/1     Running     1 (3d20h ago)   7d7h
+ccd-logstash-probate-logstash-0                    1/1     Running     0               7d7h
+ccd-logstash-probateman-logstash-0                 1/1     Running     0               7d7h
+ccd-logstash-sscs-logstash-0                       1/1     Running     0               7d7h
+</code></pre></div><p>Get information about the pod and if there were any restarts due to OOM:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe pod &lt;logstash pod name&gt; -n ccd
+</code></pre></div><p>Check logs for pod:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl logs &lt;logstash pod name&gt; -n ccd
+</code></pre></div><p>12) Remove the temp table</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>DROP TABLE IF EXISTS civil_tmp_&lt;date&gt;;
+</code></pre></div><p>13) Application team may unshutter the service.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
     <div class='page-expiry--not-expired'>
@@ -478,8 +528,8 @@ weight: 5
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/addingpages.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Adding+Pages%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Faddingpages.html%29&amp;labels=bug&amp;title=Re%3A+%27Adding+Pages%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/deleting-elastic-search-index.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27How+to+delete+Elastic+Search+Index%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Fdeleting-elastic-search-index.html%29&amp;labels=bug&amp;title=Re%3A+%27How+to+delete+Elastic+Search+Index%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>DNS Records - HMCTS</title>
+    <title>If Something Goes Wrong - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/if-something-goes-wrong.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="DNS Records - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html" />
+      <meta name="twitter:title" content="If Something Goes Wrong - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/if-something-goes-wrong.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="DNS Records" />
+      <meta property="og:title" content="If Something Goes Wrong" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Domain-Services/DNS-Changes.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/if-something-goes-wrong.html" />
 
     
   </head>
@@ -409,61 +409,162 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="dns-records">DNS Records</h1>
-<p>This document describes how to add/remove/edit DNS for the AADDS environment. All records are managed through automation in the <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a>.</p>
-<p>Rules should be adjusted by the project team on a self-service basis.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+            <h1 id="if-something-goes-wrong">If Something Goes Wrong</h1>
+<p>If you come across a failed AKS resource or you have pushed in breaking changes that have caused failures in AKS, you may find the below guidance helpful in resolving the issues.</p>
+<p>If <a href="upgrading-aks-clusters.html">upgrading</a> or <a href="rebuilding-aks-clusters.html">re-building</a> the AKS Clusters most of the times the process will go on without any issues if the steps in the respective guides have been followed thoroughly.</p>
+<p>The most common AKS cluster-related issues and resolution steps have been covered in the Troubleshooting page <a href="known-issues.html">here</a>. If you come across a problem with the AKS Cluster that has not been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.</p>
+<p>For common incidents with AKS resources refer to the <a href="#common-incidents-and-resolution-steps">Common Incidents and Resolution Steps</a> section. If you come across a problem with an AKS resource that hasn&rsquo;t been covered in the page, please add it in, so that we have a reference to it in case the issue happens again in the future.</p>
+<p>In cases where the issue isn&rsquo;t covered in the troubleshooting guide or the resolution guidance has not helped, reach out to the rest of the members on your squad for guidance. A lot of the time someone will have some ideas on where/ what the issue is and how to fix it. If that isn&rsquo;t the case, the issue can be escalated to the wider community by posting in the slack channel platform-operations stating the ticket number you are working on, error messages and what you have so far tried to resolve the issue. For any high priority problems that affect the Production environment or having an impact on multiple teams inform Karthik Chinnareddyvari and Noel Connolly so they are aware of the situation.</p>
+<h2 id="common-incidents-and-resolution-steps">Common Incidents and Resolution Steps</h2>
+<h3 id="debug-application-startup-issues-in-aks">Debug Application Startup issues in AKS</h3>
+<p>There could be many reasons why applications could fail to startup like:
+- A secret referred in helm chart is missing in keyvaults
+- Pod identity is not able to pull keyvault secrets due to missing permissions
+- There is not enough space in the cluster to fit in a new pod.
+- Pod is scheduled, but fails to pass readiness (<code>/health/readiness</code>) or  liveness (<code>/health/liveness</code>) checks.
+- A misconfigured environment variable, example - incorrect URL of a dependent service.</p>
+<p>Below are some handy kubectl commands to debug the issues</p>
 
 <ul>
-<li>GitHub write access to <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a></li>
-<li>Azure DevOps access to <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416">Azure DevOps Pipeline</a></li>
+<li>To check latest events on your namespace:</li>
 </ul>
-<h2 id="limitations">Limitations</h2>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get events <span class="nt">-n</span> &lt;your-namespace&gt;
+</code></pre></div>
+<ul>
+<li>To check status of pods:</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get pods <span class="nt">-n</span> &lt;your-namespace&gt; | <span class="nb">grep</span> &lt;helm-release-name&gt;
+
+<span class="c">#Examples</span>
+<span class="c"># kubectl get pods -n ccd | grep ccd-data-store-api</span>
+<span class="c"># kubectl get pods -n ccd | grep pr-123</span>
+</code></pre></div>
+<ul>
+<li>To check status of a specific pod which is not running</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl describe pod &lt;pod-name&gt; <span class="nt">-n</span> &lt;your-namespace&gt;
+</code></pre></div>
+<ul>
+<li>To check logs of pods which is not starting</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs &lt;pod-name&gt; <span class="nt">-n</span> &lt;your-namespace&gt;
+
+<span class="c">#To follow logs</span>
+kubectl logs &lt;pod-name&gt; <span class="nt">-n</span> &lt;your-namespace&gt; <span class="nt">-f</span>
+
+<span class="c"># To check previous pod logs if its restarting</span>
+kubectl logs &lt;pod-name&gt; <span class="nt">-n</span> &lt;your-namespace&gt; <span class="nt">-p</span>
+
+</code></pre></div><h3 id="flux-gitops">Flux / Gitops</h3>
+
+<blockquote>
+<p>Always check <strong>why</strong> your release or pod has failed in the first instance.
+Although you may have permissions to delete a helm release or pod in a non-production environment, use this privilege wisely as you could be <em>hiding a potential bug</em> which could also <em>occur in production</em>.</p>
+</blockquote>
+<h4 id="latest-image-is-not-updated-in-cluster">Latest image is not updated in cluster</h4>
 
 <ul>
-<li>At the time of writing this document, this automation does NOT support anything other than A records.</li>
-<li>AADDS can only be deployed once within an Azure tenant. This means there is only a production environment. </li>
+<li>Start with checking <a href="https://github.com/hmcts/cnp-flux-config">cnp-flux-config</a> to make sure flux has updated/ committed the image.</li>
+<li>If image hasn&rsquo;t been committed to Github, see <a href="#flux-did-not-commit-latest-image-to-github"> Flux did not commit latest image to Github</a>.</li>
+<li>If flux has committed the new image to Github, check if the <code>HelmRelease</code> has been updated by Flux. Run below command and check that the image tag has been updated in the output</li>
 </ul>
-<h2 id="process">Process</h2>
-<p>A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, you will then be able to merge your PR for an automated deployment.
-See steps 1 to 7 for details on raising a PR.</p>
-<h2 id="self-service-steps">Self-Service Steps</h2>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get hr <span class="nt">-n</span> &lt;your-namespace&gt; &lt;your-helm-release-name&gt; <span class="nt">-o</span> yaml
+</code></pre></div>
+<ul>
+<li>If Image is not updated in above, <a href="#change-in-git-is-not-applied-to-cluster">Change in git is not applied to cluster</a>.</li>
+<li>If the image tag is updated and still application pods are not deployed, see <a href="#updated-helmrelease-is-not-deployed-to-cluster">Updated HelmRelease is not deployed to cluster</a></li>
+</ul>
+<h3 id="flux-did-not-commit-latest-image-to-github">Flux did not commit latest image to Github</h3>
 
-<ol>
-<li>Clone <a href="https://github.com/hmcts/dtspo-aad-domain-services">AADDS Repo</a> to your local machine.
-<code>bash
-git clone https://github.com/hmcts/dtspo-aad-domain-services
-</code></li>
-<li>Create a new branch, typically with a JIRA ticket number.
-<code>bash
-git checkout -b BRANCH-NAME
-</code></li>
-<li><p>Navigate to terraform/scripts/dns-records.csv where you will see a CSV file containing DNS records.</p></li>
-<li><p>Modify the CSV file to meet your requirements, following existing formatting. Note: removing records from the CSV will remove them from the DNS server.</p></li>
-<li><p>Push your new branch
-<code>bash
-git push --set-upstream origin BRANCH-NAME
-</code></p></li>
-<li><p>Create Pull Request and review changes compared with master.</p></li>
-<li><p>Look out for typical formatting issues such as extra spaces or unusual characters.</p></li>
-<li><p>Ensure you are not adding anything other than an A record, see limitations section of this document.</p></li>
-<li><p>Raise a BAU ticket with the PlatOps team requesting PR approval and execution.</p></li>
-<li><p>Once approved by PlatOps, you can merge your PR, this will trigger an automated deployment which will write your changes.</p></li>
-<li><p>Ensure your build completes successfully by monitoring the <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416">Azure DevOps Pipeline</a></p></li>
-<li><p>Test your DNS changes meet your requirement.</p></li>
-</ol>
+<ul>
+<li>Image automation is run from management cluster (CFTPTL). Please login to cftptl cluster before further troubleshooting.</li>
+<li>Image reflector controller keeps polling ACR for new images, but it should generally update the new image in 10 minutes.</li>
+<li>Check status of <code>imagerepositories</code> and verify the last scan.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get imagerepositories <span class="nt">-n</span> flux-system  &lt;repository name<span class="o">(</span>usually helm release name<span class="o">)&gt;</span>
+</code></pre></div>
+<ul>
+<li>If the last scan doesn&rsquo;t update, check image reflector controller logs to see if there any logs related to the helm repo.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>image-reflector-controller <span class="nt">--tail</span><span class="o">=</span><span class="nt">-1</span>
+<span class="c"># search for specific image</span>
+kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>image-reflector-controller <span class="nt">--tail</span><span class="o">=</span><span class="nt">-1</span> | <span class="nb">grep</span> &lt;Release Name&gt;
+</code></pre></div>
+<ul>
+<li>If the last scan is latest, check <code>imagepolicy</code> status to verify that the image returned matches the expectation.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get imagepolicies <span class="nt">-n</span> flux-system &lt;policy name<span class="o">(</span>usually helm release name<span class="o">)&gt;</span>
+</code></pre></div>
+<ul>
+<li>If it doesn&rsquo;t match the expected tag, verify image reflector controller logs as described above.</li>
+<li>If the <code>imagepolicy</code> object returned shows the expected image, but it didn&rsquo;t commit to Github, check image automation controller logs.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>image-automation-controller
+<span class="c"># search for specific image</span>
+kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>image-automation-controller | <span class="nb">grep</span> &lt;Release Name&gt;
+</code></pre></div><h4 id="updated-helmrelease-is-not-deployed-to-cluster">Updated HelmRelease is not deployed to cluster</h4>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+<ul>
+<li>Helm operator queues all the updates, so it could take up to 20 minutes sometimes to be picked up.</li>
+<li>Check HelmRelease status to see the status.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get hr <span class="nt">-n</span> &lt;namespace&gt; &lt;Release Name&gt;
+</code></pre></div>
+<ul>
+<li>Look at helm operator logs to see if there are any errors specific to your helm release</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>helm-controller <span class="nt">--tail</span><span class="o">=</span>1000 | <span class="nb">grep</span> &lt;Release Name&gt;
+</code></pre></div>
+<ul>
+<li>If you see any errors like, <code>status &#39;pending-install&#39; of release does not allow a safe upgrade&quot;</code>. You need to delete <code>HelmRelease</code> for fixing this.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl delete hr &lt;helm-release-name&gt; <span class="nt">-n</span> &lt;namespace&gt;
+</code></pre></div>
+<ul>
+<li><p>In most cases, helm release gets timed out with an error in log similar to <code>failed: timed out waiting for the condition</code>. This usually means application pods didn&rsquo;t startup in time and you need to look at your pods to know more.</p></li>
+<li><p>Check the latest status on helm release and if it has already been rolled back to previous release.</p></li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl describe hr &lt;helm-release-name&gt; <span class="nt">-n</span> &lt;your-namespace&gt;
+</code></pre></div>
+<ul>
+<li><p>If you are looking at pods after a long time, <code>HelmRelease</code> might have been rolled back and you won&rsquo;t have failed pods. Easiest way is to add a simple change like a dummy environment variable in flux-config to re-trigger the release and debug the issue when it occurs.</p></li>
+<li><p>If your old pods are still running when you check, follow <a href="#debug-application-startup-issues-in-aks">Debug Application Startup issues in AKS</a> to troubleshoot further.</p></li>
+</ul>
+<h4 id="change-in-git-is-not-applied-to-cluster">Change in git is not applied to cluster</h4>
+
+<ul>
+<li>To check if latest github commit has been downloaded by checking status</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get gitrepositories flux-config <span class="nt">-n</span> flux-system
+</code></pre></div>
+<ul>
+<li>If the commit doesn&rsquo;t match latest id, verify source controller logs to see any related errors</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>source-controller
+</code></pre></div>
+<ul>
+<li>If commit id is recent, verify status of flux kustomization for your namespace to get the version of git applied.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get kustomizations.kustomize.toolkit.fluxcd.io <span class="nt">-n</span> flux-system &lt;namespace&gt;
+</code></pre></div>
+<ul>
+<li>If the above status doesn&rsquo;t show latest commit/ show any error , see kustomize controller logs to find relevant errors.</li>
+</ul>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>kustomize-controller
+<span class="c"># search for specific image</span>
+kubectl logs <span class="nt">-n</span> flux-system <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>kustomize-controller | <span class="nb">grep</span> &lt;namespace&gt;
+</code></pre></div>
+              <div data-module='page-expiry' data-last-reviewed-on="2024-07-30">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 30 January 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 30 July 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 30 July 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -473,8 +574,8 @@ git push --set-upstream origin BRANCH-NAME
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Domain-Services/DNS-Changes.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27DNS+Records%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FDomain-Services%2FDNS-Changes.html%29&amp;labels=bug&amp;title=Re%3A+%27DNS+Records%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/if-something-goes-wrong.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27If+Something+Goes+Wrong%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fif-something-goes-wrong.html%29&amp;labels=bug&amp;title=Re%3A+%27If+Something+Goes+Wrong%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

@@ -11,7 +11,9 @@ This provides instructions on how to delete Elastic Search index.  Civil cases w
 
 A change request should be raised for Production, which will be scheduled for out of hours.  As part of the change get Get confirmation on the case type.
 
-Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings)
+Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings) & Implementation plan: https://tools.hmcts.net/confluence/x/QwaHa
+
+Some changes may include both AAT & Production environments.
 
 For non-production environments use non-prod Bastion and the prod Bastion for production
 
@@ -99,6 +101,8 @@ curl -XDELETE localhost:9200/civil_cases-000001;
 
 10) Re-trigger the indexing of old cases
 
+If AAT is included in the same change then do this first before proceeding to production.
+
 Connect to ccd_data_store DB via Bastion
 
 For example civil:
@@ -113,6 +117,25 @@ Re-trigger index by increasing the offset by 10000 each time:
 
 ```
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 0 limit 10000);
+
+```
+
+Once the batch of 10000 completes check the status:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+curl localhost:9200/_cat/indices?v |grep civil_cases
+```
+
+or
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+```
+
+Start the next batch once all cross check have been done - increasing the offset by 10000 each time:
+
+```
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 10000 limit 10000);
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 20000 limit 10000);
 ```

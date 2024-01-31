@@ -1,0 +1,23 @@
+---
+title: Extend postgres migration deadline
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## Update DeprecatedPostgres.groovey file
+
+- See below example of case code block.
+
+```Example
+case "https://github.com/hmcts/wa-case-event-handler.git":
+    expirydate = LocalDate.of(2024, 02, 9)
+    break
+```
+
+- Add a new case to the exisitng switch logic in [warnAboutDeprecatedPostgres.groovy](https://github.com/hmcts/cnp-jenkins-library/blob/master/vars/warnAboutDeprecatedPostgres.groovy)
+- Set an appropiate date which, will fail the pipeline once the date has been reached.
+
+
+Note: Be sure to include .git at the end of the repo URL.
+

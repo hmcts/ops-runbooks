@@ -102,6 +102,14 @@ See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
 Once the PR has been raised and the checks have been reviewed for errors - merge the PR.
 
+## Checks to see if upgrade worked correctly
+
+You can start checking the flux config to make sure it hasn’t got any error and it has reconciled correctly
+
+```
+kubectl get kustomizations.kustomize.toolkit.fluxcd.io -n flux-system
+```
+
 Review cluster pods for Traefik have come back up:
 ```
 kubectl get pods -n admin | grep traefik
@@ -111,6 +119,14 @@ Check pods have the correct chart version:
 ```
 kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
 ```
+![](Images/patching_apps_1.png)
+
+Also, you can check on the Helm release to see if it has got correct version in the log
+
+```
+kubectl get hr -n admin
+```
+![](Images/patching_apps_2.png)
 
 Review pods for any new errors:
 ```

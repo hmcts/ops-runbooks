@@ -429,7 +429,8 @@
 <li>Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) </li>
 </ul>
 <h2 id="pods-and-hrs-health-checks">Pods and HRs Health Checks</h2>
-<p>Put a message out into the #cloud-native-announce channel to notify people which cluster will be upgraded (do not use @here as this is a notification not an announcement).</p>
+<p>Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for notifications rather than announcements).
+Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters.</p>
 <p>Ensure your logged into the correct cluster.</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl config current-context
 </code></pre></div><p>Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:</p>
@@ -491,9 +492,10 @@
 <p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren&rsquo;t building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.</p>
 <h3 id="ptlsbox-ptl">Ptlsbox, Ptl</h3>
-<p>Make an announcement that Jenkins may be briefly unavailable in the cloud-native-announce slack channel. 
-This environment is best to be done early in the morning.
-See <a href="../jenkins/">Jenkins instances</a> to check they are running after upgrades.</p>
+<p>This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
+Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.</p>
+<h3 id="production">Production</h3>
+<p>A Change Request will need to be raised 2-3 days before the upgrade is to take place via <a href="https://mojcppprod.service-now.com/navpage.do">Service Now</a>. Ensure to use the following template when raising the (Change Request) - <a href="https://mojcppprod.service-now.com/nav_to.do?uri=%2Fcom.glideapp.servicecatalog_category_view.do%3Fv%3D1%26sysparm_parent%3D575f2b6d4f145300892a00818110c746%26sysparm_catalog%3De0d08b13c3330100c8b837659bba8fb4%26sysparm_catalog_view%3Dcatalog_default%26sysparm_view%3Dcatalog_default%26sysparm_current_row%3D21">Update to latest GA AKS Version for Production AKS Clusters</a></p>
 <h2 id="upgrading-the-cluster">Upgrading the Cluster</h2>
 <p>Find the cluster you want to upgrade into the portal, which should have been removed from app gateway.</p>
 <p>Cluster Configuration &gt; Upgrade Version &gt; in the Kubernetes version drop down menu choose the latest GA version &gt; Click Save</p>
@@ -543,17 +545,17 @@ See <a href="../jenkins/">Jenkins instances</a> to check they are running after 
 <p><code>waiting for update of Node Pool &quot;msnode&quot; (Kubernetes Cluster &quot;ss-sbox-00-aks&quot; / Resource Group &quot;ss-sbox-00-rg&quot;): Code=&quot;ReconcileVMSSAgentPoolFailed&quot; Message=&quot;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&quot; Message=\&quot;Cannot add network interface &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode&#39; with accelerated networking to an existing virtual machine &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0&#39;</code></p>
 <p>We&rsquo;ve seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-01">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 1 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 1 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 1 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

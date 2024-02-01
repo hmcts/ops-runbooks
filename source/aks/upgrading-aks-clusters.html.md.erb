@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2024-02-01
 review_in: 12 months
 weight: 30
 ---
@@ -25,7 +25,8 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 
 ## Pods and HRs Health Checks
 
-Put a message out into the #cloud-native-announce channel to notify people which cluster will be upgraded (do not use @here as this is a notification not an announcement).
+Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for notifications rather than announcements).
+Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters. 
 
 Ensure your logged into the correct cluster.
 
@@ -108,9 +109,13 @@ Some environments do have some additional requirements / checks that need to be 
 We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 
 ### Ptlsbox, Ptl
-Make an announcement that Jenkins may be briefly unavailable in the cloud-native-announce slack channel. 
-This environment is best to be done early in the morning.
-See [Jenkins instances](../../jenkins/index.html) to check they are running after upgrades.
+
+This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
+Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
+
+### Production
+
+A Change Request will need to be raised 2-3 days before the upgrade is to take place via [Service Now] (https://mojcppprod.service-now.com/navpage.do). Ensure to use the following template when raising the (Change Request) - [Update to latest GA AKS Version for Production AKS Clusters] (https://mojcppprod.service-now.com/nav_to.do?uri=%2Fcom.glideapp.servicecatalog_category_view.do%3Fv%3D1%26sysparm_parent%3D575f2b6d4f145300892a00818110c746%26sysparm_catalog%3De0d08b13c3330100c8b837659bba8fb4%26sysparm_catalog_view%3Dcatalog_default%26sysparm_view%3Dcatalog_default%26sysparm_current_row%3D21)
 
 ## Upgrading the Cluster
 

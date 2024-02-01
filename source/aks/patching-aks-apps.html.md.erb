@@ -42,19 +42,9 @@ For this example, the latest version in v26 and our existing version was v23.1.0
 
 The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attention to any breaking changes.
 
-After performing a search in GitHub, there was no impact from the breaking changes in our configuration.
+For example: in v25 there was a change in the syntax for the use of "redirectTo". After searching GitHub we found that we were not using this feature in our configuration so there was no impact.
 
 ## Test existing configuration
-
-Ensure your logged into the correct cluster
-```
-kubectl config current-context
-```
-
-Use desired cluster
-```
-kubectl config use-context ss-sbox-00-aks
-```
 
 In SDS, check traefik pods are running
 ```
@@ -75,10 +65,18 @@ apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
 &
 
 ```
-apps/admin/traefik2/sbox/00-traefik2.yaml
+apps/admin/traefik-crds-upgrade-v26/kustomize.yaml
 ```
 
 This enables us to target specific enviornments at this new crd version.
+
+We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
+  
+Eg: 
+![](Images/patching_apps_3.png)
+```
+clusters/sbox/base/kustomization.yaml
+```
 
 With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 

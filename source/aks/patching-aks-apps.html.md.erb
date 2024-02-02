@@ -68,11 +68,14 @@ apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
 apps/admin/traefik-crds-upgrade-v26/kustomize.yaml
 ```
 
+[See example PR containing these files](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
+
 This enables us to target specific enviornments at this new crd version.
 
 We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
   
-Eg: 
+Eg:
+
 ![](Images/patching_apps_3.png)
 ```
 clusters/sbox/base/kustomization.yaml

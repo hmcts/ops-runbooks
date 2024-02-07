@@ -1,5 +1,7 @@
 ---
 title: How to switch PTL Clusters Runbook
+last_reviewed_on: 2024-01-26
+review_in: 12 months
 weight: 40
 ---
 
@@ -8,7 +10,6 @@ weight: 40
 Previously we moved away from ARM templates for the AKS cluster creation to Terraform from the old release pipeline [here](https://dev.azure.com/hmcts/CNP/_release?definitionId=16&view=mine&_a=releases) to this new one [here](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766).
 
 This wiki page documents some tasks that we had to perform when switching over PTL jenkins to Terraform and new infra. We don't expect this will need to be done again, however just incase it does the following information will likely be useful.
-
 
 ## Change Request
 
@@ -53,7 +54,7 @@ return true
 
 * Now there should be no jobs running within Jenkins. Now you can need to delete all the agents that are within Jenkins [here](https://build.platform.hmcts.net/computer/). You can delete them manually or script it if easier.
 
-* Now you can shut Jenkins down via this [page](Go to this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins).
+* Now you can shut Jenkins down via this [page](https://build.platform.hmcts.net/safeExit). As per this support [page](https://support.cloudbees.com/hc/en-us/articles/216118748-How-to-Start-Stop-or-Restart-your-Instance-) this will shutdown Jenkins.
 
 * The disk that Jenkins uses is currently in [here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/disks-ptl-rg/providers/Microsoft.Compute/disks/jenkins-disk). If the RG that the Jenkins disk is to be stored in is going to change then you need to take a snapshot of this disk and then create a disk from it in the new RG.
 
@@ -67,7 +68,7 @@ return true
 
 * Update the palos to add the new vnet, example [here](https://github.com/hmcts/rdo-terraform-hub-dmz/pull/529).
 
-* Now we can destroy the cluster via this [pipeline](https://dev.azure.com/hmcts/CNP/_build?definitionId=483). Just ensure you select the environment to PTL.
+* Now we can destroy the cluster via this [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766&_a=summary). Just ensure you select the environment to PTL.
 
 * Once destroyed use the same pipeline and select the PTL environment and Apply to rebuild the cluster.
 
@@ -75,7 +76,7 @@ return true
 
 * If the load balancer IP has changed, you will also need to update local traffic within the F5 VPN too. Within the F5 VPN browse to **Local Traffic** on the main menu, then select **Pools** and **Pool List**. There is currently six pools listed, however you need to make updates to the following named pools **pool_build-beta.platform.hmcts.net**, **pool_response-api.platform.hmcts.net** and **pool_response.platform.hmcts.net**. Within each of these pools you will need to click on **Members** and add a new member, I would recommend looking at the existing member and copying everything into a new member except the Address which will need to be substituted with the new load balancer IP. Finally, ensure that you **Disable** the old member and then **Enable** the newly entered member before clicking on the **Update** button.
 
-* Now log back into Jenkins (it may take a while to come back) and once logged in run the cnp-plum-recipes-service [job](https://build.platform.hmcts.net/view/Platform/job/HMCTS_CNP/job/cnp-plum-recipes-service/job/master/) and confirm it is successful.
+* Now log back into Jenkins (it may take a while to come back) and once logged in run the cnp-plum-recipes-service [job](https://build.hmcts.net/job/HMCTS_a_to_c/job/cnp-plum-recipes-service/job/master/) and confirm it is successful.
 
 * Providing the cnp-plum-recipes-service job was successful Jenkins should now be fine.
 

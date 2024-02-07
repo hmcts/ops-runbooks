@@ -1,0 +1,31 @@
+---
+title: How to downgrade a Jenkins plugin
+last_reviewed_on: 2024-02-01
+review_in: 12 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+Plugin versions are managed from within [cnp-jenkins-docker](https://github.com/hmcts/cnp-jenkins-docker).
+
+Renovate checks plugin versions and [automatically upgrades them each morning](https://github.com/hmcts/cnp-jenkins-docker/blob/master/.github/renovate.json)
+
+If an issue has arisen with a new version of a plugin and it needs to be downgraded:
+
+* [Downgrade it](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/plugins.txt) in the image
+* Deploy the [new image on CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) and [on SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml)
+
+* Jenkins may run into issues when downgrading plugins, if this is the case:
+
+Wipe the plugins folder
+```bash
+kubectl exec -it jenkins-0 -c jenkins -- rm -rf /var/jenkins_home/plugins/
+```
+Then restart Jenkins
+```bash
+kubectl delete pod jenkins-0
+```
+
+* Make the maintainers of the plugin aware of the issue
+* Temporarily freeze renovate for that particular plugin (add to `ignoreDeps`)

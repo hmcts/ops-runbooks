@@ -157,7 +157,7 @@ Ensure to monitor the status for the HRs and pods to ensure they come back succe
 
 Repeat steps in CFT
 
-## Ready to move onto Non-prod enviornments.
+## Ready to move onto Non-prod environments.
 
 ## AAD Pod Identity has been depricated hence there is not going to be further patches.
 
@@ -167,7 +167,17 @@ Repeat steps in CFT
 
 [SDS](https://github.com/hmcts/sds-flux-config/blob/7d17076d3b98f6f8ec225aa55dea15c18cfc6977/apps/admin/aad-pod-identity/kustomization.yaml#L5)
 
+## Prod environments.
 
+You want to test ptl environment on its own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
+
+PR examples
+[PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
+[PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
+
+For Prod you want to remove the previous patches you did for the other environments and just update the application yaml file see the examples below:
+[Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
+[Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)
 
 ## Additional App Examples
 

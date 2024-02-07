@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Services - HMCTS</title>
+    <title>keda Patching Example - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Services/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-keda-example.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Services - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Services/" />
+      <meta name="twitter:title" content="keda Patching Example - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-keda-example.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Services" />
+      <meta property="og:title" content="keda Patching Example" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Services/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-keda-example.html" />
 
     
   </head>
@@ -418,39 +418,23 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="services">Services</h1>
-<p>This space is for any guides relating to services that we deploy and share responsibility for.</p>
-<h2 id="mailrelay-guides">Mailrelay Guides</h2>
-<p><a href="mailrelay.html">Mailrelay</a></p>
-<h2 id="globalscape-guides"> Globalscape Guides</h2>
-<p><a href="globalscape.html">Globalscape</a></p>
-<h2 id="docmosis-guides"> Docmosis Guides</h2>
-<p><a href="docmosis.html">Updating Docmosis Variables</a></p>
-<h2 id="other-docmosis-docs">Other Docmosis Docs</h2>
-<p><a href="https://tools.hmcts.net/confluence/display/RD/Docmosis+Service+Operations+Guide+2.0">Docmosis</a></p>
+            <h1 id="keda-patching-example">keda Patching Example</h1>
+<p>This document covers a high level patching example for the KEDA app patching. Please see <a href="patching-aks-apps.html">Patching AKS Apps - Traefik</a> for a lower level example with more information.</p>
+<p>keda is patched globally, rather than starting in sbox and working up through the enviornments, due to its limited use. There should be PRs raised by renovate for both SDS and CFT</p>
+<h2 id="keda">keda</h2>
+<p>Review releases page for breaking changes <a href="https://github.com/kedacore/charts/releases">KEDA Releases</a></p>
+<h3 id="sds">SDS</h3>
+<p>https://github.com/hmcts/sds-flux-config/pull/3572</p>
+<h3 id="cft">CFT</h3>
+<p>https://github.com/hmcts/cnp-flux-config/pull/25236</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
-    <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
-
-        It needs to be reviewed again on 26 January 2025
-        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
-        .
-    </div>
-
-    <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
-       by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
-      This might mean the content is out of date.
-    </div>
-  </div>
-
+            
           </main>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Services/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Services%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FServices%2F%29&amp;labels=bug&amp;title=Re%3A+%27Services%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-keda-example.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27keda+Patching+Example%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-keda-example.html%29&amp;labels=bug&amp;title=Re%3A+%27keda+Patching+Example%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

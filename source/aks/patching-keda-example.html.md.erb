@@ -1,0 +1,25 @@
+---
+title: keda Patching Example
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for the KEDA app patching. Please see [Patching AKS Apps - Traefik](patching-aks-apps.html) for a lower level example with more information.
+
+keda is patched globally, rather than starting in sbox and working up through the enviornments, due to its limited use. There should be PRs raised by renovate for both SDS and CFT
+
+##keda
+
+Review releases page for breaking changes [KEDA Releases](https://github.com/kedacore/charts/releases)
+
+###SDS
+https://github.com/hmcts/sds-flux-config/pull/3572
+
+
+###CFT
+https://github.com/hmcts/cnp-flux-config/pull/25236
+
+
+
+

@@ -76,6 +76,24 @@ Logs can be found in `/var/jenkins_home/logs/jenkins.branch.*`.
 
 They aren't terribly useful, [@timja](https://github.com/timja) enhanced the logging in https://github.com/jenkinsci/branch-api-plugin/pull/305 but we didn't end up investing time to try get it merged as it served its purpose but could be revived again if ever needed.
 
+## Builds not being triggered at all
+
+When a pull request is submitted, updated or merged into master/main, a webhook event is triggered. 
+
+This event is processed and sent to an Azure Logic App which processes the request and sends it to an Azure Service Bus Queue.
+
+The queue is polled by a pod on our AKS cluster and the event is then sent to Jenkins which kicks off a build.
+
+This configuration ensures that, if a build is to be triggered when the clusters are off or Jenkins is otherwise unreachable, it will stored and retried when Jenkins is reachable again.
+
+The [Jenkins WebHook Relay repo](https://github.com/hmcts/jenkins-webhook-relay/) controls the behaviour of the pod that polls the service bus queue.
+
+The webhook relay pod is managed by a Keda scaled job. If the scaled job isn't working, the pods will not be scheduled and the service bus queue will not be polled.
+
+If this happens, builds will not be automatically triggered on Jenkins.
+
+Teams can use the `Scan Organisation Now` function in Jenkins to trigger builds if there is an issue but we don't want to encourage this behaviour as a general practice.
+
 ## References
 
 - [My Jenkins build isn't triggering when I push](https://blog.timja.dev/my-jenkins-build-isnt-triggering-when-i-push/) - Post by [@timja](https://github.com/timja) on a previous issue we had with builds not triggering

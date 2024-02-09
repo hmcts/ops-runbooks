@@ -82,6 +82,8 @@ When a pull request is submitted, updated or merged into master/main, a webhook 
 
 This event is processed and sent to an Azure Logic App which processes the request and sends it to an Azure Service Bus Queue.
 
+The logic app and service bus queues are created by [cft-jenkins-infrastructure(https://github.com/hmcts/cft-jenkins-infrastructure)] and [sds-jenkins-infrastructure](https://github.com/hmcts/sds-jenkins-infrastructure) repos.
+
 The queue is polled by a pod on our AKS cluster and the event is then sent to Jenkins which kicks off a build.
 
 This configuration ensures that, if a build is to be triggered when the clusters are off or Jenkins is otherwise unreachable, it will stored and retried when Jenkins is reachable again.

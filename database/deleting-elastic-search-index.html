@@ -460,13 +460,16 @@ ssh bastion-prod.platform.hmcts.net
 <p>For example civil:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 </code></pre></div><p>8) Delete the Index</p>
-<p>For exampole civil:</p>
+<p>For example civil:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl -XDELETE localhost:9200/civil_cases-000001;
 </code></pre></div><p>9) Application team will Merge CCD Definition File and creating new index.</p>
 <p>10) Re-trigger the indexing of old cases</p>
 <p>If AAT is included in the same change then do this first before proceeding to production.</p>
 <p>Connect to ccd_data_store DB via Bastion</p>
 <p>For example civil:</p>
+<p>If small amount of cases (i.e. 10K) then run the following:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>UPDATE case_data SET marked_by_logstash = false WHERE case_type_id='CIVIL' AND marked_by_logstash = true; 
+</code></pre></div><p>If more than 10K cases then do the following:</p>
 <p>Create temp table - the example below is civil_tmp_<date>:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>create table civil_tmp_&lt;date&gt; as select id from case_data where case_type_id = 'CIVIL' and marked_by_logstash = true;
 </code></pre></div><p>Re-trigger index by increasing the offset by 10000 each time:</p>

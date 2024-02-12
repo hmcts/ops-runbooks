@@ -91,7 +91,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 
 8) Delete the Index
 
-For exampole civil:
+For example civil:
 
 ```
 curl -XDELETE localhost:9200/civil_cases-000001;
@@ -107,6 +107,14 @@ Connect to ccd_data_store DB via Bastion
 
 For example civil:
 
+If small amount of cases (i.e. 10K) then run the following:
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE case_type_id='CIVIL' AND marked_by_logstash = true; 
+```
+
+If more than 10K cases then do the following:
+  
 Create temp table - the example below is civil_tmp_<date>:
 
 ```

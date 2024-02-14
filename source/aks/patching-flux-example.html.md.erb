@@ -46,6 +46,12 @@ The same process will work for CFT.
 
 To replicate this in another environment, update the `flux install` command to point to the environment you're targeting and update the relevant kustomization file.
 
+## Prod environment
+
+When you get to the prod environment, you can remove all the previous changes you made per environment and update flux in the base configuration so it applies to all environments.
+
+`flux install --export > apps/flux-system/base/gotk-components.yaml`
+
 
 
 

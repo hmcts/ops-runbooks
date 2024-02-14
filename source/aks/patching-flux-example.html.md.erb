@@ -44,6 +44,22 @@ You can find a full example for CFT in [this pull request](https://github.com/hm
 
 The same process will work for SDS.
 
+## Testing everything is working and has been updated
+
+If you describe some of the crds flux deploys you will see the updated versions:
+
+```
+kubectl describe crd helmreleases.helm.toolkit.fluxcd.io -n flux-system | grep app.kubernetes.io/version
+```
+
+You can also check the image version on the deployments or pods. The example below shows the source-controller deployment:
+
+```
+kubectl describe deploy source-controller -n flux-system | grep ghcr.io
+```
+
+The pods should have been redeployed as well, so their uptime should be very recent.
+
 ## Non-Prod environments
 
 To replicate the above procedure in a nonprod environment, update the `flux install` command to point to the environment you're targeting and update the relevant kustomization file.

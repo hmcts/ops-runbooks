@@ -40,17 +40,25 @@ This command will generate a file containing the latest versions of all the flux
 
 You will also need to update the kustomization to point to this updated version instead of the existing version.
 
-You can find a full example for SDS in [this pull request](https://github.com/hmcts/cnp-flux-config/pull/29230/files).
+You can find a full example for CFT in [this pull request](https://github.com/hmcts/cnp-flux-config/pull/29230/files).
 
-The same process will work for CFT.
+The same process will work for SDS.
 
-To replicate this in another environment, update the `flux install` command to point to the environment you're targeting and update the relevant kustomization file.
+## Non-Prod environments
+
+To replicate the above procedure in a nonprod environment, update the `flux install` command to point to the environment you're targeting and update the relevant kustomization file.
+
+For example:
+
+```
+flux install --export > apps/flux-system/ithc/base/gotk-components.yaml
+```
 
 ## Prod environment
 
-When you get to the prod environment, you can remove all the previous changes you made per environment and update flux in the base configuration so it applies to all environments.
+When you get to the prod environment, you can merge the renovate pull request that will update the base version of Flux.
 
-`flux install --export > apps/flux-system/base/gotk-components.yaml`
+You can then remove all the previous changes you made per environment and the base version will take over.
 
 
 

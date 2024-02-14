@@ -1,0 +1,51 @@
+---
+title: Flux Patching Example
+weight: 30
+last_reviewed_on: 2024-02-14
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for Flux.
+
+Flux should be patched per environment because it is crucial for the operation of our clusters and deploying applications to them.
+
+Review the renovate pull requests in the flux repos for breaking changes.
+
+- [CFT](https://github.com/hmcts/cnp-flux-config/pulls?q=is%3Apr+is%3Aopen+fluxcd+author%3Aapp%2Frenovate)
+- [SDS](https://github.com/hmcts/sds-flux-config/pulls?q=is%3Apr+is%3Aopen+fluxcd+author%3Aapp%2Frenovate)
+
+Cross check with the [Flux releases page](https://github.com/fluxcd/flux2/releases).
+
+Upgrading flux includes upgrading the main flux software itself but also the various components that it deploys to perform its various functions.
+
+You can find info about these components [here](https://fluxcd.io/flux/components/).
+
+These can be upgraded separately so it's best to use the process detailed below to keep everything in sync.
+
+To upgrade all of these together in a single environment, you can use the Flux CLI.
+
+The generic process can be found on the [Flux website](https://fluxcd.io/flux/installation/upgrade/) including information on how to install the CLI tool on your machine.
+
+Make sure to clone the flux repos and enter them on your terminal by running `cd cnp-flux-config` or `cd sds-flux-config`.
+
+The specific command we need to target an environment, e.g, sandbox, is:
+
+```
+flux install --export > apps/flux-system/sbox/base/gotk-components.yaml
+```
+
+This command will generate a file containing the latest versions of all the flux components.
+
+You will also need to update the kustomization to point to this updated version instead of the existing version.
+
+You can find a full example for SDS in [this pull request](https://github.com/hmcts/cnp-flux-config/pull/29230/files).
+
+The same process will work for CFT.
+
+To replicate this in another environment, update the `flux install` command to point to the environment you're targeting and update the relevant kustomization file.
+
+
+
+

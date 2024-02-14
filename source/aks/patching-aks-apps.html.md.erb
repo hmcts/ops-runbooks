@@ -1,7 +1,7 @@
 ---
 title: Patching AKS Apps
 weight: 30
-last_reviewed_on: 2024-02-09
+last_reviewed_on: 2024-02-14
 review_in: 12 months
 ---
 
@@ -12,7 +12,7 @@ This run book documents some tasks that we have to perform when patching apps on
 **Note: steps may differ depending on the application being patched.**
 
 
-## App Patchign Schedule
+## App Patching Schedule
 
 Patching is shared across the Platform Operations team, review the patching rota to view which app is due and who it is assigned to.
 
@@ -37,15 +37,24 @@ SDS is a good place to start, as any issues will have a smaller impact due to th
 
 ### Production
 - Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
-- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
+- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks)
+
 ## Research the App version
 It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
 
-For this example, the latest version in v26 and our existing version was v23.1.0
+Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.
 
-The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attention to any breaking changes.
+For [this example](https://github.com/hmcts/cnp-flux-config/pull/27188) concerning Traefik, the latest version was 26.0.0 and our existing version was 23.1.0.
 
-For example: in v25 there was a change in the syntax for the use of "redirectTo". After searching GitHub we found that we were not using this feature in our configuration so there was no impact.
+The breaking changes in the pull request were reviewed and the [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was cross checked.
+
+This was necessary to ensure there were no ill effects from the upgrade.
+
+For example, in v25 there was a change in the syntax for the use of "redirectTo". 
+
+After searching GitHub for `redirectTo` we found that we were not using this feature in our configuration so there was no impact.
+
+If you are unsure whether a breaking change will affect us or our application teams, shout out on your standup or send a message on slack to #platform-operations.
 
 ## Test existing configuration
 
@@ -58,7 +67,7 @@ Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmct
 
 Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
 
-## Updating
+## Updating - start with sandbox
 
 In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
 
@@ -77,12 +86,9 @@ This enables us to target specific enviornments at this new crd version.
 
 We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
   
-Eg:
+Eg: `clusters/sbox/base/kustomization.yaml`
 
 ![](Images/patching_apps_3.png)
-```
-clusters/sbox/base/kustomization.yaml
-```
 
 With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
@@ -108,24 +114,46 @@ Once the PR has been raised and the checks have been reviewed for errors - merge
 
 ## Checks to see if upgrade worked correctly
 
-You can start checking the flux config to make sure it hasn’t got any error and it has reconciled correctly
+When updating an application you can monitor the cluster to see if the upgrade completes.
+
+There are a few things you can check to see the progress of the update end-to-end.
+
+You can start checking the flux config to make sure it hasn’t got any error and it has reconciled correctly.
+
+When a change is pushed to the flux repo, the flux controller pods on the cluster sync with GitHub.
+
+This triggers a reconciliation of the kustomizations in the flux-system namespace. 
+
+You can see this by running:
 
 ```
 kubectl get kustomizations.kustomize.toolkit.fluxcd.io -n flux-system
 ```
 
-Review cluster pods for Traefik have come back up:
+You can also use `ks` which is shorthand for `kustomization`.
+
+There will be a kustomization per namespace and once it becomes reconciled it will say `Applied revision` followed by the Github branch and commit SHA e.g. `master@abcd1234...`.
+
+Generally, if you find any changes are not deploying to the cluster, checking the kustomizations are reconciling properly is one thing you can do to troubleshoot.
+
+Next, check the pods have come back up:
+
 ```
 kubectl get pods -n admin | grep traefik
 ```
 
+The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.
+
 Check pods have the correct chart version:
+
 ```
 kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
+
 ```
+
 ![](Images/patching_apps_1.png)
 
-Also, you can check on the Helm release to see if it has got correct version in the log
+Also, you can check on the Helm release to see if it has got correct version in the log.
 
 ```
 kubectl get hr -n admin
@@ -137,13 +165,18 @@ Review pods for any new errors:
 kubectl logs {pod-name} -n admin -f
 ```
 
-Check test sites are accessible
+You can also check if any UIs are reachable.
 
-Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible.
+In the case of traefik, it does have a UI but it's not usually exposed. 
 
-Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
+However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.
+
+Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible on SDS.
+
+Check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) on CFT.
 
 In sandbox, delete Toffee / Plum HRs to test
+
 ```
 kubectl get hr -n toffee
 ```
@@ -151,6 +184,7 @@ kubectl get hr -n toffee
 ```
 kubectl delete hr toffee-recipe-backend -n toffee
 ```
+
 ```
 kubectl delete hr toffee-frontend -n toffee
 ```
@@ -159,32 +193,38 @@ Ensure to monitor the status for the HRs and pods to ensure they come back succe
 
 Repeat steps in CFT
 
-## Ready to move onto Non-prod environments.
+## Non-prod environments
 
-## AAD Pod Identity has been depricated hence there is not going to be further patches.
+Now you've completed sandbox, move onto the nonprod environments.
+
+## Prod environments
+
+You want to test ptl environment on its own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
+
+PR examples:
+
+- [PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
+- [PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
+
+For Prod you want to remove the previous patches you did for the other environments and just update the application yaml file see the examples below:
+
+- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
+- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)
+
+## Additional App Examples
+
+- [flux](patching-flux-example.html)
+- [keda](patching-keda-example.html)
+
+## Other notes
+
+AAD Pod Identity has been depricated hence there is not going to be further patches.
 
 [AAD Pod Identity](https://github.com/Azure/aad-pod-identity/releases) already using latest version on both sds and CFT.
 
 [CNP](https://github.com/hmcts/cnp-flux-config/blob/04dd5c0c33a789e672021c4a9daeb83c6aad1de8/apps/admin/aad-pod-id/kustomization.yaml#L5)
 
 [SDS](https://github.com/hmcts/sds-flux-config/blob/7d17076d3b98f6f8ec225aa55dea15c18cfc6977/apps/admin/aad-pod-identity/kustomization.yaml#L5)
-
-## Prod environments.
-
-You want to test ptl environment on its own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
-
-PR examples
-[PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
-[PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
-
-For Prod you want to remove the previous patches you did for the other environments and just update the application yaml file see the examples below:
-
-[Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
-[Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)
-
-## Additional App Examples
-
-[keda example](patching-keda-example.html)
 
 
 

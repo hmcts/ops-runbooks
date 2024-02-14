@@ -167,6 +167,8 @@ kubectl logs {pod-name} -n admin -f
 
 You can also check if any UIs are reachable.
 
+## Further testing
+
 In the case of traefik, it does have a UI but it's not usually exposed. 
 
 However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.
@@ -175,7 +177,9 @@ Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmct
 
 Check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) on CFT.
 
-In sandbox, delete Toffee / Plum HRs to test
+You could also delete the Toffee or Plum HRs to make sure they come back up and they are reachable via Traefik.
+
+The example commands below are for SDS using toffee:
 
 ```
 kubectl get hr -n toffee

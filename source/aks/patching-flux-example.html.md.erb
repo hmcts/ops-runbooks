@@ -52,6 +52,12 @@ If you describe some of the crds flux deploys you will see the updated versions:
 kubectl describe crd helmreleases.helm.toolkit.fluxcd.io -n flux-system | grep app.kubernetes.io/version
 ```
 
+You can get the list of crds deployed by flux by running:
+
+```
+kubectl get crds | grep fluxcd
+```
+
 You can also check the image version on the deployments or pods. The example below shows the source-controller deployment:
 
 ```

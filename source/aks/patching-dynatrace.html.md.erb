@@ -1,0 +1,97 @@
+---
+title: Dynatrace Patching
+weight: 30
+last_reviewed_on: 2024-02-15
+review_in: 6 months
+---
+
+# <%= current_page.data.title %>
+
+### Context
+We use the [dynatrace-operator helm chart](https://docs.dynatrace.com/docs/shortlink/release-notes#dynatrace-operator) to deploy our instances of Dynatrace. This supports the rollout and lifecycle management of both Activegate and Oneagent in Kubernetes.
+
+Before patching, you need to [check the latest available version](https://github.com/Dynatrace/dynatrace-operator/releases/). Make sure to read through the [release notes](https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator) between the currrent version and latest, to see if there are any breaking changes, or pre-reqs before an upgrade.
+
+For example, when upgrading from 0.12 -> 0.15, there is a note in [0.13 about containerd version required](https://docs.dynatrace.com/docs/whats-new/release-notes/dynatrace-operator/dto-fix-0-13-0). To check this, you can run:
+
+```bash
+kubectl get nodes -A -o wide
+```
+
+### Patching process
+
+Dynatrace is deployed through flux-config, upgrading involves a PR to flux to change version numbers.
+
+[CFT Example](https://github.com/hmcts/cnp-flux-config/pull/29321)
+
+[SDS Example](https://github.com/hmcts/sds-flux-config/pull/4256)
+
+In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize.
+
+### Monitoring the upgrade
+
+Once the PR to flux is merged, you can check if the cluster has picked it up yet by running:
+
+```bash
+kubectl get kustomizations -n flux-system
+```
+
+You can see the hash from flux-config here to see if your commit has been picked up yet.
+![](Images/flux_config_hash.png)
+Below, you can see below my revision is yet to be applied, wait for it to be applied before you start checking more closely on the deployment.
+![](Images/kustomizations.png)
+
+Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running: 
+
+```bash
+kubectl get hr -n dynatrace
+```
+
+Whilst this is happening, I like to have a few windows open running the following commands to see how things are going. This builds on the principle of failing fast and you can see quickly if something is not working, so you can revert your changes if needed.
+
+Checking pods are being deployed healthily on the new version:
+
+```bash
+watch kubectl get pods -n dynatrace
+```
+
+Checking events in the namespace in case of failures or errors:
+
+```bash
+kubectl get events --sort-by=".lastTimestamp" -n dynatrace
+```
+
+Usually, you will see if the deployment is successful through helm, before kubectl will report back to you.
+If all goes well, you can check this is deployed successfully using the following commands:
+
+```bash
+kubectl get hr -n dynatrace
+helm ls -a -n dynatrace
+```
+
+### Troubleshooting
+If the upgrade is failing, you will see an error when the pods are starting up, or in the events of the namespace. You should revert your upgrade PR and look into those logs to see what other changes may be needed.
+
+If there are no errors in the pods or events, but you find that the helm upgrade is just timing out, you can take the below approach to reconcile things.
+You can see attempted revisions/upgrades using helm history:
+
+```bash
+helm history dynatrace-operator -n dynatrace
+```
+In the example, you can see that a timeout occured upgrading from 0.12 to 0.15:
+![](Images/helm_history.png)
+
+To try this again, you can run the below command to retry the revision which attempted to deploy the ugpraded version, in this case revision 11.
+
+
+```bash
+helm rollback dynatrace-operator 11 -n dynatrace
+```
+
+It may take a few times of doing this if you keep seeing a context deadline exceeded error.
+
+#### Edge case
+
+Somehow, it may get into a state where helm shows the latest chart version as deployed, but kubectl shows it in a "False" state.
+This happens when kubectl has hit it's max retries, but you have manually used helm rollback to get the deployment into the correct state.
+You can use kubectl edit, to increase the retries temporarily, and flux should reconcile the kubectl reply to show the correct status. Flux will reset this back to the original value for retries after a few minutes.

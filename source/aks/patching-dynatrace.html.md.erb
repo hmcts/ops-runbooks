@@ -26,7 +26,7 @@ Dynatrace is deployed through flux-config, upgrading involves a PR to flux to ch
 
 [SDS Example](https://github.com/hmcts/sds-flux-config/pull/4256)
 
-In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize.
+In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize. There is a good example of applying CRDS to a certain env in the traefik patching docs.
 
 ### Monitoring the upgrade
 

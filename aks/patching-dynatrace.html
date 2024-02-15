@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Availability Tests in App Insights - HMCTS</title>
+    <title>Dynatrace Patching - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/monitoring/availability-tests.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-dynatrace.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Availability Tests in App Insights - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/monitoring/availability-tests.html" />
+      <meta name="twitter:title" content="Dynatrace Patching - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-dynatrace.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Availability Tests in App Insights" />
+      <meta property="og:title" content="Dynatrace Patching" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/monitoring/availability-tests.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-dynatrace.html" />
 
     
   </head>
@@ -424,43 +424,61 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="availability-tests-in-app-insights">Availability Tests in App Insights</h1>
-<p>Availability tests are an AppInsights feature that can be used to measure the uptime of a service and trigger automatic alerts when downtime is detected. This document covers how to set up an availability test, how to set up automatic alerts for that availability test and how to assign an existing action group to an availability test. This document assumes you already have an AppInsights Azure Resource already configured and working.</p>
+            <h1 id="dynatrace-patching">Dynatrace Patching</h1>
+<h3 id="context">Context</h3>
+<p>We use the <a href="https://docs.dynatrace.com/docs/shortlink/release-notes#dynatrace-operator">dynatrace-operator helm chart</a> to deploy our instances of Dynatrace. This supports the rollout and lifecycle management of both Activegate and Oneagent in Kubernetes.</p>
+<p>Before patching, you need to <a href="https://github.com/Dynatrace/dynatrace-operator/releases/">check the latest available version</a>. Make sure to read through the <a href="https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator">release notes</a> between the currrent version and latest, to see if there are any breaking changes, or pre-reqs before an upgrade.</p>
+<p>For example, when upgrading from 0.12 -&gt; 0.15, there is a note in <a href="https://docs.dynatrace.com/docs/whats-new/release-notes/dynatrace-operator/dto-fix-0-13-0">0.13 about containerd version required</a>. To check this, you can run:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get nodes <span class="nt">-A</span> <span class="nt">-o</span> wide
+</code></pre></div><h3 id="patching-process">Patching process</h3>
+<p>Dynatrace is deployed through flux-config, upgrading involves a PR to flux to change version numbers.</p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/29321">CFT Example</a></p>
+<p><a href="https://github.com/hmcts/sds-flux-config/pull/4256">SDS Example</a></p>
+<p>In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize. There is a good example of applying CRDS to a certain env in the traefik patching docs.</p>
+<h3 id="monitoring-the-upgrade">Monitoring the upgrade</h3>
+<p>Once the PR to flux is merged, you can check if the cluster has picked it up yet by running:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get kustomizations <span class="nt">-n</span> flux-system
+</code></pre></div><p>You can see the hash from flux-config here to see if your commit has been picked up yet.
+<a href="Images/flux_config_hash.png" rel="noopener noreferrer"><img src="Images/flux_config_hash.png" alt="" /></a>
+Below, you can see below my revision is yet to be applied, wait for it to be applied before you start checking more closely on the deployment.
+<a href="Images/kustomizations.png" rel="noopener noreferrer"><img src="Images/kustomizations.png" alt="" /></a></p>
+<p>Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get hr <span class="nt">-n</span> dynatrace
+</code></pre></div><p>Whilst this is happening, I like to have a few windows open running the following commands to see how things are going. This builds on the principle of failing fast and you can see quickly if something is not working, so you can revert your changes if needed.</p>
+<p>Checking pods are being deployed healthily on the new version:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>watch kubectl get pods <span class="nt">-n</span> dynatrace
+</code></pre></div><p>Checking events in the namespace in case of failures or errors:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get events <span class="nt">--sort-by</span><span class="o">=</span><span class="s2">".lastTimestamp"</span> <span class="nt">-n</span> dynatrace
+</code></pre></div><p>Usually, you will see if the deployment is successful through helm, before kubectl will report back to you.
+If all goes well, you can check this is deployed successfully using the following commands:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get hr <span class="nt">-n</span> dynatrace
+helm <span class="nb">ls</span> <span class="nt">-a</span> <span class="nt">-n</span> dynatrace
+</code></pre></div><h3 id="troubleshooting">Troubleshooting</h3>
+<p>If the upgrade is failing, you will see an error when the pods are starting up, or in the events of the namespace. You should revert your upgrade PR and look into those logs to see what other changes may be needed.</p>
+<p>If there are no errors in the pods or events, but you find that the helm upgrade is just timing out, you can take the below approach to reconcile things.
+You can see attempted revisions/upgrades using helm history:</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm <span class="nb">history </span>dynatrace-operator <span class="nt">-n</span> dynatrace
+</code></pre></div><p>In the example, you can see that a timeout occured upgrading from 0.12 to 0.15:
+<a href="Images/helm_history.png" rel="noopener noreferrer"><img src="Images/helm_history.png" alt="" /></a></p>
+<p>To try this again, you can run the below command to retry the revision which attempted to deploy the ugpraded version, in this case revision 11.</p>
+<div class="highlight"><pre class="highlight shell" tabindex="0"><code>helm rollback dynatrace-operator 11 <span class="nt">-n</span> dynatrace
+</code></pre></div><p>It may take a few times of doing this if you keep seeing a context deadline exceeded error.</p>
+<h4 id="edge-case">Edge case</h4>
+<p>Somehow, it may get into a state where helm shows the latest chart version as deployed, but kubectl shows it in a &ldquo;False&rdquo; state.
+This happens when kubectl has hit it&rsquo;s max retries, but you have manually used helm rollback to get the deployment into the correct state.
+You can use kubectl edit, to increase the retries temporarily, and flux should reconcile the kubectl reply to show the correct status. Flux will reset this back to the original value for retries after a few minutes.</p>
 
-<ul>
-<li><a href="#making-an-availability-test">Making an Availability Test</a></li>
-<li><a href="#configuring-alerting">Configuring Alerting</a></li>
-<li><a href="#configuring-action-groups">Configuring Action Groups</a></li>
-</ul>
-<h2 id="making-an-availability-test">Making an Availability Test</h2>
-<p>In the Azure Portal, navigate to your AppInsights resource. Then, in the left panel, navigate to <code>Investigate &gt; Availability</code>. Here you can see all currently configured availability tests for the resource as well as the resource&rsquo;s availability over time.</p>
-<p>To add an availability test, click the &lsquo;Add Classic Test&rsquo; button near the top-left of the center panel. In the pop-up on the right, you will need to provide a name for your test and a URL for it to ping.</p>
-<p><img src=images/create-availability-test.png  width="600"></p>
-<p>&lsquo;Name&rsquo; should read as the service or application being monitored by the test. Name this appropriately so the team immediately knows what part of the service is down when an alert is triggered by the test. Test names have to be unique across the project, so Azure will automatically prepend this name with an auto-generated test ID. This is normal.</p>
-<p>&lsquo;URL&rsquo; should point to the health page of the application or service. This must be publicly-accessible or the test will fail.</p>
-<p>&lsquo;Enable retries for availability test failures&rsquo; will ping the URL again after 20 seconds if the test fails. While this option is enabled, Azure will only record a failure if the test fails three times in a row. This can reduce the number of false positives generated by the test at the cost of potentially missing brief periods of downtime. If in doubt, leave this box checked.</p>
-<p>Adjust the test frequency to your liking and the success crieria to your needs. If you want an alert to be raised when this test fails, leave the &lsquo;Alerts&rsquo; slider on &lsquo;Enabled&rsquo;. Configuring alerts will be covered in the next step, so for now, just click the &lsquo;Create&rsquo; button.</p>
-<h2 id="configuring-alerting">Configuring Alerting</h2>
-<p>Now that you have a test configured (and hopefully running green) we can configure an alert for it to monitor for when it fails. In the <code>Availability</code> tab, find your test in the list, click the <code>...</code> icon to open a drop-down context, then click the &lsquo;Open Rules (Alerts) page&rsquo; option. Here you can see all the alert rules for the test you have configured. These rules define <em>when</em> an alert should be triggered. If you enabled alerts when you created the availability test, you should already have an alert rule set up.</p>
-<p>Clicking on the alert here will open up a detailed view where you can examine the availability test it&rsquo;s monitoring and the condition that will cause the alert to be raised. By default, this should be something to the effect of &ldquo;Whenever the average failed locations is greater than or equal to X&rdquo;.</p>
-<p><img src=images/action-groups.png width=600></p>
-<p>Here we can see the action groups assigned to this alert. When the alert is triggered, it will trigger all the actions in these action groups. In this case, the alert is assigned to only the &lsquo;servicenow production&rsquo; group. This is the standard action group for all availability tests in prod and is configured to send an E-Mail to everyone in the Reform DevOps group and raise an incident in ServiceNow.</p>
-<p>Scrolling to the bottom, we can edit the description and severity of the alert. If this alert is warning about potential downtime on production environments, &lsquo;Severity&rsquo; should be set to &lsquo;Critical&rsquo; so it is raised as a P0 incident in SNOW.</p>
-<h2 id="configuring-action-groups">Configuring Action Groups</h2>
-<p>Opening up the action group, we can see two groups: Notifications and Actions. Notification are in effect, limited to sending an email to a group. Functionality does exist to send SMS messages and automated phone calls, however neither of these two options are in use by the project (automated phone calls for on-call members are handled through SNOW instead).</p>
-<p>Actions, on the other hand are more versatile and can invoke anything from Azure functions to scure webhooks. Raising incidents in SNOW is handled through an ITSM action here. Multiple notifications and actions can be configured per action group and are covered more in depth in <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/alerts/action-groups#action-specific-information">the Microsoft action groups documentation</a></p>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-08-15">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 15 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 15 August 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 15 August 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -470,8 +488,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/monitoring/availability-tests.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Availability+Tests+in+App+Insights%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fmonitoring%2Favailability-tests.html%29&amp;labels=bug&amp;title=Re%3A+%27Availability+Tests+in+App+Insights%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-dynatrace.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Dynatrace+Patching%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-dynatrace.html%29&amp;labels=bug&amp;title=Re%3A+%27Dynatrace+Patching%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

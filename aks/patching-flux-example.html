@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Security Operations - HMCTS</title>
+    <title>Flux Patching Example - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Security/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-flux-example.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Security Operations - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Security/" />
+      <meta name="twitter:title" content="Flux Patching Example - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-flux-example.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Security Operations" />
+      <meta property="og:title" content="Flux Patching Example" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Security/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-flux-example.html" />
 
     
   </head>
@@ -427,31 +427,55 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="security-operations">Security Operations</h1>
-<p>This space is for any guides relating to work with the SOC team.</p>
-<h2 id="splunk-infrastructure-low-level-configuration">Splunk infrastructure low-level configuration</h2>
+            <h1 id="flux-patching-example">Flux Patching Example</h1>
+<p>This document covers a high level patching example for Flux.</p>
+<p>Flux should be patched per environment because it is crucial for the operation of our clusters and deploying applications to them.</p>
+<p>Review the renovate pull requests in the flux repos for breaking changes.</p>
 
 <ul>
-<li><a href="datadisk-config-notes.html">Splunk Data disk configuration notes</a></li>
-<li><a href="server-access.html">Splunk Server Access</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pulls?q=is%3Apr+is%3Aopen+fluxcd+author%3Aapp%2Frenovate">CFT</a></li>
+<li><a href="https://github.com/hmcts/sds-flux-config/pulls?q=is%3Apr+is%3Aopen+fluxcd+author%3Aapp%2Frenovate">SDS</a></li>
 </ul>
-<h2 id="tenable-nessus">Tenable Nessus</h2>
+<p>Cross check with the <a href="https://github.com/fluxcd/flux2/releases">Flux releases page</a>.</p>
+<p>Upgrading flux includes upgrading the main flux software itself but also the various components that it deploys to perform its various functions.</p>
+<p>You can find info about these components <a href="https://fluxcd.io/flux/components/">here</a>.</p>
+<p>These can be upgraded separately so it&rsquo;s best to use the process detailed below to keep everything in sync.</p>
+<p>To upgrade all of these together in a single environment, you can use the Flux CLI.</p>
+<p>The generic process can be found on the <a href="https://fluxcd.io/flux/installation/upgrade/">Flux website</a> including information on how to install the CLI tool on your machine.</p>
+<p>Make sure to clone the flux repos and enter them on your terminal by running <code>cd cnp-flux-config</code> or <code>cd sds-flux-config</code>.</p>
+<p>The specific command we need to target an environment, e.g, sandbox, is:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>flux install --export &gt; apps/flux-system/sbox/base/gotk-components.yaml
+</code></pre></div><p>This command will generate a file containing the latest versions of all the flux components.</p>
+<p>You will also need to update the kustomization to point to this updated version instead of the existing version.</p>
+<p>You can find a full example for CFT in <a href="https://github.com/hmcts/cnp-flux-config/pull/29230/files">this pull request</a>.</p>
+<p>The same process will work for SDS.</p>
+<h2 id="testing-everything-is-working-and-has-been-updated">Testing everything is working and has been updated</h2>
+<p>If you describe some of the crds flux deploys you will see the updated versions:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe crd helmreleases.helm.toolkit.fluxcd.io -n flux-system | grep app.kubernetes.io/version
+</code></pre></div><p>You can get the list of crds deployed by flux by running:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get crds | grep fluxcd
+</code></pre></div><p>You can also check the image version on the deployments or pods. The example below shows the source-controller deployment:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe deploy source-controller -n flux-system | grep ghcr.io
+</code></pre></div><p>The pods should have been redeployed as well, so their uptime should be very recent.</p>
+<h2 id="non-prod-environments">Non-Prod environments</h2>
+<p>To replicate the above procedure in a nonprod environment, update the <code>flux install</code> command to point to the environment you&rsquo;re targeting and update the relevant kustomization file.</p>
+<p>For example:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>flux install --export &gt; apps/flux-system/ithc/base/gotk-components.yaml
+</code></pre></div><h2 id="prod-environment">Prod environment</h2>
+<p>When you get to the prod environment, you can merge the renovate pull request that will update the base version of Flux.</p>
+<p>You can then remove all the previous changes you made per environment and the base version will take over.</p>
 
-<ul>
-<li><a href="tenable-nessus.html">Tenable Nessus</a></li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-19">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 19 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 19 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 19 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -461,8 +485,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Security/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Security+Operations%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FSecurity%2F%29&amp;labels=bug&amp;title=Re%3A+%27Security+Operations%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-flux-example.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Flux+Patching+Example%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-flux-example.html%29&amp;labels=bug&amp;title=Re%3A+%27Flux+Patching+Example%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

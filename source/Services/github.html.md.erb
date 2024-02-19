@@ -1,0 +1,54 @@
+---
+title: Github Overview
+last_reviewed_on: 2024-02-19
+review_in: 6 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+### What is a Repository
+
+A repository in GitHub is a place where you can store your code, files, and the revision history of each file. Repositories are essential for version control and collaboration on projects. They can have multiple collaborators and can be public, internal, or private.
+Key features and terminology of repositories include:
+* Branch: A parallel version of your code within the repository that does not affect the main branch. 
+* Clone: To download a full copy of a repository's data from GitHub, including all versions of every file and folder.
+* Fork: A new repository that shares code and visibility settings with the original "upstream" repository.
+* Merge: To apply changes from one branch to another.
+* Pull request: A request to merge changes from one branch into another.
+* Remote: A repository stored on GitHub Enterprise Cloud, not on your computer.
+* Upstream: The branch on an original repository that has been forked or cloned.
+
+### How to find a repository
+
+To find the repository that you need to work on., go to [HMCTS Github](https://github.com/hmcts/) where there is a search option to find a repository, as seen on the example below;
+
+![Screenshot of Search Repository](images/SearchRepo.png)
+
+### Creating a New Branch
+
+Once in the repository you need to work on, it is important that you create a **new** branch **before** making any changes to a file.  This is to ensure that ay changes does not impact the main master branch.  
+
+Create a new branch by clicking on the drop-down box that says master.  Type in the name of your new branch to work on and click on Create branch (branch name) from master. 
+
+![Screenshot of New Branch](images/NewBranch.png)
+
+You will now see in the drop-down box that you are working on the new branch that you have created.
+
+![Screenshot of MyChanges test Branch](images/MyChangesBranch.png)
+
+### Pull Requests
+
+Once your changes are made and you are finished with your edits, the repository will state that your branch has had recent pushes.  From here you can click on Compare and Pull Request which will raise a Pull Request which is a request to merge changes from your created branch and the main/master branch.
+
+![Screenshot of Create Pull Request](images/CreatePullRequest.png)
+
+On the request you should add a title and description related to the changes that is being made on the branch.
+
+![Screenshot of Pull Request Content](images/PRcontent.png)
+
+This request go through some automated checks to ensure the changes will work correctly once merged.  The request will go out to other collaborators of the repository who can look through the requested changes and either approve the request or provide comments or improvements if there are any issues with the request. 
+
+Once the pull request checks have passed and it is approved, then the branch is ready to be merged with the main/master branch.  Click on Merge pull request to merge your created branch with the main/master branch.
+
+![Screenshot of PR approved and ready to merge](images/PRChecksApprovals.png)

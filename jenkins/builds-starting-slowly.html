@@ -471,6 +471,16 @@
 </blockquote>
 <p>Logs can be found in <code>/var/jenkins_home/logs/jenkins.branch.*</code>.</p>
 <p>They aren&rsquo;t terribly useful, <a href="https://github.com/timja">@timja</a> enhanced the logging in https://github.com/jenkinsci/branch-api-plugin/pull/305 but we didn&rsquo;t end up investing time to try get it merged as it served its purpose but could be revived again if ever needed.</p>
+<h2 id="builds-not-being-triggered-at-all">Builds not being triggered at all</h2>
+<p>When a pull request is submitted, updated or merged into master/main, a webhook event is triggered.</p>
+<p>This event is processed and sent to an Azure Logic App which processes the request and sends it to an Azure Service Bus Queue.</p>
+<p>The logic app and service bus queues are created by <a href="https://github.com/hmcts/cft-jenkins-infrastructure">cft-jenkins-infrastructure</a> and <a href="https://github.com/hmcts/sds-jenkins-infrastructure">sds-jenkins-infrastructure</a> repos.</p>
+<p>The queue is polled by a pod on our AKS cluster and the event is then sent to Jenkins which kicks off a build.</p>
+<p>This configuration ensures that, if a build is to be triggered when the clusters are off or Jenkins is otherwise unreachable, it will stored and retried when Jenkins is reachable again.</p>
+<p>The <a href="https://github.com/hmcts/jenkins-webhook-relay/">Jenkins WebHook Relay repo</a> controls the behaviour of the pod that polls the service bus queue.</p>
+<p>The webhook relay pod is managed by a Keda scaled job. If the scaled job isn&rsquo;t working, the pods will not be scheduled and the service bus queue will not be polled.</p>
+<p>If this happens, builds will not be automatically triggered on Jenkins.</p>
+<p>Teams can use the <code>Scan Organisation Now</code> function in Jenkins to trigger builds if there is an issue but we don&rsquo;t want to encourage this behaviour as a general practice.</p>
 <h2 id="references">References</h2>
 
 <ul>

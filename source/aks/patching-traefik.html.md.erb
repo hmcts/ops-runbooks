@@ -1,21 +1,33 @@
 ---
 title: Traefik Patching Example
 weight: 30
-last_reviewed_on: 2024-02-15
+last_reviewed_on: 2024-02-19
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
 
+This document covers a high level patching example for Traefik.
+
+Traefik should be patched per environment because it is crucial for providing network access to our applications.
+
 It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
 
-For this example, the latest version in v26 and our existing version was v23.1.0
+Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.
 
-The [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was reviewed, paying particular attention to any breaking changes.
+For [this example](https://github.com/hmcts/cnp-flux-config/pull/27188) concerning Traefik, the latest version was 26.0.0 and our existing version was 23.1.0.
 
-For example: in v25 there was a change in the syntax for the use of "redirectTo". After searching GitHub we found that we were not using this feature in our configuration so there was no impact.
+The breaking changes in the pull request were reviewed and the [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was cross checked.
 
-## Test existing configuration
+This was necessary to ensure there were no ill effects from the upgrade.
+
+For example, in v25 there was a change in the syntax for the use of "redirectTo". 
+
+After searching GitHub for `redirectTo` we found that we were not using this feature in our configuration so there was no impact.
+
+If you are unsure whether a breaking change will affect us or our application teams, shout out on your standup or send a message on slack to #platform-operations.
+
+## Check existing configuration
 
 In SDS, check traefik pods are running
 ```
@@ -26,7 +38,7 @@ Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmct
 
 Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
 
-## Updating
+## Updating - start with sandbox
 
 In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
 
@@ -45,12 +57,9 @@ This enables us to target specific enviornments at this new crd version.
 
 We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
   
-Eg:
+Eg: `clusters/sbox/base/kustomization.yaml`
 
 ![](Images/patching_apps_3.png)
-```
-clusters/sbox/base/kustomization.yaml
-```
 
 With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
@@ -68,32 +77,38 @@ spec:
     namespace: admin
 ```
 
-Update the cluster kustomization file pointing to the new crd directory created earlier - see pr below
+Update the cluster kustomization file pointing to the new crd directory created earlier.
+
+Raise a pull request to upgrade the version.
 
 See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
 
-Once the PR has been raised and the checks have been reviewed for errors - merge the PR.
+There are checks that take place when you raise a PR to validate the kustomization is valid. 
+
+These can be found in the `tests` folder
+
+Review the pipeline checks for errors. If there are no errors and the PR has been approved, merge the PR.
 
 ## Checks to see if upgrade worked correctly
 
-You can start checking the flux config to make sure it hasn’t got any error and it has reconciled correctly
+Check the pods have come back up:
 
-```
-kubectl get kustomizations.kustomize.toolkit.fluxcd.io -n flux-system
-```
-
-Review cluster pods for Traefik have come back up:
 ```
 kubectl get pods -n admin | grep traefik
 ```
 
+The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.
+
 Check pods have the correct chart version:
+
 ```
 kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
+
 ```
+
 ![](Images/patching_apps_1.png)
 
-Also, you can check on the Helm release to see if it has got correct version in the log
+Also, you can check on the Helm release to see if it has got correct version in the log.
 
 ```
 kubectl get hr -n admin
@@ -105,13 +120,18 @@ Review pods for any new errors:
 kubectl logs {pod-name} -n admin -f
 ```
 
-Check test sites are accessible
+Traefik does have a UI but it's not usually exposed. 
 
-Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible.
+However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.
 
-Note: check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) for CFT.
+Ensure [toffee.sandbox.platform.hmcts.net/](https://toffee.sandbox.platform.hmcts.net/) is accessible on SDS.
 
-In sandbox, delete Toffee / Plum HRs to test
+Check [plum.sandbox.platform.hmcts.net/](https://plum.sandbox.platform.hmcts.net/) on CFT.
+
+You could also delete the Toffee or Plum HRs to make sure they come back up and they are reachable via Traefik.
+
+The example commands below are for SDS using toffee:
+
 ```
 kubectl get hr -n toffee
 ```
@@ -119,6 +139,7 @@ kubectl get hr -n toffee
 ```
 kubectl delete hr toffee-recipe-backend -n toffee
 ```
+
 ```
 kubectl delete hr toffee-frontend -n toffee
 ```
@@ -127,25 +148,20 @@ Ensure to monitor the status for the HRs and pods to ensure they come back succe
 
 Repeat steps in CFT
 
-## Ready to move onto Non-prod environments.
+## Non-prod environments
 
-## AAD Pod Identity has been depricated hence there is not going to be further patches.
+Now you've completed sandbox, move onto the nonprod environments.
 
-[AAD Pod Identity](https://github.com/Azure/aad-pod-identity/releases) already using latest version on both sds and CFT.
+## Prod environments
 
-[CNP](https://github.com/hmcts/cnp-flux-config/blob/04dd5c0c33a789e672021c4a9daeb83c6aad1de8/apps/admin/aad-pod-id/kustomization.yaml#L5)
+You will want to test the PTL environments on their own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
 
-[SDS](https://github.com/hmcts/sds-flux-config/blob/7d17076d3b98f6f8ec225aa55dea15c18cfc6977/apps/admin/aad-pod-identity/kustomization.yaml#L5)
+PR examples:
 
-## Prod environments.
-
-You want to test ptl environment on its own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
-
-PR examples
-[PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
-[PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
+- [PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
+- [PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
 
 For Prod you want to remove the previous patches you did for the other environments and just update the application yaml file see the examples below:
 
-[Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
-[Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)
+- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
+- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)

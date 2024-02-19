@@ -1,0 +1,126 @@
+---
+title: Data Boarding 
+last_reviewed_on: 2024-02-19
+review_in: 6 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+### Prerequisites
+
+* Be onboarded to the [HMCTS Github Organisation](https://hmcts.github.io/cloud-native-platform/onboarding/person/index.html)
+* Get a member of your team to add you to [devops-azure-ad](https://github.com/hmcts/devops-azure-ad) or raise a [platops-help](https://moj.enterprise.slack.com/archives/C8SR5CAMU) ticket.
+
+[GitHub Overview, Repositories and Pull Requests](github.html)
+
+### Overview
+
+A total of four storage accounts have been deployed, an internal and an external account in both the NonProd and Prod environments. The external account is directly accessible from RDWeb and is enabled for SFTP. The internal account is mounted as anetwork drive to the Jumpbox for that environment.
+
+These accounts allow the transfer of data in and out of the HMCTS Azure environments withan audit trail. 
+
+### Copying Data from RDWeb to the external storage accounts
+
+Both the production and non-production external storage accounts can be SFTPd to fromRDWEB. The connection strings are below:
+
+* Nonprod: boardingextnonprodstor.blob.core.windows.net
+* Prod: boardingextprodstor.blob.core.windows.net
+
+Usernames and passwords have already been shared with CGI - if these have been lost or this is a new application please raise a [platops-help](https://moj.enterprise.slack.com/archives/C8SR5CAMU) ticket.
+
+Upload files or folders as you would to any other SFTP server. Data will be retained for 30 days before it is automatically removed.
+
+### Copy data between internal/external storage accounts
+
+To copy data between the external and internal storage accounts there is an automated, config-driven process. Configuration is via [YAML](https://yaml.org/) files in the data-config folder of the [hmcts/ops-jumpboxes](https://github.com/hmcts/ops-jumpboxes) GitHub repository.
+
+An example configuration is below:
+
+```
+boarding:
+    - path: ProjectX/my-db-import.pgdump
+        source:
+            environment: prod
+            account: external
+        destination:
+            environment: prod
+            account: internal
+        completed: false
+```
+
+The first line defines a list of boarding objects, this will always be required.
+
+```
+boarding:
+```
+
+The path property of a configuration refers to where the source folder/file is in the source storage account. This is where you would have uploaded/copied your file to.
+
+```
+- path: ProjectX/my-db-import.pgdump
+```
+
+The source object defines which environment and account you want to transfer file from. Valid values for environment are prod or nonprod. Valid values for account are external or internal.
+
+```
+source:
+    environment: prod
+    account: external
+```
+
+The destination object defines which environment and account you want to transfer to. The format is the same as the source object.
+
+```
+destination:
+    environment: prod
+    account: internal
+```
+
+The completed property is used by the automation to determine whether a given config file has been actioned or not. The automation will update config files with completed: true once it has successfully transferred the file/folder.
+
+```
+completed: false
+```
+
+### Copying data to/from internal storage accounts
+
+The internal storage account is mounted as a network drive on the Jumpbox for that environment. Data can be copied and pasted to this as if it was a local disk on the Jumpbox.
+
+![Screenshot of mounted internal storage account](images/MountedInternalAccount.png)
+
+### Examples
+
+### External to Internal
+
+I need to copy a my-import.pgdump file from RDWeb through to the non-production Jumpbox, where I can then import it into an Azure PostgreSQL Flexible server.
+
+1. SFTP toboardingextnonprodstor.myusername@boardingextnonprodstor.blob.core.windows.net
+2. Upload my-import.pgdump file
+3. Navigate to [hmcts/ops-jumpboxes](https://github.com/hmcts/ops-jumpboxes/tree/master/data-config)
+4. Create a MyPgDumpTransfer.yaml the name of this file doesn't matter
+5. Add the contents:
+
+```
+boarding:
+    - path: my-import.pgdump
+        source:
+            environment: nonprod
+            account: external
+        destination:
+            environment: nonprod
+            account: internal
+        completed: false
+```
+
+6. Raise a pull request, this will validate your configuration and give information about what the automation will do. If your configuration file was not picked up or has validation errors a comment will be added to your pull request with the details of any errors. If your config is valid it will detail the files to be transferred.
+
+![Screenshot of PR Validation Error](images/PRValidationError.png)
+
+7. Merge the pull request and wait for the automation to pick up the files. You can view your config file in the data-config folder and check that the completed flag has been set to true
+
+![Screenshot of completed flag set to true](images/CompletedFlagTrue.png)
+
+8. Your file will be present in the internal store.
+
+![Screenshot of file present in internal store](images/FileInInternalStore.png)

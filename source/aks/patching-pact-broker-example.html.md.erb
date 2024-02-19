@@ -1,0 +1,39 @@
+---
+title: Pact-Broker Patching Example
+weight: 30
+last_reviewed_on: 2024-02-19
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for the pact-broker app patching.
+
+pact-broker is patched globally, rather than starting in sbox and working up through the environments, due to its limited use.
+
+pact-broker is only needed to patch on CFT environment as its only setup there for ptl and ptlsbox environments.
+
+## Patching
+
+Review [chart-pact-broker Releases](https://github.com/hmcts/chart-pact-broker/releases) page to check for breaking changes.
+
+There may be no new version released, in that case, check commit history to make sure the latest version released is after the last commit on the repo.
+
+Also, check if there are pending renovate PRs which updating dependencies chart version - e.g. [postgresql](https://github.com/hmcts/chart-pact-broker/pull/42)
+if there are PRs to review and merge, review them and then merge the PRs.
+Release new version of the chart and use that new version of chart for pact-broker app (example below)
+
+### CFT
+Create a PR in cnp-flux-config to patch pact-broker in CFT.
+
+[Example PR](https://github.com/hmcts/cnp-flux-config/pull/29368)
+
+### Checks to see if upgrade worked correctly
+After above raised PR approved and merged, describe the pact-broker pod on ptl and ptlsbox environment and check the labels has new pact broker chart version.
+e.g.
+
+```
+kubectl describe pod -n pact-broker <podname> | grep "helm.sh/chart=pact-broker"
+```
+
+

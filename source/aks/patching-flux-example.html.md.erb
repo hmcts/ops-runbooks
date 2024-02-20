@@ -83,7 +83,7 @@ For PTL, there are two extra components that need to be deployed:
 - Image reflector controller
 - Image automation controller
 
-These components are critical for ensuring automated updates to images are pushed to Git and synced to the clusters.
+These components are critical for ensuring updates to images are pushed to Git and synced to the clusters automatically.
 
 To add these components on PTL, use this command:
 
@@ -97,7 +97,7 @@ Now all environments, except prod, should be updated and you can move onto updat
 
 To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.
 
-You can then remove all the previous changes you made per environment and the base version will take over.
+You can then remove all the previous changes you made per environment, **except in PTL because it needs the extra components**, and the base version will take over.
 
 
 

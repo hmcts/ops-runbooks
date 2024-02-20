@@ -93,6 +93,12 @@ flux install --components-extra image-reflector-controller,image-automation-cont
 
 You can review this [pull request](https://github.com/hmcts/sds-flux-config/pull/4270/files) and see the extra components are present.
 
+To ensure that the image automation components are working, as well as the [other checks](patching-aks-apps.html#checks-to-see-if-upgrade-worked-correctly) you can perform, you can check the flux repo to see if updates are being pushed by fluxcdbot.
+
+![](Images/patching_flux.png)
+
+See how fluxcdbot was still working after the upgrade.
+
 Now all environments, except prod, should be updated and you can move onto updating prod itself.
 
 To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.

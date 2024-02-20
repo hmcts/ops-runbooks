@@ -470,8 +470,19 @@
 <p>To replicate the above procedure in a nonprod environment, update the <code>flux install</code> command to point to the environment you&rsquo;re targeting and update the relevant kustomization file.</p>
 <p>For example:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>flux install --export &gt; apps/flux-system/ithc/base/gotk-components.yaml
-</code></pre></div><h2 id="prod-environment">Prod environment</h2>
-<p>When you get to the prod environment, you can merge the renovate pull request that will update the base version of Flux.</p>
+</code></pre></div><h2 id="prod-environments">Prod environments</h2>
+<p>For PTL, there are two extra components that need to be deployed:</p>
+
+<ul>
+<li>Image reflector controller</li>
+<li>Image automation controller</li>
+</ul>
+<p>These components are critical for ensuring automated updates to images are pushed to Git and synced to the clusters.</p>
+<p>To add these components on PTL, use this command:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>flux install --components-extra image-reflector-controller,image-automation-controller --export &gt; apps/flux-system/ptl/base/gotk-components.yaml
+</code></pre></div><p>You can review this <a href="https://github.com/hmcts/sds-flux-config/pull/4270/files">pull request</a> and see the extra components are present.</p>
+<p>Now all environments, except prod, should be updated and you can move onto updating prod itself.</p>
+<p>To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.</p>
 <p>You can then remove all the previous changes you made per environment and the base version will take over.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-02-19">

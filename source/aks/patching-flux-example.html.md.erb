@@ -76,9 +76,26 @@ For example:
 flux install --export > apps/flux-system/ithc/base/gotk-components.yaml
 ```
 
-## Prod environment
+## Prod environments
 
-When you get to the prod environment, you can merge the renovate pull request that will update the base version of Flux.
+For PTL, there are two extra components that need to be deployed:
+
+- Image reflector controller
+- Image automation controller
+
+These components are critical for ensuring automated updates to images are pushed to Git and synced to the clusters.
+
+To add these components on PTL, use this command:
+
+```
+flux install --components-extra image-reflector-controller,image-automation-controller --export > apps/flux-system/ptl/base/gotk-components.yaml
+```
+
+You can review this [pull request](https://github.com/hmcts/sds-flux-config/pull/4270/files) and see the extra components are present.
+
+Now all environments, except prod, should be updated and you can move onto updating prod itself.
+
+To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.
 
 You can then remove all the previous changes you made per environment and the base version will take over.
 

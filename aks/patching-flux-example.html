@@ -477,13 +477,13 @@
 <li>Image reflector controller</li>
 <li>Image automation controller</li>
 </ul>
-<p>These components are critical for ensuring automated updates to images are pushed to Git and synced to the clusters.</p>
+<p>These components are critical for ensuring updates to images are pushed to Git and synced to the clusters automatically.</p>
 <p>To add these components on PTL, use this command:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>flux install --components-extra image-reflector-controller,image-automation-controller --export &gt; apps/flux-system/ptl/base/gotk-components.yaml
 </code></pre></div><p>You can review this <a href="https://github.com/hmcts/sds-flux-config/pull/4270/files">pull request</a> and see the extra components are present.</p>
 <p>Now all environments, except prod, should be updated and you can move onto updating prod itself.</p>
 <p>To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.</p>
-<p>You can then remove all the previous changes you made per environment and the base version will take over.</p>
+<p>You can then remove all the previous changes you made per environment, <strong>except in PTL because it needs the extra components</strong>, and the base version will take over.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-02-19">
     <div class='page-expiry--not-expired'>

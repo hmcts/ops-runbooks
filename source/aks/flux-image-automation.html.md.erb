@@ -51,14 +51,59 @@ We have the image automation components set up on our PTL clusters only.
 
 You can see more info about how the PTL clusters have been configured specifically in the guide on [flux patching](./patching-flux-example.html#prod-environments).
 
-To view the image repos and policies that are on the PTL clusters, you can run:
+To view the image repos that are on the PTL clusters, you can run:
 
 ```
 kubectl get imagerepository.image.toolkit.fluxcd.io -n flux-system
 ```
 
+This will give you output like this:
+
+```
+NAME                                                         LAST SCAN              TAGS
+adoption-cos-api                                             2024-02-20T11:19:04Z   29
+adoption-web                                                 2024-02-20T11:19:02Z   27
+am-judicial-booking-service                                  2024-02-20T11:19:03Z   33
+am-org-role-mapping-service                                  2024-02-20T11:19:02Z   94
+am-role-assignment-batch-service                             2024-02-20T11:19:06Z   25
+am-role-assignment-refresh-batch                             2024-02-20T11:19:01Z   25
+am-role-assignment-service                                   2024-02-20T11:19:05Z   43
+am-slack-help-bot                                            2024-02-20T11:19:07Z   9
+azure-devops-agent                                           2024-02-20T11:19:08Z   6
+backstage-backend                                            2024-02-20T11:19:08Z   8
+bar-api                                                      2024-02-20T11:19:09Z   38
+bar-csv-report                                               2024-02-20T11:19:36Z   12
+bar-web                                                      2024-02-20T11:19:06Z   40
+bulk-scan-orchestrator                                       2024-02-20T11:19:08Z   19
+bulk-scan-orchestrator-orchestrator-test                     2023-03-23T09:41:51Z   12
+bulk-scan-payment-processor                                  2024-02-20T11:19:09Z   20
+```
+
+To view the image policies that are on the PTL clusters, you can run:
+
 ```
 kubectl get imagepolicy.image.toolkit.fluxcd.io -n flux-system
+```
+
+This will give you output like this:
+
+```
+NAME                                                         LATESTIMAGE
+aat-docmosis                                                 hmctsprivate.azurecr.io/docmosis:aat-deb97fb-528465
+adoption-cos-api                                             hmctspublic.azurecr.io/adoption/cos-api:prod-c3ad4f6-20240208111252
+adoption-web                                                 hmctspublic.azurecr.io/adoption/web:prod-de886e3-20240219083106
+am-judicial-booking-service                                  hmctspublic.azurecr.io/am/judicial-booking-service:prod-690a664-20240219163916
+am-org-role-mapping-service                                  hmctspublic.azurecr.io/am/org-role-mapping-service:prod-35b1858-20240219155814
+am-role-assignment-batch-service                             hmctspublic.azurecr.io/am/role-assignment-batch-service:prod-aee84b4-20240219155849
+am-role-assignment-refresh-batch                             hmctspublic.azurecr.io/am/role-assignment-refresh-batch:prod-ed0a5ec-20240219155914
+am-role-assignment-service                                   hmctspublic.azurecr.io/am/role-assignment-service:prod-6f52577-20240219162452
+am-slack-help-bot                                            hmctspublic.azurecr.io/am/slack-help-bot:prod-e10eb27-20240207131817
+azure-devops-agent                                           hmctspublic.azurecr.io/azure-devops-agent:prod-97ab16c3-1693560380
+backstage-backend                                            hmctspublic.azurecr.io/backstage/backend:prod-d7a4dd68-1679670023
+bar-api                                                      hmctspublic.azurecr.io/bar/api:prod-70c5019-20240219114120
+bar-csv-report                                               hmctspublic.azurecr.io/payment/jobs:prod-75d31ad-20240119120136
+bar-web                                                      hmctspublic.azurecr.io/bar/web:prod-4d156bc-20240213163035
+bulk-scan-orchestrator                                       hmctspublic.azurecr.io/bulk-scan/orchestrator:prod-ffe8840-20240207091349
 ```
 
 Each application should have an image repo and policy configured if the team wishes to automate updates to their live applications.

@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Troubleshooting builds starting slowly - HMCTS</title>
+    <title>kured Patching Example - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/jenkins/builds-starting-slowly.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-kured-example.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Troubleshooting builds starting slowly - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/jenkins/builds-starting-slowly.html" />
+      <meta name="twitter:title" content="kured Patching Example - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-kured-example.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Troubleshooting builds starting slowly" />
+      <meta property="og:title" content="kured Patching Example" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/jenkins/builds-starting-slowly.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-kured-example.html" />
 
     
   </head>
@@ -439,77 +439,30 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="troubleshooting-builds-starting-slowly">Troubleshooting builds starting slowly</h1>
-<p>There are two main reasons for builds starting slowly.</p>
-<p>One is contention for the <code>Queue</code> lock.</p>
-<p>The other is multi branch events not being processed in a timely manner.</p>
-<h2 id="symptoms-of-the-queue-lock-contention">Symptoms of the queue lock contention</h2>
+            <h1 id="kured-patching-example">kured Patching Example</h1>
+<p>This document covers a high level patching example for the kured app patching.</p>
+<h2 id="patching">Patching</h2>
+<p>Review <a href="https://github.com/kubereboot/charts/releases">kured Releases</a> page to check for breaking changes.</p>
+<p>Create a PR in cnp-flux-config to patch pact-broker in CFT.</p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/29413">Example PR</a></p>
+<p>Similarly, create a PR in sds-flux-config to patch kured in SDS.  Please note that in SDS environment, kured is deployed under admin namespace.</p>
+<h3 id="checks-to-see-if-upgrade-worked-correctly">Checks to see if upgrade worked correctly</h3>
+<p>After above raised PR approved and merged, describe the kured pod on different clusters and check the labels has updated kured chart version.
+e.g.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe pod &lt;PODNAME&gt; -n kured | grep "helm.sh/chart"
 
-<ul>
-<li>Builds not starting when &lsquo;Build now&rsquo; is pressed</li>
-<li>Builds not starting when actions are done in GitHub like &lsquo;push&rsquo; or creating a pull request.</li>
-</ul>
-<p>More information can be found on the <a href="https://support.cloudbees.com/hc/en-us/articles/360016134572-Jenkins-Jobs-are-not-Starting">CloudBees support article</a>.</p>
-<p>Generally this will involve taking thread dumps with <a href="https://support.cloudbees.com/hc/en-us/articles/360016440131-What-is-collectPerformanceData-sh-and-how-does-it-help-">collectPerformanceData.sh</a> and then analysing them in something like <a href="https://jstack.review/">jstack.review</a>.</p>
-<p>To use it you will need to find the PID of the Jenkins controller which can be done by running <code>jps</code></p>
-<p>Run <code>./collectPerformanceData.sh</code> to see what options you have.</p>
-<p>Normally it&rsquo;s run with something like:
-<code>command
-./collectPerformanceData.sh  6 120 10
-</code></p>
-<p>You can copy the tarball to your machine with:</p>
-<p>(Replacing the pid if required, it&rsquo;s 6 in the example)</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl cp -c jenkins jenkins-0:/var/jenkins_home/performanceData.6.output.tar.gz performanceData.6.output.tar.gz
-</code></pre></div><p>Given we have no support contract for Jenkins you will likely need to either pin to the last working version (this can make upgrades very difficult so try avoid it) and report an issue on the plugin&rsquo;s issue tracker or create a fix ourselves (recommended).</p>
-<h2 id="multi-branch-events-not-being-processed-in-a-timely-manner">Multi branch events not being processed in a timely manner</h2>
-<p>There are two likely causes for this.</p>
-
-<ol>
-<li>Events aren&rsquo;t actually arriving or are coming slowly because of a problem on the GitHub side</li>
-<li>Jenkins can&rsquo;t process the queue quick enough</li>
-</ol>
-<p>CFT Jenkins publishes metrics about the event queue to dynatrace.</p>
-<p>You can see the events queue size on the <a href="https://ebe20728.live.dynatrace.com/#dashboard;id=4a6a6184-f1b6-486f-b810-3b93ef05e5b2;gf=all;gtf=-2h">CFT Jenkins dashboard</a>.</p>
-<p><a href="images/scm-event-queue.png" rel="noopener noreferrer"><img src="images/scm-event-queue.png" alt="SCM Event queue" /></a></p>
-<p>As long as it&rsquo;s under 50 or so it&rsquo;s fine. During previous issues it was up to 1500+ which caused multi hour delays to builds starting.</p>
-<p>There are additional metrics that you can look at like <code>pending</code> and <code>running</code>.</p>
-<p>These can be checked in the Dynatrace metrics explorer, search <code>jenkins.scm.event</code>.</p>
-<p>If Dynatrace isn&rsquo;t working or you&rsquo;re using SDS which doesn&rsquo;t currently have Dynatrace you can get the metrics directly at the current point in time by running the below script in the <a href="https://www.jenkins.io/doc/book/managing/script-console/">Jenkins script console</a></p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>jenkins.scm.api.SCMEvent.executorService
-</code></pre></div><p>You should see something like:</p>
-
-<blockquote>
-<p>Result: java.util.concurrent.ScheduledThreadPoolExecutor@8b0291b[Running, pool size = 10, active threads = 10, queued tasks = 84, completed tasks = 21888]</p>
-</blockquote>
-<p>Logs can be found in <code>/var/jenkins_home/logs/jenkins.branch.*</code>.</p>
-<p>They aren&rsquo;t terribly useful, <a href="https://github.com/timja">@timja</a> enhanced the logging in https://github.com/jenkinsci/branch-api-plugin/pull/305 but we didn&rsquo;t end up investing time to try get it merged as it served its purpose but could be revived again if ever needed.</p>
-<h2 id="builds-not-being-triggered-at-all">Builds not being triggered at all</h2>
-<p>When a pull request is submitted, updated or merged into master/main, a webhook event is triggered.</p>
-<p>This event is processed and sent to an Azure Logic App which processes the request and sends it to an Azure Service Bus Queue.</p>
-<p>The logic app and service bus queues are created by <a href="https://github.com/hmcts/cft-jenkins-infrastructure">cft-jenkins-infrastructure</a> and <a href="https://github.com/hmcts/sds-jenkins-infrastructure">sds-jenkins-infrastructure</a> repos.</p>
-<p>The queue is polled by a pod on our AKS cluster and the event is then sent to Jenkins which kicks off a build.</p>
-<p>This configuration ensures that, if a build is to be triggered when the clusters are off or Jenkins is otherwise unreachable, it will stored and retried when Jenkins is reachable again.</p>
-<p>The <a href="https://github.com/hmcts/jenkins-webhook-relay/">Jenkins WebHook Relay repo</a> controls the behaviour of the pod that polls the service bus queue.</p>
-<p>The webhook relay pod is managed by a Keda scaled job. If the scaled job isn&rsquo;t working, the pods will not be scheduled and the service bus queue will not be polled.</p>
-<p>If this happens, builds will not be automatically triggered on Jenkins.</p>
-<p>Teams can use the <code>Scan Organisation Now</code> function in Jenkins to trigger builds if there is an issue but we don&rsquo;t want to encourage this behaviour as a general practice.</p>
-<h2 id="references">References</h2>
-
-<ul>
-<li><a href="https://blog.timja.dev/my-jenkins-build-isnt-triggering-when-i-push/">My Jenkins build isn&rsquo;t triggering when I push</a> - Post by <a href="https://github.com/timja">@timja</a> on a previous issue we had with builds not triggering</li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+</code></pre></div>
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-21">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 21 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 21 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 21 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -519,8 +472,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/jenkins/builds-starting-slowly.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Troubleshooting+builds+starting+slowly%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fjenkins%2Fbuilds-starting-slowly.html%29&amp;labels=bug&amp;title=Re%3A+%27Troubleshooting+builds+starting+slowly%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-kured-example.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27kured+Patching+Example%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-kured-example.html%29&amp;labels=bug&amp;title=Re%3A+%27kured+Patching+Example%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

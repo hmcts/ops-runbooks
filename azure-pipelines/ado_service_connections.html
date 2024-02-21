@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Managed certificates - HMCTS</title>
+    <title>ADO Service Connections - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Certificates/managed.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/azure-pipelines/ado_service_connections.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Managed certificates - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Certificates/managed.html" />
+      <meta name="twitter:title" content="ADO Service Connections - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/azure-pipelines/ado_service_connections.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Managed certificates" />
+      <meta property="og:title" content="ADO Service Connections" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Certificates/managed.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/azure-pipelines/ado_service_connections.html" />
 
     
   </head>
@@ -442,36 +442,21 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="managed-certificates">Managed certificates</h1>
-<p>Microsoft documentation for managed certs are specific to each product, here&rsquo;s the <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#option-1-default-use-a-certificate-managed-by-front-door">FrontDoor documentation</a>.</p>
-<h2 id="when-to-use-managed-certificates">When to use Managed Certificates</h2>
-<p>If you are using one of the following services:</p>
+            <h1 id="ado-service-connections">ADO Service Connections</h1>
+<p>An Excel document with the list of service connections for Platform Operations and CNP.</p>
+<p><a href="https://justiceuk.sharepoint.com/:f:/r/sites/DTSPlatformOperations/Shared%20Documents/General/ADO%20-%20Service%20Connections?csf=1&amp;web=1&amp;e=5M32LL">ADO-Service-Connections</a></p>
 
-<ul>
-<li>Frontdoor</li>
-<li>CDN</li>
-<li>App Service</li>
-</ul>
-<h2 id="frontdoor-managed-certificate-limitations">FrontDoor managed certificate limitations</h2>
-<p><em>Other services may have these limitations too, not verified</em></p>
-
-<ul>
-<li><a href="https://www.quora.com/What-is-an-apex-domain">Apex domains</a> do not work with managed certificates, e.g. <code>hmcts-access.service.gov.uk</code></li>
-<li>Domains using <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain#map-the-temporary-afdverify-subdomain">afdverify</a> only and not direct validation do not work</li>
-</ul>
-<p>You should use <a href="newacme.html">Let’s encrypt certificates</a> in the above scenarios.</p>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-21">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 21 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 21 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 21 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -481,8 +466,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Certificates/managed.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Managed+certificates%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FCertificates%2Fmanaged.html%29&amp;labels=bug&amp;title=Re%3A+%27Managed+certificates%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/azure-pipelines/ado_service_connections.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27ADO+Service+Connections%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fazure-pipelines%2Fado_service_connections.html%29&amp;labels=bug&amp;title=Re%3A+%27ADO+Service+Connections%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

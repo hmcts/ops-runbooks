@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Change Management - HMCTS</title>
+    <title>DNS Node Cache Patching - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Change-Requests/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-dns-node-cache.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Change Management - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Change-Requests/" />
+      <meta name="twitter:title" content="DNS Node Cache Patching - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-dns-node-cache.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Change Management" />
+      <meta property="og:title" content="DNS Node Cache Patching" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Change-Requests/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-dns-node-cache.html" />
 
     
   </head>
@@ -452,23 +452,24 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="change-management">Change Management</h1>
-<h2 id="guides">Guides</h2>
-<p><a href="How-to-raise-a-Change-request.html">How to Raise a Change Request in ServiceNow</a></p>
-<h2 id="other-docs">Other Docs</h2>
-<p><a href="https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1507727920">Filling in a Change Request</a></p>
+            <h1 id="dns-node-cache-patching">DNS Node Cache Patching</h1>
+<p>This document covers how to check and patch the DNS node cache image.
+The image should be updated automatically by renovate, but if it is not, you can manually update the image in the <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/kube-system/nodelocaldns/nodelocaldns.yaml#L132">nodelocaldns.yaml</a> file in the <a href="https://github.com/hmcts/cnp-flux-config">cnp flux config repo</a>.</p>
+<h2 id="patching">Patching</h2>
+<p>First, check what the latest version of <a href="https://github.com/kubernetes/kubernetes/blob/98bd90fbe279f9083db92c51badce424d6d8b1c1/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml#L141">DNS Node Cache Releases</a> is.</p>
+<p>Then create a PR in the <a href="https://github.com/hmcts/cnp-flux-config">cnp flux config repo</a> to bump up the <a href="https://github.com/hmcts/cnp-flux-config/blob/master/apps/kube-system/nodelocaldns/nodelocaldns.yaml#L132">DNS node cache image</a> version</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 26 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 26 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 26 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -478,8 +479,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Change-Requests/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Change+Management%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FChange-Requests%2F%29&amp;labels=bug&amp;title=Re%3A+%27Change+Management%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-dns-node-cache.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27DNS+Node+Cache+Patching%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-dns-node-cache.html%29&amp;labels=bug&amp;title=Re%3A+%27DNS+Node+Cache+Patching%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

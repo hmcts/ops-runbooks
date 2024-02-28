@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Restoring a Single Server Azure PostgreSQL Database - HMCTS</title>
+    <title>Granting read access to production environments - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/restoring-an-azure-single-server-database.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/Access-and-Permissions/production-readers.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Restoring a Single Server Azure PostgreSQL Database - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/restoring-an-azure-single-server-database.html" />
+      <meta name="twitter:title" content="Granting read access to production environments - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Access-and-Permissions/production-readers.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Restoring a Single Server Azure PostgreSQL Database" />
+      <meta property="og:title" content="Granting read access to production environments" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/restoring-an-azure-single-server-database.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/Access-and-Permissions/production-readers.html" />
 
     
   </head>
@@ -449,64 +449,39 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="restoring-a-single-server-azure-postgresql-database">Restoring a Single Server Azure PostgreSQL Database</h1>
-<p>This really depends on the nature of the database to be restored. The example below is based on a previous ticket e.g. DTSPO-9468</p>
-<h2 id="the-database-restore-steps">The Database restore steps</h2>
-<h3 id="execute-the-restore-command">Execute the restore command</h3>
-<p>From your local machine, execute commands below:</p>
-<p><em>Source:</em> am-role-assignment-service-postgres-db-v11-demo</p>
-<p><em>Target:</em> am-role-assignment-service-postgres-db-v11-demo-restore</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az account set --subscription "DCD-CNP-DEV";
-az postgres server restore -g am-role-assignment-service-postgres-db-v11-data-demo -n am-role-assignment-service-postgres-db-v11-demo-restore --restore-point-in-time 2022-07-13T17:00:01Z -s am-role-assignment-service-postgres-db-v11-demo;
-</code></pre></div><p><strong>Note:</strong> Note the new hostname with <code>-restore</code> suffix at the end.</p>
-<h3 id="export-data-out-of-newly-restored-database">Export data out of newly restored database</h3>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pg_dump -Fc -v -h am-role-assignment-service-postgres-db-v11-demo-restore.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo-restore -d role_assignment &gt; role_assignment_demo.sql 
-</code></pre></div><p>This should create a file called <code>role_assignment_demo.sql</code> with the binary output in it.</p>
-<p><strong>Note:</strong> a switch of <code>-Fc</code> was used in the export cmd. Ensure you restore using the <code>pg_restore</code> command</p>
-<h3 id="clean-out-corrupted-database-source-using-drop-table-commands">Clean out corrupted database (Source) using drop table commands</h3>
-<p>This can only be done if you have exclusive access to the corrupted DB. Easiest way is to temporarily disable password to the DB. This will stop users/apps accessinng the DB. Another method is to change the password in the vault</p>
-<h4 id="connect-to-db">Connect to DB</h4>
-<p><code>psql -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment</code></p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>drop table  actor_cache_control cascade;
-drop table  audit_faults cascade;
-drop table  backup_role_assignment cascade ;
-......
-......
-</code></pre></div><h3 id="restore-the-exported-database-into-the-out-of-sync-db">Restore the exported database into the out-of-sync DB</h3>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pg_restore -v -h am-role-assignment-service-postgres-db-v11-demo.postgres.database.azure.com -U am@am-role-assignment-service-postgres-db-v11-demo -d role_assignment &lt; role_assignment_demo.sql
-</code></pre></div><h4 id="the-output-from-the-above-command-will-look-like-this">The output from the above command will look like this &hellip;.</h4>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pg_restore: connecting to database for restore&lt;br&gt;
-Password:&lt;br&gt;
-pg_restore: creating EXTENSION "dblink"&lt;br&gt;
-pg_restore: creating COMMENT "EXTENSION dblink"&lt;br&gt;
-pg_restore: creating TABLE "public.actor_cache_control"&lt;br&gt;
-pg_restore: creating SEQUENCE "public.audit_id_seq"&lt;br&gt;
-.......
-pg_restore: creating TABLE "public.batch_job_execution_params"&lt;br&gt;
-pg_restore: creating SEQUENCE "public.batch_job_execution_seq"&lt;br&gt;
-.......&lt;br&gt;
-.......&lt;br&gt;
-</code></pre></div><h3 id="run-analyse-on-the-newly-restored-database">Run Analyse on the newly restored Database</h3>
-<p>ANALYZE collects statistics about the contents of tables in the database, and stores the results in the <code>pg_statistic</code> system catalog. Subsequently, the query planner uses these statistics to help determine the most efficient execution plans for queries.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>analyse;
-</code></pre></div><h2 id="some-external-references">Some external references</h2>
+            <h1 id="granting-read-access-to-production-environments">Granting read access to production environments</h1>
+<p>This run book documents the process of granting read access to production environments and the restrictions that exist on doing so.</p>
+<h3 id="pre-requisites">Pre-requisites</h3>
 
 <ul>
-<li><a href="https://www.postgresqltutorial.com/postgresql-administration/postgresql-backup-database/">Database Backups</a></li>
-<li><a href="https://www.postgresqltutorial.com/postgresql-administration/postgresql-restore-database/">Database Restore</a></li>
+<li><p>The person requesting access <strong>must</strong> be security cleared.</p></li>
+<li><p>A PlatOps-Help ticket must be raised for a person to get access. Do not grant someone access just because they message you via DM.</p></li>
+<li><p>The person requesting the access must give a reason for why they need it.</p></li>
 </ul>
+<h3 id="checking-for-security-clearance">Checking for security clearance</h3>
+<p>You can check the ID Governance <a href="https://portal.azure.com/#view/Microsoft_Azure_ELMAdmin/EntitlementMenuBlade/~/users/entitlementId/e7cbb8d7-bd25-4d5a-8bbc-c94c03f1c827/catalogId/ea033c19-770d-4492-bc58-d49a229df80e/catalogName/SC/entitlementName/SC%20Access">section</a> of the Azure Portal by searching for the persons name. If they are listed and the status is <code>Delivered</code>, then the person has been cleared.</p>
+<h3 id="granting-access">Granting access</h3>
+<p>Once you&rsquo;ve confirmed that the person has security clearance, you can submit a PR or approve an existing PR to add them to the relevant groups.</p>
+<p><strong>Do not add someone who is not security cleared to these groups</strong></p>
+<p>There are groups for granting read access to production:</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+<ul>
+<li>DTS CFT Production Readers</li>
+<li>DTS SDS Production Readers</li>
+</ul>
+<p>Submit a pull request in <a href="https://github.com/hmcts/devops-azure-ad">devops-azure-ad</a> and add the group under the persons name in <code>users/prod_users.yml</code></p>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-27">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 27 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 27 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 27 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -516,8 +491,8 @@ pg_restore: creating SEQUENCE "public.batch_job_execution_seq"&lt;br&gt;
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/restoring-an-azure-single-server-database.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Restoring+a+Single+Server+Azure+PostgreSQL+Database%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Frestoring-an-azure-single-server-database.html%29&amp;labels=bug&amp;title=Re%3A+%27Restoring+a+Single+Server+Azure+PostgreSQL+Database%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Access-and-Permissions/production-readers.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Granting+read+access+to+production+environments%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FAccess-and-Permissions%2Fproduction-readers.html%29&amp;labels=bug&amp;title=Re%3A+%27Granting+read+access+to+production+environments%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

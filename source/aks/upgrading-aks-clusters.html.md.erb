@@ -29,6 +29,12 @@ Before starting to upgrade any clusters, we need to find out if the version of k
 
 We can do this using the  [pluto tool](https://github.com/FairwindsOps/pluto).
 
+Ensure you're logged into the correct cluster.
+
+```command
+kubectl config current-context
+```
+
 Run pluto against the prod and ptl clusters to ensure there are no resources using apiVersions that will be deprecated in the kubernetes version you are upgrading to.
 
 ```command
@@ -38,7 +44,6 @@ pluto detect-helm -owide --target-versions k8s=v1.29 --only-show-removed
 If there are deprecations, then run the command on all other clusters to see what applications are using APIs that will be deprecated and create a plan to address them before upgrading.
 
 If there are no apiVersions being deprecated, then you can proceed with the upgrade, going through the environments above in order.
-
 
 ## Notify teams
 

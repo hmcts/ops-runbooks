@@ -171,7 +171,7 @@ This process can be used to update all non-production environments were Neuvecto
 
 Production patching mainly involves removing some of the above configuration and updating the primary deployment files.
 
-### Remove CRD patch and update main CRD file
+### Remove non-production patching files  and update the chart version in the main deployment file
 
 Copy the contents of the temporary CRD kustomization.yaml file to the `apps/neuvector/crds/kustomization.yaml` file e.g.
 
@@ -192,9 +192,9 @@ Remove any files and patches created for the non-production CRD updates complete
 - Removing the CRD patch from the [cluster base kustomization.yaml file(s)](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) e.g. `- path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
 - Removing the temporary CRD folder and its kustomize.yaml and kustomization.yaml files
 
-### Remove environment image versions and update the chart version in the main deployment file
+---
 
-Remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
+Now you can remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
 
 ```yaml
 spec:

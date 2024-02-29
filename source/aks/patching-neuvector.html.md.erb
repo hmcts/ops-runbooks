@@ -71,6 +71,12 @@ With these files now in place you can patch any specific AKS cluster by adding a
   - path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
 ```
 
+---
+
+**_This is a [PR example](https://github.com/hmcts/sds-flux-config/pull/4301/files) showing the files and locations involved in this example._**
+
+---
+
 ### Update the chart version
 
 #### Check pod health
@@ -91,6 +97,17 @@ host: sds-neuvector00.ithc.platform.hmcts.net
 ```
 
 If the UI is working, and you can log in if required then its safe to continue on with the upgrade.
+
+Logging in should be possible by selecting the `Login with SAML` option which uses single sign on, however if that does not work there are admin credentials available to use directly.
+
+These can be found in the specific Azure Key Vault for that environment (search Azure to find these):
+
+![neuvector key vaults](Images/neuvectorKV.png)
+
+The secrets should be called:
+
+- neuvector-admin-username
+- neuvector-new-admin-password
 
 If the UI is failing or you cant log in, then you'll need to check the logs of the pods we looked at earlier:
 
@@ -120,8 +137,14 @@ The `chart.spec.version: 1.5.4` lines will override the equivalent lines in the 
 
 To check if its being installed you can view the description of one of the pods (pods that have a very short age have just been deployed so use one of these to test).
 
+---
+
+**_This is a [PR example](https://github.com/hmcts/sds-flux-config/pull/4306/files) showing the files and locations involved in this example._**
+
+---
+
 ```bash
-kc -n neuvector describe pod neuvector-controller-pod-<hash>
+kubectl -n neuvector describe pod neuvector-controller-pod-<hash>
 ```
 
 Within the description you will find the `image` tag and it should contain the latest version of the Neuvector application
@@ -169,7 +192,7 @@ Remove any files and patches created for the non-production CRD updates complete
 - Removing the CRD patch from the [cluster base kustomization.yaml file(s)](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) e.g. `- path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
 - Removing the temporary CRD folder and its kustomize.yaml and kustomization.yaml files
 
-### Remove environment image versions
+### Remove environment image versions and update the chart version in the main deployment file
 
 Remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
 
@@ -180,8 +203,6 @@ spec:
       version: 1.5.4
 ```
 
-### Update the chart version in the main deployment file
-
 Once all non-production temporary changes have been removed you can now update the chart version in the main deployment [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98) to the latest version of the HMCTS chart (the one you just removed from the environment level files).
 
 Push, commit and merge this change for it to get deployed to Production.
@@ -191,7 +212,7 @@ Push, commit and merge this change for it to get deployed to Production.
 To check if its being installed you can view the description of one of the pods (pods that have a very short age have just been deployed so use one of these to test).
 
 ```bash
-kc -n neuvector describe pod neuvector-controller-pod-<hash>
+kubectl -n neuvector describe pod neuvector-controller-pod-<hash>
 ```
 
 Within the description you will find the `image` tag and it should contain the latest version of the Neuvector application

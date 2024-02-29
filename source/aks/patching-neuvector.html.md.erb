@@ -1,0 +1,218 @@
+---
+title: Neuvector Patching
+weight: 30
+last_reviewed_on: 2024-02-29
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for Neuvector.
+
+Neuvector should be patched per environment to allow for testing and confidence in the upgraded version.
+
+Neuvector is deployed via a Helm chart which is maintained by HMCTS, the chart itself has a dependency on the upstream Neuvector Helm chart.
+
+If a new version of the upstream Neuvector chart is available then we can patch, if not then there is no need to patch unless bug fixes are required.
+
+Neuvector is deployed to both CFT and SDS AKS clusters across multiple non-production and production environments.
+
+## Prepare a new chart version
+
+Before any patching of AKS can take place we need to have an updated version of the [HMCTS Neuvector chart](https://github.com/hmcts/chart-neuvector).
+
+To check if patching is ready, check the releases on the upstream [Neuvector github](https://github.com/neuvector/neuvector-helm/releases)
+
+Then compare the latest version available with the current version that the [HMCTS Neuvector depends on](https://github.com/hmcts/chart-neuvector/blob/master/neuvector-azure-keyvault/Chart.yaml#L9-L12).
+
+If the latest release is ahead then we need to patch the HMCTS Neuvector chart with an updated dependency.
+
+Using Git you need to:
+
+- Clone the [HMCTS Neuvector chart](https://github.com/hmcts/chart-neuvector) repo
+- Create your own branch to carry out the work
+- Update the [HMCTS Neuvector dependency version](https://github.com/hmcts/chart-neuvector/blob/master/neuvector-azure-keyvault/Chart.yaml#L9-L12) to have the latest upstream release version e.g. v2.7.3 -> v2.7.4
+- Commit and push your changes and raise a PR for review
+
+Once reviewed and merged you need to draft a new release with the latest code.
+You can find steps [here on how to draft a release](../../Testing-Changes/drafting-a-release.html#create-a-pre-release-with-your-branch-as-the-source-and-a-new-tag)
+
+The instructions on that page are specific to draft releases, in this case you can create a new `latest release` by using the next version number available and setting `set as the latest release` before selecting `Publish release`.
+
+This will trigger the [Azure DevOps pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=799) to run and validate and release a new version.
+
+## Non-Production Patching
+
+### Check for additional upstream changes
+
+**_This section is only necessary for non-production environment patching_**
+
+Part of the Neuvector setup involves the installation of CRDs (custom resource definitions) and these may need to be updated as well.
+The versions installed depend on the version of the App within the upstream Neuvector chart that is now being installed
+
+- [Neuvector CRD manifests](https://github.com/neuvector/manifests/tree/main/kubernetes)
+- [Version of the app being installed](https://github.com/neuvector/neuvector-helm/blob/master/charts/crd/Chart.yaml#L4)
+
+The currently installed CRDs can be found in the [Flux apps folder for Neuvector](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/crds/kustomization.yaml)
+
+Pay close attention to the version shown in the URLs `/5.2.0/` which denotes the app version.
+
+If the version is changing, you can install the latest versions per AKS cluster by creating a new folder in the Neuvector directory with a new `kustomize.yaml` file and add the latest manifest links to this file:
+
+![neuvectorCRDs](Images/NeuvectorUpdatedCRDs.png)
+
+You will also need to copy the existing [`base/kustomize.yaml`](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/base/kustomize.yaml) file into this new directory so you can point to your newly created file.
+
+Update the path to point to your new directory `path: ./apps/neuvector/crds` -> `path: ./apps/neuvector/<some name>`
+
+With these files now in place you can patch any specific AKS cluster by adding a patch to the clusters [base kustomization](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) file:
+
+```yaml
+  - path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
+```
+
+### Update the chart version
+
+#### Check pod health
+
+Make sure that you are connected to the correct AKS cluster in your local setup (kubectl), then check the pods of the service are all healthy:
+
+```bash
+kubectl get pods -n neuvector
+```
+
+If all pods are healthy you can move on.
+
+Neuvector has a UI that should be checked to make sure its working and you can log in.
+In the case of Neuvector you can find a clusters UI address in the specific [values files](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/00.yaml#L65). It should look something like:
+
+```yaml
+host: sds-neuvector00.ithc.platform.hmcts.net
+```
+
+If the UI is working, and you can log in if required then its safe to continue on with the upgrade.
+
+If the UI is failing or you cant log in, then you'll need to check the logs of the pods we looked at earlier:
+
+```bash
+kubectl logs <pod name> -n neuvector
+```
+
+You may also need to ask `platform-operations` on Slack for input if the logs have nothing useful.
+
+#### Upgrade chart version
+
+If the everything appears to be working normally then you can now move onto the chart upgrade.
+
+Updating the chart version requires a change to the values file for the AKS cluster being updated.
+This is an override to the main deployment file which contains the older [version file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98).
+
+For example, to patch ITHC only you would added the following lines to this [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
+
+```yaml
+spec:
+  chart:
+    spec:
+      version: 1.5.4
+```
+
+The `chart.spec.version: 1.5.4` lines will override the equivalent lines in the main deployment file. Commit, push and create a PR with this change. Once reviewed and merged this will deploy the newly created HMCTS Chart version you created earlier into ITHC.
+
+To check if its being installed you can view the description of one of the pods (pods that have a very short age have just been deployed so use one of these to test).
+
+```bash
+kc -n neuvector describe pod neuvector-controller-pod-<hash>
+```
+
+Within the description you will find the `image` tag and it should contain the latest version of the Neuvector application
+
+```yaml
+Image: hmctspublic.azurecr.io/imported/neuvector/controller:5.3.0
+```
+
+You can also check the status of the Helm Release which will show the version of the HMCTS chart that has been installed:
+
+```bash
+kubectl -n neuvector get hr
+```
+
+```bash
+NAME            AGE    READY   STATUS
+fluentbit-log   427d   True    Helm upgrade succeeded
+neuvector       84d    True    Helm upgrade succeeded for release neuvector/neuvector.v6 with chart neuvector-azure-keyvault@1.5.4
+```
+
+This process can be used to update all non-production environments were Neuvector is currently installed.
+
+## Production Patching
+
+Production patching mainly involves removing some of the above configuration and updating the primary deployment files.
+
+### Remove CRD patch and update main CRD file
+
+Copy the contents of the temporary CRD kustomization.yaml file to the `apps/neuvector/crds/kustomization.yaml` file e.g.
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/crd-k8s-1.19.yaml
+  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/waf-crd-k8s-1.19.yaml
+  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/dlp-crd-k8s-1.19.yaml
+  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml
+```
+
+This will ensure these get added to all clusters now including Production (they should already be in non-production any way).
+
+Remove any files and patches created for the non-production CRD updates completed as part of the `Check for additional upstream changes` section. This involves:
+
+- Removing the CRD patch from the [cluster base kustomization.yaml file(s)](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) e.g. `- path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
+- Removing the temporary CRD folder and its kustomize.yaml and kustomization.yaml files
+
+### Remove environment image versions
+
+Remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
+
+```yaml
+spec:
+  chart:
+    spec:
+      version: 1.5.4
+```
+
+### Update the chart version in the main deployment file
+
+Once all non-production temporary changes have been removed you can now update the chart version in the main deployment [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98) to the latest version of the HMCTS chart (the one you just removed from the environment level files).
+
+Push, commit and merge this change for it to get deployed to Production.
+
+### Check everything is deployed and working as expected
+
+To check if its being installed you can view the description of one of the pods (pods that have a very short age have just been deployed so use one of these to test).
+
+```bash
+kc -n neuvector describe pod neuvector-controller-pod-<hash>
+```
+
+Within the description you will find the `image` tag and it should contain the latest version of the Neuvector application
+
+```yaml
+Image: hmctspublic.azurecr.io/imported/neuvector/controller:5.3.0
+```
+
+You can also check the status of the Helm Release which will show the version of the HMCTS chart that has been installed:
+
+```bash
+kubectl -n neuvector get hr
+```
+
+```bash
+NAME            AGE    READY   STATUS
+fluentbit-log   427d   True    Helm upgrade succeeded
+neuvector       84d    True    Helm upgrade succeeded for release neuvector/neuvector.v6 with chart neuvector-azure-keyvault@1.5.4
+```
+
+Check the UI for each Production cluster to make sure everything is working as normal:
+
+- AKS 00 - [Link](https://sds-neuvector00.platform.hmcts.net)
+- AKS 01 - [Link](https://sds-neuvector01.platform.hmcts.net)

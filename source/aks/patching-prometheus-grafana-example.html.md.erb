@@ -123,12 +123,12 @@ Ensure to monitor the status for the HRs and pods to ensure they come back succe
 
 ## Prod environments
 
-For Prod you want to remove the previous patches you did for the other environments: 
-
-- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4247/files)
-- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069/files)
-
-Once the previous patches have been removed, there will be a renovate PR that can be merged in order to update:
+For Prod, there will be a renovate PR that can be merged in order to update:
 
 - [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4132/files)
 - [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/28760/files)
+
+Once the renovate PR has been merged, remove the previous patches you did for sbox: 
+
+- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4247/files)
+- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069/files)

@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>BAIS NWindows Firewall Rules - HMCTS</title>
+    <title>Prometheus/Grafana Patching Example - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/BAIS/BAIS-Windows-Firewall.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-prometheus-grafana-example.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="BAIS NWindows Firewall Rules - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/BAIS/BAIS-Windows-Firewall.html" />
+      <meta name="twitter:title" content="Prometheus/Grafana Patching Example - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-prometheus-grafana-example.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="BAIS NWindows Firewall Rules" />
+      <meta property="og:title" content="Prometheus/Grafana Patching Example" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/BAIS/BAIS-Windows-Firewall.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-prometheus-grafana-example.html" />
 
     
   </head>
@@ -458,74 +458,87 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="bais-nwindows-firewall-rules">BAIS NWindows Firewall Rules</h1>
-<p>This document describes how to add/remove/edit Windows Firewall rules for the BAIS servers. All rules are managed through Ansible automation in the <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a>.</p>
-<p>Rules should be adjusted by the project team on a self-service basis.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+            <h1 id="prometheus-grafana-patching-example">Prometheus/Grafana Patching Example</h1>
+<p>This document covers a high level patching example for Prometheus/Grafana.</p>
+<p>Prometheus/Grafana patches should be tested in sbox to avoid downtime.</p>
+<p>It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.</p>
+<p>Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.</p>
+<h2 id="updating-start-with-sandbox">Updating - start with sandbox</h2>
+<p>In order to allow patching of sbox only, a new directory was created for the updated crd URLs.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomization.yaml
+</code></pre></div><p>&amp;</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomize.yaml
+</code></pre></div><p><a href="https://github.com/hmcts/sds-flux-config/pull/4243/files">See example PR containing these files</a></p>
+<p>This enables us to target specific enviornments at this new crd version.</p>
+<p>We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.</p>
+<p>Eg: <code>clusters/sbox/base/kustomization.yaml</code></p>
+<p><a href="Images/patching_apps_4.png" rel="noopener noreferrer"><img src="Images/patching_apps_4.png" alt="" /></a></p>
+<p>With the new crds version now available, a version selector block can be added to the <a href="https://github.com/hmcts/sds-flux-config/pull/4243/files">sbox 00 &amp; 01 config</a></p>
+<p>Example:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>chart:
+spec:
+  chart: kube-prometheus-stack
+  # Update kube-prometheus-stack-crds/kustomization.yaml when updating this
+  version: 56.6.2
+  sourceRef:
+    kind: HelmRepository
+    name: prometheus
+    namespace: monitoring
+</code></pre></div><p>Update the cluster kustomization file pointing to the new crd directory created earlier.</p>
+<p>Raise a pull request to upgrade the version.</p>
+<p>See <a href="https://github.com/hmcts/sds-flux-config/pull/4243/files">Example PR</a></p>
+<p>There are checks that take place when you raise a PR to validate the kustomization is valid.</p>
+<p>These can be found in the <code>tests</code> folder</p>
+<p>Review the pipeline checks for errors. If there are no errors and the PR has been approved, merge the PR.</p>
+<h2 id="checks-to-see-if-upgrade-worked-correctly">Checks to see if upgrade worked correctly</h2>
+<p>Check the pods have come back up:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -n monitoring | grep kube-prometheus-stack
+</code></pre></div><p>The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.</p>
+<p>Check pods have the correct chart version:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe pod {pod-name} -n monitoring | grep helm.sh/chart=kube-prometheus-stack
+
+</code></pre></div><p><a href="Images/patching_apps_5.png" rel="noopener noreferrer"><img src="Images/patching_apps_5.png" alt="" /></a></p>
+<p>Also, you can check on the Helm release to see if it has got correct version in the log.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr -n monitoring
+</code></pre></div><p><a href="Images/patching_apps_6.png" rel="noopener noreferrer"><img src="Images/patching_apps_6.png" alt="" /></a></p>
+<p>Review pods for any new errors:
+<code>
+kubectl logs {pod-name} -n monitoring -f
+</code></p>
+<p>Prometheus does have a UI which should be checked, i.e. Grafana.</p>
+<p>Ensure <a href="https://sds-grafana.sandbox.platform.hmcts.net/">sds-grafana.sandbox.platform.hmcts.net/</a> and <a href="https://grafana.sandbox.platform.hmcts.net/">grafana.sandbox.platform.hmcts.net/</a> is accessible on SDS.</p>
+<p>Check <a href="https://grafana.sandbox.platform.hmcts.net/">grafana.sandbox.platform.hmcts.net/</a> on CFT.</p>
+<p>You could also delete the prometheus HRs to make sure they come back up.</p>
+<p>The example commands below are for both CFT/SDS using prometheus:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr -n monitoring
+</code></pre></div><div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl delete hr kube-prometheus-stack -n monitoring
+</code></pre></div><div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl delete hr kube-prometheus-stack -n monitoring
+</code></pre></div><p>Ensure to monitor the status for the HRs and pods to ensure they come back successfully.</p>
+<h2 id="prod-environments">Prod environments</h2>
+<p>For Prod, there will be a renovate PR that can be merged in order to update:</p>
 
 <ul>
-<li>GitHub write access to <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a></li>
-<li>Azure DevOps access to <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">BAIS Pipeline</a></li>
+<li><a href="https://github.com/hmcts/sds-flux-config/pull/4132/files">Prod SDS</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/28760/files">Prod CFT</a></li>
 </ul>
-<h2 id="process">Process</h2>
-<p>A PR for changes to the BAIS NSG rules should be raised by the person or team requesting the change. The Platform Operations will review the PR and provide approval, followed by executing the pipeline on behalf of the requester.
-See steps 1 to 8 for details on raising a PR.</p>
-<h2 id="self-service-steps">Self-Service Steps</h2>
+<p>Once the renovate PR has been merged, remove the previous patches you did for sbox:</p>
 
-<ol>
-<li>Clone <a href="https://github.com/hmcts/globalscape-azure-infrastructure">Globalscape Repo</a> to your local machine.
-<code>bash
-git clone https://github.com/hmcts/globalscape-azure-infrastructure
-</code></li>
-<li>Create a new branch, typically with a JIRA ticket number.
-<code>bash
-git checkout -b BRANCH-NAME
-</code></li>
-<li>Navigate to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)</li>
-<li>Modify the CSV file for the required environment looking to existing rules for formatting guidance. Note: removing rules from the CSV will remove them from the server.</li>
-<li>Push your new branch
-<code>bash
-git push --set-upstream origin BRANCH-NAME
-</code></li>
-<li>Create a Pull Request and review changes compared with master.</li>
-<li>Look out for typical formatting issues such as extra spaces or unusual characters. </li>
-<li><p>Specifically the &lsquo;-&rsquo; in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.</p></li>
-<li><p>CI will run automatically across STG after the PR is raised. <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps</a></p></li>
-<li><p>Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.</p></li>
-<li><p>Raise a BAU ticket with the PlatOps team requesting PR approval and execution.</p></li>
-</ol>
-<h2 id="platform-operations-steps">Platform Operations Steps</h2>
+<ul>
+<li><a href="https://github.com/hmcts/sds-flux-config/pull/4247/files">Prod SDS</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/29069/files">Prod CFT</a></li>
+</ul>
 
-<ol>
-<li>Review PR</li>
-<li>If terraform Plan is successful:
-In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432">Azure DevOps</a> </li>
-<li>&lsquo;Run Pipeline&rsquo;</li>
-<li>Branch/tag: Your new branch name</li>
-<li>Commit: Blank</li>
-<li>Stage to Run: BAIS_Servers</li>
-<li>Location: UK South</li>
-<li>Environment: Set as required.</li>
-<li>Advanced Options: Leave as default.</li>
-</ol>
-<p>Click <strong>Run</strong></p>
-
-<ol>
-<li><p>Verify windows server accurately reflects CSV file change in from PR. You can access the servers using the guide: <a href="ServerAccess.html">Server Access</a></p></li>
-<li><p>Merge branch with Master.</p></li>
-</ol>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-19">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 19 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 19 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 19 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -535,8 +548,8 @@ In <a href="https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=4
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/BAIS/BAIS-Windows-Firewall.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27BAIS+NWindows+Firewall+Rules%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FBAIS%2FBAIS-Windows-Firewall.html%29&amp;labels=bug&amp;title=Re%3A+%27BAIS+NWindows+Firewall+Rules%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-prometheus-grafana-example.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Prometheus%2FGrafana+Patching+Example%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-prometheus-grafana-example.html%29&amp;labels=bug&amp;title=Re%3A+%27Prometheus%2FGrafana+Patching+Example%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

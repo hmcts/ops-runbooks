@@ -1,0 +1,134 @@
+---
+title: Prometheus/Grafana Patching Example
+weight: 30
+last_reviewed_on: 2024-02-19
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for Prometheus/Grafana.
+
+Prometheus/Grafana patches should be tested in sbox to avoid downtime.
+
+It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
+
+Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.
+
+## Updating - start with sandbox
+
+In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
+
+```
+apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomization.yaml
+```
+&
+
+```
+apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomize.yaml
+```
+
+[See example PR containing these files](https://github.com/hmcts/sds-flux-config/pull/4243/files)
+
+This enables us to target specific enviornments at this new crd version.
+
+We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
+  
+Eg: `clusters/sbox/base/kustomization.yaml`
+
+![](Images/patching_apps_4.png)
+
+With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/sds-flux-config/pull/4243/files)
+
+Example:
+
+```
+chart:
+spec:
+  chart: kube-prometheus-stack
+  # Update kube-prometheus-stack-crds/kustomization.yaml when updating this
+  version: 56.6.2
+  sourceRef:
+    kind: HelmRepository
+    name: prometheus
+    namespace: monitoring
+```
+
+Update the cluster kustomization file pointing to the new crd directory created earlier.
+
+Raise a pull request to upgrade the version.
+
+See [Example PR](https://github.com/hmcts/sds-flux-config/pull/4243/files)
+
+There are checks that take place when you raise a PR to validate the kustomization is valid. 
+
+These can be found in the `tests` folder
+
+Review the pipeline checks for errors. If there are no errors and the PR has been approved, merge the PR.
+
+## Checks to see if upgrade worked correctly
+
+Check the pods have come back up:
+
+```
+kubectl get pods -n monitoring | grep kube-prometheus-stack
+```
+
+The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.
+
+Check pods have the correct chart version:
+
+```
+kubectl describe pod {pod-name} -n monitoring | grep helm.sh/chart=kube-prometheus-stack
+
+```
+
+![](Images/patching_apps_5.png)
+
+Also, you can check on the Helm release to see if it has got correct version in the log.
+
+```
+kubectl get hr -n monitoring
+```
+![](Images/patching_apps_6.png)
+
+Review pods for any new errors:
+```
+kubectl logs {pod-name} -n monitoring -f
+```
+
+Prometheus does have a UI which should be checked, i.e. Grafana.
+
+Ensure [sds-grafana.sandbox.platform.hmcts.net/](https://sds-grafana.sandbox.platform.hmcts.net/) and [grafana.sandbox.platform.hmcts.net/](https://grafana.sandbox.platform.hmcts.net/) is accessible on SDS.
+
+Check [grafana.sandbox.platform.hmcts.net/](https://grafana.sandbox.platform.hmcts.net/) on CFT.
+
+You could also delete the prometheus HRs to make sure they come back up.
+
+The example commands below are for both CFT/SDS using prometheus:
+
+```
+kubectl get hr -n monitoring
+```
+
+```
+kubectl delete hr kube-prometheus-stack -n monitoring
+```
+
+```
+kubectl delete hr kube-prometheus-stack -n monitoring
+```
+
+Ensure to monitor the status for the HRs and pods to ensure they come back successfully.
+
+## Prod environments
+
+For Prod, there will be a renovate PR that can be merged in order to update:
+
+- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4132/files)
+- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/28760/files)
+
+Once the renovate PR has been merged, remove the previous patches you did for sbox: 
+
+- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4247/files)
+- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069/files)

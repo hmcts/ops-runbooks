@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Testing Changes - HMCTS</title>
+    <title>Updating Neuvector Policies - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/updating-neuvector-policies.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Testing Changes - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html" />
+      <meta name="twitter:title" content="Updating Neuvector Policies - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/updating-neuvector-policies.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Testing Changes" />
+      <meta property="og:title" content="Updating Neuvector Policies" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/testing.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/updating-neuvector-policies.html" />
 
     
   </head>
@@ -461,43 +461,39 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="testing-changes">Testing Changes</h1>
-<p>You can run a local version of &ldquo;The Middleman&rdquo; to render markdown web pages on your laptop.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+            <h1 id="updating-neuvector-policies">Updating Neuvector Policies</h1>
+<p>The policies for Neuvector are found in the <a href="https://github.com/hmcts/chart-neuvector">chart-neuvector</a> repo.</p>
+<p>If you need to make a change to the policies then you need to update this repo and create a new release of the helm chart.</p>
+<h3 id="example">Example</h3>
+<p>The most common thing you may have to change is the admission control policy.</p>
+<p><a href="https://github.com/hmcts/chart-neuvector/pull/77/files">Here</a> is an example of a pull request showing an update being made to the admission control policy to allow external docker images to be used in the artifactory namespace.</p>
+<h3 id="releasing-a-new-chart-version">Releasing a new chart version</h3>
+<p>When you merge to master in the chart-neuvector repo, a draft release is created.</p>
+<p>Find the draft release and click the edit button (the pencil icon) and publish it.</p>
+<h3 id="updating-flux-config">Updating flux config</h3>
+<p>Submit a pull request in each of the flux config repos to update the version of the chart.</p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/29662/files">Here</a> is an example in CFT.</p>
+<p>You can also follow the <a href="patching-neuvector.html">patching example</a> to see how you can target the different environments separately if you want to test the new chart version first.</p>
+<h3 id="deleting-backup-files">Deleting backup files</h3>
+<p>Neuvector config is backed up to an Azure File Share. This ensures when the neuvector pods are deleted, the config is restored.</p>
+<p>However, this can cause issues when trying to make a change to the config as it won&rsquo;t take effect until you delete the relevant backup files.</p>
+<p>In the example linked above, we were updating the namespaces that were allowed to pull third-party docker images to include the artifactory namespace because neuvector was blocking artifactory pods from deploying.</p>
+<p>To get neuvector to pick up this change, we had to delete the <code>admission_control.backup</code> and <code>crd.backup</code> files from the file share.</p>
+<p>After deleting the helm release and letting it redploy, the new admission control policy was picked up and we could deploy artifactory again.</p>
+<p>The storage accounts these file shares live in can be found in the Azure Portal by searching for <code>neuvector</code>. There is a storage account for each environment neuvector is deployed to.</p>
+<p>The storage accounts are tagged with <code>builtFrom: hmcts/chart-neuvector</code>.</p>
 
-<ul>
-<li>Access to the repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
-<li>Local clone of repo <a href="https://github.com/hmcts/ops-runbooks">hmcts/ops-runbooks</a></li>
-<li>Installed Ruby enVironment (Version) Manager (RVM) </li>
-<li>Mac Only, Installed xcode terminal</li>
-<li>Bundler</li>
-</ul>
-<h2 id="how-to">How To</h2>
-<p>Install Ruby enVironment (Version) Manager (RVM)</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>curl <span class="nt">-sSL</span> https://get.rvm.io | bash <span class="nt">-s</span> stable
-</code></pre></div><p>Install Apple terminal xcode application</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>xcode-select <span class="nt">--install</span>
-</code></pre></div><p>Install Bundler</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>gem <span class="nb">install </span>bundler
-</code></pre></div><p>Navigate terminal to javascript folder</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="nb">cd</span> /Users/a.name/Documents/Code/hmcts.github.io/source/javascripts
-</code></pre></div><p>Install application</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>bundle <span class="nb">install</span>
-</code></pre></div><p>Run website</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>bundle <span class="nb">exec </span>middleman serve
-</code></pre></div><p>Open web browser and connect</p>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-03-11">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 11 March 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 11 March 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 11 March 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -507,8 +503,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/testing.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Testing+Changes%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Ftesting.html%29&amp;labels=bug&amp;title=Re%3A+%27Testing+Changes%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/updating-neuvector-policies.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Updating+Neuvector+Policies%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fupdating-neuvector-policies.html%29&amp;labels=bug&amp;title=Re%3A+%27Updating+Neuvector+Policies%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

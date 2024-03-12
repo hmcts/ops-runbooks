@@ -183,6 +183,9 @@
   <li>
     <a href="../azure-pipelines/ado_service_connections.html"><span>ADO Service Connections</span></a>
   </li>
+  <li>
+    <a href="../azure-pipelines/ado_agent_pat.html"><span>ADO Pipeline Agents PAT Usage</span></a>
+  </li>
 </ul>
 </li>
 <li><a href="../Access-and-Permissions/index.html"><span>Access and Permissions</span></a>
@@ -468,7 +471,7 @@
 Look for the <em>agentPool</em> within the file and value will be something like <em>hmcts-sds-ptlsbox</em>. Depending on the written code, multiple agents can be described, then assigned to a specific environment.</p>
 <p>When the pipeline runs, the agent used is displayed on the 1st tab of each stage, in the pipeline.
 <a href="images/ADO-Agent-assigned.png" rel="noopener noreferrer"><img src="images/ADO-Agent-assigned.png" alt="Agent_Used" /></a></p>
-<h3 id="service-principle-agent-39-s-user-account">Service Principle, Agent&rsquo;s User Account</h3>
+<h3 id="service-principal-agent-39-s-user-account">Service Principal, Agent&rsquo;s User Account</h3>
 <p>The agent pool computer needs an account to communitate with Azure resources and a service principle is used, via the pipelines service connections. Select <em>Manage Service Principal</em> to view the details.
 backendServiceArm is used within the pipelines code to assign the Service connection.</p>
 <p><strong>Service Principals</strong> are displayed in the Azure Portal as both Enterprise Applications (Service Principal) and Applications

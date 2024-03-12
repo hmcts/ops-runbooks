@@ -1,0 +1,52 @@
+---
+title: ADO Pipeline Agents PAT Usage
+last_reviewed_on: 2024-01-26
+review_in: 12 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+We use PATs to allow azure-devops self-hosted agents to spin up through KEDA based on events in Azure Devops, and to see some information for daily-checks pipelines.
+
+## How to regenerate a PAT in case of expiry
+We use a bot account to sign in to Azure Devops and generate new PATs.
+You can sign in with `rpe-azure-devops-email` and `rpe-azure-devops-password` found in the `rpe-prod` Key Vault in Azure.
+
+Once signed in, click on user settings > Personal acccess tokens as below:
+![Agent_Token_Generation](images/ADO-Agent-PAT-setting.png)
+
+You will be able to see currrent active tokens, and expired/revoked tokens too once in this page.
+To generate a new PAT, click the `+ New Token` button.
+The docs are split between KEDA and Daily checks below as the access level varies a bit and this avoids assigning more permissions than needed to a given token.
+
+
+### Keda
+
+For KEDA (spins up ADO agents in AKS), we only need a token with access to Read & Manage the Agent Pools. Set `Custom Defined` as your scope, and a bunch of options will appear, you may need to click `Show More Scopes` if Agent Pools is not initially listed.
+The token should look like this before you create it:
+
+![Agent_PAT_Creation](images/ADO-PAT-creation.png)
+
+Once created, make sure you note down the `token` as you will not be able to see it again after initial creation. You will then be able to see it in the Personal Access Tokens home page.
+
+
+### Daily Checks
+For Daily Checks, we need Read access to a few more things to allow it to function correctly and report on the status of various things. Set `Custom Defined` as your scope, and a bunch of options will appear, you may need to click `Show More Scopes` if any of the below are not shown initially:
+
+
+- Agent Pools (Read)
+- Build (Read)
+- Pipeline Resources (Use)
+- Release (Read)
+
+Once created, make sure you note down the `token` as you will not be able to see it again after initial creation. You will then be able to see it in the Personal Access Tokens home page.
+
+The token should look like this after you create it:
+![Agent_Daily_Checks_PAT_Creation](images/ADO-daily-checks-token.png)
+
+## What to update after the tokens are created?
+
+For KEDA, we need to update the secret which contains this token in flux-config in both CFT & SDS.
+This follows the [SOPS process](https://github.com/hmcts/cnp-flux-config/blob/e85c3a96a17478ea36547803e5e30afdeec88275/docs/secrets-sops-encryption.md) for each env, and this is [an example of the change](https://github.com/hmcts/sds-flux-config/pull/4345/files). Once merged, AKS will reconcile the secret via flux, access should be restored and ADO agents should function as normal.
+
+For daily-checks pipeline, you need to create a new version of the `azure-devops-token` secret in `cftptl-intsvc` key vault in Azure, with the token you generated above.

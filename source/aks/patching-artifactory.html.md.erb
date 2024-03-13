@@ -1,0 +1,158 @@
+---
+title: Artifactory Patching
+weight: 30
+last_reviewed_on: 2024-03-08
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment. Here's how it is used based on the provided instructions:
+
+The steps below will show you how to check the current version of Artifactory being used (7.71.5) and then to update it to a newer version (7.77.3). This process involves accessing Artifactory's website to determine the latest version available.
+
+Before applying the update, a testing process is initiated. This involves downloading a repository containing configuration files for Artifactory (artifactory-sbox.yaml). This file is created and modified to reflect the desired changes, such as updating the version number.
+
+Kubernetes configuration files (kustomization.yaml) are updated to include the changes made in the testing phase. This ensures that the updated configuration is applied correctly within the Kubernetes cluster.
+
+Changes made to the configuration files are submitted for review through a pull request (PR) process. Once approved, the changes are merged into the main branch, allowing them to be deployed.
+
+If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
+
+# Artifactory Patching Process
+
+1. Azure CLI Login and Kubernetes Services:
+
+• Access Azure CLI and search for Kubernetes Services
+
+• Type the following PTL in the search box:
+
+![](Images/artifactory_pic01.png)
+
+2. Connect to PTL Box:
+
+• Click on "cft-ptlsbox-00-aks"
+
+• Navigate to Connect and open Terminal
+
+• Connect using the provided commands (first three)
+
+Note: Ensure correct cluster connection with the provided commands
+
+3. Check Active Pods:
+
+• In the terminal, execute the following commands to display active pods:
+
+```command
+kubectl get pods -n artifactory 
+```
+
+![](Images/artifactory_pic02.png)
+
+This command lists running pods.
+```command
+kubectl describe pods -n artifactory artifactory-oss-0 
+```
+
+![](Images/artifactory_pic03.png)
+
+This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)
+
+4. Version Checking:
+
+• Visit the following website to look for latest self hosted version:[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
+
+5. Pre-update Testing:
+
+• Before updating the PTL box, conduct testing to ensure no issues
+
+• Download the repository from [GitHub] (https://github.com/hmcts/cnp-flux-config)
+
+• File location: apps/artifactory/artifactory/…
+
+• Create a new file named "artifactory-sbox.yaml" with the provided code snippet
+
+```command
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: artifactory-oss
+  namespace: artifactory
+spec:
+  serviceName: "artifactory"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: artifactory-oss
+  template:
+    metadata:
+      labels:
+        app: artifactory-oss
+    spec:
+      containers:
+        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
+          name: artifactory-oss
+```
+
+[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29609/files)
+
+6. Run Test:
+
+• Add the below code to kustomization.yaml file for the test to run:
+
+```command
+patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
+```
+
+7. Push Changes:
+
+• Raise a PR and push changes out for review and approval
+
+8. Update Version:
+
+• For the PTL box, remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
+
+• Update the version in "artifactory.yaml" to 7.77.3
+
+```command
+      containers:
+        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
+          name: artifactory-oss
+          env:
+```
+
+[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29665/files)
+
+9. Push Changes:
+
+• Raise a PR and push changes out for review and approval
+
+10. Troubleshooting:
+
+• If errors occur, troubleshoot as follows:
+	• Add the missing namespace "ARTIFACTORY" in the file "admission-control.yaml" in the downloaded repo "chart-neuvector"
+	• Raise a PR and push changes out for review and approval
+
+11. Release Draft and Version Bump:
+
+• Publish the draft release in "chart-neuvector"
+
+• Bump the version in "flux-config" from 1.5.4 to 1.5.5
+
+12. Push Changes:
+
+• Raise a PR and push changes out for review and approval
+
+Troubleshooting Steps:
+
+• To resolve namespace issues in "chart-neuvector":
+	• Delete specific files from the azure file share
+	• Files to delete: "admission_control.backup" and "crd.backup"
+	• Delete the HR on the cluster and let it redeploy
+	• Confirm proper functioning after redeployment
+
+Related Links:
+
+[Artifactory Repository] (https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
+
+[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)

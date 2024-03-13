@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>AKS Known Issues - HMCTS</title>
+    <title>Artifactory Patching - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/known-issues.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/aks/patching-artifactory.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="AKS Known Issues - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/known-issues.html" />
+      <meta name="twitter:title" content="Artifactory Patching - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/aks/patching-artifactory.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="AKS Known Issues" />
+      <meta property="og:title" content="Artifactory Patching" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/known-issues.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/aks/patching-artifactory.html" />
 
     
   </head>
@@ -470,46 +470,141 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="aks-known-issues">AKS Known Issues</h1>
-<p>Known issues encountered during AKS cluster upgrade or rebuild</p>
-<p>If a cluster is in a failed state and even after troubleshooting you are unable to complete the cluster upgrade before the auto-shutdown of AKS clusters, please delete the AKS cluster in a failed state manually within the portal and try again the following morning. This stops active jobs and pods on the failed cluster trying to reach inactive endpoints due to the healthy cluster being shutdown.</p>
-<h2 id="upgrade-failed-in-the-portal">Upgrade failed in the portal</h2>
-<p>If the upgrade is showing as failed in the portal, you need to restart it by running a command on the cluster you are trying to upgrade. You can find the full resource ID in the portal too.</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>az resource update <span class="nt">--ids</span> &lt;aks-resource-id&gt;
-</code></pre></div><h2 id="one-or-more-nodes-has-failed-to-upgrade">One or more nodes has failed to upgrade</h2>
-<p>You can track the progress of the upgrade by running</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code>kubectl get nodes
-</code></pre></div><p>Eventually all nodes will show as running the intended version, in some cases however, one or more nodes may be stuck on the old AKS version, which will block the upgrade. This happens when a given node is unable to be drained before an upgrade, the most likely cause of which is a broken application.</p>
-<p>To diagnose why a node has failed to upgrade, head to the AKS cluster in the Azure portal. Navigate to Node Pools &gt; Linux/System/Other &gt; Nodes &gt; Stuck Node Name &gt; Events. From here you will likely see a failed eviction and a reason why - after which you can troubleshoot further with the relevant team / application to unblock the node draining process. If the cluster is in a failed state, or no longer shows as updating in the portal, you will need to hit the update button again.</p>
-<h2 id="quota-limit-reached">Quota limit reached</h2>
-<p>You may encounter a quota limit during an AKS upgrade due to the provisioning of new nodes during the process. Generally, you can increase these quotas yourself <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade/~/myQuotas">in the portal</a> - by selecting the subscription that the AKS cluster is part of, and increasing the Compute quota to the recommended level.</p>
-<h2 id="daemonset-failed-scheduling">DaemonSet Failed Scheduling</h2>
-<p>For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.</p>
-<p>An error similar to the below may be seen in the cluster events log:</p>
-<p><a href="Images/oneagent_scheduling_error.png" rel="noopener noreferrer"><img src="Images/oneagent_scheduling_error.png" alt="oneagent_scheduling_error" /></a></p>
+            <h1 id="artifactory-patching">Artifactory Patching</h1>
+<p>Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment. Here&rsquo;s how it is used based on the provided instructions:</p>
+<p>The steps below will show you how to check the current version of Artifactory being used (7.71.5) and then to update it to a newer version (7.77.3). This process involves accessing Artifactory&rsquo;s website to determine the latest version available.</p>
+<p>Before applying the update, a testing process is initiated. This involves downloading a repository containing configuration files for Artifactory (artifactory-sbox.yaml). This file is created and modified to reflect the desired changes, such as updating the version number.</p>
+<p>Kubernetes configuration files (kustomization.yaml) are updated to include the changes made in the testing phase. This ensures that the updated configuration is applied correctly within the Kubernetes cluster.</p>
+<p>Changes made to the configuration files are submitted for review through a pull request (PR) process. Once approved, the changes are merged into the main branch, allowing them to be deployed.</p>
+<p>If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.</p>
+<h1 id="artifactory-patching-process">Artifactory Patching Process</h1>
 
-<ul>
-<li>This happens when there is a capacity issue on specific cluster nodes</li>
-<li>DaemonSet rolling update is blocked with the pod stuck in <code>Pending</code> state</li>
-<li><p>Deleting the pod does not fix issue as pod restarts and goes into same <code>Pending</code> state</p></li>
-<li><p>Run <code>kubectl get pod &lt;podname&gt; -o yaml | grep nodeName</code> to identify the node where pod scheduling has failed</p></li>
-<li><p>Run <code>kubectl get pods -A | grep &lt;node name&gt;</code> to list all pods running on node</p></li>
-<li><p>Identify and delete one or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node</p></li>
-<li><p>If deleted pods are stuck in <code>Terminating</code> state, use <code>kubectl delete pod &lt;podname&gt; --grace-period 0 --force</code> to forcefully delete pod</p></li>
-<li><p>Confirm DaemonSet pod now starts successfully</p></li>
-</ul>
+<ol>
+<li>Azure CLI Login and Kubernetes Services:</li>
+</ol>
+<p>• Access Azure CLI and search for Kubernetes Services</p>
+<p>• Type the following PTL in the search box:</p>
+<p><a href="Images/artifactory_pic01.png" rel="noopener noreferrer"><img src="Images/artifactory_pic01.png" alt="" /></a></p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+<ol>
+<li>Connect to PTL Box:</li>
+</ol>
+<p>• Click on &ldquo;cft-ptlsbox-00-aks&rdquo;</p>
+<p>• Navigate to Connect and open Terminal</p>
+<p>• Connect using the provided commands (first three)</p>
+<p>Note: Ensure correct cluster connection with the provided commands</p>
+
+<ol>
+<li>Check Active Pods:</li>
+</ol>
+<p>• In the terminal, execute the following commands to display active pods:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -n artifactory 
+</code></pre></div><p><a href="Images/artifactory_pic02.png" rel="noopener noreferrer"><img src="Images/artifactory_pic02.png" alt="" /></a></p>
+<p>This command lists running pods.
+<code>command
+kubectl describe pods -n artifactory artifactory-oss-0 
+</code></p>
+<p><a href="Images/artifactory_pic03.png" rel="noopener noreferrer"><img src="Images/artifactory_pic03.png" alt="" /></a></p>
+<p>This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)</p>
+
+<ol>
+<li>Version Checking:</li>
+</ol>
+<p>• Visit the following website to look for latest self hosted version:<a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted">Artifactory Release Information</a></p>
+
+<ol>
+<li>Pre-update Testing:</li>
+</ol>
+<p>• Before updating the PTL box, conduct testing to ensure no issues</p>
+<p>• Download the repository from <a href="https://github.com/hmcts/cnp-flux-config">GitHub</a></p>
+<p>• File location: apps/artifactory/artifactory/…</p>
+<p>• Create a new file named &ldquo;artifactory-sbox.yaml&rdquo; with the provided code snippet</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: artifactory-oss
+  namespace: artifactory
+spec:
+  serviceName: "artifactory"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: artifactory-oss
+  template:
+    metadata:
+      labels:
+        app: artifactory-oss
+    spec:
+      containers:
+        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
+          name: artifactory-oss
+</code></pre></div><p><a href="https://github.com/hmcts/cnp-flux-config/pull/29609/files">Example PR</a></p>
+
+<ol>
+<li>Run Test:</li>
+</ol>
+<p>• Add the below code to kustomization.yaml file for the test to run:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
+</code></pre></div>
+<ol>
+<li>Push Changes:</li>
+</ol>
+<p>• Raise a PR and push changes out for review and approval</p>
+
+<ol>
+<li>Update Version:</li>
+</ol>
+<p>• For the PTL box, remove &ldquo;artifactory-sbox.yaml&rdquo; file and its corresponding code from kustomization.yaml</p>
+<p>• Update the version in &ldquo;artifactory.yaml&rdquo; to 7.77.3</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>      containers:
+        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
+          name: artifactory-oss
+          env:
+</code></pre></div><p><a href="https://github.com/hmcts/cnp-flux-config/pull/29665/files">Example PR</a></p>
+
+<ol>
+<li>Push Changes:</li>
+</ol>
+<p>• Raise a PR and push changes out for review and approval</p>
+
+<ol>
+<li>Troubleshooting:</li>
+</ol>
+<p>• If errors occur, troubleshoot as follows:
+    • Add the missing namespace &ldquo;ARTIFACTORY&rdquo; in the file &ldquo;admission-control.yaml&rdquo; in the downloaded repo &ldquo;chart-neuvector&rdquo;
+    • Raise a PR and push changes out for review and approval</p>
+
+<ol>
+<li>Release Draft and Version Bump:</li>
+</ol>
+<p>• Publish the draft release in &ldquo;chart-neuvector&rdquo;</p>
+<p>• Bump the version in &ldquo;flux-config&rdquo; from 1.5.4 to 1.5.5</p>
+
+<ol>
+<li>Push Changes:</li>
+</ol>
+<p>• Raise a PR and push changes out for review and approval</p>
+<p>Troubleshooting Steps:</p>
+<p>• To resolve namespace issues in &ldquo;chart-neuvector&rdquo;:
+    • Delete specific files from the azure file share
+    • Files to delete: &ldquo;admission_control.backup&rdquo; and &ldquo;crd.backup&rdquo;
+    • Delete the HR on the cluster and let it redeploy
+    • Confirm proper functioning after redeployment</p>
+<p>Related Links:</p>
+<p><a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifactory Repository</a> - You will need to be connect to F5 VPN to access this link</p>
+<p><a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted">Artifactory Release Information</a></p>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-03-08">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 8 March 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 8 March 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 8 March 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -519,8 +614,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/known-issues.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27AKS+Known+Issues%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fknown-issues.html%29&amp;labels=bug&amp;title=Re%3A+%27AKS+Known+Issues%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/patching-artifactory.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Artifactory+Patching%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Faks%2Fpatching-artifactory.html%29&amp;labels=bug&amp;title=Re%3A+%27Artifactory+Patching%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

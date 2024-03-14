@@ -30,6 +30,30 @@ Create a PR in cnp-flux-config to patch KEDA in CFT.
 
 [Example PR](https://github.com/hmcts/cnp-flux-config/pull/25236)
 
+### Checks
 
+To make sure KEDA scaledjobs are working, connect to the PTL and PTLSBOX clusters.
+
+Check that the helm releases for `azure-devops-agent` in the `azure-devops` namespace and `jenkins-webhook-relay` in the `jenkins` namespace have successfully upgraded.
+
+The scaled jobs created by these helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.
+
+If these are not working, they will cause many issues for application teams and result in BAU tickets being submitted.
+
+Get the list of scaled jobs in these namespaces using `kubectl get scaledjob -n <NAMESPACE`.
+
+Describe the scaled job by running `kubectl describe scaledjob <SCALED JOB NAME`.
+
+You should see events saying new jobs were created with the reason `KEDAJobsCreated`.
+
+You should also see new pods being created in the namespaces. They will be named after the job e.g. if the scaled job is called `azure-devops-agent-function`, the pods will be called `azure-devops-agent-function-<UNIQUE ID>`.
+
+Some application teams may have scaledjobs but if the azure devops agent and jenkins webhook relay jobs are working, we can expect other jobs to be working also.
+
+Keep an eye on #platops-help for any tickets that may come in from application teams using scaled jobs.
+
+### Other links
+
+You can find info on how the jenkins webhook relay works [here](../jenkins/builds-starting-slowly.html#builds-not-being-triggered-at-all).
 
 

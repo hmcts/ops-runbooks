@@ -21,6 +21,8 @@ To fix this, teams can raise a PR that triggers a script to fix ownership. Here 
 
 This issue can also be fixed manually by signing into the flexible server and running the below SQL. You will need to sign in using the single server credentials from the associated key vault.
 
+**Note: This should be used as a last resort. Preference is to use the automated solution.**
+
 ```cmd
 GRANT ${flex_server_user} TO ${single_server_user};
 REASSIGN OWNED BY ${single_server_user} TO ${flexible_server_user};
@@ -28,5 +30,5 @@ REVOKE ${flexible_server_user} FROM ${single_server_user};
 GRANT ${single_server_user} TO ${flexible_server_user};
 ```
 
-**Note:** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` we only use `am`.
+**Note:** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` use `am`.
 

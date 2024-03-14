@@ -9,9 +9,9 @@ weight: 40
 
 ## Known Issues
 
-### ERROR:  permission denied for table ${table_name}
+### ERROR: permission denied for table
 
-Teams may encounter this issue after migrating to flexible server. A new feature was added to the migration tool which migrates roles/owners as well. This results in the above error when teams are using a different administrator on flexible server than single server.
+Teams may encounter this error when they try to query the database (admin user) after migrating to flexible server. A new feature was added to the migration tool which now migrates roles/owners along with the schema. This results in the above error when teams are using a different admin user on flexible server than on single server.
 
 To fix this, teams can raise a PR that triggers a script to fix ownership. Here are some useful links for this solution:
 
@@ -19,9 +19,7 @@ To fix this, teams can raise a PR that triggers a script to fix ownership. Here 
 * [Inputs Used](https://github.com/hmcts/terraform-module-postgresql-flexible/tree/master?tab=readme-ov-file#inputs)
 * [Script](https://github.com/hmcts/terraform-module-postgresql-flexible/blob/master/set-postgres-owner.bash)
 
-This issue can also be fixed manually by signing into the flexible server and running the below SQL. You will need to sign in using the credentials the single server credentials from the associated key vault.
-
-** Note: ** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` we only use `am`.
+This issue can also be fixed manually by signing into the flexible server and running the below SQL. You will need to sign in using the single server credentials from the associated key vault.
 
 ```cmd
 GRANT ${flex_server_user} TO ${single_server_user};
@@ -29,4 +27,6 @@ REASSIGN OWNED BY ${single_server_user} TO ${flexible_server_user};
 REVOKE ${flexible_server_user} FROM ${single_server_user};
 GRANT ${single_server_user} TO ${flexible_server_user};
 ```
+
+**Note:** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` we only use `am`.
 

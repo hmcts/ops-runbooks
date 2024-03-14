@@ -487,7 +487,7 @@
 <p><a href="Images/artifactory_pic01.png" rel="noopener noreferrer"><img src="Images/artifactory_pic01.png" alt="" /></a></p>
 
 <ol>
-<li>Connect to PTL Box:</li>
+<li>Connect to PTLSBOX:</li>
 </ol>
 <p>• Click on &ldquo;cft-ptlsbox-00-aks&rdquo;</p>
 <p>• Navigate to Connect and open Terminal</p>
@@ -500,11 +500,9 @@
 <p>• In the terminal, execute the following commands to display active pods:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -n artifactory 
 </code></pre></div><p><a href="Images/artifactory_pic02.png" rel="noopener noreferrer"><img src="Images/artifactory_pic02.png" alt="" /></a></p>
-<p>This command lists running pods.
-<code>command
-kubectl describe pods -n artifactory artifactory-oss-0 
-</code></p>
-<p><a href="Images/artifactory_pic03.png" rel="noopener noreferrer"><img src="Images/artifactory_pic03.png" alt="" /></a></p>
+<p>This command lists running pods.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe pods -n artifactory artifactory-oss-0 
+</code></pre></div><p><a href="Images/artifactory_pic03.png" rel="noopener noreferrer"><img src="Images/artifactory_pic03.png" alt="" /></a></p>
 <p>This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)</p>
 
 <ol>
@@ -515,7 +513,7 @@ kubectl describe pods -n artifactory artifactory-oss-0
 <ol>
 <li>Pre-update Testing:</li>
 </ol>
-<p>• Before updating the PTL box, conduct testing to ensure no issues</p>
+<p>• Before updating the PTLSBOX, conduct testing to ensure no issues</p>
 <p>• Download the repository from <a href="https://github.com/hmcts/cnp-flux-config">GitHub</a></p>
 <p>• File location: apps/artifactory/artifactory/…</p>
 <p>• Create a new file named &ldquo;artifactory-sbox.yaml&rdquo; with the provided code snippet</p>
@@ -554,7 +552,7 @@ spec:
 <ol>
 <li>Update Version:</li>
 </ol>
-<p>• For the PTL box, remove &ldquo;artifactory-sbox.yaml&rdquo; file and its corresponding code from kustomization.yaml</p>
+<p>• For the PTLSBOX, remove &ldquo;artifactory-sbox.yaml&rdquo; file and its corresponding code from kustomization.yaml</p>
 <p>• Update the version in &ldquo;artifactory.yaml&rdquo; to 7.77.3</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>      containers:
         - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
@@ -566,13 +564,7 @@ spec:
 <li>Push Changes:</li>
 </ol>
 <p>• Raise a PR and push changes out for review and approval</p>
-
-<ol>
-<li>Troubleshooting:</li>
-</ol>
-<p>• If errors occur, troubleshoot as follows:
-    • Add the missing namespace &ldquo;ARTIFACTORY&rdquo; in the file &ldquo;admission-control.yaml&rdquo; in the downloaded repo &ldquo;chart-neuvector&rdquo;
-    • Raise a PR and push changes out for review and approval</p>
+<p>• If you can go to the <a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/">Artifactory</a> site after the upgrade and checking the packages and repositories to ensure they are working.</p>
 
 <ol>
 <li>Release Draft and Version Bump:</li>
@@ -585,26 +577,22 @@ spec:
 </ol>
 <p>• Raise a PR and push changes out for review and approval</p>
 <p>Troubleshooting Steps:</p>
-<p>• To resolve namespace issues in &ldquo;chart-neuvector&rdquo;:
-    • Delete specific files from the azure file share
-    • Files to delete: &ldquo;admission_control.backup&rdquo; and &ldquo;crd.backup&rdquo;
-    • Delete the HR on the cluster and let it redeploy
-    • Confirm proper functioning after redeployment</p>
+<p>To resolve namespace issues in <a href="https://hmcts.github.io/ops-runbooks/aks/updating-neuvector-policies.html">&ldquo;chart-neuvector&rdquo;</a>. We had specific issues with neuvector which should be resolved and the details can be found in the linked page.</p>
 <p>Related Links:</p>
 <p><a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifactory Repository</a> - You will need to be connect to F5 VPN to access this link</p>
 <p><a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted">Artifactory Release Information</a></p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-03-08">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-03-13">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 8 March 2024.
+      This page was last reviewed on 13 March 2024.
 
-        It needs to be reviewed again on 8 March 2025
+        It needs to be reviewed again on 13 March 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 8 March 2025
+      This page was set to be reviewed before 13 March 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

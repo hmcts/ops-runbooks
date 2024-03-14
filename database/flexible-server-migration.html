@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Troubleshooting - HMCTS</title>
+    <title>Migrating to Flexible Server - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/Contribution-Guide/troubleshooting.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/flexible-server-migration.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Troubleshooting - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/troubleshooting.html" />
+      <meta name="twitter:title" content="Migrating to Flexible Server - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/flexible-server-migration.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Troubleshooting" />
+      <meta property="og:title" content="Migrating to Flexible Server" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/Contribution-Guide/troubleshooting.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/flexible-server-migration.html" />
 
     
   </head>
@@ -473,36 +473,36 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="troubleshooting">Troubleshooting</h1>
-<p>Guide to resolving common problems with the Operations Guide</p>
-<h2 id="runtimeerror">RuntimeError</h2>
-<p><a href="images/RuntimeError.png" rel="noopener noreferrer"><img src="images/RuntimeError.png" alt="Operations Tabs" /></a></p>
-<p>Images and bins must be in sub folders</p>
-<h2 id="webpage-rendering-errors">Webpage Rendering Errors</h2>
-<p><a href="images/WebpageError.png" rel="noopener noreferrer"><img src="images/WebpageError.png" alt="Operations Tabs" /></a></p>
-<p>The file name is missing html from its extension.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pagename.md.erb
-vs
-pagename.html.md.erb
-</code></pre></div><h2 id="escape-a-special-character">Escape a special character</h2>
-<p>Add a backslash \ before the character</p>
-<h2 id="grouped-index-headings">Grouped Index Headings</h2>
-<p><a href="images/GroupedHeadings.png" rel="noopener noreferrer"><img src="images/GroupedHeadings.png" alt="Operations Tabs" /></a></p>
-<p>Multiple headings are shown in the index but only a single page is displayed when selected.
-Normally this is caused by a special character being included in a section of code.
-Escape the character using the backslash</p>
+            <h1 id="migrating-to-flexible-server">Migrating to Flexible Server</h1>
+<h2 id="known-issues">Known Issues</h2>
+<h3 id="error-permission-denied-for-table">ERROR: permission denied for table</h3>
+<p>Teams may encounter this error when they try to query the database (admin user) after migrating to flexible server. A new feature was added to the migration tool which now migrates roles/owners along with the schema. This results in the above error when teams are using a different admin user on flexible server than on single server.</p>
+<p>To fix this, teams can raise a PR that triggers a script to fix ownership. Here are some useful links for this solution:</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+<ul>
+<li><a href="https://github.com/hmcts/am-org-role-mapping-service/pull/1804">Example Pull Request</a></li>
+<li><a href="https://github.com/hmcts/terraform-module-postgresql-flexible/tree/master?tab=readme-ov-file#inputs">Inputs Used</a></li>
+<li><a href="https://github.com/hmcts/terraform-module-postgresql-flexible/blob/master/set-postgres-owner.bash">Script</a></li>
+</ul>
+<p>This issue can also be fixed manually by signing into the flexible server and running the below SQL. You will need to sign in using the <strong>single server credentials</strong> from the associated key vault.</p>
+<p><strong>Note: This should be used as a last resort. Preference is to use the automated solution.</strong></p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>GRANT ${flex_server_user} TO ${single_server_user};
+REASSIGN OWNED BY ${single_server_user} TO ${flexible_server_user};
+REVOKE ${flexible_server_user} FROM ${single_server_user};
+GRANT ${single_server_user} TO ${flexible_server_user};
+</code></pre></div><p><strong>Note:</strong> If the single server user is in the format <code>am@am-org-role-mapping-service-postgres-db-v11-aat</code> use <code>am</code>.</p>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-03-14">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 14 March 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 14 March 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 14 March 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -512,8 +512,8 @@ Escape the character using the backslash</p>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Contribution-Guide/troubleshooting.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Troubleshooting%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FContribution-Guide%2Ftroubleshooting.html%29&amp;labels=bug&amp;title=Re%3A+%27Troubleshooting%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/flexible-server-migration.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Migrating+to+Flexible+Server%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Fflexible-server-migration.html%29&amp;labels=bug&amp;title=Re%3A+%27Migrating+to+Flexible+Server%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

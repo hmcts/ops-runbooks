@@ -1,0 +1,32 @@
+---
+title: Migrating to Flexible Server
+last_reviewed_on: 2024-03-14
+review_in: 12 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+## Known Issues
+
+### ERROR:  permission denied for table ${table_name}
+
+Teams may encounter this issue after migrating to flexible server. A new feature was added to the migration tool which migrates roles/owners as well. This results in the above error when teams are using a different administrator on flexible server than single server.
+
+To fix this, teams can raise a PR that triggers a script to fix ownership. Here are some useful links for this solution:
+
+* [Example Pull Request](https://github.com/hmcts/am-org-role-mapping-service/pull/1804)
+* [Inputs Used](https://github.com/hmcts/terraform-module-postgresql-flexible/tree/master?tab=readme-ov-file#inputs)
+* [Script](https://github.com/hmcts/terraform-module-postgresql-flexible/blob/master/set-postgres-owner.bash)
+
+This issue can also be fixed manually by signing into the flexible server and running the below SQL. You will need to sign in using the credentials the single server credentials from the associated key vault.
+
+** Note: ** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` we only use `am`.
+
+```cmd
+GRANT ${flex_server_user} TO ${single_server_user};
+REASSIGN OWNED BY ${single_server_user} TO ${flexible_server_user};
+REVOKE ${flexible_server_user} FROM ${single_server_user};
+GRANT ${single_server_user} TO ${flexible_server_user};
+```
+

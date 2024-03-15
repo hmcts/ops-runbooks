@@ -490,6 +490,19 @@
 <h3 id="cft">CFT</h3>
 <p>Create a PR in cnp-flux-config to patch KEDA in CFT.</p>
 <p><a href="https://github.com/hmcts/cnp-flux-config/pull/25236">Example PR</a></p>
+<h3 id="checks">Checks</h3>
+<p>To make sure KEDA scaledjobs are working, connect to the PTL and PTLSBOX clusters.</p>
+<p>Check that the helm releases for <code>azure-devops-agent</code> in the <code>azure-devops</code> namespace and <code>jenkins-webhook-relay</code> in the <code>jenkins</code> namespace have successfully upgraded.</p>
+<p>The scaled jobs created by these helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.</p>
+<p>If these are not working, they will cause many issues for application teams and result in BAU tickets being submitted.</p>
+<p>Get the list of scaled jobs in these namespaces using <code>kubectl get scaledjob -n &lt;NAMESPACE</code>.</p>
+<p>Describe the scaled job by running <code>kubectl describe scaledjob &lt;SCALED JOB NAME</code>.</p>
+<p>You should see events saying new jobs were created with the reason <code>KEDAJobsCreated</code>.</p>
+<p>You should also see new pods being created in the namespaces. They will be named after the job e.g. if the scaled job is called <code>azure-devops-agent-function</code>, the pods will be called <code>azure-devops-agent-function-&lt;UNIQUE ID&gt;</code>.</p>
+<p>Some application teams may have scaledjobs but if the azure devops agent and jenkins webhook relay jobs are working, we can expect other jobs to be working also.</p>
+<p>Keep an eye on #platops-help for any tickets that may come in from application teams using scaled jobs.</p>
+<h3 id="other-links">Other links</h3>
+<p>You can find info on how the jenkins webhook relay works <a href="../jenkins/builds-starting-slowly.html#builds-not-being-triggered-at-all">here</a>.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-02-19">
     <div class='page-expiry--not-expired'>

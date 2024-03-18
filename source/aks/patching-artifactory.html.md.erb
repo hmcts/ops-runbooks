@@ -19,9 +19,9 @@ Changes made to the configuration files are submitted for review through a pull 
 
 If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
-# Artifactory Patching Process
+## Artifactory Patching Process
 
-1. Azure CLI Login and Kubernetes Services:
+Azure CLI Login and Kubernetes Services
 
 • Access Azure CLI and search for Kubernetes Services
 
@@ -29,7 +29,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ![](Images/artifactory_pic01.png)
 
-2. Connect to PTLSBOX:
+Connect to PTLSBOX
 
 • Click on "cft-ptlsbox-00-aks"
 
@@ -39,9 +39,9 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 Note: Ensure correct cluster connection with the provided commands
 
-3. Check Active Pods:
+Check Active Pods
 
-• In the terminal, execute the following commands to display active pods:
+• In the terminal, execute the following commands to display active pods
 
 ```command
 kubectl get pods -n artifactory 
@@ -49,7 +49,7 @@ kubectl get pods -n artifactory
 
 ![](Images/artifactory_pic02.png)
 
-This command lists running pods.
+This command will list running pods
 
 ```command
 kubectl describe pods -n artifactory artifactory-oss-0 
@@ -59,11 +59,11 @@ kubectl describe pods -n artifactory artifactory-oss-0
 
 This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)
 
-4. Version Checking:
+Version Checking
 
 • Visit the following website to look for latest self hosted version:[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
 
-5. Pre-update Testing:
+Pre-update Testing
 
 • Before updating the PTLSBOX, conduct testing to ensure no issues
 
@@ -97,22 +97,21 @@ spec:
 
 [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29609/files)
 
-6. Run Test:
+Run Test
 
-• Add the below code to kustomization.yaml file for the test to run:
+• Add the below code to kustomization.yaml file for the test to run
 
 ```command
 patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
 ```
 
-7. Push Changes:
+Push Changes
 
 • Raise a PR and push changes out for review and approval
 
-8. Update Version:
+Update Version
 
 • For the PTLSBOX, remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
-
 
 • Update the version in "artifactory.yaml" to 7.77.3
 
@@ -125,27 +124,27 @@ patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
 
 [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29665/files)
 
-9. Push Changes:
+Push Changes
 
 • Raise a PR and push changes out for review and approval
 
-• If you can go to the [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/) site after the upgrade and checking the packages and repositories to ensure they are working.
+• If you can go to the [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/) site after the upgrade and checking the packages and repositories to ensure they are working
 
-10. Release Draft and Version Bump:
+Release Draft and Version Bump
 
 • Publish the draft release in "chart-neuvector"
 
 • Bump the version in "flux-config" from 1.5.4 to 1.5.5
 
-11. Push Changes:
+Push Changes
 
 • Raise a PR and push changes out for review and approval
 
-Troubleshooting Steps:
+Troubleshooting Steps
 
-To resolve namespace issues in ["chart-neuvector"] (https://hmcts.github.io/ops-runbooks/aks/updating-neuvector-policies.html). We had specific issues with neuvector which should be resolved and the details can be found in the linked page.
+To resolve namespace issues in ["chart-neuvector"] (https://hmcts.github.io/ops-runbooks/aks/updating-neuvector-policies.html). We had specific issues with neuvector which should be resolved and the details can be found in the linked page
 
-Related Links:
+Related Links
 
 [Artifactory Repository] (https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
 

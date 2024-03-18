@@ -21,7 +21,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ## Artifactory Patching Process
 
-Azure CLI Login and Kubernetes Services
+1. Azure CLI Login and Kubernetes Services
 
 • Access Azure CLI and search for Kubernetes Services
 
@@ -29,7 +29,7 @@ Azure CLI Login and Kubernetes Services
 
 ![](Images/artifactory_pic01.png)
 
-Connect to PTLSBOX
+2. Connect to PTLSBOX
 
 • Click on "cft-ptlsbox-00-aks"
 
@@ -39,7 +39,7 @@ Connect to PTLSBOX
 
 Note: Ensure correct cluster connection with the provided commands
 
-Check Active Pods
+3. Check Active Pods
 
 • In the terminal, execute the following commands to display active pods
 
@@ -59,11 +59,11 @@ kubectl describe pods -n artifactory artifactory-oss-0
 
 This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)
 
-Version Checking
+4. Version Checking
 
 • Visit the following website to look for latest self hosted version:[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
 
-Pre-update Testing
+5. Pre-update Testing
 
 • Before updating the PTLSBOX, conduct testing to ensure no issues
 
@@ -97,7 +97,7 @@ spec:
 
 [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29609/files)
 
-Run Test
+6. Run Test
 
 • Add the below code to kustomization.yaml file for the test to run
 
@@ -105,11 +105,11 @@ Run Test
 patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
 ```
 
-Push Changes
+7. Push Changes
 
 • Raise a PR and push changes out for review and approval
 
-Update Version
+8. Update Version
 
 • For the PTLSBOX, remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
 
@@ -124,19 +124,19 @@ Update Version
 
 [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29665/files)
 
-Push Changes
+9. Push Changes
 
 • Raise a PR and push changes out for review and approval
 
 • If you can go to the [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/) site after the upgrade and checking the packages and repositories to ensure they are working
 
-Release Draft and Version Bump
+10. Release Draft and Version Bump
 
 • Publish the draft release in "chart-neuvector"
 
 • Bump the version in "flux-config" from 1.5.4 to 1.5.5
 
-Push Changes
+11. Push Changes
 
 • Raise a PR and push changes out for review and approval
 

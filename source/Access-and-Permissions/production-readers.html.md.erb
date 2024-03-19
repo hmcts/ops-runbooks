@@ -21,6 +21,10 @@ This run book documents the process of granting read access to production enviro
 
 You can check the ID Governance [section](https://portal.azure.com/#view/Microsoft_Azure_ELMAdmin/EntitlementMenuBlade/~/users/entitlementId/e7cbb8d7-bd25-4d5a-8bbc-c94c03f1c827/catalogId/ea033c19-770d-4492-bc58-d49a229df80e/catalogName/SC/entitlementName/SC%20Access) of the Azure Portal by searching for the persons name. If they are listed and the status is `Delivered`, then the person has been cleared.
 
+When a pull request is submitted to azure-devops-ad, the pipeline will check whether the person has security clearance and post a comment on the pull request to let you know whether it should be approved or not.
+
+If the person is not security cleared, a `Do Not Merge` label will be added as well.
+
 ### Granting access
 
 Once you've confirmed that the person has security clearance, you can submit a PR or approve an existing PR to add them to the relevant groups.

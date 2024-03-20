@@ -483,29 +483,23 @@
 
 <ol>
 <li>Request bastion access <a href="https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages">here.</a></li>
-<li>Open terminal and run:</li>
-</ol>
+<li><p>Open terminal and run:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>POSTGRES_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
 ssh bastion-prod.platform.hmcts.net -L 5440:${POSTGRES_HOST}:5432
-</code></pre></div>
-<ol>
-<li>Once connected to the bastion, open pgAdmin -&gt; right click <code>Servers</code> -&gt; <code>Register</code> -&gt; <code>Server</code>.</li>
-<li>Enter a Name and untick <code>Connect now?</code>.</li>
-<li>Go to <code>Connection</code> tab and enter the following values:</li>
-</ol>
+</code></pre></div></li>
+<li><p>Once connected to the bastion, open pgAdmin -&gt; right click <code>Servers</code> -&gt; <code>Register</code> -&gt; <code>Server</code>.</p></li>
+<li><p>Enter a Name and untick <code>Connect now?</code>.</p></li>
+<li><p>Go to <code>Connection</code> tab and enter the following values:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>Host name/addres: ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
 Port: 5432
 Maintenance database: ccd_data_store
 Username: DTS Platform Operations SC
-</code></pre></div>
-<ol>
-<li>Click <code>Save</code>.</li>
-<li>Open a terminal and run:</li>
-</ol>
+</code></pre></div></li>
+<li><p>Click <code>Save</code>.</p></li>
+<li><p>Open a terminal and run:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv
-</code></pre></div>
-<ol>
-<li>In pgAdmin, select the connection from the panel. You will be prompted to enter a password. Paste in the token returned from the above command.</li>
+</code></pre></div></li>
+<li><p>In pgAdmin, select the connection from the panel. You will be prompted to enter a password. Paste in the token returned from the above command.</p></li>
 </ol>
 <p><strong>Note:</strong> You can use <code>DTS Platform Operations</code> user for non-prod servers.</p>
 <h2 id="using-psql">Using psql</h2>
@@ -513,26 +507,24 @@ Username: DTS Platform Operations SC
 
 <ol>
 <li>Request bastion access <a href="https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages">here.</a></li>
-<li>Open terminal and run:</li>
-</ol>
+<li><p>Open terminal and run:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>ssh bastion-prod.platform.hmcts.net
-</code></pre></div>
-<ol>
-<li>Once connected to the bastion, run:</li>
-</ol>
+</code></pre></div></li>
+<li><p>Once connected to the bastion, run:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>DB_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
 DB_NAME=ccd_data_store
 DB_USER="DTS\ Platform\ Operations\ SC"
 export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv)
 
 psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432"
-</code></pre></div>
-<ol>
-<li>You will be presented with an interactive psql shell where you can run your sql queries.</li>
+</code></pre></div></li>
+<li><p>You will be presented with an interactive psql shell where you can run your sql queries.</p></li>
 </ol>
 <p><strong>Note:</strong> You can use <code>DB_USER=&quot;DTS\ Platform\ Operations&quot;</code> user for non-prod servers.</p>
 <p><strong>Note:</strong> You can run sql scripts using this method by appending <code>-f</code> followed by the name of the sql script e.g.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432" -f script.sql
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>```cmd
+psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432" -f script.sql
+```
 </code></pre></div>
               <div data-module='page-expiry' data-last-reviewed-on="2025-03-14">
     <div class='page-expiry--not-expired'>

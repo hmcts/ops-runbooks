@@ -16,28 +16,28 @@ You can connect to the flexible server databases using a couple of methods outli
 1. Request bastion access [here.](https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages)
 2. Open terminal and run:
 
-```cmd
-POSTGRES_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
-ssh bastion-prod.platform.hmcts.net -L 5440:${POSTGRES_HOST}:5432
-```
+    ```cmd
+    POSTGRES_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+    ssh bastion-prod.platform.hmcts.net -L 5440:${POSTGRES_HOST}:5432
+    ```
 
 3. Once connected to the bastion, open pgAdmin -> right click `Servers` -> `Register` -> `Server`.
 4. Enter a Name and untick `Connect now?`.
 5. Go to `Connection` tab and enter the following values:
 
-```cmd
-Host name/addres: ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
-Port: 5432
-Maintenance database: ccd_data_store
-Username: DTS Platform Operations SC
-```
+    ```cmd
+    Host name/addres: ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+    Port: 5432
+    Maintenance database: ccd_data_store
+    Username: DTS Platform Operations SC
+    ```
 
 6. Click `Save`.
 7. Open a terminal and run:
 
-```cmd
-az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv
-```
+    ```cmd
+    az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv
+    ```
 
 8. In pgAdmin, select the connection from the panel. You will be prompted to enter a password. Paste in the token returned from the above command.
 
@@ -50,20 +50,20 @@ az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv
 1. Request bastion access [here.](https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages)
 2. Open terminal and run:
 
-```cmd
-ssh bastion-prod.platform.hmcts.net
-```
+    ```cmd
+    ssh bastion-prod.platform.hmcts.net
+    ```
 
 3. Once connected to the bastion, run:
 
-```cmd
-DB_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
-DB_NAME=ccd_data_store
-DB_USER="DTS\ Platform\ Operations\ SC"
-export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv)
+    ```cmd
+    DB_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+    DB_NAME=ccd_data_store
+    DB_USER="DTS\ Platform\ Operations\ SC"
+    export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv)
 
-psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432"
-```
+    psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432"
+    ```
 
 4. You will be presented with an interactive psql shell where you can run your sql queries.
 
@@ -71,6 +71,6 @@ psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=543
 
 **Note:** You can run sql scripts using this method by appending `-f` followed by the name of the sql script e.g.
 
-```cmd
-psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432" -f script.sql
-```
+    ```cmd
+    psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432" -f script.sql
+    ```

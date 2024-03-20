@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Agent Pool Networking - HMCTS</title>
+    <title>Connecting to Flexible Server - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/azure-pipelines/ado_agent_networking.html">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/database/connecting-to-flexible-server.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Agent Pool Networking - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/azure-pipelines/ado_agent_networking.html" />
+      <meta name="twitter:title" content="Connecting to Flexible Server - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/database/connecting-to-flexible-server.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Agent Pool Networking" />
+      <meta property="og:title" content="Connecting to Flexible Server" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/azure-pipelines/ado_agent_networking.html" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/database/connecting-to-flexible-server.html" />
 
     
   </head>
@@ -476,105 +476,71 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="agent-pool-networking">Agent Pool Networking</h1>
-<p>ADO pipelines, agent pools are most likley to be containers hosted by Azure Kubernetes services for HMCTS.</p>
-<p>Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
-If the agent is actually a Kubernetes container, it will also state the Kubernetes_Port, with HMCTS being 10.0.0.1:443.</p>
-<p><a href="images/ADO-Agent-Capabilities.png" rel="noopener noreferrer"><img src="images/ADO-Agent-Capabilities.png" alt="Agent_Capabilities" /></a></p>
-<h2 id="virtual-networks">Virtual Networks</h2>
-<p>These are examples of some of the agent pool and vNet names</p>
-<div class="table-container">
-        <table>
-          <tr>
-<th>Agent Pool</th>
-<th>Virtual network</th>
-</tr><tr>
-<td>hmcts-ss-ptl</td>
-<td>ss-ptl-vnet</td>
-</tr><tr>
-<td>hmcts-ss-ptl</td>
-<td>ss-ptl-vnet</td>
-</tr><tr>
-<td>hmcts-ss-ptlsbox</td>
-<td>ss-ptlsbox-vnet</td>
-</tr><tr>
-<td>hmcts-ss-ptlsbox</td>
-<td>ss-ptlsbox-vnet</td>
-</tr>
-        </table>
-      </div><h2 id="palo-alto-firewalls">Palo Alto Firewalls</h2>
-<p>Traffic from the agent pool to the Azure resource, flows through the Palo Alto if the infrastructure has been correctly configured.</p>
-<p><a href="images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png" rel="noopener noreferrer"><img src="images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png" alt="Firewall_Monitor" /></a></p>
-<p>Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet secuirty rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
-If the traffic is coming into Azure from the agent pool, use Azure portal Network Watch to troubleshoot.</p>
-<h2 id="ado-connections-to-hmcts-environments">ADO Connections to HMCTS Environments</h2>
-<p>HMCTS operates 3 main Azure environments (SBOX, NONPROD and PROD), which are isolated from each other. ADO agent pools are connected to only ONE of these environments.
-If your pipeline is reporting network errors and you are not observing ADO traffic in the Palo Alto.  First suspect the wrong agent pool has been selected. Then start investigating the other links in the chain.</p>
-<p><a href="images/ADO-Agent-Connections.png" rel="noopener noreferrer"><img src="images/ADO-Agent-Connections.png" alt="Azure_WAN_Connections" /></a></p>
-<h2 id="agent-routing">Agent Routing</h2>
-<p>If you vNET is new, you may need to update the route table aks-ptl-route-table, to enable the agents in K8s to reach your resources.</p>
-<p><a href="https://github.com/hmcts/azure-private-dns">Azure-Private-DNS</a></p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>environment / 01-network /
-</code></pre></div><h2 id="private-dns-zones-and-private-end-points">Private DNS Zones and Private End Points</h2>
-<p>To enable ADO agents to resolve private DNS zones, each zone needs to be linked to the vNet contacting the Agent Pool.</p>
-<p><a href="https://github.com/hmcts/aks-sds-deploy">aks-sds-deploy Repo</a></p>
-<p>Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the &ldquo;stages to run&rdquo; option.
-Besure you have selected the correct <strong>Environment</strong> for your ADO agent network.</p>
-<p>Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets</p>
-<p><a href="https://github.com/hmcts/azure-private-dns/tree/master/environments/privatelink">Azure-Private-DNS-Private-Link</a></p>
-<h2 id="public-network-services-or-private">Public Network Services or Private</h2>
-<p>Some Azure resources (Storage Accounts, Databases, Purview, etc) can be configured as either public or private, with private creating additional requirements for agent pool access.</p>
-<p><a href="images/ADO-Resource-Firewall.png" rel="noopener noreferrer"><img src="images/ADO-Resource-Firewall.png" alt="Resource_Firewall" /></a></p>
-<h3 id="example-of-private-storage-account">Example of private storage account</h3>
-<p>Pipeline will fail with an AuthorizationFailure error if only private network access is configured and access has not been granted.</p>
-<p><a href="images/ADO-Storage-Error.png" rel="noopener noreferrer"><img src="images/ADO-Storage-Error.png" alt="Resource_Firewall" /></a></p>
-<h3 id="raw-error-message">RAW Error Message</h3>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>2023-07-25T16:31:31.0612142Z Error: containers.Client#GetProperties: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailure" Message="This request is not authorized to perform this operation.\nRequestId:19ad4843-f01e-007b-3515-bfe0bc000000\nTime:2023-07-25T16:31:30.6786267Z"
-2023-07-25T16:31:31.0613295Z
-2023-07-25T16:31:31.0613887Z  with module.sftp_cft_storage.azurerm_storage_container.container["dlrm"],
-2023-07-25T16:31:31.0615351Z  on .terraform/modules/sftp_cft_storage/containers.tf line 2, in resource "azurerm_storage_container" "container":
-2023-07-25T16:31:31.0616205Z   2: resource "azurerm_storage_container" "container" 
-2023-07-25T16:31:31.0616683Z
-</code></pre></div><p><a href="images/ADO-SA-vNet.png" rel="noopener noreferrer"><img src="images/ADO-SA-vNet.png" alt="Resource_vNet_Permissions" /></a></p>
-<p>Terraform code that adds agent pool vNets to the storage account: <a href="https://github.com/hmcts/ops-jumpboxes/blob/master/components/storage/40-storage.tf">link</a></p>
-<div class="highlight"><pre class="highlight terraform" tabindex="0"><code><span class="k">module</span> <span class="s2">"storage"</span> <span class="p">{</span>
-    <span class="nx">for_each</span> <span class="p">=</span> <span class="p">{</span> <span class="nx">for</span> <span class="nx">account</span> <span class="nx">in</span> <span class="kd">local</span><span class="p">.</span><span class="nx">flattened_storage_accounts</span> <span class="err">:</span> <span class="s2">"</span><span class="k">${</span><span class="nx">account</span><span class="p">.</span><span class="nx">key</span><span class="k">}</span><span class="s2">-</span><span class="k">${</span><span class="nx">account</span><span class="p">.</span><span class="nx">account_key</span><span class="k">}</span><span class="s2">"</span> <span class="p">=</span><span class="err">&gt;</span> <span class="nx">account</span> <span class="p">}</span>
-    <span class="nx">source</span>   <span class="p">=</span> <span class="s2">"github.com/hmcts/cnp-module-storage-account?ref=master"</span>
+            <h1 id="connecting-to-flexible-server">Connecting to Flexible Server</h1>
+<p>You can connect to the flexible server databases using a couple of methods outlined below. Either will work but using an application like <a href="https://www.pgadmin.org/">pgAdmin</a> is arguably a bit more user friendly than the command line.</p>
+<h2 id="using-pgadmin">Using pgAdmin</h2>
+<p><strong>Note:</strong> This example shows how to connect to ccd-data-store in production. Replace any ccd specific values for whichever server you are connecting to.</p>
 
-    <span class="nx">env</span>                        <span class="p">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">env</span>
-    <span class="nx">storage_account_name</span>       <span class="p">=</span> <span class="s2">"</span><span class="k">${</span><span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account_key</span><span class="k">}${</span><span class="kd">var</span><span class="p">.</span><span class="nx">env</span><span class="k">}</span><span class="s2">stor"</span>
-    <span class="nx">resource_group_name</span>        <span class="p">=</span> <span class="nx">azurerm_resource_group</span><span class="p">.</span><span class="nx">this</span><span class="p">[</span><span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">key</span><span class="p">].</span><span class="nx">name</span>
-    <span class="nx">location</span>                   <span class="p">=</span> <span class="nx">azurerm_resource_group</span><span class="p">.</span><span class="nx">this</span><span class="p">[</span><span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">key</span><span class="p">].</span><span class="nx">location</span>
-    <span class="nx">account_kind</span>               <span class="p">=</span> <span class="s2">"StorageV2"</span>
-    <span class="nx">account_tier</span>               <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">tier</span>
-    <span class="nx">account_replication_type</span>   <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">replication_type</span>
-    <span class="nx">enable_hns</span>                 <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">enable_hns</span>
-    <span class="nx">enable_sftp</span>                <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">enable_sftp</span>
-    <span class="nx">enable_nfs</span>                 <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">enable_nfs</span>
-    <span class="nx">private_endpoint_subnet_id</span> <span class="p">=</span> <span class="s2">"/subscriptions/</span><span class="k">${data</span><span class="p">.</span><span class="nx">azurerm_subscription</span><span class="p">.</span><span class="nx">this</span><span class="p">.</span><span class="nx">subscription_id</span><span class="k">}</span><span class="s2">/resourceGroups/</span><span class="k">${data</span><span class="p">.</span><span class="nx">azurerm_resource_group</span><span class="p">.</span><span class="nx">vnet_rg</span><span class="p">.</span><span class="nx">name</span><span class="k">}</span><span class="s2">/providers/Microsoft.Network/virtualNetworks/</span><span class="k">${data</span><span class="p">.</span><span class="nx">azurerm_virtual_network</span><span class="p">.</span><span class="nx">vnet</span><span class="p">.</span><span class="nx">name</span><span class="k">}</span><span class="s2">/subnets/</span><span class="k">${module</span><span class="p">.</span><span class="nx">networking</span><span class="p">[</span><span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">key</span><span class="p">].</span><span class="nx">subnet_names</span><span class="p">[</span><span class="s2">"</span><span class="k">${data</span><span class="p">.</span><span class="nx">azurerm_virtual_network</span><span class="p">.</span><span class="nx">vnet</span><span class="p">.</span><span class="nx">name</span><span class="k">}</span><span class="s2">-</span><span class="k">${</span><span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">key</span><span class="k">}</span><span class="s2">"</span><span class="p">]</span><span class="k">}</span><span class="s2">"</span>
-    <span class="nx">containers</span>                 <span class="p">=</span> <span class="nx">each</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">containers</span>
+<ol>
+<li>Request bastion access <a href="https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages">here.</a></li>
+<li>Open terminal and run:
+<code>cmd
+POSTGRES_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+ssh bastion-prod.platform.hmcts.net -L 5440:${POSTGRES_HOST}:5432
+</code></li>
+<li>Once connected to the bastion, open pgAdmin -&gt; right click <code>Servers</code> -&gt; <code>Register</code> -&gt; <code>Server</code>.</li>
+<li>Enter a Name and untick <code>Connect now?</code>.</li>
+<li>Go to <code>Connection</code> tab and enter the following values:
+<code>cmd
+Host name/addres: ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+Port: 5432
+Maintenance database: ccd_data_store
+Username: DTS Platform Operations SC
+</code></li>
+<li>Click <code>Save</code>.</li>
+<li>Open a terminal and run:
+<code>cmd
+az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv
+</code></li>
+<li>In pgAdmin, select the connection from the panel. You will be prompted to enter a password. Paste in the token returned from the above command.</li>
+</ol>
+<p><strong>Note:</strong> You can use <code>DTS Platform Operations</code> user for non-prod servers.</p>
+<h2 id="using-psql">Using psql</h2>
+<p><strong>Note:</strong> This example shows how to connect to ccd-data-store in production. Replace any ccd specific values for whichever server you are connecting to.</p>
 
-    <span class="nx">sa_subnets</span> <span class="p">=</span> <span class="p">[</span>
-      <span class="k">data</span><span class="p">.</span><span class="nx">azurerm_subnet</span><span class="p">.</span><span class="nx">ssptl</span><span class="err">-</span><span class="mi">00</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
-      <span class="k">data</span><span class="p">.</span><span class="nx">azurerm_subnet</span><span class="p">.</span><span class="nx">ssptl</span><span class="err">-</span><span class="mi">01</span><span class="p">.</span><span class="nx">id</span>
-    <span class="p">]</span>
+<ol>
+<li>Request bastion access <a href="https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages">here.</a></li>
+<li>Open terminal and run:
+<code>cmd
+ssh bastion-prod.platform.hmcts.net
+</code></li>
+<li>Once connected to the bastion, run:
+&ldquo;`cmd
+DB_HOST=ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com
+DB_NAME=ccd_data_store
+DB_USER=&quot;DTS\ Platform\ Operations\ SC&rdquo;
+export PGPASSWORD=$(az account get-access-token &ndash;resource-type oss-rdbms &ndash;query accessToken -o tsv)</li>
+</ol>
+<p>psql &ldquo;sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432&rdquo;
+&ldquo;`
+4. You will be presented with an interactive psql shell where you can run your sql queries.</p>
+<p><strong>Note:</strong> You can use <code>DB_USER=&quot;DTS\ Platform\ Operations&quot;</code> user for non-prod servers.</p>
+<p><strong>Note:</strong> You can run sql scripts using this method by appending <code>-f</code> followed by the name of the sql script e.g.
+<code>cmd
+psql &quot;sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432&quot; -f script.sql
+</code></p>
 
-    <span class="nx">team_name</span>    <span class="p">=</span> <span class="s2">"Platform Operations"</span>
-    <span class="nx">team_contact</span> <span class="p">=</span> <span class="s2">"#dtspo-orange"</span>
-    <span class="nx">common_tags</span>  <span class="p">=</span> <span class="k">module</span><span class="p">.</span><span class="nx">ctags</span><span class="p">.</span><span class="nx">common_tags</span>
-  <span class="p">}</span>
-</code></pre></div>
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-03-14">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 14 March 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 14 March 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 14 March 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -584,8 +550,8 @@ Besure you have selected the correct <strong>Environment</strong> for your ADO a
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/azure-pipelines/ado_agent_networking.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Agent+Pool+Networking%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fazure-pipelines%2Fado_agent_networking.html%29&amp;labels=bug&amp;title=Re%3A+%27Agent+Pool+Networking%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/connecting-to-flexible-server.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Connecting+to+Flexible+Server%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2Fdatabase%2Fconnecting-to-flexible-server.html%29&amp;labels=bug&amp;title=Re%3A+%27Connecting+to+Flexible+Server%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

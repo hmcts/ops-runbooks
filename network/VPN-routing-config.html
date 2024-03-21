@@ -538,9 +538,13 @@ Note: If using Firefox then the search function probably won&rsquo;t find the IP
 <li>Failed to open tunnel, Tunnel server already launched: Find the svpn process id: <code>ps alx | grep svpn</code>, on the result process ID use the kill command: <code>kill -9 [the process id from the ps command]</code>, and or restart the machine.</li>
 </ul>
 <p>If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you&rsquo;ll need the F5 serial number / Registration key.<br>
-To get this, you need to access the command line by <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview">SSHing into the VPN</a></p>
-<p>There you can run this command: <code>show sys license</code>.</p>
-<p>The registration key will show in the output and you can then initiate the support request.</p>
+To get this, you need to access the command line by <a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/mgmt-vpn-2-mgmt/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview">SSHing into the VPN</a></p>
+<p>To ssh you will need an account on the F5 VPN admin site with terminal access set.</p>
+<p>ssh from your local terminal session - for example &lsquo;ssh willw@%public IP address%&rsquo;</p>
+<p>There you can run this command: <code>show sys license</code> or  <code>tmsh show sys license</code>.</p>
+<p>The registration key will show in the output (last seven characters required) and you can then initiate the support request.</p>
+<p>To raise a case you will need an account setup using your hmcts.net on my.f5.com (https://my.f5.com/manage/s/contactsupport). You can also call 0-800-404-9597</p>
+<p>Further instructions on how to raise cases: https://my.f5.com/manage/s/article/K000135931</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
     <div class='page-expiry--not-expired'>

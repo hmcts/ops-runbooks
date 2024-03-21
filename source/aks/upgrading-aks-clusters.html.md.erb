@@ -23,12 +23,37 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 - Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
 - Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
 
-## Pods and HRs Health Checks
+## Planning
 
-Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for notifications rather than announcements).
+Before starting to upgrade any clusters, we need to find out if the version of kubernetes we are upgrading to has any deprecations in it that might affect our applications.
+
+We can do this using the  [pluto tool](https://github.com/FairwindsOps/pluto).
+
+Ensure you're logged into the correct cluster.
+
+```command
+kubectl config current-context
+```
+
+Run pluto against all the clusters to ensure there are no resources using apiVersions that will be deprecated in the kubernetes version you are upgrading to.
+
+```command
+pluto detect-helm -owide --target-versions k8s=v1.29 --only-show-removed
+```
+
+If there are deprecations, create a plan to address them before upgrading any cluster.
+
+If there are no apiVersions being deprecated, then you can proceed with the upgrade, going through the environments above in order.
+
+## Notify teams
+
+Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for announcements rather than notification).
+
 Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters. 
 
-Ensure your logged into the correct cluster.
+## Pods and HRs Health Checks
+
+Ensure you're logged into the correct cluster.
 
 ```command
 kubectl config current-context
@@ -41,12 +66,6 @@ kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all
 ```
 
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
-
-- Check if pluto needs updating on the cluster
-
-```command
-pluto detect-helm -owide --target-versions k8s=v1.26 --only-show-removed
-```
 
 - Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. 
 

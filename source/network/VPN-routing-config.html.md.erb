@@ -73,8 +73,16 @@ Select Apply
 * Failed to open tunnel, Tunnel server already launched: Find the svpn process id: `ps alx | grep svpn`, on the result process ID use the kill command: `kill -9 [the process id from the ps command]`, and or restart the machine.
 
 If the issue persists or has no available solution, you may need to initiate a support request with F5. To do this you'll need the F5 serial number / Registration key.  
-To get this, you need to access the command line by [SSHing into the VPN](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/rg-mgmt-vpn/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview) 
+To get this, you need to access the command line by [SSHing into the VPN](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ed302caf-ec27-4c64-a05e-85731c3ce90e/resourceGroups/mgmt-vpn-2-mgmt/providers/Microsoft.Network/publicIPAddresses/pip-vpn-mgmt/overview) 
 
-There you can run this command: `show sys license`.
+To ssh you will need an account on the F5 VPN admin site with terminal access set.
 
-The registration key will show in the output and you can then initiate the support request.
+ssh from your local terminal session - for example 'ssh willw@%public IP address%'
+
+There you can run this command: `show sys license` or  `tmsh show sys license`.
+
+The registration key will show in the output (last seven characters required) and you can then initiate the support request.
+
+To raise a case you will need an account setup using your hmcts.net on my.f5.com (https://my.f5.com/manage/s/contactsupport). You can also call 0-800-404-9597 
+
+Further instructions on how to raise cases: https://my.f5.com/manage/s/article/K000135931

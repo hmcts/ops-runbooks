@@ -23,7 +23,7 @@ jobs:
       - name: Build
         run: bundle exec middleman build
       - name: 'Check for broken links'
-        run: htmlproofer --help
+        run: bundler exec htmlproofer --help
 
   publish:
     needs: build

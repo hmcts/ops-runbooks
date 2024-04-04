@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: 'Build and Test'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Ruby
@@ -22,6 +22,21 @@ jobs:
           bundler-cache: true
       - name: Build
         run: bundle exec middleman build
+      - name: 'Check for broken links'
+        run: htmlproofer --help
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    name: 'Publish Site'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.1
+          architecture: 'x64'
+          bundler-cache: true
       - name: Publish
         run: |
           rm -rf build

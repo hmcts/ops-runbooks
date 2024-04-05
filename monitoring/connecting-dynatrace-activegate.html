@@ -213,6 +213,9 @@
     <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
   </li>
   <li>
+    <a href="../monitoring/palo-alto-snmp-dynatrace.html"><span>Updating Palo Alto SNMP settings</span></a>
+  </li>
+  <li>
     <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
   </li>
   <li>
@@ -318,6 +321,9 @@
   </li>
   <li>
     <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
+  </li>
+  <li>
+    <a href="../jenkins/install-packages.html"><span>How to add new packages to Jenkins VM Builders</span></a>
   </li>
   <li>
     <a href="../jenkins/plugin-downgrade.html"><span>How to downgrade a Jenkins plugin</span></a>
@@ -485,26 +491,40 @@
 <h2 id="connecting-to-dynatrace-vms-activegate-connecting-to-dynatrace-vms-activegate">Connecting to Dynatrace VMs (ActiveGate)</h2>
 
 <ul>
-<li>Dynatrace ActiveGate VMs exist as instances of different VMSS:
+<li><p>Dynatrace ActiveGate VMs exist as instances of different Virtual Machine Scale Sets:</p>
 
 <ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-private-ptl-vmss">Private PTL</a></li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-ptl-vmss">PTL</a></li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-private-nonprod-vmss">Private Nonprod</a></li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-nonprod-vmss">Nonprod</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/2b1afc19-5ca9-4796-a56f-574a58670244/resourceGroups/dynatrace-activegate-prod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-private-prod-vmss/overview">Private Prod</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/2b1afc19-5ca9-4796-a56f-574a58670244/resourceGroups/dynatrace-activegate-prod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-prod-vmss/overview">Prod</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b44eb479-9ae2-42e7-9c63-f3c599719b6f/resourceGroups/dynatrace-activegate-nonprod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-private-nonprod-vmss/overview">Private NonProd</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b44eb479-9ae2-42e7-9c63-f3c599719b6f/resourceGroups/dynatrace-activegate-nonprod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-nonprod-vmss">NonProd</a></li>
 </ul></li>
 </ul>
-<p>Use SSH to connect to the virtual machine, run the below <code>IPList.sh</code> to output available machines to connect to:</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c"># List all active gate virtual machine IP addresses</span>
-./monitoring/bin/IPList.sh
+<p>Request access and connect to one of the bastions and then connect to the one of the instances of the scale set either via its DNS name.</p>
+<p>The following DNS records have been set up to point to the active instance in the scalesets:</p>
 
-<span class="c"># Download key</span>
-az keyvault secret download <span class="nt">-f</span> ~/.ssh/dt-key <span class="nt">--vault-name</span> cftptl-intsvc <span class="nt">--name</span> aks-ssh-private-key
-<span class="nb">chmod </span>600 ~/.ssh/dt-key
+<ul>
+<li>dynatrace-activegate-private-prod.platform.hmcts.net</li>
+<li>dynatrace-activegate-prod.platform.hmcts.net</li>
+<li>dynatrace-activegate-private-nonprod.platform.hmcts.net</li>
+<li>dynatrace-activegate-nonprod.platform.hmcts.net</li>
+</ul>
+<p>If you need to connect to a non-active instance, you can use it&rsquo;s DNS name which will be something like:</p>
 
-<span class="c"># Connect</span>
-ssh <span class="nt">-i</span> ~/.ssh/dt-key azureuser@<span class="o">{</span>replace_me_with_vm_ip<span class="o">}</span>
-</code></pre></div>
+<ul>
+<li>dynatrace-activegate-private-prod-vmss000000.platform.hmcts.net</li>
+<li>dynatrace-activegate-prod-vmss000000.platform.hmcts.net</li>
+<li>dynatrace-activegate-private-nonprod-vmss000000.platform.hmcts.net</li>
+<li>dynatrace-activegate-nonprod-vmss000000.platform.hmcts.net</li>
+</ul>
+<p>You can also connect to it via it&rsquo;s IP address, which can be found in the Azure portal by clicking on the instance.</p>
+<p>SSH requires a private key for authentication, which can be found in <a href="https://github.com/hmcts/dynatrace-activegate/blob/8db16ee4baac8fcdfd7995417be494ad838c4e98/components/activegate/vm.tf#L27">this keyvault</a>.</p>
+<p>You can also use your Microsoft Entra ID login credentials with Just In Time Access.</p>
+<p>Request access via the dynatrace access package from the <a href="https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages">My Access</a> page.</p>
+<p>SSH to the appropriate bastion and run <code>az login</code>.</p>
+<p>Use the <code>az ssh --ip</code> command followed by the IP address of the VM to connect to it using your own account.</p>
+<p>If you are getting <code>permission denied</code>, try upgrading the instance in the portal.</p>
+
               <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
     <div class='page-expiry--not-expired'>
       This page was last reviewed on 26 January 2024.

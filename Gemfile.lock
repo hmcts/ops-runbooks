@@ -145,6 +145,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.13.10-x86_64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.10-x86_64-linux)
+      racc (~> 1.4)
     openapi3_parser (0.9.2)
       commonmarker (~> 0.17)
     padrino-helpers (0.15.3)
@@ -191,6 +193,7 @@ GEM
 
 PLATFORMS
   universal-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   govuk_tech_docs

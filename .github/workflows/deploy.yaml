@@ -23,7 +23,7 @@ jobs:
       - name: Build
         run: bundle exec middleman build
       - name: 'Check for broken links'
-        run: bundle exec htmlproofer --extensions .html --disable-external true --ignore-missing-alt=true --check-internal-hash=false ./build
+        run: bundle exec htmlproofer --extensions .html --ignore-missing-alt=true --check-internal-hash=false --check-external-hash=false ./build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

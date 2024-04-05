@@ -23,7 +23,7 @@ jobs:
       - name: Build
         run: bundle exec middleman build
       - name: 'Check for broken links'
-        run: bundler exec htmlproofer --help
+        run: bundle exec htmlproofer --extensions .html --disable-external true --ignore-missing-alt=true --check-internal-hash=false ./build
 
   publish:
     needs: build

@@ -1,4 +1,4 @@
-name: publish
+name: Static site build and publish
 
 on:
   pull_request:

@@ -20,7 +20,7 @@ More information can be found [here](https://learn.microsoft.com/en-us/azure/aks
 
 ### Running the script
 
-Make sure to run `az login`. To run the script, clone this repository and switch into the `aks/workload identity migration` directory, run `./bin/checkWorkloadIdentityMigration.sh`. The script runs against your current kubectl context.
+Make sure to run `az login`. To run the script, clone this repository and switch into the `aks/workload-identity-migration` directory, run `./bin/checkWorkloadIdentityMigration.sh`. The script runs against your current kubectl context.
 Three CSV files are created in the background to collate results: 
 
 - A list of all old Azure Identities remaining on the cluster. After running the script run `./bin/checkWorkloadIdentityMigration.sh view_azureidentities` to view this in your terminal.

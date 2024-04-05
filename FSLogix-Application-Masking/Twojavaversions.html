@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Generating an SAS Token - HMCTS</title>
+    <title>FFSLogix-Java Rule Editor - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts-runbooks.github.io/SAS Token/">
+    <link rel="canonical" href="https://hmcts-runbooks.github.io/FSLogix-Application-Masking/Twojavaversions.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts-runbooks.github.io" />
       <meta name="twitter:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
-      <meta name="twitter:title" content="Generating an SAS Token - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/SAS Token/" />
+      <meta name="twitter:title" content="FFSLogix-Java Rule Editor - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts-runbooks.github.io/FSLogix-Application-Masking/Twojavaversions.html" />
 
       <meta property="og:image" content="https://hmcts-runbooks.github.io/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Generating an SAS Token" />
+      <meta property="og:title" content="FFSLogix-Java Rule Editor" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts-runbooks.github.io/SAS Token/" />
+      <meta property="og:url" content="https://hmcts-runbooks.github.io/FSLogix-Application-Masking/Twojavaversions.html" />
 
     
   </head>
@@ -114,7 +114,7 @@
 <li><a href="../aks/index.html"><span>AKS</span></a>
 <ul>
   <li>
-    <a href="../aks/workload identity migration/index.html"><span>Workload Identity Migration</span></a>
+    <a href="../aks/workload-identity-migration/index.html"><span>Workload Identity Migration</span></a>
   </li>
   <li>
     <a href="../aks/scripts.html"><span>AKS Scripts</span></a>
@@ -123,31 +123,28 @@
     <a href="../aks/known-issues.html"><span>AKS Known Issues</span></a>
   </li>
   <li>
-    <a href="../aks/patching-dynatrace.html"><span>Dynatrace Patching Example</span></a>
-  </li>
-  <li>
     <a href="../aks/upgrading-aks-clusters.html"><span>Upgrading AKS Clusters</span></a>
-  </li>
-  <li>
-    <a href="../aks/patching-flux-example.html"><span>Flux Patching Example</span></a>
-  </li>
-  <li>
-    <a href="../aks/patching-neuvector.html"><span>Neuvector Patching</span></a>
-  </li>
-  <li>
-    <a href="../aks/patching-pact-broker-example.html"><span>Pact-Broker Patching Example</span></a>
-  </li>
-  <li>
-    <a href="../aks/patching-aks-apps.html"><span>Patching AKS Apps Overview</span></a>
   </li>
   <li>
     <a href="../aks/patching-traefik.html"><span>Traefik Patching Example</span></a>
   </li>
   <li>
-    <a href="../aks/patching-prometheus-grafana-example.html"><span>Prometheus/Grafana Patching Example</span></a>
+    <a href="../aks/patching-pact-broker-example.html"><span>Pact-Broker Patching Example</span></a>
   </li>
   <li>
     <a href="../aks/patching-keda-example.html"><span>KEDA Patching Example</span></a>
+  </li>
+  <li>
+    <a href="../aks/patching-aks-apps.html"><span>Patching AKS Apps Overview</span></a>
+  </li>
+  <li>
+    <a href="../aks/patching-prometheus-grafana-example.html"><span>Prometheus/Grafana Patching Example</span></a>
+  </li>
+  <li>
+    <a href="../aks/updating-neuvector-policies.html"><span>Updating Neuvector Policies</span></a>
+  </li>
+  <li>
+    <a href="../aks/patching-kured-example.html"><span>kured Patching Example</span></a>
   </li>
   <li>
     <a href="../aks/patching-artifactory.html"><span>Artifactory Patching</span></a>
@@ -156,13 +153,16 @@
     <a href="../aks/patching-artifactory.html"><span>Artifactory Patching Process</span></a>
   </li>
   <li>
-    <a href="../aks/updating-neuvector-policies.html"><span>Updating Neuvector Policies</span></a>
-  </li>
-  <li>
     <a href="../aks/patching-dns-node-cache.html"><span>DNS Node Cache Patching</span></a>
   </li>
   <li>
-    <a href="../aks/patching-kured-example.html"><span>kured Patching Example</span></a>
+    <a href="../aks/patching-dynatrace.html"><span>Dynatrace Patching Example</span></a>
+  </li>
+  <li>
+    <a href="../aks/patching-flux-example.html"><span>Flux Patching Example</span></a>
+  </li>
+  <li>
+    <a href="../aks/patching-neuvector.html"><span>Neuvector Patching</span></a>
   </li>
   <li>
     <a href="../aks/rebuilding-aks-clusters.html"><span>Rebuilding AKS Clusters</span></a>
@@ -172,6 +172,13 @@
   </li>
   <li>
     <a href="../aks/if-something-goes-wrong.html"><span>If Something Goes Wrong</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Access-and-Permissions/index.html"><span>Access and Permissions</span></a>
+<ul>
+  <li>
+    <a href="../Access-and-Permissions/production-readers.html"><span>Granting read access to production environments</span></a>
   </li>
 </ul>
 </li>
@@ -194,13 +201,6 @@
   </li>
 </ul>
 </li>
-<li><a href="../Access-and-Permissions/index.html"><span>Access and Permissions</span></a>
-<ul>
-  <li>
-    <a href="../Access-and-Permissions/production-readers.html"><span>Granting read access to production environments</span></a>
-  </li>
-</ul>
-</li>
 <li><a href="../monitoring/index.html"><span>Monitoring</span></a>
 <ul>
   <li>
@@ -213,13 +213,13 @@
     <a href="../monitoring/availability-tests.html"><span>Availability Tests in App Insights</span></a>
   </li>
   <li>
+    <a href="../monitoring/monitoring-request.html"><span>Raise a Dynatrace Monitoring Request</span></a>
+  </li>
+  <li>
     <a href="../monitoring/palo-alto-snmp-dynatrace.html"><span>Updating Palo Alto SNMP settings</span></a>
   </li>
   <li>
     <a href="../monitoring/connecting-dynatrace-activegate.html"><span>Connecting to Dynatrace VMs (ActiveGate)</span></a>
-  </li>
-  <li>
-    <a href="../monitoring/monitoring-request.html"><span>Raise a Dynatrace Monitoring Request</span></a>
   </li>
 </ul>
 </li>
@@ -248,10 +248,10 @@
     <a href="../database/executing-queries.html"><span>Executing Queries</span></a>
   </li>
   <li>
-    <a href="../database/deleting-elastic-search-index.html"><span>How to delete Elastic Search Index</span></a>
+    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
   </li>
   <li>
-    <a href="../database/deleting-cases-from-ccd-datastore.html"><span>Deleting a case from CCD Datastore Database</span></a>
+    <a href="../database/deleting-elastic-search-index.html"><span>How to delete Elastic Search Index</span></a>
   </li>
   <li>
     <a href="../database/restoring-an-azure-single-server-database.html"><span>Restoring a Single Server Azure PostgreSQL Database</span></a>
@@ -301,10 +301,10 @@
     <a href="../heritage/patching-heritage-vms.html"><span>Patching Heritage Virtual Machines</span></a>
   </li>
   <li>
-    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
+    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
   </li>
   <li>
-    <a href="../heritage/Heritage-VM-Disk-Expansions-(PCOL).html"><span>Heritage VM Disk Expansions</span></a>
+    <a href="../heritage/DARTS-IDAM-Cert-Renewal.html"><span>Updating the DARTS IDAM certificates</span></a>
   </li>
   <li>
     <a href="../heritage/virtual-machine-list.html"><span>Heritage Virtual Machine List</span></a>
@@ -323,23 +323,23 @@
     <a href="../jenkins/run-command-on-all-agents.html"><span>Run command on all agents</span></a>
   </li>
   <li>
-    <a href="../jenkins/install-packages.html"><span>How to add new packages to Jenkins VM Builders</span></a>
+    <a href="../jenkins/plugin-downgrade.html"><span>How to downgrade a Jenkins plugin</span></a>
   </li>
   <li>
-    <a href="../jenkins/plugin-downgrade.html"><span>How to downgrade a Jenkins plugin</span></a>
+    <a href="../jenkins/install-packages.html"><span>How to add new packages to Jenkins VM Builders</span></a>
   </li>
 </ul>
 </li>
 <li><a href="../Services/index.html"><span>Services</span></a>
 <ul>
   <li>
-    <a href="../Services/databoarding.html"><span>Data Boarding</span></a>
-  </li>
-  <li>
     <a href="../Services/mailrelay.html"><span>Mailrelay Essentials</span></a>
   </li>
   <li>
     <a href="../Services/github.html"><span>Github Overview</span></a>
+  </li>
+  <li>
+    <a href="../Services/databoarding.html"><span>Data Boarding</span></a>
   </li>
   <li>
     <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
@@ -410,15 +410,15 @@
 <li><a href="../FinOps/index.html"><span>FinOps</span></a>
 <ul>
   <li>
-    <a href="../FinOps/spot-instances.html"><span>Using Spot instances with deployments</span></a>
+    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
   </li>
   <li>
-    <a href="../FinOps/manual-tagging.html"><span>Tagging Resources Manually</span></a>
+    <a href="../FinOps/spot-instances.html"><span>Using Spot instances with deployments</span></a>
   </li>
 </ul>
 </li>
   <li>
-    <a href="../SAS Token/index.html"><span>Generating an SAS Token</span></a>
+    <a href="../SAS-Token/index.html"><span>Generating an SAS Token</span></a>
   </li>
 <li><a href="../Domain-Services/index.html"><span>Domain Services</span></a>
 <ul>
@@ -427,26 +427,13 @@
   </li>
 </ul>
 </li>
-<li><a href="../FSLogix Application Masking/index.html"><span>FSLogix Application Masking</span></a>
+<li><a href="../FSLogix-Application-Masking/index.html"><span>FSLogix Application Masking</span></a>
 <ul>
   <li>
-    <a href="../FSLogix Application Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
+    <a href="../FSLogix-Application-Masking/Twojavaversions.html"><span>FFSLogix-Java Rule Editor</span></a>
   </li>
   <li>
-    <a href="../FSLogix Application Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
-  </li>
-</ul>
-</li>
-<li><a href="../Testing-Changes/index.html"><span>Testing Changes</span></a>
-<ul>
-  <li>
-    <a href="../Testing-Changes/temporary-flux-gitrepository.html"><span>Use GitRepository in Flux to test charts from a branch</span></a>
-  </li>
-  <li>
-    <a href="../Testing-Changes/test-chart-library-changes.html"><span>Use Helm Template to test chart library changes</span></a>
-  </li>
-  <li>
-    <a href="../Testing-Changes/drafting-a-release.html"><span>Create a draft release for testing purposes</span></a>
+    <a href="../FSLogix-Application-Masking/Hidenotepad.html"><span>Hide Notepad Demo</span></a>
   </li>
 </ul>
 </li>
@@ -460,6 +447,19 @@
   </li>
   <li>
     <a href="../AppAttach/appattach_scripts.html"><span>Modified AppAttach Scripts</span></a>
+  </li>
+</ul>
+</li>
+<li><a href="../Testing-Changes/index.html"><span>Testing Changes</span></a>
+<ul>
+  <li>
+    <a href="../Testing-Changes/drafting-a-release.html"><span>Create a draft release for testing purposes</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/temporary-flux-gitrepository.html"><span>Use GitRepository in Flux to test charts from a branch</span></a>
+  </li>
+  <li>
+    <a href="../Testing-Changes/test-chart-library-changes.html"><span>Use Helm Template to test chart library changes</span></a>
   </li>
 </ul>
 </li>
@@ -482,16 +482,54 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="generating-an-sas-token">Generating an SAS Token</h1>
-<p>This wiki page documents the procedure for generating a new SAS token</p>
-<h2 id="to-grant-yourself-permissions">To grant yourself permissions:</h2>
-<p>Go to the <a href="https://portal.azure.com/#blade/Microsoft_Azure_PIMCommon/CommonMenuBlade/quickStart">PIM settings</a>.</p>
-<p>Click on <strong>My roles</strong> under tasks in the left hand side. Select Group Administrator and select <strong>activate</strong>. Then submit your request for elevator permissions.</p>
-<p>Once this has been activated, add yourself to a group with the <strong>owner</strong> permission over the subscription the storage account you need to generate the token for sits in.</p>
-<h2 id="generating-the-token">Generating the token</h2>
-<p>Navigate to the storage account and open <code>Shared Access signature</code>. Select the level of permission required, be sure to select your allowed resource types and permissions, set the expiry date, and include the allowed IP address. After creating the token, ensure you copy the <code>Connection String</code> and the <code>SAS Token</code> shown on screen, securely pass these to the requester using something like pwpush.com.</p>
-<h2 id="whitelist-ip">Whitelist IP</h2>
-<p>In the same storage account navigate to Networking &gt; Firewall and add the required IP, ensuring you click save after adding, and then confirm the token is working.</p>
+            <h1 id="ffslogix-java-rule-editor">FFSLogix-Java Rule Editor</h1>
+<p>FSLogix has a &lsquo;Java Rule Editor&rsquo; that allows creating rules limiting certain web URLs or applications (specifically .exe files) to using specific versions of the Java Runtime Environment (JRE). This can be used to limit internet explorer itself or specific java applets running in those browsers to a specific version of Java. A demo of this feature has not been created yet. I believe we can utilise https://javatester.org/version.html to accomplish this. See also: https://www.htg.co.uk/blog/fslogix-first-look-1-managing-legacy-or
+Currently FSLogix has been tested using &lsquo;ClickOps&rsquo; i.e. connecting to a jumpbox via RDP and entering the rules manually via the FSLogix GUI. There exist some methods to deploy FSLogix rules via terraform. These need looking into: https://github.com/MicrosoftDocs/azure-dev-docs/blob/main/articles/terraform/create-avd-azure-files-storage.md</p>
+<p>We&rsquo;ve constructed a demo with two java applets on different sites running different versions of Java concurrently. One running JRE 7u80 and another, (while showing an error) can be seen to be running JRE 7u45.
+<p float="left'>
+<img src=images/Javaversion.png width="400" />
+<img src=images/Error.png width="400" />
+<img src=images/TwoJavaVersions.png width="400" />
+</p></p>
+<p>It should be noted that the 32-bit JRE must be installed in order for the java redirection to work. If only the 64-bit version of the desired JRE is present, it will default to the latest JRE installed on the machine. These rules will be applied when Internet Explorer starts up. In order to apply rules while Internet Explorer is running, it will need to be closed and re-opened before they are applied. Some applets may require a security exception in the Java Control Panel to work.
+The FSLogix Java Rule Editor is a separate software package to the normal Rule Editor. It saves rule projects as a .xmlp file. This is not sufficient to apply the rules, however. To do this, a .xml file must be generated by clicking the &lsquo;generate&rsquo; button or selecting &lsquo;file -&gt; generate&rsquo; from the menu bar. The .xml file must then be copied to the FSLogix system directory as detailed previously. Only the .xml file is required to apply the Java Rule. The .xmlp file is used only to generate the .xml file.</p>
+<p>In order to configure FSLogix rules via code, we can use a Powershell module called FSLogix.Powershell.Rules to create and configure FSLogix rules and assignments: https://github.com/FSLogix/FSLogix.Powershell.Rules/tree/master
+This module can be installed from Powershell Gallery with the following commands:
+Set-PSRepository -Name &lsquo;PSGallery&rsquo; -InstallationPolicy Trusted
+Install-Module -Name FSLogix.Powershell.Rules
+It&rsquo;s important to note I&rsquo;ve been unable to find any documentation for this module, so I will provide some information here that I&rsquo;ve gleamed largely from digging around in the module&rsquo;s source code.</p>
+<h2 id="adding-rules">Adding Rules</h2>
+<p>FSLogix rules can then be added via the Add-FslRule command:
+Add-FslRule -Path &ldquo;C:\Program Files\FSLogix\Apps\Rules\HideNotepad.fxr&rdquo; -HidingType FileOrValue -FullName &ldquo;C:\Windows\system32\notepad.exe&rdquo;
+The Path parameter specifies the path to the FSLogix rule file. Here we write directly to the FSLogix program directory where it reads it&rsquo;s rules from. This will require administrator priviliges. If said priviliges are not available, it may be desirable to create the files to a different directory and then copy them over later.
+The HidingType parameter is an enum and specifies the type of object we&rsquo;re hiding. This can be any of:
+• FolderOrKey
+• FileOrValue
+• Font
+• Printer
+For our purposes, we&rsquo;re only concerned with FolderOrKey to hide folders and FileOrValue to hide individual files.
+The FullName parameter specifies the full path of the object we want to hide. In the example above, we direct this to the windows notepad executable.</p>
+<h3 id="adding-assignments">Adding Assignments</h3>
+<p>FSLogix rules can then be assigned to users/groups via the Add-FslAssignment command:
+Add-FslAssignment -Path &ldquo;C:\Program Files\FSLogix\Apps\Rules\HideNotepad.fxa&rdquo; -RuleSetApplies -UserName &ldquo;your.email@hmcts.net&rdquo;
+The Path parameter specifies the path to the FSLogix assignment file. These should have the same name as the rule file they apply to, but with the .fxa extension instead of .fxr
+The RuleSetApplies parameter is a switch that determines whether a rule set applies to the group or user we&rsquo;re specifying. If present, the rule will apply to the entity we specify, if absent the rule will not apply. This can be used to include/exclude groups of users from a rule.
+The UserName parameter specifies the name of the user this assignment is targeting. Wildcards (*) are supported. Alternatives to targeting usernames include GroupName to target groups, ProcessName to target running programs and ADDistinguishedName to target active directory objects.</p>
+<h3 id="additional-functions">Additional Functions</h3>
+<p>The full list of commands added by the FSLogix.PowerShell.Rules module can be seen in the module&rsquo;s git repository: https://github.com/FSLogix/FSLogix.Powershell.Rules/tree/master/FSLogix.PowerShell.Rules/functions/Public
+Adding the -? flag to the end of a command name details the parameters of that command and sometimes provides examples, though the quality and quantity of documentation varies from command to command.</p>
+<h2 id="reloading-rules">Reloading Rules</h2>
+<p>Once rules have been added to the FSLogix program directory, FSLogix needs to be reloaded to apply them. This can be done with the FSLogix command-line utility that is installed alongside FSLogix:
+C:\Program` Files\FSLogix\Apps\frx.exe reload-rules</p>
+<h2 id="java-rules">Java Rules</h2>
+<p>The FSLogix.PowerShell.Rules module does not have functionality required to create and add Java redirection rules. Thankfully, unlike .fxa and .fxr files, Java rules are plaintext .xml files. This makes it possible to simply construct the Java rules with native PowerShell, if so desired. I&rsquo;ve provided a sample xml file that I created during testing. The structure of the file is very simple largely self-explanatory:
+&lt;?xml version=&ldquo;1.0&rdquo;?&gt;
+<FrxBrowserAssignments version="1.0">
+  <BrowserAssignment Url="*://*.javatester.org/*" Java="1.7.0_45" />
+  <BrowserAssignment Url="*://*.pinlady.net/*" Java="1.7.0_80" />
+  <BrowserAssignment Url="*://www.stat.cmu.edu/*" Java="1.7.0_45" />
+  <BrowserAssignment Url="https://caff.de/applettest/" Java="1.7.0_45" />
+</FrxBrowserAssignments></p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
     <div class='page-expiry--not-expired'>
@@ -513,8 +551,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/SAS%20Token/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Generating+an+SAS+Token%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FSAS+Token%2F%29&amp;labels=bug&amp;title=Re%3A+%27Generating+an+SAS+Token%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/FSLogix-Application-Masking/Twojavaversions.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27FFSLogix-Java+Rule+Editor%27+%28https%3A%2F%2Fhmcts-runbooks.github.io%2FFSLogix-Application-Masking%2FTwojavaversions.html%29&amp;labels=bug&amp;title=Re%3A+%27FFSLogix-Java+Rule+Editor%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

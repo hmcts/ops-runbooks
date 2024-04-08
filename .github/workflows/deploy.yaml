@@ -23,10 +23,7 @@ jobs:
       - name: Build
         run: bundle exec middleman build
       - name: 'Check for broken links'
-        run: bundle exec rake --tasks
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        run: bundle exec rake check_urls
 
   publish:
     needs: build

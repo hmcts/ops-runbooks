@@ -15,7 +15,7 @@ proofer = HTMLProofer.check_directory("./build",
 
 
 proofer.before_request do |request|
-    request.options[:headers]["Authorization"] = "Bearer #{token}" if request.base_url == "https://github.com"
+    request.options[:headers]["Authorization"] = "Bearer #{token}" if request.base_url.includes?("https://github.com")
 end
 
 # Run HTML Proofer against built HTML files

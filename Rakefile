@@ -8,7 +8,6 @@ task :check_urls do
     proofer = HTMLProofer.check_directory("./build", 
         { 
             :check_external_hash => false,
-            :check_internal_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
             # Ignore private repo urls as auth with this tool is a nightmare

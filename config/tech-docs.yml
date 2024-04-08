@@ -1,5 +1,5 @@
 # Host to use for canonical URL generation (without trailing slash)
-host: https://hmcts-runbooks.github.io
+host: https://hmcts.github.io/ops-runbooks
 
 # Header-related options
 show_govuk_logo: false

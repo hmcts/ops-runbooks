@@ -10,10 +10,24 @@ task :check_urls do
             :check_external_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
-            # Ignore private repo urls as auth with this tool is a nightmare
-            :ignore_urls =>  [%r{.*github.com/hmcts.*}] 
+            # Ignore pulls/branches as these do not translate to raw content
+            :ignore_urls =>  [%r{github\.com/hmcts/(?=.*(?:pull|tree))}]
         })
 
+    token = ENV.fetch('GH_TOKEN', nil)
+    proofer.before_request do |request|
+        if request.base_url.include?("https://github.com/hmcts/")
+            request.options[:headers]["Authorization"] = "Bearer #{token}"
+            base_url_parts = request.base_url.split('/')
+            if base_url_parts.length == 5 && !request.base_url.include?('#')
+                request.base_url = request.base_url.gsub("github.com", "raw.githubusercontent.com")
+                request.base_url += "/master/README.md"
+            elsif request.base_url.include?("/blob/")
+                request.base_url = request.base_url.gsub("/blob", "")
+                request.base_url = request.base_url.gsub("github.com", "raw.githubusercontent.com")
+            end
+        end
+    end
     # Run HTML Proofer against built HTML files
     proofer.run
 end

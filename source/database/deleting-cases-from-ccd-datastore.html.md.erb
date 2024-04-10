@@ -13,7 +13,7 @@ This is a 2-stage process that requires you delete the case from the database fi
 
 Hop on to the bastion and run the script below. 
 
-The script takes a .txt file as argument. The file should contain a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.
+The script takes a .txt file as an argument. The file should contain a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.
 
 ```bash
 #!/bin/bash
@@ -57,7 +57,7 @@ You can review the results in the `output.txt` file.
 
 From the bastion, ssh into the appropriate Elastic Search VM and run the script below.
 
-The script takes a .txt file as argument. The file should contain a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. It will loop through the .txt file and use each reference number to search for and delete the associated case from Elastic Search.
+The script takes a .txt file as an argument. The file should contain a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. It will loop through the .txt file, using each reference number to search for and delete the associated case from Elastic Search.
 
 ```bash 
 #!/bin/bash

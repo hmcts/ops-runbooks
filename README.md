@@ -2,7 +2,7 @@
 
 This repo is a collection of runbooks for common tasks and activities done by the operations / platforms teams, hosted with GitHub Pages on:
 
-[Ops-Runbooks Site](https://hmcts.github.io/ops-runbooks/)
+[Ops-Runbooks Site](https://hmcts.github.io/ops-runbooks/){:target="_blank"}
 
 <a href="https://gitpod.io/#https://github.com/hmcts/ops-runbooks">
   <img

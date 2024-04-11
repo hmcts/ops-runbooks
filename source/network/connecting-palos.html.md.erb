@@ -1,7 +1,7 @@
 ---
 title: Connecting to a Palo Alto firewall
 weight: 60
-last_reviewed_on: 2023-10-24
+last_reviewed_on: 2024-04-11
 review_in: 6 months
 ---
 
@@ -31,29 +31,40 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 - Provide your HMCTS login details, you'd be redirected to Microsoft login page if not already signed in
 - After successful authentication you'll be redirected back
 
+### Access Panorama via App Proxy (no need for VPN)
+- [panorama sandbox](https://panorama-sandbox.hmcts.net)
+- [panorama production](https://panorama.hmcts.net)
+
+### Access All systems via VPN:
+
 #### Panorama
+- [panorama-sbox](https://panorama-sbox-uks-0.sandbox.platform.hmcts.net)
+- [panorama-prod](https://panorama-prod-uks-0.platform.hmcts.net)
 
-sbox:
--[panorama-sbox-uks-0.sandbox.platform.hmcts.net](https://panorama-sbox-uks-0.sandbox.platform.hmcts.net)
-prod:
-- [panorama-prod-uks-0.platform.hmcts.net](https://panorama-prod-uks-0.platform.hmcts.net)
+#### Palo Alto Firewalls
+**sbox:**<br>
+- [uksouth palo 0](https://uksouth-palo-0.sandbox.platform.hmcts.net)
+- [uksouth palo 1](https://uksouth-palo-1.sandbox.platform.hmcts.net)
+  **nonprod:**<br>
+- [uksouth nonprod 0](https://uksouth-nonprod-palo-0.platform.hmcts.net)
+- [uksouth-nonprod 1](https://uksouth-nonprod-palo-1.platform.hmcts.net)
+  **prod:**<br>
+- [uksouth prod 0](https://uksouth-prod-palo-0.platform.hmcts.net)
+- [uksouthnonprod 1](https://uksouth-prod-palo-1.platform.hmcts.net)
 
+#### Sandbox Virtual Machines in Azure
 
-#### Sandbox Virtual Machines
+- [hmcts-hub-sbox-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview)
+- [hmcts-hub-sbox-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview)
 
-- [hmcts-hub-sbox-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview) - https://uksouth-sbox-palo-0.platform.hmcts.net
-- [hmcts-hub-sbox-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview) - https://uksouth-sbox-palo-1.platform.hmcts.net
+#### Non-prod Virtual Machines in Azure
 
+- [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview)
+- [hmcts-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview)
 
-### Non-prod Virtual Machines
+#### Prod Virtual machines in Azure
 
-- [hmcts-hub-nonprodi-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview) - https://uksouth-nonprod-palo-0.platform.hmcts.net
-- [hmcts-hub-nonprodi-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview) - https://uksouth-nonprod-palo-1.platform.hmcts.net
-
-
-#### Prod Virtual machines
-
-- [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview) - https://uksouth-prod-palo-0.platform.hmcts.net
-- [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview) - https://uksouth-prod-palo-1.platform.hmcts.net
+- [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview)
+- [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
 
 ---

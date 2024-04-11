@@ -507,43 +507,61 @@
   </details>
 - Provide your HMCTS login details, you&rsquo;d be redirected to Microsoft login page if not already signed in
 - After successful authentication you&rsquo;ll be redirected back</p>
+<h3 id="access-panorama-via-app-proxy-no-need-for-vpn">Access Panorama via App Proxy (no need for VPN)</h3>
+
+<ul>
+<li><a href="https://panorama-sandbox.hmcts.net">panorama sandbox</a></li>
+<li><a href="https://panorama.hmcts.net">panorama production</a></li>
+</ul>
+<h3 id="access-all-systems-via-vpn">Access All systems via VPN:</h3>
 <h4 id="panorama">Panorama</h4>
-<p>sbox:
--<a href="https://panorama-sbox-uks-0.sandbox.platform.hmcts.net">panorama-sbox-uks-0.sandbox.platform.hmcts.net</a>
-prod:
-- <a href="https://panorama-prod-uks-0.platform.hmcts.net">panorama-prod-uks-0.platform.hmcts.net</a></p>
-<h4 id="sandbox-virtual-machines">Sandbox Virtual Machines</h4>
 
 <ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview">hmcts-hub-sbox-int-palo-vm-0</a> - https://uksouth-sbox-palo-0.platform.hmcts.net</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview">hmcts-hub-sbox-int-palo-vm-1</a> - https://uksouth-sbox-palo-1.platform.hmcts.net</li>
+<li><a href="https://panorama-sbox-uks-0.sandbox.platform.hmcts.net">panorama-sbox</a></li>
+<li><a href="https://panorama-prod-uks-0.platform.hmcts.net">panorama-prod</a></li>
 </ul>
-<h3 id="non-prod-virtual-machines">Non-prod Virtual Machines</h3>
+<h4 id="palo-alto-firewalls">Palo Alto Firewalls</h4>
+<p><strong>sbox:</strong><br>
+- <a href="https://uksouth-palo-0.sandbox.platform.hmcts.net">uksouth palo 0</a>
+- <a href="https://uksouth-palo-1.sandbox.platform.hmcts.net">uksouth palo 1</a>
+  <strong>nonprod:</strong><br>
+- <a href="https://uksouth-nonprod-palo-0.platform.hmcts.net">uksouth nonprod 0</a>
+- <a href="https://uksouth-nonprod-palo-1.platform.hmcts.net">uksouth-nonprod 1</a>
+  <strong>prod:</strong><br>
+- <a href="https://uksouth-prod-palo-0.platform.hmcts.net">uksouth prod 0</a>
+- <a href="https://uksouth-prod-palo-1.platform.hmcts.net">uksouthnonprod 1</a></p>
+<h4 id="sandbox-virtual-machines-in-azure">Sandbox Virtual Machines in Azure</h4>
 
 <ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview">hmcts-hub-nonprodi-palo-vm-0</a> - https://uksouth-nonprod-palo-0.platform.hmcts.net</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview">hmcts-hub-nonprodi-palo-vm-1</a> - https://uksouth-nonprod-palo-1.platform.hmcts.net</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-0/overview">hmcts-hub-sbox-int-palo-vm-0</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-sbox-int-palo-vm-1/overview">hmcts-hub-sbox-int-palo-vm-1</a></li>
 </ul>
-<h4 id="prod-virtual-machines">Prod Virtual machines</h4>
+<h4 id="non-prod-virtual-machines-in-azure">Non-prod Virtual Machines in Azure</h4>
 
 <ul>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview">hmcts-hub-prod-int-palo-vm-0</a> - https://uksouth-prod-palo-0.platform.hmcts.net</li>
-<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview">hmcts-hub-prod-int-palo-vm-1</a> - https://uksouth-prod-palo-1.platform.hmcts.net</li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-0/overview">hmcts-hub-nonprodi-palo-vm-0</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Compute/virtualMachines/hmcts-hub-nonprodi-palo-vm-1/overview">hmcts-hub-nonprodi-palo-vm-1</a></li>
+</ul>
+<h4 id="prod-virtual-machines-in-azure">Prod Virtual machines in Azure</h4>
+
+<ul>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview">hmcts-hub-prod-int-palo-vm-0</a></li>
+<li><a href="https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview">hmcts-hub-prod-int-palo-vm-1</a></li>
 </ul>
 
 <hr>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2024-04-24">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-10-11">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 24 October 2023.
+      This page was last reviewed on 11 April 2024.
 
-        It needs to be reviewed again on 24 April 2024
+        It needs to be reviewed again on 11 October 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 24 April 2024
+      This page was set to be reviewed before 11 October 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

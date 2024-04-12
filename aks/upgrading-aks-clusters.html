@@ -504,7 +504,9 @@
 <h2 id="planning">Planning</h2>
 <p>Before starting to upgrade any clusters, we need to find out if the version of kubernetes we are upgrading to has any deprecations in it that might affect our applications.</p>
 <p>We can do this using the  <a href="https://github.com/FairwindsOps/pluto">pluto tool</a>.</p>
-<p>Ensure you&rsquo;re logged into the correct cluster.</p>
+<p>If you haven&rsquo;t got pluto install on your macbook, you can install using brew</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  brew install pluto
+</code></pre></div><p>Ensure you&rsquo;re logged into the correct cluster.</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl config current-context
 </code></pre></div><p>Run pluto against all the clusters to ensure there are no resources using apiVersions that will be deprecated in the kubernetes version you are upgrading to.</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pluto detect-helm -owide --target-versions k8s=v1.29 --only-show-removed
@@ -517,7 +519,7 @@
 <p>Ensure you&rsquo;re logged into the correct cluster.</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl config current-context
 </code></pre></div><p>Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -A | wc -l &gt; pods_total_count &amp;&amp; kubectl get pods -A &gt; pods_all_status &amp;&amp; kubectl get pods -A | awk '!/(Running|Succeeded)/' &gt; pods_not_running_or_succeeded &amp;&amp; kubectl get hr -A &gt; hr_all_status
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -A | wc -l &gt; pods_total_count &amp;&amp; kubectl get pods -A &gt; pods_all_status &amp;&amp; kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' &gt; pods_not_running_or_succeeded &amp;&amp; kubectl get hr -A &gt; hr_all_status
 </code></pre></div><p>Three files will be saved in the directory from which you are running the above command and &ldquo;ll&rdquo; in the cli to display the files.</p>
 
 <ul>
@@ -535,7 +537,7 @@
 <li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).</p></li>
 <li><p>To list all failed helm releases</p></li>
 </ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr --all-namespaces | grep False
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr --all-namespaces | awk '!/(True)/'
 </code></pre></div>
 <ul>
 <li>To view helm chart history</li>
@@ -562,10 +564,26 @@
 
 <ul>
 <li><a href="https://github.com/hmcts/sds-azure-platform/pull/473/files">PR example for SDS here</a></li>
-<li><a href="https://github.com/hmcts/azure-platform-terraform/pull/580/files">PR example for CFT here</a></li>
+<li><p><a href="https://github.com/hmcts/azure-platform-terraform/pull/580/files">PR example for CFT here</a></p></li>
+<li><p>Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be seperate PR and then pipeline build
+        1. Remove 00 Cluster IP
+        2. Put back 00 Cluster IP after successful upgrade
+        3. Remove 01 Cluster IP
+        4. Put back 01 Cluster IP after successful upgrade</p>
+
+<ul>
+<li>Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: </li>
+</ul></li>
 </ul>
-<p>Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer:</p>
 <p><a href="https://portal.azure.com">portal.azure.com</a> &gt; Load Balancer &gt; search for &lsquo;kubernetes-internal&rsquo; &gt; filter by the Resource Group &gt; click on the load balancer returned by the search &gt; click on Frontend IP Configuration &gt; the IP Address is the one you need</p>
+
+<ul>
+<li><p>Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster</p>
+
+<ul>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/30375/files">Example PR</a></li>
+</ul></li>
+</ul>
 <h2 id="environment-specific-steps">Environment Specific Steps</h2>
 <p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren&rsquo;t building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.</p>
@@ -623,17 +641,17 @@ Subsequently, please verify the status of [Jenkins instances] for CFT (https://b
 <p><code>waiting for update of Node Pool &quot;msnode&quot; (Kubernetes Cluster &quot;ss-sbox-00-aks&quot; / Resource Group &quot;ss-sbox-00-rg&quot;): Code=&quot;ReconcileVMSSAgentPoolFailed&quot; Message=&quot;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&quot; Message=\&quot;Cannot add network interface &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode&#39; with accelerated networking to an existing virtual machine &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0&#39;</code></p>
 <p>We&rsquo;ve seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-02-01">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-12">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 1 February 2024.
+      This page was last reviewed on 12 April 2024.
 
-        It needs to be reviewed again on 1 February 2025
+        It needs to be reviewed again on 12 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 1 February 2025
+      This page was set to be reviewed before 12 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

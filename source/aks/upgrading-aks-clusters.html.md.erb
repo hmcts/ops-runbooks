@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-02-01
+last_reviewed_on: 2024-04-12
 review_in: 12 months
 weight: 30
 ---
@@ -92,7 +92,7 @@ kubectl get pdb -A
 - To list all failed helm releases
 
 ```command
-kubectl get hr --all-namespaces | awk '/(Unknown|False)/'
+kubectl get hr --all-namespaces | awk '!/(True)/'
 ```
 - To view helm chart history
 

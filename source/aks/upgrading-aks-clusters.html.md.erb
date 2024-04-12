@@ -30,6 +30,7 @@ Before starting to upgrade any clusters, we need to find out if the version of k
 We can do this using the  [pluto tool](https://github.com/FairwindsOps/pluto).
 
 If you haven't got pluto install on your macbook, you can install using brew
+
   ```command
   brew install pluto
   ```
@@ -135,7 +136,8 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
 - Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
-  [Examaple PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
+
+  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.

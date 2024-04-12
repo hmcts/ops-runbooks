@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-02-01
+last_reviewed_on: 2024-04-12
 review_in: 12 months
 weight: 30
 ---
@@ -28,6 +28,12 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 Before starting to upgrade any clusters, we need to find out if the version of kubernetes we are upgrading to has any deprecations in it that might affect our applications.
 
 We can do this using the  [pluto tool](https://github.com/FairwindsOps/pluto).
+
+If you haven't got pluto install on your macbook, you can install using brew
+
+  ```command
+  brew install pluto
+  ```
 
 Ensure you're logged into the correct cluster.
 
@@ -62,7 +68,7 @@ kubectl config current-context
 Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:
 
 ```command
-kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
+kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
 ```
 
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
@@ -86,7 +92,7 @@ kubectl get pdb -A
 - To list all failed helm releases
 
 ```command
-kubectl get hr --all-namespaces | grep False
+kubectl get hr --all-namespaces | awk '!/(True)/'
 ```
 - To view helm chart history
 
@@ -119,9 +125,19 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 
-Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
+  - Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be seperate PR and then pipeline build
+            1. Remove 00 Cluster IP
+            2. Put back 00 Cluster IP after successful upgrade
+            3. Remove 01 Cluster IP
+            4. Put back 01 Cluster IP after successful upgrade
 
-[portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
+
+  [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+
+- Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
+
+  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.

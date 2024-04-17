@@ -68,7 +68,7 @@ kubectl config current-context
 Before upgrading any of the clusters run the following query on the cluster you are planning to upgrade to find out the statuses of the pods and hrs:
 
 ```command
-kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status
+kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status && kubectl get pdb -A > pdb_status && kubectl get hr --all-namespaces | awk '/(Unknown|False)/' > hr_failed_status
 ```
 
 Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
@@ -88,7 +88,7 @@ kubectl get pdb -A
   <%= warning_text('The <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade..') %>
 
 - We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster
-  
+
   - [PR example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
 
 

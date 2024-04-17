@@ -85,7 +85,7 @@ kubectl get helm --all-namespaces / kubectl get pods --all-namespaces
 kubectl get pdb -A
 ```
 
-  <%= warning_text('If the <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade..') %>
+  <%= warning_text('If the <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade. When it set to 0, it essentially prohibiting any voluntary evictions. This means that no pods can be taken down intentionally during maintenance or disruptions.') %>
 
 - We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster
 

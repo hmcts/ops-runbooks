@@ -50,6 +50,17 @@ If the graphs are being refreshed with new data, the logs are flowing.
 If the dynatrace dashboards are not receiving data, there are a couple of things you can check:
 
 - Are the DNS records pointing to the right instances?
+
+    Dynatrace ActiveGates are configured as a scaleset.
+
+    Our monitoring is configured to connect to the ActiveGates via a DNS name.
+
+    If logs are not showing in the portal, e.g. if SNMP data from the Palo Altos is missing, you may need to point the DNS to a different instance within the scaleset.
+
+    The relevant records can be found [here](https://github.com/hmcts/azure-private-dns/blob/f3af539f9881c0d98a3d4879899725fcc08ea7f2/environments/prod/platform-hmcts-net.yml#L631-L642).
+
+    Check the logs are flowing again after this change is made.
+
 - Is the dynatrace service running? You can check it by connecting to the activegates and running `service dynatracegateway status`
 - Are the activegates in the correct group? The activegates must be in a group called `cft-nonprod` or `cft-prod`, depending on the environment, in order for the SNMP logs to be received.
 

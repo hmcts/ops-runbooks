@@ -1,0 +1,63 @@
+---
+title: Patching CCD ELK VMs
+weight: 255
+last_reviewed_on: 2024-04-19
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+The CCD ELK VMs host an ELK stack and there are a set of VMs per environment.
+
+There is a separate SSH key for connecting to the nonprod and prod VMs. Speak to a colleague to get access to the key.
+
+Request access to the appropriate bastion (nonprod or prod) and connect to it via SSH:
+
+`ssh bastion-nonprod.platform.hmcts.net`
+
+Then connect to the VMs in turn:
+
+`ssh -p22  elkadmin@%ip address% -i .private-key`
+
+You can append `sudo` to the below commands or switch to the root user using `sudo su -`
+
+Check the Ubuntu version before you start:
+
+`hostnamectl`
+
+Update the pacakge cache and check what packages have updates available:
+
+```
+apt-get update
+apt list --upgradable
+```
+
+Upgrade the packages:
+```
+apt-get upgrade
+```
+
+When you get to here press enter to select the default:
+
+```
+	Configuration file '/etc/default/irqbalance'
+ ==> File on system created by you or by a script.
+ ==> File also in package provided by package maintainer.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** irqbalance (Y/I/N/O/D/Z) [default=N] ?
+```
+
+Reboot the VM with the `reboot` command
+
+Leave 10 mins between each server per subscription
+
+Check health before and after by logging into a different VM within that subscription and running:
+
+`curl -X GET http://%ip address%:9200/_cluster/health`
+
+
+

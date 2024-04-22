@@ -82,14 +82,15 @@ kubectl get helm --all-namespaces / kubectl get pods --all-namespaces
 - Check if these pods have pod disruption budgets 
 
 ```command
-kubectl get pdb -A
+echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json | jq -r '.items[] | select(.status.disruptionsAllowed==0) | {namespace: .metadata.namespace,disruptionsAllowed: .status.disruptionsAllowed,name: .metadata.name} | [.namespace, .disruptionsAllowed, .name] | @tsv' | sed 's/\t\t/ | /g'
 ```
 
   <%= warning_text('If the <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade. When it set to 0, it essentially prohibiting any voluntary evictions. This means that no pods can be taken down intentionally during maintenance or disruptions.') %>
 
-- We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster
+- We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster. Please remember to revert the PR after upgrade.
 
-  - [PR example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
+  - [SDS example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
+  - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/30547/files)
 
 
 - For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release). 
@@ -196,3 +197,10 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 `waiting for update of Node Pool "msnode" (Kubernetes Cluster "ss-sbox-00-aks" / Resource Group "ss-sbox-00-rg"): Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\" Message=\"Cannot add network interface '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode' with accelerated networking to an existing virtual machine '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0'`
 
 We've seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.
+
+### Old Chart being used
+
+On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on `pluto` that those CronJobs are using depricated kubernetes apis but the problem was that it has not got updated chart.
+
+The only way we managed to fix and get updated chart for the CronJobs is by following [this blog post](https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b) by running helm uninstall and then removing the helm release.
+

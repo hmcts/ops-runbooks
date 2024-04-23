@@ -17,13 +17,7 @@ task :check_urls do
                 %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html},
                 # Temp ignore these to fix issues
                 %r{https://hmcts.github.io/ops-runbooks/Patching/Patching-CCD-ELK-VMs.html},
-                %r{https://toffee.sandbox.platform.hmcts.net/},
-                %r{https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/flux-image-automation.html.md.erb},
-                %r{https://hmcts.github.io/ops-runbooks/aks/flux/},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/index.html.md.erb},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/flux-image-automation.html.md.erb},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/index.html.md.erb}
+                %r{https://toffee.sandbox.platform.hmcts.net/}
             ],
             :new_files_ignore => true
         })

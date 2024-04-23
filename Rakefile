@@ -21,6 +21,8 @@ task :check_urls do
                 %r{https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html},
                 %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/flux-image-automation.html.md.erb},
                 %r{https://hmcts.github.io/ops-runbooks/aks/flux/},
+                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/index.html.md.erb},
+                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/flux-image-automation.html.md.erb},
                 %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/index.html.md.erb}
             ],
             :new_files_ignore => true

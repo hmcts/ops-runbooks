@@ -1,0 +1,87 @@
+---
+title: Updating Palo Alto SNMP settings
+last_reviewed_on: 2024-03-28
+review_in: 12 months
+weight: 40
+---
+# <%= current_page.data.title %>
+
+## Pre-Requisites
+
+- Connected to the [VPN](https://portal.platform.hmcts.net)
+
+## Checking the config in Panorama
+
+Connect to [Panorama](https://panorama-prod--uks-0.platform.hmcts.net).
+
+Select the stack you want to work on i.e., nonprod or prod, by clicking on the dropdown box beside `Template`:
+
+<img src=images/palo-alto-stacks.png  width="600">
+
+Click on `Device` and then `Server Profiles` and then `SNMP Trap.
+
+You will see an SNMP trap configured that will point to the Dynatrace ActiveGates.
+
+<img src=images/snmp-trap.png  width="600">
+
+## Updating config
+
+Configuration for the SNMP traps is managed via [hub-panorama-terraform](https://github.com/hmcts/hub-panorama-terraform/blob/ae3b4417bfed2dbbcee8006e4b8aa62635338f13/components/configuration/02-variables.tf#L134-L142).
+
+You can update this variable to add or remove SNMP log destinations as needed.
+
+At present, the SNMP traps are being sent to a DNS name. More details on these can be found [here](connecting-dynatrace-activegate.html).
+
+If you need to switch the DNS to point to another instance in the scaleset, update the [azure-private-dns](https://github.com/hmcts/azure-private-dns/blob/a38b757dfaf20c65b21a1e9862dcfc0cdeed7c96/environments/prod/platform-hmcts-net.yml#L631-L642) repo.
+
+There may be a brief pause in logs being received whilst the DNS updates.
+
+## Checking SNMP logs are being received in Dynatrace
+
+There are dashboards in Dynatrace that show various metrics from the Palo Altos which you can check to confirm SNMP data is being received.
+
+If the graphs are being refreshed with new data, the logs are flowing.
+
+- [NonProd dashboard](https://yrk32651.apps.dynatrace.com/ui/apps/dynatrace.classic.dashboards/#dashboard;gtf=-30m;gf=all;id=ab163c60-07f5-7e82-40d5-35cd6a8be991)
+- [Prod dashboard](https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.dashboards/#dashboard;gtf=-2h;gf=all;id=ab163c60-07f5-7e82-40d5-35cd6a8be991)
+
+## Dynatrace isn't receiving any data
+
+If the dynatrace dashboards are not receiving data, there are a couple of things you can check:
+
+- Are the DNS records pointing to the right instances?
+
+    Dynatrace ActiveGates are configured as a scaleset.
+
+    Our monitoring is configured to connect to the ActiveGates via a DNS name.
+
+    If logs are not showing in the portal, e.g. if SNMP data from the Palo Altos is missing, you may need to point the DNS to a different instance within the scaleset.
+
+    The relevant records can be found [here](https://github.com/hmcts/azure-private-dns/blob/f3af539f9881c0d98a3d4879899725fcc08ea7f2/environments/prod/platform-hmcts-net.yml#L631-L642).
+
+    Check the logs are flowing again after this change is made.
+
+- Is the dynatrace service running? You can check it by connecting to the activegates and running `service dynatracegateway status`
+- Are the activegates in the correct group? The activegates must be in a group called `cft-nonprod` or `cft-prod`, depending on the environment, in order for the SNMP logs to be received.
+
+## Adding an activegate to a group
+
+This should be done automatically when the scale set instance is created but if you need to add an activegate to a group manually, you can.
+
+Go to the dynatrace portal and select `Deployment status` from the left hand pane.
+
+Click `ActiveGates`.
+
+Select the activegates you want to put into the group and select `Modify activegate group` at the bottom of the screen and click `Run Action`.
+
+<img src=images/dynatrace-activegate-groups-1.png  width="600">
+
+Select the group and click `Next`.
+
+<img src=images/dynatrace-activegate-groups-2.png  width="600">
+
+Once confirmed, the activegates should get moved into the group and the remote configuration will be updated.
+
+You can confirm the group the activegate is in by clicking on the activegate and checking the `Group` value.
+
+<img src=images/dynatrace-activegate-groups-3.png  width="600">

@@ -12,22 +12,39 @@ weight: 40
 
 ## Connecting to Dynatrace VMs (ActiveGate)
 
-- Dynatrace ActiveGate VMs exist as instances of different VMSS:
-  - [Private PTL](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-private-ptl-vmss)
-  - [PTL](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-ptl-vmss)
-  - [Private Nonprod](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-private-nonprod-vmss)
-  - [Nonprod](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_Compute/VirtualMachineScaleSet/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/aks-infra-cftptl-intsvc-rg/providers/Microsoft.Compute/virtualMachineScaleSets/activegate-nonprod-vmss)
+- Dynatrace ActiveGate VMs exist as instances of different Virtual Machine Scale Sets:
 
-Use SSH to connect to the virtual machine, run the below `IPList.sh` to output available machines to connect to:
+  - [Private Prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/2b1afc19-5ca9-4796-a56f-574a58670244/resourceGroups/dynatrace-activegate-prod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-private-prod-vmss/overview)
+  - [Prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/2b1afc19-5ca9-4796-a56f-574a58670244/resourceGroups/dynatrace-activegate-prod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-prod-vmss/overview)
+  - [Private NonProd](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b44eb479-9ae2-42e7-9c63-f3c599719b6f/resourceGroups/dynatrace-activegate-nonprod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-private-nonprod-vmss/overview)
+  - [NonProd](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b44eb479-9ae2-42e7-9c63-f3c599719b6f/resourceGroups/dynatrace-activegate-nonprod/providers/Microsoft.Compute/virtualMachineScaleSets/dynatrace-activegate-nonprod-vmss)
 
-```bash
-# List all active gate virtual machine IP addresses
-./monitoring/bin/IPList.sh
+Request access and connect to one of the bastions and then connect to the one of the instances of the scale set either via its DNS name.
 
-# Download key
-az keyvault secret download -f ~/.ssh/dt-key --vault-name cftptl-intsvc --name aks-ssh-private-key
-chmod 600 ~/.ssh/dt-key
+The following DNS records have been set up to point to the active instance in the scalesets:
 
-# Connect
-ssh -i ~/.ssh/dt-key azureuser@{replace_me_with_vm_ip}
-```
+ - dynatrace-activegate-private-prod.platform.hmcts.net
+ - dynatrace-activegate-prod.platform.hmcts.net
+ - dynatrace-activegate-private-nonprod.platform.hmcts.net
+ - dynatrace-activegate-nonprod.platform.hmcts.net
+
+If you need to connect to a non-active instance, you can use it's DNS name which will be something like:
+
+- dynatrace-activegate-private-prod-vmss000000.platform.hmcts.net
+- dynatrace-activegate-prod-vmss000000.platform.hmcts.net
+- dynatrace-activegate-private-nonprod-vmss000000.platform.hmcts.net
+- dynatrace-activegate-nonprod-vmss000000.platform.hmcts.net
+
+You can also connect to it via it's IP address, which can be found in the Azure portal by clicking on the instance.
+
+SSH requires a private key for authentication, which can be found in [this keyvault](https://github.com/hmcts/dynatrace-activegate/blob/8db16ee4baac8fcdfd7995417be494ad838c4e98/components/activegate/vm.tf#L27).
+
+You can also use your Microsoft Entra ID login credentials with Just In Time Access.
+
+Request access via the dynatrace access package from the [My Access](https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages) page.
+
+SSH to the appropriate bastion and run `az login`.
+
+Use the `az ssh --ip` command followed by the IP address of the VM to connect to it using your own account.
+
+If you are getting `permission denied`, try upgrading the instance in the portal.

@@ -1,0 +1,17 @@
+---
+title: DNS Node Cache Patching
+weight: 30
+last_reviewed_on: 2024-02-26
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers how to check and patch the DNS node cache image.
+The image should be updated automatically by renovate, but if it is not, you can manually update the image in the [nodelocaldns.yaml](https://github.com/hmcts/cnp-flux-config/blob/master/apps/kube-system/nodelocaldns/nodelocaldns.yaml#L132) file in the [cnp flux config repo](https://github.com/hmcts/cnp-flux-config).
+
+## Patching
+First, check what the latest version of [DNS Node Cache Releases](https://github.com/kubernetes/kubernetes/blob/98bd90fbe279f9083db92c51badce424d6d8b1c1/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml#L141) is.
+
+Then create a PR in the [cnp flux config repo](https://github.com/hmcts/cnp-flux-config) to bump up the [DNS node cache image](https://github.com/hmcts/cnp-flux-config/blob/master/apps/kube-system/nodelocaldns/nodelocaldns.yaml#L132) version
+

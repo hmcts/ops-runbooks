@@ -155,6 +155,14 @@ We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building anot
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
 Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
 
+- Update Ptlsbox Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
+
+  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
+
+- Update ptl Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
+
+  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/24498/files)
+
 ### perftest
 
 If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand. 

@@ -6,7 +6,7 @@ ENV["BRANCH_NAME"] = "ghpages"
 
 task :check_urls do
     directories = ['content']
-    merge_base = %x(git merge-base origin/master HEAD).chomp
+    merge_base = %x(git merge-base origin/ghpages HEAD).chomp
     diffable_files = %x(git diff -z --name-only --diff-filter=AC #{merge_base}).split("\0")
     diffable_files = diffable_files.select do |filename|
     next true if directories.include?(File.dirname(filename))

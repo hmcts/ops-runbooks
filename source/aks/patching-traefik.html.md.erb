@@ -33,12 +33,12 @@ In SDS, check traefik pods are running
 ```
 kubectl get pods -n admin | grep traefik
 ```
-<%=
+<% =begin %>
 *TODO* please revert back from below when toffee is back online
 Ensure [Toffee application](https://toffee.sandbox.platform.hmcts.net) is accessible.
 
 Note: check [Plum application](https://plum.sandbox.platform.hmcts.net) for CFT.
-%>
+<% =end %>
 
 Ensure to check that Toffee `(SDS)` and Plum `(CFT)` applications at
 ```cmd
@@ -133,12 +133,12 @@ Traefik does have a UI but it's not usually exposed.
 
 However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.
 
-<%=
+<% =begin %>
 *TODO* please back to this from below revert when toffee is back online
 Ensure [Toffee application](https://toffee.sandbox.platform.hmcts.net/) is accessible on SDS.
 
 Check [Plum application](https://plum.sandbox.platform.hmcts.net/) on CFT.
- %>
+<% =end %>
 Please ensure to check that Toffee `(SDS)` and Plum `(CFT)` applications at
 ```cmd
    https://toffee.sandbox.platform.hmcts.net

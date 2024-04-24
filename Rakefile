@@ -5,23 +5,26 @@ ENV["COMMIT_MESSAGE_SUFFIX"] = "[skip ci]"
 ENV["BRANCH_NAME"] = "ghpages"
 
 task :check_urls do
-    proofer = HTMLProofer.check_directory("./build", 
+    directories = ['content']
+    merge_base = %x(git merge-base origin/production HEAD).chomp
+    diffable_files = %x(git diff -z --name-only --diff-filter=AC #{merge_base}).split("\0")
+    diffable_files = diffable_files.select do |filename|
+    next true if directories.include?(File.dirname(filename))
+
+    filename.end_with?(".md")
+    end.map { |f| Regexp.new(File.basename(f, File.extname(f))) }
+
+    proofer = HTMLProofer.check_directory("./output",
         { 
             :check_external_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
             :ignore_urls =>  [
+                diffable_files
                 # Ignore pulls/branches as these do not translate to raw content
                 %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))}, 
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
-                %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html},
-                # Temp ignore these to fix issues
-                %r{https://hmcts.github.io/ops-runbooks/Patching/Patching-CCD-ELK-VMs.html},
-                %r{https://toffee.sandbox.platform.hmcts.net/},
-                %r{https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/flux-image-automation.html.md.erb},
-                %r{https://hmcts.github.io/ops-runbooks/aks/flux/},
-                %r{https://raw.githubusercontent.com/hmcts/ops-runbooks/master/source/aks/flux/index.html.md.erb}
+                %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html}
             ],
             :new_files_ignore => true
         })
@@ -35,7 +38,7 @@ task :check_urls do
             # to check the repo exists
             if base_url_parts.length == 5 && !request.base_url.include?('#')
                 request.base_url = request.base_url.gsub("github.com", "raw.githubusercontent.com")
-                request.base_url += "/image-automation/README.md"
+                request.base_url += "/master/README.md"
             # Checking for blob is to convert URLs pointing to files
             elsif request.base_url.include?("/blob/")
                 request.base_url = request.base_url.gsub("/blob", "")

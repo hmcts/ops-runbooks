@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Heritage VM Disk Expansions - HMCTS</title>
+    <title>Patching CCD ELK VMs - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/heritage/Heritage-VM-Disk-Expansions-(PCOL).html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Patching/ccd-elk-vms.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Heritage VM Disk Expansions - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/heritage/Heritage-VM-Disk-Expansions-(PCOL).html" />
+      <meta name="twitter:title" content="Patching CCD ELK VMs - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Patching/ccd-elk-vms.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Heritage VM Disk Expansions" />
+      <meta property="og:title" content="Patching CCD ELK VMs" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/heritage/Heritage-VM-Disk-Expansions-(PCOL).html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Patching/ccd-elk-vms.html" />
 
     
   </head>
@@ -488,44 +488,51 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="heritage-vm-disk-expansions">Heritage VM Disk Expansions</h1>
-<p>This document covers the process for expanding the disks for the PCOL VMs and likely other VMs under the heritage umbrella.</p>
-<h2 id="initial-attempt">Initial Attempt</h2>
-<p>Initially an automated approach was tried in the NLE environment for a disk expansion. 
-This involved:</p>
+            <h1 id="patching-ccd-elk-vms">Patching CCD ELK VMs</h1>
+<p>The CCD ELK VMs host an ELK stack and there are a set of VMs per environment.</p>
+<p>There is a separate SSH key for connecting to the nonprod and prod VMs.</p>
+<p>You can find the key in the <code>ccd-$env</code> keyvaults.</p>
+<p>Request access to the appropriate bastion (nonprod or prod) and connect to it via SSH:</p>
+<p><code>ssh bastion-nonprod.platform.hmcts.net</code></p>
+<p>Then connect to the VMs in turn:</p>
+<p><code>ssh -p22  elkadmin@%ip address% -i .private-key</code></p>
+<p>You can append <code>sudo</code> to the below commands or switch to the root user using <code>sudo su -</code></p>
+<p>Check the Ubuntu version before you start:</p>
+<p><code>hostnamectl</code></p>
+<p>Update the package cache and check what packages have updates available:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apt-get update
+apt list --upgradable
+</code></pre></div><p>Upgrade the packages:
+<code>
+apt-get upgrade
+</code></p>
+<p>When you get to here press enter to select the default:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>    Configuration file '/etc/default/irqbalance'
+ ==&gt; File on system created by you or by a script.
+ ==&gt; File also in package provided by package maintainer.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** irqbalance (Y/I/N/O/D/Z) [default=N] ?
+</code></pre></div><p>Reboot the VM with the <code>reboot</code> command</p>
+<p>Leave 10 mins between each server per subscription</p>
+<p>Check health before and after by logging into a different VM within that subscription and running:</p>
+<p><code>curl -X GET http://%ip address%:9200/_cluster/health</code></p>
 
-<ol>
-<li><p>Modifying the terraform code to increase disk space.</p></li>
-<li><p>Run a terraform plan to ensure only change was disk expansion.</p></li>
-<li><p>Run a terraform apply.</p></li>
-</ol>
-<p>However, soon after this CGI raised an incident. It seemed that the deallocation of the server (during the terraform apply) had caused the drives to mount in the wrong order. This was resolved by a server restart and CGI manually starting the required services for the Oracle DB.</p>
-<h2 id="working-solution">Working Solution</h2>
-<p>It was clear that the inital solution wouldn&rsquo;t be viable. From there a strategy was drawn up, tested and successfully carried out in production that didn&rsquo;t involve deallocating the server.</p>
-<p>Discovered during NLE testing, it is important CGI are available for disk expansion changes in order to stop/start services to avoid an outage.</p>
-<p>Steps:</p>
-
-<ol>
-<li><p>Check disks attached to VM and note the <em>LUN</em> of the disk that needs resized.</p></li>
-<li><p>Manually unattach the disk that needs resized via Azure.</p></li>
-<li><p>Manually resize the disk on the portal.</p></li>
-<li><p>Manually attach the disk to the VM on the portal, ensuring the LUN noted in step 1 is used.</p></li>
-<li><p>Retrofit the changes within the terraform code. See <a href="https://github.com/hmcts/oracle-azure-infrastructure/commit/9e99883b6b52274ae8c66ba0b3cb06f721ae311f">example.</a></p></li>
-<li><p>Request approval from someone on your team. Once approved merge your pull request.</p></li>
-<li><p>Run a terraform plan to ensure there are no changes.</p></li>
-</ol>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-10-19">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 19 April 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 19 October 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 19 October 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -535,8 +542,8 @@ This involved:</p>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/heritage/Heritage-VM-Disk-Expansions-(PCOL).html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Heritage+VM+Disk+Expansions%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Fheritage%2FHeritage-VM-Disk-Expansions-%28PCOL%29.html%29&amp;labels=bug&amp;title=Re%3A+%27Heritage+VM+Disk+Expansions%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/ccd-elk-vms.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Patching+CCD+ELK+VMs%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FPatching%2Fccd-elk-vms.html%29&amp;labels=bug&amp;title=Re%3A+%27Patching+CCD+ELK+VMs%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

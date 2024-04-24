@@ -469,6 +469,9 @@
 <li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
 <ul>
   <li>
+    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
+  </li>
+  <li>
     <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
   </li>
   <li>
@@ -501,8 +504,8 @@
 <code>
 kubectl get pods -n admin | grep traefik
 </code></p>
-<p>Ensure <a href="https://toffee.sandbox.platform.hmcts.net/">toffee.sandbox.platform.hmcts.net/</a> is accessible.</p>
-<p>Note: check <a href="https://plum.sandbox.platform.hmcts.net/">plum.sandbox.platform.hmcts.net/</a> for CFT.</p>
+<p>Ensure <a href="https://toffee.sandbox.platform.hmcts.net">Toffee application</a> is accessible.</p>
+<p>Note: check <a href="https://plum.sandbox.platform.hmcts.net">Plum application</a> for CFT.</p>
 <h2 id="updating-start-with-sandbox">Updating - start with sandbox</h2>
 <p>In order to allow patching of sbox only, a new directory was created for the updated crd URLs.</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
@@ -547,8 +550,8 @@ kubectl logs {pod-name} -n admin -f
 </code></p>
 <p>Traefik does have a UI but it&rsquo;s not usually exposed.</p>
 <p>However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.</p>
-<p>Ensure <a href="https://toffee.sandbox.platform.hmcts.net/">toffee.sandbox.platform.hmcts.net/</a> is accessible on SDS.</p>
-<p>Check <a href="https://plum.sandbox.platform.hmcts.net/">plum.sandbox.platform.hmcts.net/</a> on CFT.</p>
+<p>Ensure <a href="https://toffee.sandbox.platform.hmcts.net/">Toffee application</a> is accessible on SDS.</p>
+<p>Check <a href="https://plum.sandbox.platform.hmcts.net/">Plum application</a> on CFT.</p>
 <p>You could also delete the Toffee or Plum HRs to make sure they come back up and they are reachable via Traefik.</p>
 <p>The example commands below are for SDS using toffee:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get hr -n toffee

@@ -22,9 +22,9 @@ task :check_urls do
             :ignore_urls =>  [
                 diffable_files
                 # Ignore pulls/branches as these do not translate to raw content
-                %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))}, 
+                # %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))}, 
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
-                %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html}
+                # %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html}
             ],
             :new_files_ignore => true
         })

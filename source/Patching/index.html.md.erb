@@ -1,9 +1,9 @@
 ---
 title: OS Patch Management
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2024-04-26
 review_in: 12 months
 
-weight: 250
+weight: 133
 ---
 # <%= current_page.data.title %>
 
@@ -37,7 +37,14 @@ Once restarts have been completed, development team to start & test applications
 Once the above is successful, the next environment will be patched with similar steps.
 
 
-## OS Patching Instructions
+## Azure Update Manager
+Azure Update Manager is a SaaS solution, to manage and govern software updates for Windows and Linux machines. As part of its deep integration with the Azure Portal, all Azure infrastructure in place and any VM’s created using Azure marketplace images, already include the necessary software. Removing all barriers to implementation.
+
+The native software update feature within the operating system is utilised by Azure Update Manager (AUM), to first audit the patching requirements and then apply any updates.  With scheduling and scope, controlled by AUM, with results reported back, via a single console.
+
+- [Azure Update Manager Page](AUM-intro.html)
+
+## Manual OS Patching Instructions
 
 See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:
 
@@ -291,7 +298,3 @@ kill -9 1211 2376
 ```
 
 where the numbers are the PIDs, replace as required.
-
-## Azure Update Manager, Proof of concept
-HMCTS Orange squad PoC of next generation patching solution
-- [Azure Update Manager Page](AUM-intro.html)

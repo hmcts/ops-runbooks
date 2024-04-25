@@ -150,7 +150,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 
-### Ptlsbox, Ptl
+### Ptlsbox, Ptl, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
 Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
@@ -159,7 +159,7 @@ Subsequently, please verify the status of [Jenkins instances] for CFT (https://b
 
   - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
 
-- Update ptl Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
+- Update AAT Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
 
   - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/24498/files)
 

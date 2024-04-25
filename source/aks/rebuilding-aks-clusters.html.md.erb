@@ -44,7 +44,7 @@ Click on **Run** to start the pipeline.
 #### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .
-  - If not updated, you can change manually providing PR has been approved and merged [View Jenkins Configuration](https://build.platform.hmcts.net/configure)
+  - After merging above PR, if Jenkins is not updated [Check Here](https://build.platform.hmcts.net/configure), you MUST manually change Jenkins config to use the other cluster.
 - Swap external DNS active cluster, e.g. [cnp-flux-config#19889](https://github.com/hmcts/cnp-flux-config/pull/19889) 
 - Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service) . [example PR](https://github.com/hmcts/rpe-pdf-service/pull/318)
   - Check this PR in Jenkins has successfully ran through stage [AKS deploy - preview](https://build.platform.hmcts.net/job/HMCTS_Platform/job/rpe-pdf-service/view/change-requests/job/PR-318/)

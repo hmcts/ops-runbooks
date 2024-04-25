@@ -497,7 +497,7 @@
 <li>Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)</li>
 <li>Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)</li>
 <li>ITHC             - (cft-ithc-00-aks, cft-ithc-01-aks/ ss-ithc-00-aks, ss-ithc-01-aks)</li>
-<li>Preview          - (cft-preview-01-aks/ ss-dev-01-aks)</li>
+<li>Preview          - (cft-preview-00-aks/ ss-dev-01-aks)</li>
 <li>Demo             - (cft-demo-00-aks, cft-demo-01-aks/ ss-demo-00-aks, ss-demo-01-aks)</li>
 <li>Perftest         - (cft-perftest-00-aks, cft-perftest-01-aks/ ss-test-00-aks, ss-test-01-aks)</li>
 <li>AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)</li>
@@ -533,7 +533,7 @@
 <ul>
 <li>Check if these pods have pod disruption budgets </li>
 </ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pdb -A
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" &amp;&amp; kubectl get pdb -A -o json | jq -r '.items[] | select(.status.disruptionsAllowed==0) | {namespace: .metadata.namespace,disruptionsAllowed: .status.disruptionsAllowed,name: .metadata.name} | [.namespace, .disruptionsAllowed, .name] | @tsv' | sed 's/\t\t/ | /g'
 </code></pre></div><p><div class="govuk-warning-text">
   <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
   <strong class="govuk-warning-text__text">
@@ -543,10 +543,11 @@
 </div></p>
 
 <ul>
-<li><p>We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster</p>
+<li><p>We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster. Please remember to revert the PR after upgrade.</p>
 
 <ul>
-<li><a href="https://github.com/hmcts/sds-flux-config/pull/4547/files">PR example</a></li>
+<li><a href="https://github.com/hmcts/sds-flux-config/pull/4547/files">SDS example</a></li>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/30547/files">CFT example</a></li>
 </ul></li>
 <li><p>For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).</p></li>
 <li><p>To list all failed helm releases</p></li>
@@ -590,20 +591,28 @@
 </ul></li>
 </ul>
 <p><a href="https://portal.azure.com">portal.azure.com</a> &gt; Load Balancer &gt; search for &lsquo;kubernetes-internal&rsquo; &gt; filter by the Resource Group &gt; click on the load balancer returned by the search &gt; click on Frontend IP Configuration &gt; the IP Address is the one you need</p>
+<h2 id="environment-specific-steps">Environment Specific Steps</h2>
+<p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
+We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren&rsquo;t building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.</p>
+<h3 id="ptlsbox-ptl-aat">Ptlsbox, Ptl, AAT</h3>
+<p>This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
+Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.</p>
 
 <ul>
-<li><p>Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster</p>
+<li><p>Update Ptlsbox Jenkins to switch from 00 to 01 if you are upgrading 00 cluster</p>
 
 <ul>
 <li><a href="https://github.com/hmcts/cnp-flux-config/pull/30375/files">Example PR</a></li>
 </ul></li>
+<li><p>Update AAT Jenkins to switch from 00 to 01 if you are upgrading 00 cluster</p>
+
+<ul>
+<li><a href="https://github.com/hmcts/cnp-flux-config/pull/24498/files">Example PR</a></li>
+</ul></li>
+<li><p>If the configuration doesn&rsquo;t update after your pull request has been merged, you can change it manually in the <a href="https://build.platform.hmcts.net/configure">Jenkins Configuration</a></p></li>
 </ul>
-<h2 id="environment-specific-steps">Environment Specific Steps</h2>
-<p>Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
-We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren&rsquo;t building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.</p>
-<h3 id="ptlsbox-ptl">Ptlsbox, Ptl</h3>
-<p>This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
-Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.</p>
+<h3 id="perftest">perftest</h3>
+<p>If we are upgrading <code>cft-perftest-00-aks</code> and <code>cft-perftest-01-aks</code>, we have to agree on time with on this channel <code>perftest-cluster</code> beforehand.</p>
 <h3 id="production">Production</h3>
 <p>A Change Request will need to be raised 2-3 days before the upgrade is to take place via <a href="https://mojcppprod.service-now.com/navpage.do">Service Now</a>. Ensure to use the following template when raising the (Change Request) - <a href="https://mojcppprod.service-now.com/nav_to.do?uri=%2Fcom.glideapp.servicecatalog_category_view.do%3Fv%3D1%26sysparm_parent%3D575f2b6d4f145300892a00818110c746%26sysparm_catalog%3De0d08b13c3330100c8b837659bba8fb4%26sysparm_catalog_view%3Dcatalog_default%26sysparm_view%3Dcatalog_default%26sysparm_current_row%3D21">Update to latest GA AKS Version for Production AKS Clusters</a></p>
 <h2 id="upgrading-the-cluster">Upgrading the Cluster</h2>
@@ -654,18 +663,21 @@ Subsequently, please verify the status of [Jenkins instances] for CFT (https://b
 <h3 id="code-quot-reconcilevmssagentpoolfailed-quot-message-quot-code-quot-cannotaddacceleratednetworkingnictoanexistingvirtualmachine-quot">Code=&ldquo;ReconcileVMSSAgentPoolFailed&rdquo; Message=&ldquo;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&rdquo;</h3>
 <p><code>waiting for update of Node Pool &quot;msnode&quot; (Kubernetes Cluster &quot;ss-sbox-00-aks&quot; / Resource Group &quot;ss-sbox-00-rg&quot;): Code=&quot;ReconcileVMSSAgentPoolFailed&quot; Message=&quot;Code=\&quot;CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\&quot; Message=\&quot;Cannot add network interface &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode&#39; with accelerated networking to an existing virtual machine &#39;/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0&#39;</code></p>
 <p>We&rsquo;ve seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.</p>
+<h3 id="old-chart-being-used">Old Chart being used</h3>
+<p>On the <code>cft-demo-01-aks</code> cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on <code>pluto</code> that those CronJobs are using depricated kubernetes apis but the problem was that it has not got updated chart.</p>
+<p>The only way we managed to fix and get updated chart for the CronJobs is by following <a href="https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b">this blog post</a> by running helm uninstall and then removing the helm release.</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-04-12">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-25">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 12 April 2024.
+      This page was last reviewed on 25 April 2024.
 
-        It needs to be reviewed again on 12 April 2025
+        It needs to be reviewed again on 25 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 12 April 2025
+      This page was set to be reviewed before 25 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-04-12
+last_reviewed_on: 2024-04-25
 review_in: 12 months
 weight: 30
 ---
@@ -16,7 +16,7 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 - Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
 - Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)
 - ITHC             - (cft-ithc-00-aks, cft-ithc-01-aks/ ss-ithc-00-aks, ss-ithc-01-aks)
-- Preview          - (cft-preview-01-aks/ ss-dev-01-aks)
+- Preview          - (cft-preview-00-aks/ ss-dev-01-aks)
 - Demo             - (cft-demo-00-aks, cft-demo-01-aks/ ss-demo-00-aks, ss-demo-01-aks)
 - Perftest         - (cft-perftest-00-aks, cft-perftest-01-aks/ ss-test-00-aks, ss-test-01-aks)
 - AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)
@@ -141,10 +141,6 @@ The upgrade process begins by removing the cluster you are going to upgrade from
 - Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
 
   [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
-
-- Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
-
-  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.

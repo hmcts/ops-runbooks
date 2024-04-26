@@ -1,8 +1,8 @@
 ---
 title: Azure Update Manager - Operations Guide
 weight: 255
-last_reviewed_on: 2023-12-14
-review_in: 6 months
+last_reviewed_on: 2024-04-26
+review_in: 12 months
 ---
 # <%= current_page.data.title %>
 
@@ -18,15 +18,77 @@ Azure Update Manager is a unified service, tightly integrated into the Azure Por
 
 Only supported configurations will recieve patches [Supported Operating Systems](https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems).
 
-## Getting Started
----
 
-Using the Azure portal, browse to the VM to be protected. Select **Updates** then **Update Settings**
+# Scripting AUM
+HMCTS adopted AUM in February 2024 and many VMs are already protected. Additional VMs should be added to the repositories described below.
+
+## Enabling VM OS Scans
+Azure policy has been used to set VM **Update Settings**, enabling periodic assessment for all VMs within the management group.
+
+[Github Azure-Policy](https://github.com/hmcts/azure-policy)
+
+Windows VMs - assign.aum_Windows_scan.json
+Linux VMs - assign.aum_Windows_scan.json
+
+## Updating OS
+Azure maintenance configurations are used to select VMs for updating, assigning the types of updates, scheduling and managing reboots.
+
+[Github Azure-Update-Manager-Maintenance-Configurations](https://github.com/hmcts/Azure-Update-Manager-Maintenance-Configurations)
+
+See the detailed Readme file on the repository for further details.  Be aware that terraform limits each maintenance configuration to a single subscription ID.
+
+# Ad Hoc Jobs 
+These processes can be used to trigger scans and deploy updates on demand.  A single VM can be managed from its Azure portal webpage by browsing for the VM and select the Update from the left hand menu.  Multiple VMs can be managed from the Azure update manager web page. 
+
+[Azure Update Manager Portal](https://portal.azure.com/#view/Microsoft_Azure_Automation/UpdateCenterMenuBlade/~/overview)
+
+[AUM Multiple VMs Instructions](AUM-Multi-VM.html)
+
+## Individual VM Updates
+
+### Step 1 - Enable AUM
+Using the Azure portal, browse to the VM to be protected. Select Operations / **Updates** from the tool bar, then **Update Settings**
 
 ![Update_Settings](images/AUM_Update_Settings.png)
 
-For HMCTS maintence configurations, set the *Periodic assessment* as **Enable** and *Patch orchestration* as **Customer Managed Schedules**
+For HMCTS maintenance configurations, set the *Periodic assessment* as **Enable** and *Patch orchestration* as **Customer Managed Schedules**
 
 ![Configuration_Settings](images/AUM_VM_UpdateSettings.png)
 
 Various problems described in the troubleshooting section are the result, of not setting these values correctly.
+
+### Step 2 - Audit OS
+AUM will ask the OS to begin an audit of missing updates using its own tool, either Windows Update or APT/YUM. Please note this process can be slow, as it needs to trigger the OS tool, wait for the results, collect the results and then process them with the AUM.  Waiting patiently is recommended and triggering more than 3 scans in a 24 hour period can result in even longer waits.  
+
+
+Using the Azure portal, browse to the VM to be protected. Select **Updates** then **Check for Updates**.  Can take 5 minutes for Linux machines and 20 - 40 minutes for Windows VMs.
+
+
+The results will be shown on the VMs *Updates** page as Recommended Updates. If nothing is shown as required, there is nothing to update and the process is complete.
+
+
+### Step 3 - Updating VM/s
+Once a scan has successfully completed, AUM will present a list of missing updates which can be applied to the VMs operating system.
+
+
+Select **One-time update** from the VMs Updates screen, to open the **Install one-time updates** wizard. Select the Machine Name to be updated and click Next.
+
+A preview of the updates to be installed will be displayed.  This can be modified using the **Update selection** options. Once the correct updates are displayed, click Next.
+
+
+**Caution**
+The default reboot option is "Reboot if required" which can sometimes automatically reboot the VM to complete the patching process. Be sure to select the "Never reboot" option, if you dont want the VM to reboot.  Click Next
+
+
+Review the choices which have been selected and click Install to start the update job.  To abort the wizard, click the X in the top right hand corner, ending the process. 
+
+
+The patching process will begin.
+
+
+### Step 4 - Rebooting VM
+If you need to manually reboot the VM, select **Overview** from the left hand menu.  Then click on the Restart button, which will gracefully restart the operating system.
+
+
+### Step 5 - Progress and History
+From the VMs **Updates** page, select the **History** button.  Each jobs status will be displayed including active tasks.  However this information can lag many minutes behind.  Waiting patiently is recommended...

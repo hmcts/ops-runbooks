@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Executing Queries - HMCTS</title>
+    <title>AUM - Multiple VM Operations - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/database/executing-queries.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Patching/AUM-Multi-VM.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Executing Queries - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/database/executing-queries.html" />
+      <meta name="twitter:title" content="AUM - Multiple VM Operations - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Patching/AUM-Multi-VM.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Executing Queries" />
+      <meta property="og:title" content="AUM - Multiple VM Operations" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/database/executing-queries.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Patching/AUM-Multi-VM.html" />
 
     
   </head>
@@ -500,100 +500,39 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="executing-queries">Executing Queries</h1>
-<p>You can execute queries in any number of ways, below are some suggestions</p>
-<h2 id="small-queries">Small queries</h2>
+            <h1 id="aum-multiple-vm-operations">AUM - Multiple VM Operations</h1>
+<h1 id="ad-hoc-jobs-for-multiple-vms">Ad Hoc Jobs For Multiple VMs</h1>
+<p>To manage multiple VMs, browse to the Azure Update Manager, Machines page</p>
+<p><a href="images/AUM_Machines.png" rel="noopener noreferrer"><img src="images/AUM_Machines.png" alt="AUM-Machines" /></a></p>
+<h3 id="1-filter-by-name">1 - Filter by Name</h3>
+<p>Filter by name (1 on diagram) enables searching for VMs by using either the specific name or just part of the name, such as proxy.  In the diagram, &lsquo;proxy&rsquo; would return change the view, to show just the 3 machines app-proxy-0, app-proxy-1 and app-proxy-3.  Using &lsquo;sbox&rsquo; would return &lsquo;all&rsquo; 21 from 545 VMs, with sbox, within any part of their name.</p>
+<h3 id="2-check-for-updates">2 - Check for Updates</h3>
+<p>By first selecting the target VMs using the check box (9 on diagram), a scan for missing updates can be triggered by clicking <strong>Check for Updates</strong>.  (2 on diagram).</p>
+<h3 id="3-one-time-update">3 - One-time update</h3>
+<p>After selecting the target VMs, click <strong>One-time update</strong> (3 on diagram) to open the wizard. Select all the VMs to be updated and click Next.</p>
+<p>A preview of the updates to be installed will be displayed.  This can be modified using the <strong>Update selection</strong> options. Once the correct updates are displayed, click Next.</p>
+<h3 id="4-edit-update-setting">4 - Edit Update Setting</h3>
+<p>Azure policy should force the VMs update settings but sometimes they need to be changed. Select the target VMs and the click <strong>Settings</strong> (4 on diagram).</p>
+<h3 id="5-export-to-csv">5 - Export to CSV</h3>
+<p>Azure Update manager holds data about the VMs which can be exported to a CSV file and processed by 3rd party applications like Excel. Use <strong>Export to CSV</strong> (5 on diagram).</p>
+<h3 id="6-filters">6 - Filters</h3>
+<p>With over 500 VMs, the machines view can contain a lot of noise. The diagram shows app-proxy-1, which is deallocated. By click on Status within the view filers (6 on diagram), only running VMs could be shown. These filters are very powerful and time spent exploring them, with be rewarded.</p>
+<h3 id="7-fast-filters">7 - Fast Filters</h3>
+<p>The view of shown VMs can be quickly changed using these filters. Just click on <strong>Pending reboot</strong> (7 on diagram), to see only these 32 VMs.</p>
+<h3 id="8-columb-order">8 - Columb Order</h3>
+<p>By default, the view of VMs is sorted by the VMs name.  This can be changed by selecting any columb header (8 on diagram).</p>
 
-<ul>
-<li><p>Connect to  Postgres by following commands outlined in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> <br></p></li>
-<li><p>Once in, you can execute provided query
-<code>cmd
-psql&gt; paste your query here;
-</code></p></li>
-</ul>
-<p><strong>Note:</strong> The prompt would most likely be the <code>DB_NAME</code> you provided in steps you followed when connecting to the DB</p>
-
-<ul>
-<li><p>Copy the output result and send it to the authorised recipient, this is usually mentioned in the ticket. If not mentioned, then confirm with team members before sending data off</p></li>
-<li><p>For small queries with large results, you could do the following to output to file</p></li>
-</ul>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  \o &lt;filename&gt;.csv
-    &lt;your query here&gt;
-  \q
-</code></pre></div><p>This should create a file called <code>&lt;filename&gt;.csv</code> with the output in it.</p>
-<p><strong>Note:</strong> the extension could be whatever you choose, using <code>csv</code> in the example below</p>
-<p><strong>Example:</strong>
-  <a href="images/query-output.png" rel="noopener noreferrer"><img src="images/query-output.png" alt="Output to file" /></a></p>
-<h2 id="larger-lengthier-queries">Larger, lengthier queries</h2>
-
-<ul>
-<li>Connect to Postgres as described in above step</li>
-<li>Create a new file, for example
-<code>cmd
-vi &lt;ticket-number&gt;-&lt;any-extras-labeling&gt;.sql
-</code>
-You could use <code>nano</code> as well. Just replace <code>vi</code> with <code>nano</code></li>
-<li>Copy/paste query and save it
-<code>cmd 
-:wq!
-</code>
-If using <code>nano</code> then use it&rsquo;s equivalent</li>
-<li>Once file is saved you could run the command passing the file as input to Postgres.
-<code>cmd 
-psql &quot;sslmode=require host=${POSTGRES_HOST} dbname=${DB_NAME} user=${DB_USER}&quot; -o DTSPO-2766-result.csv &lt; DTSPO-2766-get-case-data.sql
-</code>
-<em>Here <code>DTSPO-2766-result.csv</code> is where I want the results saved and <code>DTSPO-2766-get-case-data.sql</code> is the file with provided sql query</em></li>
-<li>If no errors, you can <code>cat</code> the output file for a quick eye-balling 👀
-<code>cmd 
-cat &lt;output-file&gt;.csv
-</code></li>
-</ul>
-<h2 id="bringing-query-file-home">Bringing query file home</h2>
-<p>You can use any <code>sftp</code> tool of your choice to connect to bastion or follow below steps</p>
-
-<ul>
-<li>Log out of your ssh terminal by exiting</li>
-<li>Copy the file from the bastion server right from your terminal
-<code>cmd 
-scp user.name@hmcts.net@bastion-devops-prod.platform.hmcts.net:/home/user.name/DTSPO-2766-result.csv /Users/&lt;location-of-choice&gt;
-</code>
-<code>/Users/&lt;location-of-choice&gt;</code> being a path on your file system, here is an example using a MAC</li>
-<li>You can now send the file(s) to authorised recipient(s) or share as instructed in the ticket.<br> 
-If unclear, confirm with team members.</li>
-</ul>
-<p>If you run into any other issues please feel free to reach out to team members.</p>
-<h3 id="notes">Notes</h3>
-<p>In the in <a href="https://github.com/hmcts/cnp-module-postgres#production">cnp-module-postgres</a> documentation
-<code>cmd
-export PGPASSWORD=&lt;result-from-earlier&gt;
-</code>
-Assign to the variable <code>PGPASSWORD</code> the token returned from the <code>az account get-access-token ...</code> command you ran earlier</p>
-<p><strong>Example:</strong></p>
-<p><a href="images/assign-to-password-var.png" rel="noopener noreferrer"><img src="images/assign-to-password-var.png" alt="Token to Password" /></a></p>
-<h3 id="some-external-reference">Some external reference</h3>
-<p>You can have a quick peak for some <code>psql</code> info that may be useful</p>
-
-<ul>
-<li><a href="https://dataschool.com/learn-sql/outputting-query-results-to-files-with-o/">Outputting Query Results to Files with \o</a></li>
-<li><a href="https://www.warp.dev/terminus/psql-run-sql-file">How to run an SQL file in Postgres</a>
-
-<ul>
-<li>Run a SQL file in Postgres using the ‘psql’ command </li>
-<li>Connect to PostgreSQL and then run a SQL file using ‘psql’</li>
-</ul></li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 26 April 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 26 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 26 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -603,8 +542,8 @@ Assign to the variable <code>PGPASSWORD</code> the token returned from the <code
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/database/executing-queries.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Executing+Queries%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Fdatabase%2Fexecuting-queries.html%29&amp;labels=bug&amp;title=Re%3A+%27Executing+Queries%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/AUM-Multi-VM.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27AUM+-+Multiple+VM+Operations%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FPatching%2FAUM-Multi-VM.html%29&amp;labels=bug&amp;title=Re%3A+%27AUM+-+Multiple+VM+Operations%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

@@ -377,6 +377,31 @@
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
+<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
+<ul>
+  <li>
+    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Scripting AUM</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Ad Hoc Jobs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>AUM - Multiple VM Operations</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>Ad Hoc Jobs For Multiple VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
 <ul>
   <li>
@@ -466,19 +491,6 @@
   </li>
 </ul>
 </li>
-<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
-<ul>
-  <li>
-    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
-  </li>
-</ul>
-</li>
 </ul>
 
 
@@ -496,26 +508,56 @@
 <p><a href="https://learn.microsoft.com/en-us/azure/update-manager/">Link to MS docs</a></p>
 <h3 id="support-matrix-for-azure-update-manager">Support matrix for Azure Update Manager</h3>
 <p>Only supported configurations will recieve patches <a href="https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems">Supported Operating Systems</a>.</p>
-<h2 id="getting-started">Getting Started</h2>
-
-<hr>
-<p>Using the Azure portal, browse to the VM to be protected. Select <strong>Updates</strong> then <strong>Update Settings</strong></p>
-<p><a href="images/AUM_Update_Settings.png" rel="noopener noreferrer"><img src="images/AUM_Update_Settings.png" alt="Update_Settings" /></a></p>
-<p>For HMCTS maintence configurations, set the <em>Periodic assessment</em> as <strong>Enable</strong> and <em>Patch orchestration</em> as <strong>Customer Managed Schedules</strong></p>
-<p><a href="images/AUM_VM_UpdateSettings.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings.png" alt="Configuration_Settings" /></a></p>
+<h1 id="scripting-aum">Scripting AUM</h1>
+<p>HMCTS adopted AUM in February 2024 and many VMs are already protected. Additional VMs should be added to the repositories described below.</p>
+<h2 id="enabling-vm-os-scans">Enabling VM OS Scans</h2>
+<p>Azure policy has been used to set VM <strong>Update Settings</strong>, enabling periodic assessment for all VMs within the management group.</p>
+<p><a href="https://github.com/hmcts/azure-policy">Github Azure-Policy</a></p>
+<p>Windows VMs - assign.aum_Windows_scan.json
+Linux VMs - assign.aum_Windows_scan.json</p>
+<h2 id="updating-os">Updating OS</h2>
+<p>Azure maintenance configurations are used to select VMs for updating, assigning the types of updates, scheduling and managing reboots.</p>
+<p><a href="https://github.com/hmcts/Azure-Update-Manager-Maintenance-Configurations">Github Azure-Update-Manager-Maintenance-Configurations</a></p>
+<p>See the detailed Readme file on the repository for further details.  Be aware that terraform limits each maintenance configuration to a single subscription ID.</p>
+<h1 id="ad-hoc-jobs">Ad Hoc Jobs</h1>
+<p>These processes can be used to trigger scans and deploy updates on demand.  A single VM can be managed from its Azure portal webpage by browsing for the VM and select the Update from the left hand menu.  Multiple VMs can be managed from the Azure update manager web page.</p>
+<p><a href="https://portal.azure.com/#view/Microsoft_Azure_Automation/UpdateCenterMenuBlade/~/overview">Azure Update Manager Portal</a></p>
+<p><a href="AUM-Multi-VM.html">AUM Multiple VMs Instructions</a></p>
+<h2 id="individual-vm-updates">Individual VM Updates</h2>
+<h3 id="step-1-enable-aum">Step 1 - Enable AUM</h3>
+<p>Using the Azure portal, browse to the VM to be protected. Select Operations / <strong>Updates</strong> from the tool bar, then <strong>Update Settings</strong></p>
+<p><a href="images/AUM_Update_Settings1.png" rel="noopener noreferrer"><img src="images/AUM_Update_Settings1.png" alt="Update_Settings" /></a></p>
+<p>For HMCTS maintenance configurations, set the <em>Periodic assessment</em> as <strong>Enable</strong> and <em>Patch orchestration</em> as <strong>Customer Managed Schedules</strong></p>
+<p><a href="images/AUM_VM_UpdateSettings1.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings1.png" alt="Configuration_Settings" /></a></p>
 <p>Various problems described in the troubleshooting section are the result, of not setting these values correctly.</p>
+<h3 id="step-2-audit-os">Step 2 - Audit OS</h3>
+<p>AUM will ask the OS to begin an audit of missing updates using its own tool, either Windows Update or APT/YUM. Please note this process can be slow, as it needs to trigger the OS tool, wait for the results, collect the results and then process them with the AUM.  Waiting patiently is recommended and triggering more than 3 scans in a 24 hour period can result in even longer waits.</p>
+<p>Using the Azure portal, browse to the VM to be protected. Select <strong>Updates</strong> then <strong>Check for Updates</strong>.  Can take 5 minutes for Linux machines and 20 - 40 minutes for Windows VMs.</p>
+<p>The results will be shown on the VMs <em>Updates</em>* page as Recommended Updates. If nothing is shown as required, there is nothing to update and the process is complete.</p>
+<h3 id="step-3-updating-vm-s">Step 3 - Updating VM/s</h3>
+<p>Once a scan has successfully completed, AUM will present a list of missing updates which can be applied to the VMs operating system.</p>
+<p>Select <strong>One-time update</strong> from the VMs Updates screen, to open the <strong>Install one-time updates</strong> wizard. Select the Machine Name to be updated and click Next.</p>
+<p>A preview of the updates to be installed will be displayed.  This can be modified using the <strong>Update selection</strong> options. Once the correct updates are displayed, click Next.</p>
+<p><strong>Caution</strong>
+The default reboot option is &ldquo;Reboot if required&rdquo; which can sometimes automatically reboot the VM to complete the patching process. Be sure to select the &ldquo;Never reboot&rdquo; option, if you dont want the VM to reboot.  Click Next</p>
+<p>Review the choices which have been selected and click Install to start the update job.  To abort the wizard, click the X in the top right hand corner, ending the process.</p>
+<p>The patching process will begin.</p>
+<h3 id="step-4-rebooting-vm">Step 4 - Rebooting VM</h3>
+<p>If you need to manually reboot the VM, select <strong>Overview</strong> from the left hand menu.  Then click on the Restart button, which will gracefully restart the operating system.</p>
+<h3 id="step-5-progress-and-history">Step 5 - Progress and History</h3>
+<p>From the VMs <strong>Updates</strong> page, select the <strong>History</strong> button.  Each jobs status will be displayed including active tasks.  However this information can lag many minutes behind.  Waiting patiently is recommended&hellip;</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2024-06-14">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 14 December 2023.
+      This page was last reviewed on 26 April 2024.
 
-        It needs to be reviewed again on 14 June 2024
+        It needs to be reviewed again on 26 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 14 June 2024
+      This page was set to be reviewed before 26 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

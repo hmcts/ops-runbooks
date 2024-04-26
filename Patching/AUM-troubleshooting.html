@@ -377,6 +377,31 @@
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
+<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
+<ul>
+  <li>
+    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Scripting AUM</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Ad Hoc Jobs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>AUM - Multiple VM Operations</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>Ad Hoc Jobs For Multiple VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
 <ul>
   <li>
@@ -466,19 +491,6 @@
   </li>
 </ul>
 </li>
-<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
-<ul>
-  <li>
-    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
-  </li>
-</ul>
-</li>
 </ul>
 
 
@@ -503,7 +515,7 @@ If these services are faulty, AUM will be unable to resolve the issue and only h
 <p>It has been noted in testing that status updates and progress are not frequently refreshed.  Allow time 15 minutes for processes to complete. The operating system update features need to report thier status to AUM.
 The recommended updates screen does not refresh multiple times within an hour and over night might be required, for all activities to be reported correctly.</p>
 <p>Error - &ldquo;The following packages have been kept back&rdquo; Error while updating your system 
-Ubuntu (Canonical) phases updates, which require time for package changes to propagate. Overnight, resolved this issue and</p>
+Ubuntu (Canonical) phases updates, which require time for package changes to propagate. Waiting overnight, resolved this issue.</p>
 <h3 id="agents">Agents</h3>
 <p>Azure Update Manager uses an agent which is included with supported Azure Marketplace images.</p>
 <p><a href="https://learn.microsoft.com/en-gb/azure/virtual-machines/extensions/agent-windows">Windows VM Agent</a></p>
@@ -516,7 +528,10 @@ Ubuntu (Canonical) phases updates, which require time for package changes to pro
 <p>You may also see this error
 <a href="images/AUM_Schedule_Error1.png" rel="noopener noreferrer"><img src="images/AUM_Schedule_Error1.png" alt="Maintenance_Configuration_Error2" /></a></p>
 <p>This is because the VM Update Setting have not been configured correctly. 
-<a href="images/AUM_VM_UpdateSettings.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings.png" alt="Configuration_Settings" /></a></p>
+<a href="images/AUM_VM_UpdateSettings1.png" rel="noopener noreferrer"><img src="images/AUM_VM_UpdateSettings1.png" alt="Configuration_Settings" /></a></p>
+<h3 id="linux-error">Linux Error</h3>
+<p><a href="images/AUM_Agent_Error1.png" rel="noopener noreferrer"><img src="images/AUM_Agent_Error1.png" alt="Linux Error" /></a>
+Rebooting the VM and rescanning for missing patches, resolved this issue.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2024-06-14">
     <div class='page-expiry--not-expired'>

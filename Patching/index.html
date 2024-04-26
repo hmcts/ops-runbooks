@@ -377,6 +377,31 @@
   <li>
     <a href="../oncall/index.html"><span>On Call</span></a>
   </li>
+<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
+<ul>
+  <li>
+    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Scripting AUM</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-intro.html"><span>Ad Hoc Jobs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>AUM - Multiple VM Operations</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-Multi-VM.html"><span>Ad Hoc Jobs For Multiple VMs</span></a>
+  </li>
+  <li>
+    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
+  </li>
+</ul>
+</li>
 <li><a href="../Change-Requests/index.html"><span>Change Management</span></a>
 <ul>
   <li>
@@ -466,19 +491,6 @@
   </li>
 </ul>
 </li>
-<li><a href="../Patching/index.html"><span>OS Patch Management</span></a>
-<ul>
-  <li>
-    <a href="../Patching/ccd-elk-vms.html"><span>Patching CCD ELK VMs</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-intro.html"><span>Azure Update Manager - Operations Guide</span></a>
-  </li>
-  <li>
-    <a href="../Patching/AUM-troubleshooting.html"><span>Troubleshooting Azure Update Manager</span></a>
-  </li>
-</ul>
-</li>
 </ul>
 
 
@@ -512,7 +524,14 @@ This initial process should be documented if not already.
 To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
 Once restarts have been completed, development team to start &amp; test applications.
 Once the above is successful, the next environment will be patched with similar steps.</p>
-<h2 id="os-patching-instructions">OS Patching Instructions</h2>
+<h2 id="azure-update-manager">Azure Update Manager</h2>
+<p>Azure Update Manager is a SaaS solution, to manage and govern software updates for Windows and Linux machines. As part of its deep integration with the Azure Portal, all Azure infrastructure in place and any VM’s created using Azure marketplace images, already include the necessary software. Removing all barriers to implementation.</p>
+<p>The native software update feature within the operating system is utilised by Azure Update Manager (AUM), to first audit the patching requirements and then apply any updates.  With scheduling and scope, controlled by AUM, with results reported back, via a single console.</p>
+
+<ul>
+<li><a href="AUM-intro.html">Azure Update Manager Page</a></li>
+</ul>
+<h2 id="manual-os-patching-instructions">Manual OS Patching Instructions</h2>
 <p>See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:</p>
 <h3 id="rhel">RHEL</h3>
 <p><strong>1.</strong>  Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default</p>
@@ -670,21 +689,18 @@ ps -ef |grep aide
 </code></pre></div><p>which will return a list of the aide processes. If CPU/ Memory usage is very high try terminating some of the aide processes by taking the PID Numbers from the list and running the below</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kill -9 1211 2376
 </code></pre></div><p>where the numbers are the PIDs, replace as required.</p>
-<h2 id="azure-update-manager-proof-of-concept">Azure Update Manager, Proof of concept</h2>
-<p>HMCTS Orange squad PoC of next generation patching solution
-- <a href="AUM-intro.html">Azure Update Manager Page</a></p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 26 April 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 26 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 26 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

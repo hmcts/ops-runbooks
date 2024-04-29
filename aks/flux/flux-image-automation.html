@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Workload Identity Migration - HMCTS</title>
+    <title>Flux Image Automation - HMCTS</title>
 
     <link href="../../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Workload Identity Migration - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/" />
+      <meta name="twitter:title" content="Flux Image Automation - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Workload Identity Migration" />
+      <meta property="og:title" content="Flux Image Automation" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/aks/flux/flux-image-automation.html" />
 
     
   </head>
@@ -507,38 +507,91 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="workload-identity-migration">Workload Identity Migration</h1>
-<h2 id="check-workload-identity-migration-script">Check Workload Identity Migration script</h2>
-<p>Script was created to check for required Microsoft Entra ID Workload Identity label in deployments. As this is required for correct configuration of pods to use the new identites, its presence indicates if a deployment has been migrated or not.
-More information can be found <a href="https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels">here</a></p>
-<h3 id="pre-requisites">Pre-requisites</h3>
+            <h1 id="flux-image-automation">Flux Image Automation</h1>
+<p>One of the optional components of flux is image automation.</p>
+<p>This allows you to automatically pick up the latest version of an image and push it to your Flux repo, which is then synced to the cluster.</p>
+<p>By doing this, you shouldn&rsquo;t need to manually update a container image version and your cluster should always deploy the latest available version.</p>
+<p>To enable this, you set up an image repository and an image policy resource via flux.</p>
+<p>An image repository tells flux where it should scan for new images.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: azure-devops-agent
+  annotations:
+    hmcts.github.com/image-registry: hmctspublic
+spec:
+  image: hmctspublic.azurecr.io/azure-devops-agent
+</code></pre></div><p>An image policy dictates which newly found images should be applied. By using filters, you can include or exclude certain images based on their tags.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  name: default
+spec:
+  filterTags:
+    pattern: '^prod-[a-f0-9]+-(?P&lt;ts&gt;[0-9]+)'
+    extract: '$ts'
+  policy:
+    alphabetical:
+      order: asc
+</code></pre></div><p>In the example above, only images tagged with something similar to <code>prod-abcd1234</code> will be applied.</p>
+<p>We have the image automation components set up on our PTL clusters only.</p>
+<p>You can see more info about how the PTL clusters have been configured specifically in the guide on <a href="../patching-flux-example.html#prod-environments">flux patching</a>.</p>
+<p>To view the image repos that are on the PTL clusters, you can run:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get imagerepository.image.toolkit.fluxcd.io -n flux-system
+</code></pre></div><p>This will give you output like this:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>NAME                                                         LAST SCAN              TAGS
+adoption-cos-api                                             2024-02-20T11:19:04Z   29
+adoption-web                                                 2024-02-20T11:19:02Z   27
+am-judicial-booking-service                                  2024-02-20T11:19:03Z   33
+am-org-role-mapping-service                                  2024-02-20T11:19:02Z   94
+am-role-assignment-batch-service                             2024-02-20T11:19:06Z   25
+am-role-assignment-refresh-batch                             2024-02-20T11:19:01Z   25
+am-role-assignment-service                                   2024-02-20T11:19:05Z   43
+am-slack-help-bot                                            2024-02-20T11:19:07Z   9
+azure-devops-agent                                           2024-02-20T11:19:08Z   6
+backstage-backend                                            2024-02-20T11:19:08Z   8
+bar-api                                                      2024-02-20T11:19:09Z   38
+bar-csv-report                                               2024-02-20T11:19:36Z   12
+bar-web                                                      2024-02-20T11:19:06Z   40
+bulk-scan-orchestrator                                       2024-02-20T11:19:08Z   19
+bulk-scan-orchestrator-orchestrator-test                     2023-03-23T09:41:51Z   12
+bulk-scan-payment-processor                                  2024-02-20T11:19:09Z   20
+</code></pre></div><p>To view the image policies that are on the PTL clusters, you can run:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get imagepolicy.image.toolkit.fluxcd.io -n flux-system
+</code></pre></div><p>This will give you output like this:</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>NAME                                                         LATESTIMAGE
+aat-docmosis                                                 hmctsprivate.azurecr.io/docmosis:aat-deb97fb-528465
+adoption-cos-api                                             hmctspublic.azurecr.io/adoption/cos-api:prod-c3ad4f6-20240208111252
+adoption-web                                                 hmctspublic.azurecr.io/adoption/web:prod-de886e3-20240219083106
+am-judicial-booking-service                                  hmctspublic.azurecr.io/am/judicial-booking-service:prod-690a664-20240219163916
+am-org-role-mapping-service                                  hmctspublic.azurecr.io/am/org-role-mapping-service:prod-35b1858-20240219155814
+am-role-assignment-batch-service                             hmctspublic.azurecr.io/am/role-assignment-batch-service:prod-aee84b4-20240219155849
+am-role-assignment-refresh-batch                             hmctspublic.azurecr.io/am/role-assignment-refresh-batch:prod-ed0a5ec-20240219155914
+am-role-assignment-service                                   hmctspublic.azurecr.io/am/role-assignment-service:prod-6f52577-20240219162452
+am-slack-help-bot                                            hmctspublic.azurecr.io/am/slack-help-bot:prod-e10eb27-20240207131817
+azure-devops-agent                                           hmctspublic.azurecr.io/azure-devops-agent:prod-97ab16c3-1693560380
+backstage-backend                                            hmctspublic.azurecr.io/backstage/backend:prod-d7a4dd68-1679670023
+bar-api                                                      hmctspublic.azurecr.io/bar/api:prod-70c5019-20240219114120
+bar-csv-report                                               hmctspublic.azurecr.io/payment/jobs:prod-75d31ad-20240119120136
+bar-web                                                      hmctspublic.azurecr.io/bar/web:prod-4d156bc-20240213163035
+bulk-scan-orchestrator                                       hmctspublic.azurecr.io/bulk-scan/orchestrator:prod-ffe8840-20240207091349
+</code></pre></div><p>Each application should have an image repo and policy configured if the team wishes to automate updates to their live applications.</p>
+<h3 id="troubleshooting-image-automation">Troubleshooting image automation</h3>
+<p>Check out the dedicated <a href="../if-something-goes-wrong.html#flux-gitops">troubleshooting section</a> for this.</p>
+<h3 id="external-links">External links</h3>
+<p>For a more detailed guide on how flux image automation works, check out the <a href="https://fluxcd.io/flux/guides/image-update/">official docs</a>.</p>
 
-<ul>
-<li><a href="https://stedolan.github.io/jq/download/"><code>jq</code></a>. </li>
-<li><a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"><code>azure-cli</code></a></li>
-<li><a href="https://hmcts.github.io/cloud-native-platform/troubleshooting/#connecting-to-aks-clusters">Connect to one of the AKS clusters</a> before running the script.</li>
-</ul>
-<h3 id="running-the-script">Running the script</h3>
-<p>Make sure to run <code>az login</code>. To run the script, clone this repository and switch into the <code>aks/workload-identity-migration</code> directory, run <code>./bin/checkWorkloadIdentityMigration.sh</code>. The script runs against your current kubectl context.
-Three CSV files are created in the background to collate results:</p>
-
-<ul>
-<li>A list of all old Azure Identities remaining on the cluster. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_azureidentities</code> to view this in your terminal.</li>
-<li>A list of deployments containing the required workload identity label. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_labelled</code> to view this in your terminal.</li>
-<li>A lost of deployments NOT containing the required workload identity lael. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_not_labelled</code> to view this in your terminal.</li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-02-20">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 20 February 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 20 February 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 20 February 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -548,8 +601,8 @@ Three CSV files are created in the background to collate results:</p>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/workload-identity-migration/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Workload+Identity+Migration%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Faks%2Fworkload-identity-migration%2F%29&amp;labels=bug&amp;title=Re%3A+%27Workload+Identity+Migration%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/flux/flux-image-automation.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Flux+Image+Automation%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Faks%2Fflux%2Fflux-image-automation.html%29&amp;labels=bug&amp;title=Re%3A+%27Flux+Image+Automation%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

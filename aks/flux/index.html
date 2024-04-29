@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Workload Identity Migration - HMCTS</title>
+    <title>Flux - HMCTS</title>
 
     <link href="../../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/aks/flux/">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Workload Identity Migration - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/" />
+      <meta name="twitter:title" content="Flux - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/aks/flux/" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Workload Identity Migration" />
+      <meta property="og:title" content="Flux" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/aks/workload-identity-migration/" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/aks/flux/" />
 
     
   </head>
@@ -507,38 +507,21 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="workload-identity-migration">Workload Identity Migration</h1>
-<h2 id="check-workload-identity-migration-script">Check Workload Identity Migration script</h2>
-<p>Script was created to check for required Microsoft Entra ID Workload Identity label in deployments. As this is required for correct configuration of pods to use the new identites, its presence indicates if a deployment has been migrated or not.
-More information can be found <a href="https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels">here</a></p>
-<h3 id="pre-requisites">Pre-requisites</h3>
+            <h1 id="flux">Flux</h1>
+<h2 id="guides">Guides</h2>
+<h1 id="flux-image-automation"><a href="flux-image-automation.html">Flux Image Automation</a></h1>
 
-<ul>
-<li><a href="https://stedolan.github.io/jq/download/"><code>jq</code></a>. </li>
-<li><a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"><code>azure-cli</code></a></li>
-<li><a href="https://hmcts.github.io/cloud-native-platform/troubleshooting/#connecting-to-aks-clusters">Connect to one of the AKS clusters</a> before running the script.</li>
-</ul>
-<h3 id="running-the-script">Running the script</h3>
-<p>Make sure to run <code>az login</code>. To run the script, clone this repository and switch into the <code>aks/workload-identity-migration</code> directory, run <code>./bin/checkWorkloadIdentityMigration.sh</code>. The script runs against your current kubectl context.
-Three CSV files are created in the background to collate results:</p>
-
-<ul>
-<li>A list of all old Azure Identities remaining on the cluster. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_azureidentities</code> to view this in your terminal.</li>
-<li>A list of deployments containing the required workload identity label. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_labelled</code> to view this in your terminal.</li>
-<li>A lost of deployments NOT containing the required workload identity lael. After running the script run <code>./bin/checkWorkloadIdentityMigration.sh view_not_labelled</code> to view this in your terminal.</li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-23">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 23 April 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 23 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 23 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -548,8 +531,8 @@ Three CSV files are created in the background to collate results:</p>
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/workload-identity-migration/index.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Workload+Identity+Migration%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Faks%2Fworkload-identity-migration%2F%29&amp;labels=bug&amp;title=Re%3A+%27Workload+Identity+Migration%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/aks/flux/index.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Flux%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Faks%2Fflux%2F%29&amp;labels=bug&amp;title=Re%3A+%27Flux%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

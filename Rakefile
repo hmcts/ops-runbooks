@@ -5,24 +5,16 @@ ENV["COMMIT_MESSAGE_SUFFIX"] = "[skip ci]"
 ENV["BRANCH_NAME"] = "ghpages"
 
 task :check_urls do
-    directories = ['content']
-    merge_base = %x(git merge-base origin/ghpages HEAD).chomp
-    diffable_files = %x(git diff -z --name-only --diff-filter=AC #{merge_base}).split("\0")
-    diffable_files = diffable_files.select do |filename|
-    next true if directories.include?(File.dirname(filename))
-
-    filename.end_with?(".md")
-    end.map { |f| Regexp.new(File.basename(f, File.extname(f))) }
-
-    proofer = HTMLProofer.check_directory("./output",
-        { 
+    proofer = HTMLProofer.check_directory("./build",
+        {
             :check_external_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
+            :disable_external => true,
             :ignore_urls =>  [
                 diffable_files
                 # Ignore pulls/branches as these do not translate to raw content
-                # %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))}, 
+                %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))},
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
                 # %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html}
             ],

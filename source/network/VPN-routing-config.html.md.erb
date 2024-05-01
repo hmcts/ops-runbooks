@@ -1,6 +1,6 @@
 ---
 title: F5 VPN Config
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2024-05-01
 review_in: 12 months
 weight: 12
 ---
@@ -12,11 +12,17 @@ This document details the steps to configure routing to make internal apps avail
 ## Routing
 
 1. Connect to the [VPN](https://portal.platform.hmcts.net)
-2. Login to <https://vpn.platform.hmcts.net/>.
+2. Login to <https://vpn.platform.hmcts.net/>   or if this does not work  look for the VM `mgmt-vpn-2-vm` and use its public IP to login
 If you are accessing the F5 portal for the first time, submit a pull request to the [user accounts](accounts.html) file in this repo and ask someone with existing access to create your account.
 If you lose your login details, a person with existing access can provide you with new credentials.
 
-3. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'acl_vpn_reform', [direct link](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
+3. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'User-defined ACLs' → 'acl_vpn_reform', [direct link](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
+
+    <img src=images/f5_routing_1.png  width="400">
+
+4. Make sure the range in question is NOT already added  (If the range is already there and your app still not accessible through f5, see Common Issues section below)
+
+    <img src=images/f5_routing_2.png  width="400">
 
 4. You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click 'Add' for your new one. Copy the required details from the existing one to the new one.
 Note: If using Firefox then the search function probably won't find the IP address you type in.
@@ -67,6 +73,26 @@ Select Apply
 <img src=images/apply_access_policy_review.png  width="400">
 
 ## Common Issues
+
+### App not available through f5, after CIDR range added to 'acl_vpn_reform'  Access Control Lists?
+
+If your app is not available after adding CIDR range and you know that app is accessible internally (from internal pod etc.), and only not available through f5, check if the CIDR range or the DNS zone is missing in the network access lists.   Please follow below.
+
+1. Click  'Access → 'Connectivity/VPN' → 'Network Access(VPN)' → 'Network Access Lists'  and then  select `netacl_mojvpn` from the list
+
+<img src=images/f5_routing_3.png width="400">
+
+2. Click on Network Settings tab
+
+3. Change from `Basic` to `Advanced` in the `Client Settings` 
+
+4. Add new CIDR range under IPV4 and IPV6 if its not there already
+
+5. Make sure private dns zone has been added under DNS Address Space too
+
+<img src=images/f5_routing_4.png width="400">
+
+###  Other Common issue
 
 * Failed HDD encryption check: Likely means that FileVault is turned off if it's Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.
 * User is not assigned to a role for the application: https://hmcts.github.io/onboarding/person/#person

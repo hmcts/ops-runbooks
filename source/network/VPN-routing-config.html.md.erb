@@ -74,7 +74,9 @@ Select Apply
 
 ## Common Issues
 
-### App not available through f5, after CIDR range added to 'acl_vpn_reform'  Access Control Lists
+### App not available through f5, after CIDR range added to 'acl_vpn_reform'  Access Control Lists?
+
+If your app is not available after adding CIDR range and you know that app is accessible internally (from internal pod etc.), and only not available through f5, check if the CIDR range or the DNS zone is missing in the network access lists.   Please follow below.
 
 1. Click  'Access → 'Connectivity/VPN' → 'Network Access(VPN)' → 'Network Access Lists'  and then  select `netacl_mojvpn` from the list
 

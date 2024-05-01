@@ -513,10 +513,13 @@
 
 <ol>
 <li>Connect to the <a href="https://portal.platform.hmcts.net">VPN</a></li>
-<li><p>Login to <a href="https://vpn.platform.hmcts.net/">https://vpn.platform.hmcts.net/</a>.
+<li><p>Login to <a href="https://vpn.platform.hmcts.net/">https://vpn.platform.hmcts.net/</a>   or if this does not work  look for the VM <code>mgmt-vpn-2-vm</code> and use its public IP to login
 If you are accessing the F5 portal for the first time, submit a pull request to the <a href="accounts.html">user accounts</a> file in this repo and ask someone with existing access to create your account.
 If you lose your login details, a person with existing access can provide you with new credentials.</p></li>
-<li><p>For making the changes to the ACL: click &lsquo;Access → &#39;Access Control Lists&rsquo; → &lsquo;acl_vpn_reform&rsquo;, <a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform">direct link</a></p></li>
+<li><p>For making the changes to the ACL: click &lsquo;Access → &#39;Access Control Lists&rsquo; → &lsquo;User-defined ACLs&rsquo; → &lsquo;acl_vpn_reform&rsquo;, <a href="https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform">direct link</a></p>
+<p><img src=images/f5_routing_1.png  width="400"></p></li>
+<li><p>Make sure the range in question is NOT already added  (If the range is already there and your app still not accessible through f5, see Common Issues section below)</p>
+<p><img src=images/f5_routing_2.png  width="400"></p></li>
 <li><p>You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click &lsquo;Add&rsquo; for your new one. Copy the required details from the existing one to the new one.
 Note: If using Firefox then the search function probably won&rsquo;t find the IP address you type in.</p></li>
 <li><p>You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:</p>
@@ -562,6 +565,22 @@ Note: If using Firefox then the search function probably won&rsquo;t find the IP
 </ul>
 <p><img src=images/apply_access_policy_review.png  width="400"></p>
 <h2 id="common-issues">Common Issues</h2>
+<h3 id="app-not-available-through-f5-after-cidr-range-added-to-39-acl-vpn-reform-39-access-control-lists">App not available through f5, after CIDR range added to &lsquo;acl_vpn_reform&rsquo;  Access Control Lists?</h3>
+<p>If your app is not available after adding CIDR range and you know that app is accessible internally (from internal pod etc.), and only not available through f5, check if the CIDR range or the DNS zone is missing in the network access lists.   Please follow below.</p>
+
+<ol>
+<li>Click  &lsquo;Access → &#39;Connectivity/VPN&rsquo; → &lsquo;Network Access(VPN)&rsquo; → &lsquo;Network Access Lists&rsquo;  and then  select <code>netacl_mojvpn</code> from the list</li>
+</ol>
+<p><img src=images/f5_routing_3.png width="400"></p>
+
+<ol>
+<li><p>Click on Network Settings tab</p></li>
+<li><p>Change from <code>Basic</code> to <code>Advanced</code> in the <code>Client Settings</code></p></li>
+<li><p>Add new CIDR range under IPV4 and IPV6 if its not there already</p></li>
+<li><p>Make sure private dns zone has been added under DNS Address Space too</p></li>
+</ol>
+<p><img src=images/f5_routing_4.png width="400"></p>
+<h3 id="other-common-issue">Other Common issue</h3>
 
 <ul>
 <li>Failed HDD encryption check: Likely means that FileVault is turned off if it&rsquo;s Mac, or some other whitelisted Full Disk encryption needs to be installed and used on a Windows/Ubuntu machine.</li>
@@ -577,17 +596,17 @@ To get this, you need to access the command line by <a href="https://portal.azur
 <p>To raise a case you will need an account setup using your hmcts.net on my.f5.com (https://my.f5.com/manage/s/contactsupport). You can also call 0-800-404-9597</p>
 <p>Further instructions on how to raise cases: https://my.f5.com/manage/s/article/K000135931</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-05-01">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 1 May 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 1 May 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 1 May 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

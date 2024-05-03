@@ -43,7 +43,7 @@ Teams can raise a PR to trigger the script that will create the role and assign 
 
 If after the pipeline runs, teams are still unable to log in with the JIT role, they can view the output from their tf apply stage which should give them some idea of what went wrong. An example of this, would be if the team has set an incorrect value for `product` in their infrastructure code. This value is used to determine the name of the JIT role to be created, so if this is wrong it won't be able to create the role.
 
-* Example Error in TF Apply - `ERROR:  Could not validate AAD user DTS JIT Access rd-judicial-ref-api DB Reader SC because its name is not found in the tenant.`
+* Example Error - `ERROR:  Could not validate AAD user DTS JIT Access rd-judicial-ref-api DB Reader SC because its name is not found in the tenant.`
 * [Example Fix](https://github.com/hmcts/rd-judicial-api/pull/798/files)
 
 ### DTS JIT xx DB Reader SC does not have correct permissions

@@ -525,6 +525,25 @@ REASSIGN OWNED BY ${single_server_user} TO ${flexible_server_user};
 REVOKE ${flexible_server_user} FROM ${single_server_user};
 GRANT ${single_server_user} TO ${flexible_server_user};
 </code></pre></div><p><strong>Note:</strong> If the single server user is in the format <code>am@am-org-role-mapping-service-postgres-db-v11-aat</code> use <code>am</code>.</p>
+<h3 id="unable-to-login-with-dts-jit-xx-db-reader-sc">Unable to login with DTS JIT xx DB Reader SC</h3>
+<p>After migrating the data from Single Server to Flexible Server, the team may find that they are unable to sign into the new Flexible Server database using the JIT role. In this case, it&rsquo;s likely that the user did not get created during the migration.</p>
+<p>Teams can raise a PR to trigger the script that will create the role and assign appropriate permissions. Here are some useful links:</p>
+
+<ul>
+<li><a href="https://github.com/hmcts/am-org-role-mapping-service/pull/1877/files">Example Pull Request</a></li>
+<li><a href="https://github.com/hmcts/terraform-module-postgresql-flexible/blob/master/set-postgres-permissions.bash">Script</a></li>
+</ul>
+<p>If after the pipeline runs, teams are still unable to log in with the JIT role, they can view the output from their tf apply stage which should give them some idea of what went wrong. An example of this, would be if the team has set an incorrect value for <code>product</code> in their infrastructure code. This value is used to determine the name of the JIT role to be created, so if this is wrong it won&rsquo;t be able to create the role.</p>
+
+<ul>
+<li>Example Error - <code>ERROR:  Could not validate AAD user DTS JIT Access rd-judicial-ref-api DB Reader SC because its name is not found in the tenant.</code></li>
+<li><a href="https://github.com/hmcts/rd-judicial-api/pull/798/files">Example Fix</a></li>
+</ul>
+<h3 id="dts-jit-xx-db-reader-sc-does-not-have-correct-permissions">DTS JIT xx DB Reader SC does not have correct permissions</h3>
+<p>Once able to login with the JIT role, teams should confirm they have appropriate permissions by running a simple select query. If they get a permission denied error, you can run the following commands to grant permissions:</p>
+<div class="highlight"><pre class="highlight sql" tabindex="0"><code><span class="k">GRANT</span> <span class="k">SELECT</span> <span class="k">ON</span> <span class="k">ALL</span> <span class="n">TABLES</span> <span class="k">IN</span> <span class="k">SCHEMA</span> <span class="k">public</span> <span class="k">TO</span> <span class="nv">"DTS JIT Access rd DB Reader SC"</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">USAGE</span> <span class="k">ON</span> <span class="k">SCHEMA</span> <span class="k">public</span> <span class="k">TO</span> <span class="nv">"DTS JIT Access rd DB Reader SC"</span><span class="p">;</span>
+</code></pre></div><p><strong>NOTE:</strong> The above commands will need to be run against any additonal schemas that are in use.</p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-03-14">
     <div class='page-expiry--not-expired'>

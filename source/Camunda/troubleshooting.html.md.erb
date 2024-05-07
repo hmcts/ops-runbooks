@@ -9,6 +9,18 @@ weight: 55
 
 This page should contain guides and information to help troubleshoot the Camunda BPM deployment.
 
+## Application Config
+
+Camunda application config is stored in 3 distinct areas:
+
+- [Camunda source code](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml) - The application itself contains a set of default values that are used if no other is supplied i.e. we can override the values that have an environment variable assigned as well as a default: `${CAMUNDA_HISTORY_TTL:P5D}`
+
+- [Helm Chart](https://github.com/hmcts/camunda-bpm/blob/master/charts/camunda-bpm/values.yaml) - The Helm chart is the next possible configuration option, values supplied here may override the default values within the source code file or add additional values such as secrets or hosted database connection details.
+
+- [Flux](https://github.com/hmcts/cnp-flux-config/tree/master/apps/camunda/camunda-api) - Flux is the final possible configuration option before deployment to AKS. There are 2 deployments via Flux, UI and API, and both have their own distinct configuration settings.
+
+Its important to remember that this list is heirarchical i.e. Flux will override Helm Chart which will override Camunda source code. When troubleshooting, start with the Flux configuration options and work backwards to see if any issues arise.
+
 ## Database Performance
 
 There are many reasons a database cant become a bottleneck for any service so we cannot document all of them here but we can document those issues that we've seen and resolved.
@@ -31,6 +43,7 @@ This process heavily utilizes available resources. Given the shared nature of Ca
 
 ### Checking historical record numbers
 
+#### Camunda Cleanup
 Its possible to find the number of historical records held in the database in the Camunda UI.
 
 - Navigate to the Camunda interface, the URL will depend on the [environment](setup.html#environments).
@@ -57,6 +70,8 @@ Its possible to find the number of historical records held in the database in th
 
          <img src="images/cleanableRecords.png" style="width:200px;">
 
+#### Camunda Batch Operations
+
 It is also possible to get a single total number of finished processes or decisions but depending on how many exist it may create a large query to the database so you should first look at the above cleanable data page to see rough numbers before doing the following steps.
 
 Whilst we do not want to carry out any batch operations, they do provide some initial information that can be useful and they have built in query types which are helpful.
@@ -69,4 +84,8 @@ Whilst we do not want to carry out any batch operations, they do provide some in
 
     <img src="images/batchOperationOptions.png" style="width:300px;">
 
-- 
+- By selecting one of these options you will begin a select query to the database using the criteria of the operation e.g. `Delete finished process instances` will search initially for **ALL** finished process instances in the database.
+
+- To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options such as start date, finish date, `incident status` and a host of `IDs` options.
+
+    <img src="images/searchCriteria.png" style="width:600px;">

@@ -30,6 +30,78 @@ Every upgrade will have a guide that details the changes being made, the reasoni
 Example upgrade guide for [7.20->7.21](https://docs.camunda.org/manual/7.21/update/minor/720-to-721/)
 
 ## Raising tickets with Camunda Support
+
+If the worst happens and you cannot solve the issue yourself then we have access to Camunda to raise support tickets.
+This [URL](https://jira.camunda.com/servicedesk/customer/portal/1/user/login) leads to the Camunda Jira service desk.
+The credentials for this can be found in the `camunda-prod` Key Vault under the secrets **__Camunda_Service_Desk_[user/password]__**
+
+Logging in you will find 3 different options, the most likely option to use is `Help Request`. 
+
+Selecting this will open a request form to enter all the information you think will help Camunda to triage the ticket quicker.
+
+For priority you choose between 3 levels, Level 3(L3) is a normal request issue and Level 1(L1) is a P1 response issue. If Camunda is currently functional then L3 is the correct option here.
+
+For the Component select C7 which means Camunda version 7 (unless we upgrade to version 8 at some point!).
+
+> Its important that you check back on the ticket daily, the account is not linked to your email so you will not receive any update notifications.
+
 ## Search Camunda database
-## Remove finished records manually
+
+## Remove process instances manually (running and finished)
+
+There are instances were you may need to remove finished processes or decisions manually e.g. the team have removed their definition code from the repository and Camunda has not processed this correctly. Example [ticket](https://tools.hmcts.net/jira/browse/DTSPO-16734).
+
+If you know the name of the definition you can search for it via the Camunda Cockpit UI.
+
+<img src="images/processInstances.png" style="height:300px;">
+
+Once you've found it you can select the process to see more details about it including a list of process instances for this specific process definition.
+
+Within the definition page there is a `delete running instances` option
+
+<img src="images/deleteRunningProcess.png" style="height:200px;">
+
+Selecting this starts a `batch operation` input and automatically selects `Delete Running Process Instances` in the operation type dropdown. This can be changed to `Delete finished process instances` if required (this is likely a good choice to test initially!).
+
+<img src="images/deleteProcessInstanceBatchOp.png" style="height:300px;">
+
+Enter a reason for the deletion e.g. the Jira ticket number and then use the search criteria to narrow down the results to what you need.
+
+Its possible to select only specific records in the list of results or by selecting `Query` it will select all records found, **ALL** records means across all pages shown now just the current page, remember these are SQL queries in the background!
+
 ## Update removal time on a record
+
+Camunda removal time updates are a batch operation that can be carried out via the Camunda Cockpit UI.
+
+Updating a records removal time will control when that record will be removed from the Camunda database by the nightly Camunda clean up task.
+
+To run a removal time operation you can:
+
+- Log into Camunda and select the `Cockpit` option
+
+    <img src="images/cockpit.png" style="height:100px;">
+
+- Navigate to the menu and select `more` then `batch operation`
+
+    <img src="images/batchOperation.png" style="width:150px;">
+
+- On this page you will find a number of fields, selecting `operation` will show a dropdown of available options
+
+    <img src="images/batchOperationOptions.png" style="width:300px;">
+
+- Select one of the `Set removal time to historic X` options that applies to your need.
+
+- Initially this will search the database for all historic records for your chosen option e.g. all completed process instances. You can reduce the time to return results by using search criteria.
+
+- To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options such as start date, finish date, `incident status` and a host of `IDs` options.
+
+    <img src="images/searchCriteria.png" style="width:600px;">
+
+- For set removal time batch operations there are a number of additional options provided:
+
+    - **Cleared** - removes the removal time of the select records, there should be no reason to use this.
+    - **Calculated** - Uses either the Time To Live of the definition that created this record OR the system default of 30 days where no TTL is available. The value is calculated by Camunda an will likely be in the future by at least 30 days.
+    - **Absolute** - An absolute date chosen by the user to set for each record selected, a calendar input appears for this option and it can be set to any date past or present. Past simply means the record will be removed during the next clean up task.
+    - **Hierarchical** - Sets the removal time across all instances of the hierarchy
+    - **Update in chunks** - Will stream the changes slowly to ensure the database is not overloaded. It is very advisable to use this option.
+    - **Chunk Size** - this option will appear when `Update in chunks` is select and should be set to a reasonable number to maintain normal functionality of the service but still achieve the desired outcome.

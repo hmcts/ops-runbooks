@@ -47,6 +47,37 @@ For the Component select C7 which means Camunda version 7 (unless we upgrade to 
 
 ## Search Camunda database
 
+There are 2 ways to search the Camunda database, one via Camunda UI itself and the other directly on the database instance, using the Camunda UI should always be preferrable as it carries less risk.
+
+### Camunda UI
+This method of searching the DB is a workaround, it provides search facilities but its primary purpose is to make **changes** so please be careful.
+
+Searching the Camunda DB via the UI provides less freedom, you can use batch operations of specific types to search through the returned results of that operation e.g. the operation `delete all finished process instances` will only ever return finish process instances, not running instances or any decisions. 
+
+If what you need falls into one of the existing batch operations then it is best to use the UI to carry out the query however you must **NOT** complete the operation if you are simply doing a search!
+
+<img src="images/batchOperationDelete.png" style="height:50px;">
+
+### PSQL
+
+Connecting directly to the database instance itself provides all of the traditional SQL based query options as any other database.
+
+Connecting to the DB requires:
+
+- Access to a bastion host, prod/nonprod depending on environment
+- Access to the Camunda key vaults, named `camunda-<env>`
+- Access to the database instance in azure, name `hmcts-camunda-v14-flexible-<env>`
+
+Selecting the relevant DB you can choose the `connect` option in the menu which will provide details on how to connect directly to the database
+
+<img src="images/databaseConnection.png" style="height:250px;">
+
+Use this information on the bastion host to connect to the database using `psql` as described on the page.
+
+The 2 most obvious choices here are exporting environment variables or supplying all the details inline with the `psql` command
+
+<img src="images/connectionOptions.png" style="height:250px;">
+
 ## Remove process instances manually (running and finished)
 
 There are instances were you may need to remove finished processes or decisions manually e.g. the team have removed their definition code from the repository and Camunda has not processed this correctly. Example [ticket](https://tools.hmcts.net/jira/browse/DTSPO-16734).

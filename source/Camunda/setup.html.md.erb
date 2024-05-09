@@ -1,0 +1,150 @@
+---
+title: Camunda Setup
+last_reviewed_on: 2024-04-27
+review_in: 12 months
+weight: 45
+---
+
+# <%= current_page.data.title %>
+
+This page will detail the setup and environments for Camunda BPM.
+
+## Applicatiocof  n
+
+The Camunda application as built, hosted and used by HMCTS is a customized version of the actual Camunda-BPM application.
+
+All of the source code is available in the [repository](https://github.com/hmcts/camunda-bpm/tree/master/src) src folder. The primary customization we have implemented is the use of Spring Boot as a framework to allow for integration with Azure Entra and Single Sign On.
+
+There are useful guides available to show different ways to integrate Camunda and Spring Boot such as this [one](https://www.baeldung.com/spring-boot-embedded-camunda) but they will not be a perfect match for our existing setup.
+
+The Azure Entra configuration can be found [here](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml#L176), without this we would not be able to sign into Camunda with our existing usernames.
+
+## Components
+
+Camunda is made up of 3 components:
+
+- Camunda API
+- Camunda UI
+- Postgres Database
+
+Camunda API and UI are both deployed centrally to AKS (CFT). What is unique about this deployment is that they both use the same container image.
+
+The image is built via [Jenkins](https://build.hmcts.net/job/HMCTS_a_to_c/job/camunda-bpm/) and stored in Azure Container Registry in the [hmctsprivate](https://portal.azure.com/#view/Microsoft_Azure_ContainerRegistries/RepositoryBlade/id/%2Fsubscriptions%2F8999dec3-0104-4a27-94ee-6588559729d1%2FresourceGroups%2Frpe-acr-prod-rg%2Fproviders%2FMicrosoft.ContainerRegistry%2Fregistries%2Fhmctsprivate/repository/camunda%2Fbpm) repository so you cannot access this without the relevant permissions in Azure.
+
+The image contains all elements related to Camunda BPM and by having a single image it allows teams and local development to take place in a simple docker setup. 
+In AKS, specifically Flux, we split out the API and UI functionality by supplying environment variables which enable or disable certain features.
+Within Flux the deployments will be found under `apps/camunda/` and they are split into UI and API.
+
+### Camunda UI
+
+Camunda UI contains all of the user interface functionality including the authentication to the service.
+Within [Flux](https://github.com/hmcts/cnp-flux-config/blob/master/apps/camunda/camunda-ui/camunda-ui.yaml#L15) we have the following environment variable defined:
+
+```yaml
+      environment:
+        SPRING_PROFILES_ACTIVE: springauth
+```
+
+This variable is used to trigger a specific section of the application configuration, namely the use of Single Sign On via Azure Entra.
+The application config can be found [here](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml#L169).
+
+You can see that with this section of the `application.yaml` file we have defined a much smaller configuration and this is because the entire document is merged at runtime and the last defined keys will override any higher in the file.
+In this case we have some definitions which override other previously defined configuration:
+
+```yaml
+camunda:
+  api:
+    auth:
+      enabled: false
+  ui:
+    auth:
+      enabled: true
+```
+
+This disables the API auth functionality built into the application/image and focuses on the UI component which is enabled here.
+The default in the configuration if the environment variable was not defined would be reversed resulting in no UI and API that requires authentication.
+
+### Camunda API
+
+Camunda API is a more lightweight deployment, whilst it uses the same image we use environment variables again to enable/disable features.
+
+By default the API services in the image require authentication.
+This is not required when we deploy to AKS and have no ingress for public access to this service so we disable the API auth feature by creating an environment variable in [Flux](https://github.com/hmcts/cnp-flux-config/blob/master/apps/camunda/camunda-api/camunda-api.yaml#L16).
+
+```yaml
+      environment:
+        CAMUNDA_API_AUTH_ENABLED: false
+```
+
+With this environment and the built in application defaults we have now removed all UI components (default) and API authentication (Flux override).
+
+### Postgres Database
+
+A single Postgres database instance is used for Camunda.
+
+The schema is managed via code and upgrades/migrations of Camunda can require additional files to be added to the [repository](https://github.com/hmcts/camunda-bpm/tree/master/src/main/resources/db/migration).
+
+These files are provided by Camunda in their upgrade guides and can also be found [here](https://github.com/camunda/camunda-bpm-platform/blob/master/engine/src/main/resources/org/camunda/bpm/engine/db/upgrade/postgres_engine_7.20_to_7.21.sql).
+If a database change is required as part of an upgrade a file will exist with the previous version and new version in the title e.g. `postgres_engine_7.20_to_7.21.sql`
+
+## Environments
+
+Camunda is deployed across multiple environments into AKS and each environment contains its own Postgres DB.
+
+The following environments contain a Camunda deployment:
+
+- ITHC - [URL](https://camunda-bpm.ithc.platform.hmcts.net/)
+- DEMO - [URL](https://camunda-bpm.demo.platform.hmcts.net/)
+- PERFTEST - [URL](https://camunda-bpm.perftest.platform.hmcts.net/)
+- AAT - [URL](https://camunda-bpm.aat.platform.hmcts.net/)
+- PRODUCTION - [URL](https://camunda-bpm.platform.hmcts.net/)
+
+Each environment provides the same service but from a PlatOps perspective some of them have specific uses:
+
+- ITHC is typically the first environment used to test upgrades and changes to the Camunda Application.
+- Perftest is the most like for like with Production, this provides the best option for testing any changes that carry a risk of - breaking the service before deploying to Production.
+- Demo is heavily used by teams so it provides a good test environment for changes that might affect BAU e.g. upgrading Java version or changing existing functionality.
+
+### Deployments
+
+#### Infrastructure
+
+Within the repository there is an [infrastructure](https://github.com/hmcts/camunda-bpm/tree/master/infrastructure) folder that contains Terraform code. This is used to build any required infrastructure for Camunda to function including the database, app insights and a key vault.
+
+A environment specific variable file exists for every environment listed above and these can be used to customise configuration for those resources e.g. Postgres Shared Buffers is custom across different environments.
+
+#### AKS
+
+The application components are deployed to AKS via [Flux](https://github.com/hmcts/cnp-flux-config/tree/master/apps/camunda) and the deployment follows the same model as all other applications in Flux:
+
+- App specific folders (UI and API) with environment overrides
+- Environment specific folders linked to the apps and any patches
+- Automation for image policies
+- service accounts containing Managed Identities
+
+Whilst the deployments are architecturely the same they differ in configuration. UI is similar across all environments but API has custom configuration specifically for Production and Demo which are the ones like to see the most end user traffic.
+
+For Demo and Productino we have setup controlled clean up configuration.
+The application has default values for these built in however due to the nature of Production these defaults have been overridden.
+
+```YAML
+  CAMUNDA_BATCH_HISTORY_TTL: "P30D"
+  CAMUNDA_BATCH_OPERATIONS: "P30D"
+  CAMUNDA_HISTORY_TTL: "P30D"
+  CAMUNDA_HISTORY_JOBLOG__TTL: "P30D"
+  CAMUNDA_HISTORY_CLEANUP_START_TIME: "00:30+0100"
+  CAMUNDA_HISTORY_CLEANUP_END_TIME: "06:00+0100"
+  CAMUNDA_HISTORY_CLEANUP_STRATEGY: "removalTimeBased"
+  CAMUNDA_PARALLELISM: 1
+```
+
+These values control the length fo time any database record should exist e.g. `P30D = 30 Days`
+Each of these values relates back to the applications built in configuration where an override is allowed and a default is setup.
+
+As an example, we have this value in the [application.yaml](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml#L54) config file for the app:
+
+```YAML
+historyTimeToLive: ${CAMUNDA_HISTORY_TTL:P5D}
+```
+
+The `historyTimeToLive` configuration can be set by using `CAMUNDA_HISTORY_TTL` or it will be assigned a default of `P5D (5 Days)`. This allows us to override any value in the application.yaml file from Flux on a per environment basis.

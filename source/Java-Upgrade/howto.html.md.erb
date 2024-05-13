@@ -11,7 +11,7 @@ This page will contain helpful guidance on updating Java.
 
 ## Add new image to the agents
 
-New java image needs to be added to the jenkins agents. This can be done in the jenkins-packer [repo](https://github.com/hmcts/jenkins-packer)
+You will need to add the new java image to the jenkins-packer [repo](https://github.com/hmcts/jenkins-packer) first so it can be used by the jenkins agents.
 
 Example of Java 21 being [added](https://github.com/hmcts/jenkins-packer/pull/164/files)
 
@@ -21,10 +21,10 @@ On the application repos you need to update the files using java to the latest v
 
 Before applying the upgrade it best to test it on a lower environment first.
 
-Example of Pdf-service being updated to v21
+Example of Pdf-service being upgraded to v21
 https://github.com/hmcts/rpe-pdf-service/pull/753/files
 
-## Warning when updating java on camunda
+## Warning when upgrading java on camunda
 
 It is best to check [camunda docs](https://docs.camunda.org/enterprise/announcement/) before updating java as the java version might not be compatible with the currect version of camunda.  If this is the case you will need to [upgrade camunda](https://hmcts.github.io/ops-runbooks/Camunda/howto.html).
 

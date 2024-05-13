@@ -1,0 +1,40 @@
+---
+title: Java Upgrade How To Guide
+last_reviewed_on: 2024-05-13
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+This page will contain helpful guidance on updating Java.
+
+## Add new image to the agents
+
+New java image needs to be added to the jenkins agents. This can be done in the jenkins-packer [repo](https://github.com/hmcts/jenkins-packer)
+
+Example of Java 21 being [added](https://github.com/hmcts/jenkins-packer/pull/164/files)
+
+## Update application
+
+On the application repos you need to update the files using java to the latest version we are currently supporting. The main three are acb.tpl, build.gradle and dockerfile. You also might need to add some dependencies to pass the pipeline checks.
+
+Before applying the upgrade it best to test it on a lower environment first.
+
+Example of Pdf-service being updated to v21
+https://github.com/hmcts/rpe-pdf-service/pull/753/files
+
+## Warning when updating java on camunda
+
+It is best to check [camunda docs](https://docs.camunda.org/enterprise/announcement/) before updating java as the java version might not be compatible with the currect version of camunda.  If this is the case you will need to [upgrade camunda](https://hmcts.github.io/ops-runbooks/Camunda/howto.html).
+
+## List of apps we currently support that will need to be updated.
+
+[Plum ](https://github.com/hmcts/cnp-plum-recipes-service)
+[Toffee](https://github.com/hmcts/sds-toffee-recipes-service)
+[Draft-store](https://github.com/hmcts/draft-store/)
+[Pdf-service](https://github.com/hmcts/rpe-pdf-service)
+[Camunda](https://github.com/hmcts/camunda-bpm)
+[Template-spring-boot](https://github.com/hmcts/template-spring-boot)
+[Spring-boot-template](https://github.com/hmcts/spring-boot-template/)
+[Service-auth-provider-app](https://github.com/hmcts/service-auth-provider-app)

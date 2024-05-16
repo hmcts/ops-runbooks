@@ -17,11 +17,19 @@ Example of Java 21 being [added](https://github.com/hmcts/jenkins-packer/pull/16
 
 ## Upgrade application
 
-On the application repos you will need to update the files using java to the latest version we are currently supporting. The main three are acb.tpl, build.gradle and dockerfile. You also might need to add some dependencies to pass the pipeline checks.
+On the application repos you will need to update the files using java to the latest version we are currently supporting. The main three you should look at: 
 
-Before applying the upgrade it best to test it on a lower environment first.
+- `acb.tpl.yaml`
+- `build.gradle`
+- `Dockerfile`
+
+You also might need to add some dependencies and fix deprecations/vulnerabilities but this will vary based on the application.
+
+Before applying the upgrade it's best to test it on a lower environment first.
 
 Example of Pdf-service being upgraded to [v21](https://github.com/hmcts/rpe-pdf-service/pull/753/files)
+
+**NOTE:** If you are upgrading the Java version in a template, we found the best way to do this is by creating a test app from the template and upgrading it. Once you are happy it is upgraded and working, you can then make the same changes to the template.
 
 ## Warning when upgrading java on camunda
 

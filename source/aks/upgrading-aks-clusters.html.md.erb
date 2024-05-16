@@ -224,4 +224,4 @@ Failed to save Kubernetes service 'cft-preview-01-aks'. Error: Code="SubnetIsFul
 
 The only reason we can think of this error is because the cluster had 119 nodes at that time but it still the address space is quite large with 8,192 IPs so not sure why it did not have enough space.
 
-The only solution we had for this is to swap the cft-preview-01-aks  cluster with cft-preview-00-aks cluster.  Please follow [Re-building a cluster](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html) guide to find how to swap the clusters.
+The only solution we had for this is to rebuild and swap the cft-preview-01-aks  cluster with cft-preview-00-aks cluster.  Please follow [Re-building a cluster](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html) guide to find how to rebuild Preview.

@@ -529,10 +529,13 @@
 <p>You will need to add the new java image to the jenkins-packer <a href="https://github.com/hmcts/jenkins-packer">repo</a> first so it can be used by the jenkins agents.</p>
 <p>Example of Java 21 being <a href="https://github.com/hmcts/jenkins-packer/pull/164/files">added</a></p>
 <h2 id="upgrade-application">Upgrade application</h2>
-<p>On the application repos you will need to update the files using java to the latest version we are currently supporting. The main three you should look at: 
-- acb.tpl.yaml
-- build.gradle
-- Dockerfile</p>
+<p>On the application repos you will need to update the files using java to the latest version we are currently supporting. The main three you should look at:</p>
+
+<ul>
+<li><code>acb.tpl.yaml</code></li>
+<li><code>build.gradle</code></li>
+<li><code>Dockerfile</code></li>
+</ul>
 <p>You also might need to add some dependencies and fix deprecations/vulnerabilities but this will vary based on the application.</p>
 <p>Before applying the upgrade it&rsquo;s best to test it on a lower environment first.</p>
 <p>Example of Pdf-service being upgraded to <a href="https://github.com/hmcts/rpe-pdf-service/pull/753/files">v21</a></p>

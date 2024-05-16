@@ -214,3 +214,14 @@ On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older
 
 The only way we managed to fix and get updated chart for the CronJobs is by following [this blog post](https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b) by running helm uninstall and then removing the helm release.
 
+### cft-preview cluster needed swapping because address does not have enough capacity for 2301 IP addresses
+
+On the `cft-preview-01-aks` cluster, while upgrading on Azure portal, it thrown below error.
+
+```command
+Failed to save Kubernetes service 'cft-preview-01-aks'. Error: Code="SubnetIsFull" Message="Subnet aks-01 with address prefix 10.101.160.0/19 does not have enough capacity for 2301 IP addresses." Details=[]
+```
+
+The only reason we can think of this error is because the cluster had 119 nodes at that time but it still the address space is quite large with 8,192 IPs so not sure why it did not have enough space.
+
+The only solution we had for this is to swap the cft-preview-01-aks  cluster with cft-preview-00-aks cluster.  Please follow [Re-building a cluster](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html) guide to find how to swap the clusters.

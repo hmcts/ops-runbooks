@@ -24,6 +24,8 @@ You can find info about these components [here](https://fluxcd.io/flux/component
 
 These can be upgraded separately so it's best to use the process detailed below to keep everything in sync.
 
+**NOTE:** If there are API changes listed on the Flux release page, it may be a good idea to leave these until all environments are running the new Flux version to avoid conflicts. Once all environments are upgraded you can test the api changes on plum/toffee before applying to the rest of the apps.
+
 To upgrade all of these together in a single environment, you can use the Flux CLI.
 
 The generic process can be found on the [Flux website](https://fluxcd.io/flux/installation/upgrade/) including information on how to install the CLI tool on your machine.
@@ -104,6 +106,17 @@ Now all environments, except prod, should be updated and you can move onto updat
 To do this, you can merge the renovate pull request. That pull request will update the base version of Flux that applies to all environments by default.
 
 You can then remove all the previous changes you made per environment, **except in PTL because it needs the extra components**, and the base version will take over.
+
+## Upgrading Flux when there are API changes
+
+Below is a step by step on how to upgrade flux when there are API changes included in the new version. The example is taken from SDS.
+
+1. [Upgrade flux version in lower environments](https://github.com/hmcts/sds-flux-config/pull/4089)
+2. Test that has worked using commands mentioned above.
+3. [Upgrade flux version in prod/ptl](https://github.com/hmcts/sds-flux-config/pull/4091)
+4. Test again using commands above.
+5. Upgrade API versions e.g. [HelmRelease](https://github.com/hmcts/sds-flux-config/pull/4133) and [ImageRepository](https://github.com/hmcts/sds-flux-config/pull/4134)
+6. Test all is still working after the upgrade. **NOTE:** You can also apply the API changes only to Plum/Toffee initially to test, before applying to other apps.
 
 
 

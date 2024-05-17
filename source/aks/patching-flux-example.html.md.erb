@@ -24,6 +24,8 @@ You can find info about these components [here](https://fluxcd.io/flux/component
 
 These can be upgraded separately so it's best to use the process detailed below to keep everything in sync.
 
+**NOTE:** If there are API changes listed on the Flux release page, it may be a good idea to leave these until all environments are running the new Flux version to avoid conflicts. Once all environments are upgraded you can test the api changes on plum/toffee before applying to the rest of the apps.
+
 To upgrade all of these together in a single environment, you can use the Flux CLI.
 
 The generic process can be found on the [Flux website](https://fluxcd.io/flux/installation/upgrade/) including information on how to install the CLI tool on your machine.

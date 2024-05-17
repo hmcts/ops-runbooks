@@ -107,6 +107,17 @@ To do this, you can merge the renovate pull request. That pull request will upda
 
 You can then remove all the previous changes you made per environment, **except in PTL because it needs the extra components**, and the base version will take over.
 
+## Upgrading Flux when there are API changes
+
+Below is a step by step on how to upgrade flux when there are API changes included in the new version. The example is taken from SDS.
+
+1. [Upgrade flux version in lower environments](https://github.com/hmcts/sds-flux-config/pull/4089)
+2. Test that has worked using commands mentioned above.
+3. [Upgrade flux version in prod/ptl](https://github.com/hmcts/sds-flux-config/pull/4091)
+4. Test again using commands above.
+5. Upgrade API versions e.g. [HelmRelease](https://github.com/hmcts/sds-flux-config/pull/4133) and [ImageRepository](https://github.com/hmcts/sds-flux-config/pull/4134)
+6. Test all is still working after the upgrade. **NOTE:** You can also apply the API changes only to Plum/Toffee initially to test, before applying to other apps.
+
 
 
 

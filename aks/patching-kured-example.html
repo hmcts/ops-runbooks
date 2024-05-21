@@ -527,8 +527,7 @@
 <p>This document covers a high level patching example for the kured app patching.</p>
 <h2 id="patching">Patching</h2>
 <p>Review <a href="https://github.com/kubereboot/charts/releases">kured Releases</a> page to check for breaking changes.</p>
-<p>Create a PR in cnp-flux-config to patch pact-broker in CFT.</p>
-<p><a href="https://github.com/hmcts/cnp-flux-config/pull/29413">Example PR</a></p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/29413">Example PR for upgrading version</a></p>
 <p>Similarly, create a PR in sds-flux-config to patch kured in SDS.  Please note that in SDS environment, kured is deployed under admin namespace.</p>
 <h3 id="checks-to-see-if-upgrade-worked-correctly">Checks to see if upgrade worked correctly</h3>
 <p>After above raised PR approved and merged, describe the kured pod on different clusters and check the labels has updated kured chart version.

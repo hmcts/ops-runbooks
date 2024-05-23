@@ -52,4 +52,18 @@ You can then restore this to the sandbox flexible server:
 pg_restore -v --no-owner --host=owaspdependency-sandbox.postgres.database.azure.com --port=5432 --username=pgadmin --dbname=owaspdependencycheck ~/Desktop/owaspdependencycheck.dump
 ```
 
+Sometimes you might get this error when restoring:
+
+```
+pg_restore -v --no-owner --host=owaspdependency-sandbox.postgres.database.azure.com --port=5432 --username=pgadmin --dbname=owaspdependencycheck ~/Desktop/owaspdependencycheck.dump pg_restore: error: input file appears to be a text format dump. Please use psql.
+```
+
+To fix this, you can run:
+
+```
+psql -h owaspdependency-sandbox.postgres.database.azure.com -d owaspdependencycheck -U pgadmin -f ~/Desktop/owaspdependencycheck.dump
+```
+
+Once you run the restore, you will get some erors about dupli§cate keys. This is because the data in the dump is already in the database. You can ignore these errors.
+
 The two databases should now match and the pipeline should work again.

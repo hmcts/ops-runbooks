@@ -1,0 +1,53 @@
+---
+title: Restoring OWASP Dependency Check DB in Sandbox
+last_reviewed_on: 2024-05-23
+review_in: 12 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+If the [sandbox owasp dependency check flexible server](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/bf308a5c-0624-4334-8ff8-8dca9fd43783/resourceGroups/owaspdependency-data-sandbox/providers/Microsoft.DBforPostgreSQL/flexibleServers/owaspdependency-sandbox/overview) is deleted and recreated, there will be very little CVE data contained in it.
+
+## Checking the database
+
+On sandbox and prod, you can list the tables in the database by running:
+
+```
+SELECT * FROM pg_catalog.pg_tables;
+```
+
+And then view the rows in the vulnerability table by running:
+
+```
+SELECT * FROM vulnerability
+ORDER BY id DESC
+```
+
+This can be done using Azure Data Studio or another tool of your choosing.
+
+If you compare sandbox with prod, sandbox will be missing many CVEs and will need updated.
+
+Because the vulnerability table in the owaspdependencycheck database needs many rows added and the SKU of the server is not able to cope, the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=808) that updates the database will not work.
+
+You could resize the flexible server, run the update and then downsize or you could restore the data from prod as the two environments should match.
+
+## Dump the database from prod
+
+Connect to the VPN and run this command:
+
+```
+pg_dump owaspdependencycheck -h owaspdependency-prod.postgres.database.azure.com -U pgadmin --data-only > ~/Desktop/owaspdependencycheck.dump
+```
+
+You will be prompted for the password which you can find in [keyvault](https://github.com/hmcts/cnp-owaspdependencycheck-database/blob/54e0d1d464f3734d20442904637b18da626bb259/main.tf#L78-L84).
+
+Now you will have a dump of the owaspdependencycheck database.
+
+You can then restore this to the sandbox flexible server:
+
+```
+pg_restore -v --no-owner --host=owaspdependency-sandbox.postgres.database.azure.com --port=5432 --username=pgadmin --dbname=owaspdependencycheck ~/Desktop/owaspdependencycheck.dump
+```
+
+The two databases should now match and the pipeline should work again.

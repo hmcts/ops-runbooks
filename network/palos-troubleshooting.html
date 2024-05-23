@@ -584,6 +584,65 @@ The errors tell us that the <code>log-setting</code> value <code>azure_log_analy
     <img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
 </details>
 <p>For more information on types of filters you can apply check out <a href="https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK">Basics of traffic monitor filtering</a>.</p>
+<h2 id="disk-space-full-messages">Disk space full messages</h2>
+<p>If the management UI becomes unresponsive, there is a chance the VM has ran out of disk space and is struggling. You may
+see errors in the <code>System</code> log such as <code>Disk usage for / exceeds limit, 100 percent in use, cleaning filesystem</code> the <code>/</code> means
+root. Some other path may be presented in the error not always <code>/</code>.</p>
+
+<details>
+    <summary>Disk usage for / exceeds limit</summary>
+    <img alt="Disk usage" src="images/disk_usage_exceeds_limit.png" width="423">
+</details>
+<p>When this happens then there needs to be a cleaning exercise or a hard reboot as a last resort.</p>
+<h3 id="disk-space-full-messages-troubleshooting-tip"><strong>Troubleshooting tip</strong></h3>
+
+<ol>
+<li>Log unto the VPN and <code>ssh</code> into the vm in questions. Good chance that at this point the management UI is inaccessible</li>
+<li>Check that there aren&rsquo;t any disk partition maxed out
+<code>cmd
+show system disk-space
+</code></li>
+</ol>
+<p><details>
+    <summary>Disk usage for / exceeds limit</summary>
+    <img alt="Disk usage result" src="images/disk_usage_high.png" width="591" height="225">
+   </details></p>
+
+<ol>
+<li>Verify the aggressive clean up is enabled
+<code>cmd
+show system state | match aggressive-cleaning
+</code>
+At the moment, setting is only available via the terminal. There is a possibility that this gets lost between major version upgrades or vm restarts</li>
+<li>In above command give no output then there is need to enable it per vm. chose <code>y</code> option to remove all old file. SysLog information would have already been
+sent to Panorama log collector, run the bellow command in the terminal
+<code>cmd
+debug software disk-usage aggressive-cleaning enable
+</code></li>
+</ol>
+<p><details>
+    <summary>Enable cleanup</summary>
+    <img alt="Disk usage result" src="images/disk_usage_enable_cleanup.png" width="514">
+   </details></p>
+
+<ol>
+<li>Set to threshold to <code>90%</code> or lower e.g. <code>85%</code>
+<code>cmd
+debug software disk-usage cleanup deep threshold 90
+</code></li>
+</ol>
+<p><details>
+    <summary>Disk cleanup setting</summary>
+    <img alt="Disk usage result" src="images/disk_usage_reset.png" width="775">
+   </details></p>
+<p>You should see info stating usage has been adjusted</p>
+
+<ol>
+<li>Perform other clean up tasks described in the documentation links below</li>
+</ol>
+<p>Link with further details,
+- <a href="https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClaJCAS">High Disk Space Usage on / root partition and How To Clear</a>
+- <a href="https://www.analysisman.com/2020/08/pan-diskspace.html">AnalysisMan</a></p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2024-07-26">
     <div class='page-expiry--not-expired'>

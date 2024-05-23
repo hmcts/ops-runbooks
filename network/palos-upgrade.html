@@ -588,6 +588,8 @@ The flow is <code>sbox</code> -&gt; <code>nonprod</code> -&gt; <code>prod</code>
 <li>Download if not already and install next major release i.e. <code>v10.0.7</code> or <code>v10.1.x</code></li>
 <li>Verify system is up and running, check cpu, memory etc</li>
 <li>⚠️ Note: Prod update would need a <code>CR</code> raised and done out of office hours as the vm will reboot</li>
+<li>🔔 <em>Note:</em> After reboot, follow the steps in the <a href="palos-troubleshooting.html">Disk space full messages</a> to re-enable automatic disk usage cleanup by the VM (Very important)
+-Looking to see if this can be automated in some way but for now please enable-</li>
 </ul>
 <h2 id="post-upgrade">Post Upgrade</h2>
 
@@ -595,23 +597,24 @@ The flow is <code>sbox</code> -&gt; <code>nonprod</code> -&gt; <code>prod</code>
 <li>Rerun pipeline to see if any issues between current config and new software version</li>
 <li>Fix forward if any issues, config might need to be updated i.e new markup introduced</li>
 <li>Deleting old installation files to save space and cleanup is a nice to have</li>
+<li>Verify, via the cli, that disk usage cleanup is enabled</li>
 <li>Move to <code>nonprod</code> after <code>sbox</code> is stable and pipeline runs well i.e. commits current config<br>
 Flow is: <code>sbox</code> -&gt; <code>nonprod</code> -&gt; <code>prod</code></li>
 <li>Let team members know that the upgrade was successful</li>
 <li>📕 Revisit every 3 months for the next upgrade to keep the firewall software up-to-date</li>
 </ul>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2024-09-16">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-09-23">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 16 May 2024.
+      This page was last reviewed on 23 May 2024.
 
-        It needs to be reviewed again on 16 September 2024
+        It needs to be reviewed again on 23 September 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 16 September 2024
+      This page was set to be reviewed before 23 September 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Run command on all agents - HMCTS</title>
+    <title>OS Patch Management - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/jenkins/run-command-on-all-agents.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Run command on all agents - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/jenkins/run-command-on-all-agents.html" />
+      <meta name="twitter:title" content="OS Patch Management - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Run command on all agents" />
+      <meta property="og:title" content="OS Patch Management" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/jenkins/run-command-on-all-agents.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html" />
 
     
   </head>
@@ -529,71 +529,19 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="run-command-on-all-agents">Run command on all agents</h1>
-<p><em>Note: Somehow people manage to break the Jenkins agents, likely by running docker commands with misconfigured mounts, you may not be able to access all agents and sudo will be broken on some of them. You can just delete these when no builds are running on them</em></p>
-<h2 id="collecting-agent-ip-addresses">Collecting agent IP addresses</h2>
-<p>First get a list of all agents from the Jenkins script console</p>
+            <h1 id="os-patch-management">OS Patch Management</h1>
 
-<ul>
-<li><code>$JENKINS_URL/script</code>
-
-<ul>
-<li>https://build.platform.hmcts.net/script</li>
-<li>https://sandbox-build.platform.hmcts.net/script</li>
-<li>https://sds-build.platform.hmcts.net/script</li>
-<li>https://sds-sandbox-build.platform.hmcts.net/script</li>
-</ul></li>
-</ul>
-<p>By running the script:
-<code>groovy
-for (agent in jenkins.model.Jenkins.instance.slaves) {
-    println agent.privateIP
-}
-</code></p>
-<p>Store the result of this in a file called <code>/tmp/ips</code></p>
-<h2 id="get-agent-password">Get agent password</h2>
-<p>Then get the Jenkins agent password from the vault for the corresponding Jenkins:</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c"># sds prod</span>
-az keyvault secret show <span class="nt">--vault-name</span> ptl <span class="nt">--name</span> jenkins-agent-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
-<span class="c"># sds sandbox</span>
-az keyvault secret show <span class="nt">--vault-name</span> ptl <span class="nt">--name</span> jenkins-agent-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
-
-<span class="c"># cft prod</span>
-az keyvault secret show <span class="nt">--vault-name</span> cftptl-intsvc <span class="nt">--name</span> mgmt-bastion-creds-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
-<span class="c"># cft sbox</span>
-az keyvault secret show <span class="nt">--vault-name</span> cftsbox-intsvc <span class="nt">--name</span> mgmt-bastion-creds-password <span class="nt">--query</span> value <span class="nt">-o</span> tsv
-</code></pre></div><p>Export it in your shell:
-<code>bash
-export JENKINS_AGENT_PASSWORD=$(az keyvault ...)
-</code></p>
-<h2 id="run-command">Run command</h2>
-<p>First make sure you have connected to the VPN.</p>
-<p>Copy this to a file on your machine and edit the command and then run script</p>
-<div class="highlight"><pre class="highlight shell" tabindex="0"><code><span class="c">#!/bin/bash</span>
-
-<span class="nv">SHELL_COMMAND</span><span class="o">=</span><span class="s2">"tfcmt --version; sonar-scanner --version"</span>
-
-<span class="k">while </span><span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> <span class="nt">-u</span> 10 <span class="nt">-r</span> host<span class="p">;</span> <span class="k">do
-   </span><span class="nb">echo</span> <span class="nv">$host</span>
-  sshpass <span class="nt">-p</span> <span class="s2">"</span><span class="k">${</span><span class="nv">JENKINS_AGENT_PASSWORD</span><span class="k">}</span><span class="s2">"</span> ssh jenkinsssh@<span class="s2">"</span><span class="nv">$host</span><span class="s2">"</span> <span class="nt">-o</span> <span class="s2">"UserKnownHostsFile=/dev/null"</span> <span class="nt">-o</span> <span class="nv">StrictHostKeyChecking</span><span class="o">=</span>no <span class="s2">"</span><span class="k">${</span><span class="nv">SHELL_COMMAND</span><span class="k">}</span><span class="s2">"</span>
-<span class="k">done </span>10&lt; /tmp/ips
-</code></pre></div><h2 id="ip-to-agent-name">IP to agent name</h2>
-<p>If you need to tie and agent name back to an IP address you can run this in the Jenkins script console:</p>
-<div class="highlight"><pre class="highlight groovy" tabindex="0"><code><span class="k">for</span> <span class="o">(</span><span class="n">agent</span> <span class="k">in</span> <span class="n">jenkins</span><span class="o">.</span><span class="na">model</span><span class="o">.</span><span class="na">Jenkins</span><span class="o">.</span><span class="na">instance</span><span class="o">.</span><span class="na">slaves</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">println</span> <span class="n">agent</span><span class="o">.</span><span class="na">name</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="n">agent</span><span class="o">.</span><span class="na">privateIP</span>
-<span class="o">}</span>
-</code></pre></div>
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-04-26">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 26 April 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 26 April 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 26 April 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -603,8 +551,8 @@ export JENKINS_AGENT_PASSWORD=$(az keyvault ...)
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/jenkins/run-command-on-all-agents.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Run+command+on+all+agents%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Fjenkins%2Frun-command-on-all-agents.html%29&amp;labels=bug&amp;title=Re%3A+%27Run+command+on+all+agents%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/migrating-apim.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27OS+Patch+Management%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FPatching%2Fmigrating-apim.html%29&amp;labels=bug&amp;title=Re%3A+%27OS+Patch+Management%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

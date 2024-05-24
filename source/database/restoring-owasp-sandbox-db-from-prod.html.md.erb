@@ -1,6 +1,6 @@
 ---
 title: Restoring OWASP Dependency Check DB in Sandbox
-last_reviewed_on: 2024-05-23
+last_reviewed_on: 2024-05-24
 review_in: 12 months
 weight: 30
 ---
@@ -23,7 +23,7 @@ And then view the rows in the vulnerability table by running:
 
 ```
 SELECT * FROM vulnerability
-ORDER BY id DESC
+ORDER BY cve DESC
 ```
 
 This can be done using Azure Data Studio or another tool of your choosing.
@@ -34,17 +34,29 @@ Because the vulnerability table in the owaspdependencycheck database needs many 
 
 You could resize the flexible server, run the update and then downsize or you could restore the data from prod as the two environments should match.
 
+## Delete the sandbox database
+
+Go to the Azure portal and find the flexible server.
+
+Click on `Settings` > `Databases` and select the `owaspdependencycheck` database.
+
+Click `Delete`.
+
+Once it's deleted, create a new database with the same name.
+
 ## Dump the database from prod
 
 Connect to the VPN and run this command:
 
 ```
-pg_dump owaspdependencycheck -h owaspdependency-prod.postgres.database.azure.com -U pgadmin --data-only > ~/Desktop/owaspdependencycheck.dump
+pg_dump owaspdependencycheck -h owaspdependency-prod.postgres.database.azure.com -U pgadmin -F c > ~/Desktop/owaspdependencycheck.dump
 ```
 
 You will be prompted for the password which you can find in [keyvault](https://github.com/hmcts/cnp-owaspdependencycheck-database/blob/54e0d1d464f3734d20442904637b18da626bb259/main.tf#L78-L84).
 
 Now you will have a dump of the owaspdependencycheck database.
+
+## Restore the database to sandbox
 
 You can then restore this to the sandbox flexible server:
 
@@ -52,18 +64,33 @@ You can then restore this to the sandbox flexible server:
 pg_restore -v --no-owner --host=owaspdependency-sandbox.postgres.database.azure.com --port=5432 --username=pgadmin --dbname=owaspdependencycheck ~/Desktop/owaspdependencycheck.dump
 ```
 
-Sometimes you might get this error when restoring:
+You should see output similar to the below:
 
 ```
-pg_restore -v --no-owner --host=owaspdependency-sandbox.postgres.database.azure.com --port=5432 --username=pgadmin --dbname=owaspdependencycheck ~/Desktop/owaspdependencycheck.dump pg_restore: error: input file appears to be a text format dump. Please use psql.
+pg_restore: creating SCHEMA "public"
+pg_restore: creating FUNCTION "public.insert_software(integer, character, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, boolean)"
+pg_restore: creating FUNCTION "public.merge_ecosystem(character varying, character varying, character varying)"
+pg_restore: creating PROCEDURE "public.merge_knownexploited(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)"
+pg_restore: creating FUNCTION "public.save_property(character varying, character varying)"
+pg_restore: creating FUNCTION "public.update_vulnerability(character varying, character varying, character varying, numeric, numeric, boolean, boolean, boolean, boolean, boolean, numeric, character varying, character varying, character varying, character varying, character varying, character varying, character varying, numeric, numeric, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, numeric, character varying, character varying)"
+pg_restore: creating TABLE "public.cpeecosystemcache"
+pg_restore: creating TABLE "public.cpeentry"
+pg_restore: creating SEQUENCE "public.cpeentry_id_seq"
+pg_restore: creating ACL "public.TABLE vulnerability"
+pg_restore: from TOC entry 4094; 0 0 ACL TABLE vulnerability pgadmin
+pg_restore: error: could not execute query: no connection to the server
+Command was: GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vulnerability TO dcuser;
+pg_restore: creating ACL "public.SEQUENCE vulnerability_id_seq"
+pg_restore: from TOC entry 4096; 0 0 ACL SEQUENCE vulnerability_id_seq pgadmin
+pg_restore: error: could not execute query: no connection to the server
+Command was: GRANT SELECT,USAGE ON SEQUENCE public.vulnerability_id_seq TO dcuser;
 ```
 
-To fix this, you can run:
+The database should be restored and if you run the below command, you should see the latest vulnerabilities listed.
 
 ```
-psql -h owaspdependency-sandbox.postgres.database.azure.com -d owaspdependencycheck -U pgadmin -f ~/Desktop/owaspdependencycheck.dump
+SELECT * FROM vulnerability
+ORDER BY cve DESC
 ```
 
-Once you run the restore, you will get some erors about dupli§cate keys. This is because the data in the dump is already in the database. You can ignore these errors.
-
-The two databases should now match and the pipeline should work again.
+The pipeline to update the database with new vulnerabilities should now work again.

@@ -9,9 +9,9 @@ weight: 45
 
 This page will detail the setup and environments for Camunda BPM.
 
-## Applicatiocof  n
+## Application Configuration
 
-The Camunda application as built, hosted and used by HMCTS is a customized version of the actual Camunda-BPM application.
+We build and host a customized version of the actual Camunda-BPM application on HMCTS.
 
 All of the source code is available in the [repository](https://github.com/hmcts/camunda-bpm/tree/master/src) src folder. The primary customization we have implemented is the use of Spring Boot as a framework to allow for integration with Azure Entra and Single Sign On.
 
@@ -93,11 +93,11 @@ Camunda is deployed across multiple environments into AKS and each environment c
 
 The following environments contain a Camunda deployment:
 
-- ITHC - [URL](https://camunda-bpm.ithc.platform.hmcts.net/)
-- DEMO - [URL](https://camunda-bpm.demo.platform.hmcts.net/)
-- PERFTEST - [URL](https://camunda-bpm.perftest.platform.hmcts.net/)
-- AAT - [URL](https://camunda-bpm.aat.platform.hmcts.net/)
-- PRODUCTION - [URL](https://camunda-bpm.platform.hmcts.net/)
+- [ITHC](https://camunda-bpm.ithc.platform.hmcts.net/)
+- [DEMO](https://camunda-bpm.demo.platform.hmcts.net/)
+- [PERFTEST](https://camunda-bpm.perftest.platform.hmcts.net/)
+- [AAT](https://camunda-bpm.aat.platform.hmcts.net/)
+- [PRODUCTION](https://camunda-bpm.platform.hmcts.net/)
 
 Each environment provides the same service but from a PlatOps perspective some of them have specific uses:
 
@@ -124,7 +124,7 @@ The application components are deployed to AKS via [Flux](https://github.com/hmc
 
 Whilst the deployments are architecturely the same they differ in configuration. UI is similar across all environments but API has custom configuration specifically for Production and Demo which are the ones like to see the most end user traffic.
 
-For Demo and Productino we have setup controlled clean up configuration.
+For Demo and Production we have setup controlled clean up configuration.
 The application has default values for these built in however due to the nature of Production these defaults have been overridden.
 
 ```YAML
@@ -138,7 +138,7 @@ The application has default values for these built in however due to the nature 
   CAMUNDA_PARALLELISM: 1
 ```
 
-These values control the length fo time any database record should exist e.g. `P30D = 30 Days`
+These values control the length of time any database record should exist e.g. `P30D = 30 Days`
 Each of these values relates back to the applications built in configuration where an override is allowed and a default is setup.
 
 As an example, we have this value in the [application.yaml](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml#L54) config file for the app:

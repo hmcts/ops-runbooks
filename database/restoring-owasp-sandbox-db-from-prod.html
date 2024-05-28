@@ -554,7 +554,7 @@ ORDER BY cve DESC
 <p>Go to the Azure portal and find the flexible server.</p>
 <p>Click on <code>Settings</code> &gt; <code>Databases</code> and select the <code>owaspdependencycheck</code> database.</p>
 <p>Click <code>Delete</code>.</p>
-<p>Once it&rsquo;s deleted, create a new database with the same name.</p>
+<p>Once it&rsquo;s deleted, run the pipeline to create a new db: https://sandbox-build.hmcts.net/job/HMCTS_a_to_c_Sandbox/job/cnp-owaspdependencycheck-database/job/master/</p>
 <h2 id="dump-the-database-from-prod">Dump the database from prod</h2>
 <p>Connect to the VPN and run this command:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>pg_dump owaspdependencycheck -h owaspdependency-prod.postgres.database.azure.com -U pgadmin -F c &gt; ~/Desktop/owaspdependencycheck.dump

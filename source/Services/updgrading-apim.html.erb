@@ -1,0 +1,58 @@
+---
+title: Upgrading Azure API Management platform version 
+last_reviewed_on: 2024-01-26
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+This runbook describes how to upgrade the Azure API Management platform version.
+
+Upgrading Azure API Management platform version
+This runbook describes how to upgrade the Azure API Management platform version, specifically migrating from stv1 to stv2.
+
+Follow these steps to perform the migration:
+
+Trigger migration: Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration = true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
+
+Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration = false. After about 20 minutes, the APIM instance should be back in the old subnet.
+
+Code clean up: Wait for 40 minutes for the temporary IP to disassociate from the Azure owned load balancer.
+
+For all other environments, you will need to pass the temporary subnet prefix via the component to create the migration subnet as iaas will not be used in the migration.
+
+Ensure the subnet of the API Management route table is the same as the temporary one.
+
+Update hub-terraform-infra with the new private IP. 
+
+```
+https://github.com/hmcts/hub-terraform-infra/tree/master/environments
+
+```
+
+Update hub-panorama-terraform with the new private IP.
+
+```
+https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects
+
+```
+
+
+Update the private DNS address.
+
+```
+https://github.com/hmcts/azure-private-dns/blob/master/environments/staging/staging-platform-hmcts-net.yml#L22 - sds
+
+```
+Clean up temporary resources
+
+Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.
+
+```
+Set trigger_migration_temp_pip = false.
+```
+
+After the migration, clean up the temporary resources from the module:
+
+Run the pipeline to destroy the temporary resources.

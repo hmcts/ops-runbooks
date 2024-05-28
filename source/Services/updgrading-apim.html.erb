@@ -7,14 +7,19 @@ weight: 50
 
 # <%= current_page.data.title %>
 
-This runbook describes how to upgrade the Azure API Management platform version.
+This runbook describes how to upgrade the Azure API Management platform version. 
+
+Stv1 to stv2 migration is a two-step process. The first step is to trigger the migration by moving to the new subnet. The second step is to move back to the old subnet.
+
+stv2	Single-tenant v2	Azure-allocated compute infrastructure that supports availability zones, private endpoints	Developer, Basic, Standard, Premium
+stv1	Single-tenant v1	Azure-allocated compute infrastructure
 
 Upgrading Azure API Management platform version
 This runbook describes how to upgrade the Azure API Management platform version, specifically migrating from stv1 to stv2.
 
 Follow these steps to perform the migration:
 
-Trigger migration: Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration = true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
+Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration = true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
 
 Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration = false. After about 20 minutes, the APIM instance should be back in the old subnet.
 
@@ -52,6 +57,6 @@ Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.
 Set trigger_migration_temp_pip = false.
 ```
 
-After the migration, clean up the temporary resources from the module:
+After the migration, clean up the temporary resources from the module and do sds repo 
 
 Run the pipeline to destroy the temporary resources.

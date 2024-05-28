@@ -18,9 +18,9 @@ This runbook describes how to upgrade the Azure API Management platform version,
 
 Follow these steps to perform the migration:
 
-Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration = true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
+Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration to true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
 
-Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration = false. After about 20 minutes, the APIM instance should be back in the old subnet.
+Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration to false. After about 20 minutes, the APIM instance should be back in the old subnet.
 
 Code clean up: Wait for 40 minutes for the temporary IP to disassociate from the Azure owned load balancer.
 

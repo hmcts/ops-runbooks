@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Useful tools - HMCTS</title>
+    <title>Upgrading Azure API Management platform version - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/PlatOps-Toolkit/useful-tools.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Services/apim-migration.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Useful tools - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/PlatOps-Toolkit/useful-tools.html" />
+      <meta name="twitter:title" content="Upgrading Azure API Management platform version - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Services/apim-migration.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Useful tools" />
+      <meta property="og:title" content="Upgrading Azure API Management platform version" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/PlatOps-Toolkit/useful-tools.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Services/apim-migration.html" />
 
     
   </head>
@@ -551,41 +551,44 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="useful-tools">Useful tools</h1>
-<h2 id="kubernetes-config-injector"><a href="https://github.com/hmcts/k8s-env-injector">Kubernetes Config Injector</a></h2>
+            <h1 id="upgrading-azure-api-management-platform-version">Upgrading Azure API Management platform version</h1>
+<p>This runbook describes how to upgrade the Azure API Management platform version.</p>
+<p>Stv1 to stv2 migration is a two-step process. The first step is to trigger the migration by moving to the new subnet. The second step is to move back to the old subnet.</p>
 
 <ul>
-<li>The config injector will allow administrators to inject new configuration into pod dpeloyments, It will also override matching existing configuration where the keys are matching but the values are not. Available configurations are:
-
-<ul>
-<li>Environment Variables </li>
-<li>DNS Options</li>
-<li>Tolerations</li>
-<li>Required and Preferred node affinity</li>
-<li>Toplogy Spread Constraints</li>
-</ul></li>
+<li><p>stv1, or Single-tenant version 1, is an Azure-allocated compute infrastructure. It represents an older version of Azure single-tenant compute infrastructure.</p></li>
+<li><p>stv2, or Single-tenant version 2, is a more advanced Azure-allocated compute infrastructure. It supports additional features such as availability zones and private endpoints. This version is available for various tiers including Developer, Basic, Standard, and Premium.
+This runbook describes how to upgrade the Azure API Management platform version, specifically migrating from stv1 to stv2.</p></li>
 </ul>
-<h2 id="multi-gitter"><a href="https://github.com/lindell/multi-gitter">Multi-gitter</a></h2>
+<p>Follow these steps to perform the migration:</p>
+<p>Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration to true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.</p>
+<p>Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration to false. After about 20 minutes, the APIM instance should be back in the old subnet.</p>
+<p>For all other environments, you will need to pass the temporary subnet prefix via the component to create the migration subnet as iaas will not be used in the migration.</p>
+<p>Ensure the subnet of the API Management route table is the same as the temporary one.</p>
+<h1 id="updating-firewall">Updating Firewall #</h1>
+<p>Update hub-terraform-infra with the new private IP. <a href="https://github.com/hmcts/hub-terraform-infra/tree/master/environments">hub-terraform-infra</a></p>
+<p>Update hub-panorama-terraform with the new private IP. <a href="https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects">hub-panoram-terraform</a></p>
+<h1 id="updating-dns">Updating DNS #</h1>
+<p>Update the private DNS address with new private IP  <a href="https://github.com/hmcts/azure-private-dns/blob/master/environments">Private DNS</a></p>
+<p>Clean up temporary resources</p>
+<p>Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.</p>
+<p>After the migration, Resources clean up via triggering the temp_pip variable which will destroy all temp resources.</p>
+<p>Run the pipeline to destroy the temporary resources.</p>
+<p>Confirm the migration is successful by checking the APIM instance is in the old subnet and test the API endpoints.</p>
+<h1 id="references">References</h1>
+<p>Migrate to stv2 platform - Azure API Management - VNet injected - https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration</p>
 
-<ul>
-<li>Multi-gitter is a simple CLI tool that will allow adminstrators to make mass changes to git repositories. Example use might be:
-
-<ul>
-<li>A setting change is required across many Apps, multi-gitter can create the PR containing the change required on every repository with a consistent change and message.</li>
-</ul></li>
-</ul>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-05-28">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 28 May 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 28 May 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 28 May 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -595,8 +598,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/PlatOps-Toolkit/useful-tools.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Useful+tools%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FPlatOps-Toolkit%2Fuseful-tools.html%29&amp;labels=bug&amp;title=Re%3A+%27Useful+tools%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Services/apim-migration.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Upgrading+Azure+API+Management+platform+version%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FServices%2Fapim-migration.html%29&amp;labels=bug&amp;title=Re%3A+%27Upgrading+Azure+API+Management+platform+version%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

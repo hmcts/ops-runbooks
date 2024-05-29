@@ -26,13 +26,13 @@ For all other environments, you will need to pass the temporary subnet prefix vi
 
 Ensure the subnet of the API Management route table is the same as the temporary one.
 
-# Updating Firewall # 
+### Updating Firewall
 
 Update hub-terraform-infra with the new private IP. [hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra/tree/master/environments)
 
 Update hub-panorama-terraform with the new private IP. [hub-panoram-terraform](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects)
 
-#Updating DNS # 
+### Updating DNS
 
 Update the private DNS address with new private IP  [Private DNS](https://github.com/hmcts/azure-private-dns/blob/master/environments)
 
@@ -46,6 +46,6 @@ Run the pipeline to destroy the temporary resources.
 
 Confirm the migration is successful by checking the APIM instance is in the old subnet and test the API endpoints.
 
-#References#
+### References
 
-Migrate to stv2 platform - Azure API Management - VNet injected - https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration 
+[Migrate to stv2 platform - Azure API Management - VNet injected](https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration)

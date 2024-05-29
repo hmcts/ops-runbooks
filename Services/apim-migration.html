@@ -381,15 +381,6 @@
     <a href="../Services/apim-migration.html"><span>Upgrading Azure API Management platform version</span></a>
   </li>
   <li>
-    <a href="../Services/apim-migration.html"><span>Updating Firewall #</span></a>
-  </li>
-  <li>
-    <a href="../Services/apim-migration.html"><span>Updating DNS #</span></a>
-  </li>
-  <li>
-    <a href="../Services/apim-migration.html"><span>References</span></a>
-  </li>
-  <li>
     <a href="../Services/globalscape.html"><span>Globalscape / EFT Enterprise</span></a>
   </li>
   <li>
@@ -565,18 +556,18 @@ This runbook describes how to upgrade the Azure API Management platform version,
 <p>Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration to false. After about 20 minutes, the APIM instance should be back in the old subnet.</p>
 <p>For all other environments, you will need to pass the temporary subnet prefix via the component to create the migration subnet as iaas will not be used in the migration.</p>
 <p>Ensure the subnet of the API Management route table is the same as the temporary one.</p>
-<h1 id="updating-firewall">Updating Firewall #</h1>
+<h3 id="updating-firewall">Updating Firewall</h3>
 <p>Update hub-terraform-infra with the new private IP. <a href="https://github.com/hmcts/hub-terraform-infra/tree/master/environments">hub-terraform-infra</a></p>
 <p>Update hub-panorama-terraform with the new private IP. <a href="https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects">hub-panoram-terraform</a></p>
-<h1 id="updating-dns">Updating DNS #</h1>
+<h3 id="updating-dns">Updating DNS</h3>
 <p>Update the private DNS address with new private IP  <a href="https://github.com/hmcts/azure-private-dns/blob/master/environments">Private DNS</a></p>
 <p>Clean up temporary resources</p>
 <p>Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.</p>
 <p>After the migration, Resources clean up via triggering the temp_pip variable which will destroy all temp resources.</p>
 <p>Run the pipeline to destroy the temporary resources.</p>
 <p>Confirm the migration is successful by checking the APIM instance is in the old subnet and test the API endpoints.</p>
-<h1 id="references">References</h1>
-<p>Migrate to stv2 platform - Azure API Management - VNet injected - https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration</p>
+<h3 id="references">References</h3>
+<p><a href="https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration">Migrate to stv2 platform - Azure API Management - VNet injected</a></p>
 
               <div data-module='page-expiry' data-last-reviewed-on="2025-05-28">
     <div class='page-expiry--not-expired'>

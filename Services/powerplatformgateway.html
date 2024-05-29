@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Updating Palo Alto SNMP settings - HMCTS</title>
+    <title>Power Platform Gateways - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/monitoring/palo-alto-snmp-dynatrace.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Services/powerplatformgateway.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Updating Palo Alto SNMP settings - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/monitoring/palo-alto-snmp-dynatrace.html" />
+      <meta name="twitter:title" content="Power Platform Gateways - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Services/powerplatformgateway.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Updating Palo Alto SNMP settings" />
+      <meta property="og:title" content="Power Platform Gateways" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/monitoring/palo-alto-snmp-dynatrace.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Services/powerplatformgateway.html" />
 
     
   </head>
@@ -539,69 +539,49 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="updating-palo-alto-snmp-settings">Updating Palo Alto SNMP settings</h1>
-<h2 id="pre-requisites">Pre-Requisites</h2>
+            <h1 id="power-platform-gateways">Power Platform Gateways</h1>
+<h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
-<li>Connected to the <a href="https://portal.platform.hmcts.net">VPN</a></li>
+<li>Admin account to access the <a href="https://admin.powerplatform.microsoft.com/ext/DataGateways">Power Platform Portal</a></li>
 </ul>
-<h2 id="checking-the-config-in-panorama">Checking the config in Panorama</h2>
-<p>Connect to <a href="https://panorama-prod--uks-0.platform.hmcts.net">Panorama</a>.</p>
-<p>Select the stack you want to work on i.e., nonprod or prod, by clicking on the dropdown box beside <code>Template</code>:</p>
-<p><img src=images/palo-alto-stacks.png  width="600"></p>
-<p>Click on <code>Device</code> and then <code>Server Profiles</code> and then `SNMP Trap.</p>
-<p>You will see an SNMP trap configured that will point to the Dynatrace ActiveGates.</p>
-<p><img src=images/snmp-trap.png  width="600"></p>
-<h2 id="updating-config">Updating config</h2>
-<p>Configuration for the SNMP traps is managed via <a href="https://github.com/hmcts/hub-panorama-terraform/blob/ae3b4417bfed2dbbcee8006e4b8aa62635338f13/components/configuration/02-variables.tf#L134-L142">hub-panorama-terraform</a>.</p>
-<p>You can update this variable to add or remove SNMP log destinations as needed.</p>
-<p>At present, the SNMP traps are being sent to a DNS name. More details on these can be found <a href="connecting-dynatrace-activegate.html">here</a>.</p>
-<p>If you need to switch the DNS to point to another instance in the scaleset, update the <a href="https://github.com/hmcts/azure-private-dns/blob/a38b757dfaf20c65b21a1e9862dcfc0cdeed7c96/environments/prod/platform-hmcts-net.yml#L631-L642">azure-private-dns</a> repo.</p>
-<p>There may be a brief pause in logs being received whilst the DNS updates.</p>
-<h2 id="checking-snmp-logs-are-being-received-in-dynatrace">Checking SNMP logs are being received in Dynatrace</h2>
-<p>There are dashboards in Dynatrace that show various metrics from the Palo Altos which you can check to confirm SNMP data is being received.</p>
-<p>If the graphs are being refreshed with new data, the logs are flowing.</p>
+<h2 id="overview">Overview</h2>
+<p>On-premises gateways are Windows 2022 VMs running the Power Platform on-premises gate way service. They have been deployed as 2 node gateway clusters, in an actice/active configuration. The VMs are Azure virtual machine scale set instances.</p>
+<p>The Power Platform portal has been deployed into HMCTS using both the North Europe (Default) and UK South.  Confusingly, the VMs hosting the on-premises gateways are both hosted in the UK South region, within the Azure portal. The Power Platform region, is selected using switch 2 in the diagram bellow.</p>
+<p><a href="images/PowerPlatormGateways.png" rel="noopener noreferrer"><img src="images/PowerPlatormGateways.png" alt="Screenshot of Power Platform and VMSS" /></a></p>
+<h2 id="update-an-on-premises-data-gateway">Update an on-premises data gateway</h2>
+<p>Currently, Microsoft actively supports only the last six releases of the on-premises data gateway. With a new release update for data gateways, posted every month.</p>
+<p><a href="https://learn.microsoft.com/en-us/data-integration/gateway/service-gateway-update">Microsoft Learn Gateway Updates</a></p>
+<p>We recommend that you update gateway members one after the other in a timely manner. This process reduces sporadic failures as a query may succeed on one gateway member, but not on the other, based on disparity in capabilities across different versions.</p>
+<p>Use the following steps when updating a gateway cluster with two or more members:</p>
 
-<ul>
-<li><a href="https://yrk32651.apps.dynatrace.com/ui/apps/dynatrace.classic.dashboards/#dashboard;gtf=-30m;gf=all;id=ab163c60-07f5-7e82-40d5-35cd6a8be991">NonProd dashboard</a></li>
-<li><a href="https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.dashboards/#dashboard;gtf=-2h;gf=all;id=ab163c60-07f5-7e82-40d5-35cd6a8be991">Prod dashboard</a></li>
-</ul>
-<h2 id="dynatrace-isn-39-t-receiving-any-data">Dynatrace isn&rsquo;t receiving any data</h2>
-<p>If the dynatrace dashboards are not receiving data, there are a couple of things you can check:</p>
+<ol>
+<li>Disable one gateway member.</li>
+<li>Wait for ongoing work to be completed. A waiting period of 30 minutes is sufficient for most workloads, however clusters frequently running critical long running jobs may require more time for requests to drain.</li>
+<li>Update the gateway member.</li>
+<li>Enable the updated gateway member.</li>
+<li>Repeat step 1-4 until all gateway members are updated.
+Disabling a gateway makes sure the load balancer doesn&rsquo;t try to execute queries on the member you&rsquo;re updating, hence reducing delays and failures.</li>
+</ol>
+<h3 id="hmcts-update-tips">HMCTS Update Tips</h3>
+<p>Cluster details can be view by selecting the cluster (3 in image above) then clicking details (1 in image above).</p>
+<p>The Power Platform cluster device name, corresponds with the VMSS instance name, shown in the lower half of the above image.</p>
+<p>To upgrade the service, RDP to the VM, using the username VMAdmin and password from the vault.</p>
+<p>When viewing the cluster status details page in the Power Platform portal, it offers a link to the latest version of the software. This URL can be copied, pasted into each VM, to down load and perform an in place update of the on-premises gateway.</p>
+<p>To see the &lsquo;new&rsquo; version of the on-premises gateway in the portal, the node must 1st be enabled.  Allow 30-60 seconds for comminations to complete. Some browsers my cache the version number, so browse to the Power Platform portal home page, refresh (f5) and then browse back to the on-premises gateway page.  The correct information should now be displayed.  This may require 5 minutes to complete.</p>
+<p>There is no requirement to add an email address into the installed client.  Sign-in is only required, if additional information about the client is required and to access the logging options.</p>
 
-<ul>
-<li><p>Are the DNS records pointing to the right instances?</p>
-<p>Dynatrace ActiveGates are configured as a scaleset.</p>
-<p>Our monitoring is configured to connect to the ActiveGates via a DNS name.</p>
-<p>If logs are not showing in the portal, e.g. if SNMP data from the Palo Altos is missing, you may need to point the DNS to a different instance within the scaleset.</p>
-<p>The relevant records can be found <a href="https://github.com/hmcts/azure-private-dns/blob/f3af539f9881c0d98a3d4879899725fcc08ea7f2/environments/prod/platform-hmcts-net.yml#L631-L642">here</a>.</p>
-<p>Check the logs are flowing again after this change is made.</p></li>
-<li><p>Is the dynatrace service running? You can check it by connecting to the activegates and running <code>service dynatracegateway status</code></p></li>
-<li><p>Are the activegates in the correct group? The activegates must be in a group called <code>cft-nonprod</code> or <code>cft-prod</code>, depending on the environment, in order for the SNMP logs to be received.</p></li>
-</ul>
-<h2 id="adding-an-activegate-to-a-group">Adding an activegate to a group</h2>
-<p>This should be done automatically when the scale set instance is created but if you need to add an activegate to a group manually, you can.</p>
-<p>Go to the dynatrace portal and select <code>Deployment status</code> from the left hand pane.</p>
-<p>Click <code>ActiveGates</code>.</p>
-<p>Select the activegates you want to put into the group and select <code>Modify activegate group</code> at the bottom of the screen and click <code>Run Action</code>.</p>
-<p><img src=images/dynatrace-activegate-groups-1.png  width="600"></p>
-<p>Select the group and click <code>Next</code>.</p>
-<p><img src=images/dynatrace-activegate-groups-2.png  width="600"></p>
-<p>Once confirmed, the activegates should get moved into the group and the remote configuration will be updated.</p>
-<p>You can confirm the group the activegate is in by clicking on the activegate and checking the <code>Group</code> value.</p>
-<p><img src=images/dynatrace-activegate-groups-3.png  width="600"></p>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-03-28">
+              <div data-module='page-expiry' data-last-reviewed-on="2024-11-28">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 28 March 2024.
+      This page was last reviewed on 28 May 2024.
 
-        It needs to be reviewed again on 28 March 2025
+        It needs to be reviewed again on 28 November 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 28 March 2025
+      This page was set to be reviewed before 28 November 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -611,8 +591,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/monitoring/palo-alto-snmp-dynatrace.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Updating+Palo+Alto+SNMP+settings%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Fmonitoring%2Fpalo-alto-snmp-dynatrace.html%29&amp;labels=bug&amp;title=Re%3A+%27Updating+Palo+Alto+SNMP+settings%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Services/powerplatformgateway.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Power+Platform+Gateways%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FServices%2Fpowerplatformgateway.html%29&amp;labels=bug&amp;title=Re%3A+%27Power+Platform+Gateways%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

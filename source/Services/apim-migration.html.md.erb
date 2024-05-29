@@ -9,11 +9,7 @@ weight: 50
 
 This runbook describes how to upgrade the Azure API Management platform version. 
 
-<<<<<<< HEAD
-Stv1 to stv2 migration is a two-step process. The first step is to move to new subnet and assign a temporary IP. 
-=======
 Stv1 to stv2 migration is a two-step process. The first step is to trigger the migration by moving to the new subnet. The second step is to move back to the old subnet.
->>>>>>> origin/add-apim-migration
 
 - stv1, or Single-tenant version 1, is an Azure-allocated compute infrastructure. It represents an older version of Azure single-tenant compute infrastructure.
 
@@ -26,16 +22,10 @@ Trigger the migration by moving to the new subnet. This can be done via the pipe
 
 Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration to false. After about 20 minutes, the APIM instance should be back in the old subnet.
 
-<<<<<<< HEAD
-=======
-Code clean up: Wait for 40 minutes for the temporary IP to disassociate from the Azure owned load balancer.
-
->>>>>>> origin/add-apim-migration
 For all other environments, you will need to pass the temporary subnet prefix via the component to create the migration subnet as iaas will not be used in the migration.
 
 Ensure the subnet of the API Management route table is the same as the temporary one.
 
-<<<<<<< HEAD
 # Updating Firewall # 
 
 Update hub-terraform-infra with the new private IP. [hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra/tree/master/environments)
@@ -45,25 +35,12 @@ Update hub-panorama-terraform with the new private IP. [hub-panoram-terraform](h
 #Updating DNS # 
 
 Update the private DNS address with new private IP  [Private DNS](https://github.com/hmcts/azure-private-dns/blob/master/environments)
-=======
-Update hub-terraform-infra with the new private IP. [hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra/tree/master/environments)
-
-
-Update hub-panorama-terraform with the new private IP. [hub-panoram-terraform](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects)
-
-
-Update the private DNS address.  [Private DNS](https://github.com/hmcts/azure-private-dns/blob/master/environments)
->>>>>>> origin/add-apim-migration
 
 Clean up temporary resources
 
 Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.
 
-<<<<<<< HEAD
 After the migration, Resources clean up via triggering the temp_pip variable which will destroy all temp resources.
-=======
-After the migration, clean up the temporary resources from the module and do sds repo 
->>>>>>> origin/add-apim-migration
 
 Run the pipeline to destroy the temporary resources.
 

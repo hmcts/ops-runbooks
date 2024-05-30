@@ -25,7 +25,7 @@ Azure Update Manager is used to apply updates to the VMs and automatically reboo
 
 Crime Portal is a highly stateful legacy application which has been moved to the cloud. It was not part of the project to rewrite the Java Wildfly based services. Therefore application and LDAP services have been deployed within a docker container running within the respective VMs. These have been doubled into pairs to provide HA and increased throughput.  With the application gateway probing for container health, ensuring session persistence​ and load balancing.
 
-LDAP services required by Crime Portal couldn't be migrated to Azure provided platforms, so the existing solution was kept. 
+LDAP services required by Crime Portal could not be migrated to Azure provided platforms, so the existing solution was kept. 
 
 
 ## Overview

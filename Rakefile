@@ -10,7 +10,6 @@ task :check_urls do
             :check_external_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
-            :disable_external => true,
             :ignore_urls =>  [
                 # Ignore pulls/branches as these do not translate to raw content
                 %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))},

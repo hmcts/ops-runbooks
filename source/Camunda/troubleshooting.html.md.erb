@@ -26,6 +26,7 @@ Its important to remember that this list is heirarchical i.e. Flux will override
 There are many reasons a database cant become a bottleneck for any service so we cannot document all of them here but we can document those issues that we've seen and resolved.
 
 ### Database size
+
 We've observed that the Camunda interface can become sluggish and unresponsive, leading to service timeouts and eventual 504 responses.
 
 Our initial solution was to increase the DB SKU, thereby allocating more resources for the service to use. However, this is a temporary fix, not a long-term solution.
@@ -88,3 +89,4 @@ Whilst we do not want to carry out any batch operations, they do provide some in
 - To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options such as start date, finish date, `incident status` and a host of `IDs` options.
 
     <img src="images/searchCriteria.png" style="width:600px;">
+

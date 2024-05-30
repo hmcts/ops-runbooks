@@ -560,7 +560,7 @@ This runbook describes how to upgrade the Azure API Management platform version,
 <p>Update hub-terraform-infra with the new private IP. <a href="https://github.com/hmcts/hub-terraform-infra/tree/master/environments">hub-terraform-infra</a></p>
 <p>Update hub-panorama-terraform with the new private IP. <a href="https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects">hub-panoram-terraform</a></p>
 <h3 id="updating-dns">Updating DNS</h3>
-<p>Update the private DNS address with new private IP  <a href="https://github.com/hmcts/azure-private-dns/blob/master/environments">Private DNS</a></p>
+<p>Update the private DNS address with new private IP  <a href="https://github.com/hmcts/azure-private-dns/tree/master/environments">Private DNS</a></p>
 <p>Clean up temporary resources</p>
 <p>Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.</p>
 <p>After the migration, Resources clean up via triggering the temp_pip variable which will destroy all temp resources.</p>

@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>OS Patch Management - HMCTS</title>
+    <title>Crime Portal - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/Services/crimeportal.html">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="OS Patch Management - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html" />
+      <meta name="twitter:title" content="Crime Portal - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/Services/crimeportal.html" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="OS Patch Management" />
+      <meta property="og:title" content="Crime Portal" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Patching/migrating-apim.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/Services/crimeportal.html" />
 
     
   </head>
@@ -545,19 +545,69 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="os-patch-management">OS Patch Management</h1>
+            <h1 id="crime-portal">Crime Portal</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Crime Portal services are referred to as ‘Follow a Case’ and ‘Follow a Person’ respectively and are used internally via an application.  3rd parties can subscribe to the data using external gateway endpoints and public access is via a browser.</p>
+<p>Data comes from the Libra database, which holds data from the Magistrates Court case management system that contains personal details of the defendant(s), Court they were prosecuted at, Offence(s) they were prosecuted for, Outcome of the court case, (e.g. reached a verdict, withdrawn, dismissed etc) whether they were convicted, the nature of the sentence, and time taken for court proceedings.</p>
+<h2 id="management">Management</h2>
+<p>The application is owned by CGI and anything which breaks service, should 1st be agreed with them.  The infrastructure is managed by platform operations.</p>
+<p>As a public web service, users could be using the system on a 27x7x365 basis.  However Monday to Friday, 8am to 6 pm are more typical service hours.</p>
+<h3 id="patching">Patching</h3>
+<p>Azure Update Manager is used to apply updates to the VMs and automatically reboot them outside of business hours.</p>
+<h2 id="legacy">Legacy</h2>
+<p>Crime Portal is a highly stateful legacy application which has been moved to the cloud. It was not part of the project to rewrite the Java Wildfly based services. Therefore application and LDAP services have been deployed within a docker container running within the respective VMs. These have been doubled into pairs to provide HA and increased throughput.  With the application gateway probing for container health, ensuring session persistence and load balancing.</p>
+<p>LDAP services required by Crime Portal could not be migrated to Azure provided platforms, so the existing solution was kept.</p>
+<h2 id="overview">Overview</h2>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-04-26">
+<ul>
+<li>Crime Portal replace existing services which have been migrated into HMCTS Azure platform</li>
+<li>3-tier Architecture connected to PaaS database</li>
+<li>Publicly access via Azure Front Door</li>
+<li>Staging (STG) and Production (Prod) environments</li>
+</ul>
+<p>GitHub Repo: <a href="https://github.com/hmcts/crime-portal-infra">https://github.com/hmcts/crime-portal-infra</a></p>
+<p>ADO Pipeline: PlatformOperations, hmcts.crime-portal-infra</p>
+<h3 id="access-to-vms">Access to VMs</h3>
+<p>Add users to the correct group</p>
+
+<ul>
+<li>DTS Crime Portal VM Login (env:staging)</li>
+<li><p>DTS Crime Portal VM Admin Login (env:staging)</p></li>
+<li><p>DTS Crime Portal VM Login (env:production)</p></li>
+<li><p>DTS Crime Portal VM Admin Login (env:production)</p></li>
+</ul>
+<h2 id="application-gateway">Application Gateway</h2>
+<p>Provides session persistence</p>
+<p>Load balancing, Ports 80 and 443</p>
+<p>TLS termination for integration with Libra in Interim Hosting
+* crimeportal-libra-gw-staging-internal-hmcts-net
+* crimeportal-libra-gw-prod-internal-hmcts-net</p>
+<h2 id="certificates">Certificates</h2>
+<p>Function App Managed Certificates
+Pipeline runs weekdays at 6 pm
+Controlling Repo: <a href="https://github.com/hmcts/azure-enterprise-acme">github.com/hmcts/azure-enterprise-acme</a></p>
+<p>Further Instructions, <a href="https://hmcts.github.io/ops-runbooks/Certificates/newacme.html">hmcts.github.io/ops-runbooks/Certificates/newacme.html</a></p>
+<h2 id="shared-front-door">Shared Front Door</h2>
+<p>Crime Portal public endpoints allowed through Heritage Front Door
+Use this repo <a href="https://github.com/hmcts/oracle-azure-infrastructure">github.com/hmcts/oracle-azure-infrastructure</a></p>
+<p>Host public endpoints</p>
+
+<ul>
+<li><a href="https://crimeportal.staging.apps.hmcts.net">github.com/hmcts/oracle-azure-infrastructure</a></li>
+<li><a href="https://crimeportal.apps.hmcts.net">crimeportal.apps.hmcts.net</a></li>
+</ul>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2024-11-30">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 April 2024.
+      This page was last reviewed on 30 May 2024.
 
-        It needs to be reviewed again on 26 April 2025
+        It needs to be reviewed again on 30 November 2024
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 April 2025
+      This page was set to be reviewed before 30 November 2024
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -567,8 +617,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Patching/migrating-apim.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27OS+Patch+Management%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FPatching%2Fmigrating-apim.html%29&amp;labels=bug&amp;title=Re%3A+%27OS+Patch+Management%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/Services/crimeportal.html.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Crime+Portal%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FServices%2Fcrimeportal.html%29&amp;labels=bug&amp;title=Re%3A+%27Crime+Portal%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

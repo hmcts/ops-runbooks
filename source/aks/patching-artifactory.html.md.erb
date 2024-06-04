@@ -41,115 +41,111 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 3. Check Active Pods:
 
-• In the terminal, execute the following commands to display active pods:
+  • In the terminal, execute the following commands to display active pods:
 
-```command
-kubectl get pods -n artifactory 
-```
+  ```command
+  kubectl get pods -n artifactory 
+  ```
 
-![](Images/artifactory_pic02.png)
+  ![](Images/artifactory_pic02.png)
 
-This command lists running pods.
+  This command lists running pods.
 
-```command
-kubectl describe pods -n artifactory artifactory-oss-0 
-```
+  ```command
+  kubectl describe pods -n artifactory artifactory-oss-0 
+  ```
 
-![](Images/artifactory_pic03.png)
+  ![](Images/artifactory_pic03.png)
 
-This command provides detailed information about the desired pods, confirming the version (Image: 7.84.12)
+  This command provides detailed information about the desired pods, confirming the version (Image: 7.84.12)
 
 4. Version Checking:
 
-• Visit the following website to look for latest * self hosted version *: [Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)
+  • Visit the following website to look for latest * self hosted version *: [Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)
 
 5. Pre-update Testing:
 
-• Before updating the PTLSBOX, conduct testing to ensure no issues
+  • Before updating the PTLSBOX, conduct testing to ensure no issues
 
-• Download the repository from [GitHub] (https://github.com/hmcts/cnp-flux-config)
+  • Download the repository from [GitHub] (https://github.com/hmcts/cnp-flux-config)
 
-• File location: apps/artifactory/artifactory/…
+  • File directory: apps/artifactory/artifactory/…
 
-• Create a new file named "artifactory-sbox.yaml" with the provided code snippet
+  • Create a new file named "artifactory-sbox.yaml" with the provided code snippet
+  
+  • New file should be in the following file path "apps/artifactory/artifactory/artifactory-sbox.yaml"
 
-• Update updated-version-here with latest version eg (7.84.12)
+  • Update updated-version-here with latest version eg (7.84.12)
 
-```command
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: artifactory-oss
-  namespace: artifactory
-spec:
-  serviceName: "artifactory"
-  replicas: 2
-  selector:
-    matchLabels:
-      app: artifactory-oss
-  template:
-    metadata:
-      labels:
+  ```command
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: artifactory-oss
+    namespace: artifactory
+  spec:
+    serviceName: "artifactory"
+    replicas: 2
+    selector:
+      matchLabels:
         app: artifactory-oss
-    spec:
-      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:updated-version-here
-          name: artifactory-oss
-```
+    template:
+      metadata:
+        labels:
+          app: artifactory-oss
+      spec:
+        containers:
+          - image: docker.bintray.io/jfrog/artifactory-oss:7.84.12
+            name: artifactory-oss
+  ```
 
-[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29609/files)
+  [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/32185/files)
 
 6. Run Test:
 
-• Add the below code to kustomization.yaml file for the test to run:
+  • Add the below code to kustomization.yaml file for the test to run:
 
-```command
-patchesStrategicMerge: 
-  - ../../artifactory/artifactory-sbox.yaml
-```
+  • kustomization.yaml file can be found here "apps/artifactory/sbox-intsvc/base/kustomization.yaml"
+
+  ```command
+  patchesStrategicMerge: 
+    - ../../artifactory/artifactory-sbox.yaml
+  ```
 
 7. Push Changes:
 
-• Raise a PR and push changes out for review and approval
+  • Raise a PR and push changes out for review and approval
+  
+  • Once approve merge changes and check if version has updated in ptlsbox cluster
 
-8. Update Version:
+8. Check Version on ptlsbox:
+  
+  • Verifiy ptlsbox has picked up the new version
+  
+  • Run the following command and make sure pods are running with no errors
 
-• For the PTL AKS Cluster, remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
+  ```command
+  patchesStrategicMerge: 
+    - ../../artifactory/artifactory-sbox.yaml
+  ```
 
+9. Update Version after testing:
 
-• Update the version in "artifactory.yaml" to latest version eg, 7.84.12
+  • Remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
 
-```command
-      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:7.84.12
-          name: artifactory-oss
-          env:
-```
+  • Update the version in "artifactory.yaml" to latest version eg, 7.84.12
 
-[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29665/files)
+  ```command
+        containers:
+          - image: docker.bintray.io/jfrog/artifactory-oss:7.84.12
+            name: artifactory-oss
+            env:
+  ```
 
-9. Push Changes:
+  [Example PR] (https://github.com/hmcts/cnp-flux-config/pull/32191/files)
 
-• Raise a PR and push changes out for review and approval
+  Related Links:
 
-• If you can go to the [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/) site after the upgrade and checking the packages and repositories to ensure they are working.
+  [Artifactory] (https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
 
-10. Release Draft and Version Bump:
-
-• Publish the draft release in "chart-neuvector"
-
-• Bump the version in "flux-config" from 1.5.4 to 1.5.5
-
-11. Push Changes:
-
-• Raise a PR and push changes out for review and approval
-
-Troubleshooting Steps:
-
-To resolve namespace issues in ["chart-neuvector"] (https://hmcts.github.io/ops-runbooks/neuvector/updating-neuvector-policies.html). We had specific issues with neuvector which should be resolved and the details can be found in the linked page.
-
-Related Links:
-
-[Artifactory Repository] (https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
-
-[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
+  [Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)

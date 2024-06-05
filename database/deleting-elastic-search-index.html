@@ -590,6 +590,8 @@ ssh bastion-prod.platform.hmcts.net
 <p>For example civil:</p>
 <div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>curl -XDELETE localhost:9200/civil_cases-000001;
 </code></pre></div><p>9) Application team will Merge CCD Definition File and creating new index.</p>
+<p>This step is mandatory even when no changes have been made to the definition file.</p>
+<p>This is because we need the new definition file to recreate the index so the following steps can populate it.</p>
 <p>10) Re-trigger the indexing of old cases</p>
 <p>If AAT is included in the same change then do this first before proceeding to production.</p>
 <p>Connect to ccd_data_store DB via Bastion</p>

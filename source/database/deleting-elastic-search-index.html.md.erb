@@ -99,6 +99,10 @@ curl -XDELETE localhost:9200/civil_cases-000001;
 
 9) Application team will Merge CCD Definition File and creating new index.
 
+This step is mandatory even when no changes have been made to the definition file.
+
+This is because we need the new definition file to recreate the index so the following steps can populate it.
+
 10) Re-trigger the indexing of old cases
 
 If AAT is included in the same change then do this first before proceeding to production.

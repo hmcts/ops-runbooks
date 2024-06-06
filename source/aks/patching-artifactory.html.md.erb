@@ -24,25 +24,11 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 # Artifactory Patching Process
 
-## 1. Azure CLI Login and Kubernetes Services
+## 1. Connect to CFT PTLSBOX AKS Cluster
 
-  • Access Azure CLI and search for Kubernetes Services
+  • [Connect to PTLSBOX cluster using the following doc](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
-  • Type the "PTL" in the search box:
-
-  ![Azure portal displaying key search 'ptl' and hovering over 'cft-ptlsbox-00-aks'](Images/artifactory_pic01.png)
-
-## 2. Connect to PTLSBOX
-
-  • Click on "cft-ptlsbox-00-aks"
-
-  • Navigate to Connect and open Terminal
-
-  • Connect using the provided commands (first three)
-
-  **Note:** Ensure correct cluster connection with the provided commands
-
-## 3. Check Artifactory Pods
+## 2. Check Artifactory Pods
 
   • In the terminal, execute the following command to display artifactory pods:
 
@@ -50,7 +36,7 @@ If any issues arise during the update process, troubleshooting steps are provide
   kubectl get pods -n artifactory 
   ```
 
-  ![Kubectl command displaying artifactory pods that are running](Images/artifactory_pic02.png)
+  ![Kubectl command displaying artifactory pods that are running](Images/artifactory_pic01.png)
 
   This command describes one of the artifactory pods, note the version number at "artifactory-oss"
 
@@ -58,15 +44,15 @@ If any issues arise during the update process, troubleshooting steps are provide
   kubectl describe pods -n artifactory artifactory-oss-0 
   ```
 
-  ![Kubectl command describing pod and displaying container information](Images/artifactory_pic03.png)
+  ![Kubectl command describing pod and displaying container information](Images/artifactory_pic02.png)
 
-## 4. Updating PTLSBOX
+## 3. Updating CFT PTLSBOX
 
-  • Create a new file named "artifactory-sbox.yaml" with the code found in the example pr in the following directory: https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory
+  • Create a new file named "artifactory-sbox.yaml" with the code found in the example pr in the following directory: <https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory>
   
   • Update artifactory-oss with **latest self-hosted version** [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) eg (7.84.12)
 
-  • Add the kustomization code to the kustomization.yaml file described in the example pr in the found here: https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml
+  • Add the kustomization code to the kustomization.yaml file described in the example pr in the found here: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml>
 
    [Example PR with artifactory-sbox.yaml and kustomization.yaml](https://github.com/hmcts/cnp-flux-config/pull/32185/files)
   
@@ -74,7 +60,7 @@ If any issues arise during the update process, troubleshooting steps are provide
   
   • Once approved merge changes and check version has updated in PTLSBOX cluster
 
-## 5. Check Version on PTLSBOX
+## 4. Check Version on CFT PTLSBOX
   
   • Run the following command and make sure pods are initialising/running with no errors
 
@@ -88,7 +74,9 @@ If any issues arise during the update process, troubleshooting steps are provide
   kubectl describe pods -n artifactory artifactory-oss-0
   ```
 
-## 6. Update PTL
+## 5. Update CFT PTL
+  
+  • [Connect to PTL cluster using the following doc](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
   • Remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
 

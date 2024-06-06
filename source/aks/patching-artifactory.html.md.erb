@@ -8,9 +8,10 @@ review_in: 12 months
 # <%= current_page.data.title %>
 
 Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment.
+
 The steps below will show you how to check and update **self-hosted version** of Artifactory being used. This process involves accessing [Artifactory's website](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) to determine the latest **self-hosted version** version available.
 
-Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to [GitHub](https://github.com/hmcts/cnp-flux-config) containing configuration files for Artifactory, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below
+Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to [GitHub](https://github.com/hmcts/cnp-flux-config) containing configuration files for Artifactory, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below.
 
 [Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes
 

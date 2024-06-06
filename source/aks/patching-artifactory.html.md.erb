@@ -12,7 +12,7 @@ Here's how it is used based on the provided instructions:
 
 The steps below will show you how to check the current **self-hosted version** of Artifactory being used and then to update it to a newer **self-hosted version**. This process involves accessing <[Artifactory's website](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)> to determine the latest **self-hosted version** version available.
 
-Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves downloading the repository on <[GitHub](https://github.com/hmcts/cnp-flux-config)> containing configuration files for Artifactory and creating (artifactory-sbox.yaml). This file is then modified to reflect the desired changes, such as updating the version number.
+Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to [GitHub](https://github.com/hmcts/cnp-flux-config) containing configuration files for Artifactory and creating 'artifactory-sbox.yaml' with your changes as seen in the example PR below
 
 Kubernetes configuration files (kustomization.yaml) are updated to include the changes made in the testing phase. This ensures that the updated configuration is applied correctly within the Kubernetes cluster.
 

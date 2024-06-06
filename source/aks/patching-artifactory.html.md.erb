@@ -23,7 +23,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ### 1. Connect to CFT PTLSBOX AKS Cluster
 
-  • [Connect to PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters) using the linked doc
+  • [Connect to PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
 ### 2. Check Artifactory Pods
 
@@ -49,11 +49,11 @@ If any issues arise during the update process, troubleshooting steps are provide
   
   • Update artifactory-oss with **latest self-hosted version** [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) eg (7.84.12)
 
-  • Add the kustomization code to the kustomization.yaml file described in the example pr in the found here: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml>
+  • Make changes to the kustomization.yaml file described in the example pr, file location: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml>
 
   • [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files)
   
-  • Raise a PR and on approval merge changes
+  • Raise a PR and merge changes
 
 ### 4. Check Version on CFT PTLSBOX
   
@@ -71,7 +71,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ### 5. Update CFT PTL
   
-  • [Connect to PTL cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters) using the linked doc
+  • [Connect to PTL cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
   • Remove 'artifactory-sbox.yaml' file and its corresponding code from kustomization.yaml
 

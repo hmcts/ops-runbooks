@@ -13,9 +13,9 @@ The steps below will show you how to check and update **self-hosted version** of
 
 Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to the [Artifactory repo](https://github.com/hmcts/cnp-flux-config) containing configuration files, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below. In addition, checking Artifactory pods are healthy and access to [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is available.
 
-[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes
+[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes.
 
-[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX
+[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX.
 
 If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
@@ -29,21 +29,21 @@ If any issues arise during the update process, troubleshooting steps are provide
 
   • Create a new file named 'artifactory-sbox.yaml' with the code found in the example pr in the following directory: <https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory>
   
-  • Update artifactory-oss with **latest self-hosted version** [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) eg (7.84.12)
+  • Update artifactory-oss with **latest self-hosted version** [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) eg, (7.84.12).
 
   • Make changes to the kustomization.yaml file described in the example pr, file location: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml>
 
-  • Raise a PR similar to [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and get your PR approved and merged.
+  • Raise a PR similar to the [Example](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and get your PR approved and merged.
 
-### 3. Check Version on CFT PTLSBOX
+### 3. Check new version on CFT PTLSBOX
   
-  • Run the following command and make sure pods are initialising/running with no errors
+  • Run the following commands ensuring pods are **healthy** and has applied new version, note the version number at "artifactory-oss".
+
+  • Ensure you can access [Artifacory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) website.
 
   ```command
   kubectl get pods -n artifactory
   ```
-
-  • Run the following command and make sure pod has picked up new version, note the version number at "artifactory-oss"
 
   ```command
   kubectl describe pods -n artifactory artifactory-oss-0
@@ -53,9 +53,9 @@ If any issues arise during the update process, troubleshooting steps are provide
   
   • [Connect to PTL cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
-  • Remove 'artifactory-sbox.yaml' file and its corresponding code from kustomization.yaml
+  • Remove 'artifactory-sbox.yaml' file and its corresponding code from kustomization.yaml.
 
-  • Update the version in 'artifactory.yaml' to latest version eg, 7.84.12
+  • Update the version in 'artifactory.yaml' to latest version eg, (7.84.12).
 
   ```command
         containers:
@@ -63,12 +63,14 @@ If any issues arise during the update process, troubleshooting steps are provide
             name: artifactory-oss
   ```
   
-  [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) with above changes
+  • Raise a PR similar to the [Example](https://github.com/hmcts/cnp-flux-config/pull/32191/files) and get your PR approved and merged.
+  
+  • Repeat step 3 checking the new version on CFT PTL ensuring the pods are healthy.
 
 ### Related Links
   
   [GitHub repo](https://github.com/hmcts/cnp-flux-config)
   
-  [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
+  [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link.
 
   [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)

@@ -14,7 +14,9 @@ The steps below will show you how to check and update **self-hosted version** of
 
 Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to [GitHub](https://github.com/hmcts/cnp-flux-config) containing configuration files for Artifactory, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below
 
-[Exampe PR showing artifactory-sbox.yaml and kustomization.yaml changes](https://github.com/hmcts/cnp-flux-config/pull/32185/files)
+[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes
+
+[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX
 
 If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
@@ -22,7 +24,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ### 1. Connect to CFT PTLSBOX AKS Cluster
 
-  • [Connect to PTLSBOX cluster using the following doc](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
+  • [Connect to PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters) using the following doc
 
 ### 2. Check Artifactory Pods
 
@@ -50,7 +52,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
   • Add the kustomization code to the kustomization.yaml file described in the example pr in the found here: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml>
 
-   [Example PR with artifactory-sbox.yaml and kustomization.yaml](https://github.com/hmcts/cnp-flux-config/pull/32185/files)
+  • [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files)
   
   • Raise a PR and push changes out for review and approval
   
@@ -72,7 +74,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
 ### 5. Update CFT PTL
   
-  • [Connect to PTL cluster using the following doc](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
+  • [Connect to PTL cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters) using the following doc
 
   • Remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
 
@@ -84,7 +86,7 @@ If any issues arise during the update process, troubleshooting steps are provide
             name: artifactory-oss
   ```
   
-  [Example PR with above changes](https://github.com/hmcts/cnp-flux-config/pull/32191/files)
+  [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) with above changes
 
 ### Related Links
   

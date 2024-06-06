@@ -148,9 +148,6 @@
     <a href="../aks/patching-artifactory.html"><span>Artifactory Patching</span></a>
   </li>
   <li>
-    <a href="../aks/patching-artifactory.html"><span>Artifactory Patching Process</span></a>
-  </li>
-  <li>
     <a href="../aks/patching-pact-broker-example.html"><span>Pact-Broker Patching Example</span></a>
   </li>
   <li>
@@ -546,128 +543,48 @@
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
             <h1 id="artifactory-patching">Artifactory Patching</h1>
-<p>Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment. Here&rsquo;s how it is used based on the provided instructions:</p>
-<p>The steps below will show you how to check the current version of Artifactory being used (7.71.5) and then to update it to a newer version (7.77.3). This process involves accessing Artifactory&rsquo;s website to determine the latest version available.</p>
-<p>Before applying the update, a testing process is initiated. This involves downloading a repository containing configuration files for Artifactory (artifactory-sbox.yaml). This file is created and modified to reflect the desired changes, such as updating the version number.</p>
-<p>Kubernetes configuration files (kustomization.yaml) are updated to include the changes made in the testing phase. This ensures that the updated configuration is applied correctly within the Kubernetes cluster.</p>
-<p>Changes made to the configuration files are submitted for review through a pull request (PR) process. Once approved, the changes are merged into the main branch, allowing them to be deployed.</p>
+<p>Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment.</p>
+<p>The steps below will show you how to check and update <strong>self-hosted version</strong> of Artifactory being used. This process involves accessing <a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes">Artifactory&rsquo;s website</a> to determine the latest version available.</p>
+<p>Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to the <a href="https://github.com/hmcts/cnp-flux-config">Artifactory repo</a> containing configuration files, creating &lsquo;artifactory-sbox.yaml&rsquo; file and editing &lsquo;kustomization.yaml&rsquo; files with your changes as seen in the example PR below. In addition, checking Artifactory pods are healthy and access to <a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifcatory</a> is available.</p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/32185/files">Exampe PR</a> of PTLSBOX changes.</p>
+<p><a href="https://github.com/hmcts/cnp-flux-config/pull/32191/files">Exampe PR</a> of PTL changes after testing on PTLSBOX.</p>
 <p>If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.</p>
-<h1 id="artifactory-patching-process">Artifactory Patching Process</h1>
+<h2 id="artifactory-patching-process">Artifactory Patching Process</h2>
+<h3 id="1-updating-cft-ptlsbox">1. Updating CFT PTLSBOX</h3>
+<p>• <a href="https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters">Connect to PTLSBOX cluster</a></p>
+<p>• Make the changes to the &lsquo;kustomization.yaml&rsquo; and create a new file named &lsquo;artifactory-sbox.yaml&rsquo; following the <a href="https://github.com/hmcts/cnp-flux-config/pull/32185/files">Example PR</a> and updating the leatest version.</p>
+<p>• <strong>Note</strong> the file path of &lsquo;kustomization.yaml&rsquo; and &lsquo;artifactory-sbox.yaml&rsquo; in the PR.</p>
+<p>• Raise a PR similar to the <a href="https://github.com/hmcts/cnp-flux-config/pull/32185/files">Example PR</a> and get your PR approved and merged.</p>
+<h3 id="2-check-new-version-on-cft-ptlsbox">2. Check new version on CFT PTLSBOX</h3>
+<p>• Run the following commands ensuring pods are <strong>healthy</strong> and has applied new version. <strong>Note</strong> version number found at &ldquo;artifactory-oss&rdquo;.</p>
+<p>• Ensure you can access <a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifacory</a> website. <strong>Note</strong> you will need to be connected to F5 VPN to access this link.</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  kubectl get pods -n artifactory
+</code></pre></div><div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>  kubectl describe pods -n artifactory artifactory-oss-0
+</code></pre></div><h3 id="3-update-cft-ptl">3. Update CFT PTL</h3>
+<p>• <a href="https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters">Connect to PTL cluster</a></p>
+<p>• Remove &lsquo;artifactory-sbox.yaml&rsquo; file and its corresponding code from kustomization.yaml.</p>
+<p>• Update the version in &lsquo;artifactory.yaml&rsquo; to latest version eg, (7.84.12).</p>
+<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>        containers:
+          - image: docker.bintray.io/jfrog/artifactory-oss:7.84.12
+            name: artifactory-oss
+</code></pre></div><p>• Raise a PR similar to the <a href="https://github.com/hmcts/cnp-flux-config/pull/32191/files">Example</a> and get your PR approved and merged.</p>
+<p>• Repeat <a href="#2-check-new-version-on-cft-ptlsbox">step 2</a> checking the new version on CFT PTL ensuring the pods are healthy.</p>
+<h3 id="related-links">Related Links</h3>
+<p><a href="https://github.com/hmcts/cnp-flux-config">GitHub repo</a></p>
+<p><a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifactory</a> <strong>Note</strong> you will need to be connected to F5 VPN to access this link.</p>
+<p><a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes">Artifactory Release Information</a></p>
 
-<ol>
-<li>Azure CLI Login and Kubernetes Services:</li>
-</ol>
-<p>• Access Azure CLI and search for Kubernetes Services</p>
-<p>• Type the following PTL in the search box:</p>
-<p><a href="Images/artifactory_pic01.png" rel="noopener noreferrer"><img src="Images/artifactory_pic01.png" alt="" /></a></p>
-
-<ol>
-<li>Connect to PTLSBOX:</li>
-</ol>
-<p>• Click on &ldquo;cft-ptlsbox-00-aks&rdquo;</p>
-<p>• Navigate to Connect and open Terminal</p>
-<p>• Connect using the provided commands (first three)</p>
-<p>Note: Ensure correct cluster connection with the provided commands</p>
-
-<ol>
-<li>Check Active Pods:</li>
-</ol>
-<p>• In the terminal, execute the following commands to display active pods:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl get pods -n artifactory 
-</code></pre></div><p><a href="Images/artifactory_pic02.png" rel="noopener noreferrer"><img src="Images/artifactory_pic02.png" alt="" /></a></p>
-<p>This command lists running pods.</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>kubectl describe pods -n artifactory artifactory-oss-0 
-</code></pre></div><p><a href="Images/artifactory_pic03.png" rel="noopener noreferrer"><img src="Images/artifactory_pic03.png" alt="" /></a></p>
-<p>This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)</p>
-
-<ol>
-<li>Version Checking:</li>
-</ol>
-<p>• Visit the following website to look for latest self hosted version:<a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted">Artifactory Release Information</a></p>
-
-<ol>
-<li>Pre-update Testing:</li>
-</ol>
-<p>• Before updating the PTLSBOX, conduct testing to ensure no issues</p>
-<p>• Download the repository from <a href="https://github.com/hmcts/cnp-flux-config">GitHub</a></p>
-<p>• File location: apps/artifactory/artifactory/…</p>
-<p>• Create a new file named &ldquo;artifactory-sbox.yaml&rdquo; with the provided code snippet</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: artifactory-oss
-  namespace: artifactory
-spec:
-  serviceName: "artifactory"
-  replicas: 2
-  selector:
-    matchLabels:
-      app: artifactory-oss
-  template:
-    metadata:
-      labels:
-        app: artifactory-oss
-    spec:
-      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
-          name: artifactory-oss
-</code></pre></div><p><a href="https://github.com/hmcts/cnp-flux-config/pull/29609/files">Example PR</a></p>
-
-<ol>
-<li>Run Test:</li>
-</ol>
-<p>• Add the below code to kustomization.yaml file for the test to run:</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
-</code></pre></div>
-<ol>
-<li>Push Changes:</li>
-</ol>
-<p>• Raise a PR and push changes out for review and approval</p>
-
-<ol>
-<li>Update Version:</li>
-</ol>
-<p>• For the PTLSBOX, remove &ldquo;artifactory-sbox.yaml&rdquo; file and its corresponding code from kustomization.yaml</p>
-<p>• Update the version in &ldquo;artifactory.yaml&rdquo; to 7.77.3</p>
-<div class="highlight"><pre class="highlight plaintext" tabindex="0"><code>      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
-          name: artifactory-oss
-          env:
-</code></pre></div><p><a href="https://github.com/hmcts/cnp-flux-config/pull/29665/files">Example PR</a></p>
-
-<ol>
-<li>Push Changes:</li>
-</ol>
-<p>• Raise a PR and push changes out for review and approval</p>
-<p>• If you can go to the <a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/">Artifactory</a> site after the upgrade and checking the packages and repositories to ensure they are working.</p>
-
-<ol>
-<li>Release Draft and Version Bump:</li>
-</ol>
-<p>• Publish the draft release in &ldquo;chart-neuvector&rdquo;</p>
-<p>• Bump the version in &ldquo;flux-config&rdquo; from 1.5.4 to 1.5.5</p>
-
-<ol>
-<li>Push Changes:</li>
-</ol>
-<p>• Raise a PR and push changes out for review and approval</p>
-<p>Troubleshooting Steps:</p>
-<p>To resolve namespace issues in <a href="https://hmcts.github.io/ops-runbooks/neuvector/updating-neuvector-policies.html">&ldquo;chart-neuvector&rdquo;</a>. We had specific issues with neuvector which should be resolved and the details can be found in the linked page.</p>
-<p>Related Links:</p>
-<p><a href="https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts">Artifactory Repository</a> - You will need to be connect to F5 VPN to access this link</p>
-<p><a href="https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted">Artifactory Release Information</a></p>
-
-              <div data-module='page-expiry' data-last-reviewed-on="2025-03-13">
+              <div data-module='page-expiry' data-last-reviewed-on="2025-06-06">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 13 March 2024.
+      This page was last reviewed on 6 June 2024.
 
-        It needs to be reviewed again on 13 March 2025
+        It needs to be reviewed again on 6 June 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 13 March 2025
+      This page was set to be reviewed before 6 June 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>

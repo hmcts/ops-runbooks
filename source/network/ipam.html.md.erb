@@ -11,7 +11,7 @@ weight: 160
 
 This is in relation to a VNet peering issue due to address space clash and the user needed new available address space.  See ticket for more informatio:
 
-https://tools.hmcts.net/jira/browse/DTSPO-9414
+(Examlpe)[https://tools.hmcts.net/jira/browse/DTSPO-9414]
 
 ### Check address space range
 
@@ -20,15 +20,15 @@ Check the existing address space in use by checking the address space within vir
 
 ### ipam for available address spaces
 
-We can use ipam (https://ipam.hmcts.net/) to find next available space which is not overlapping with existing vnet space.
+We can use [ipam](https://ipam.hmcts.net/) to find next available space which is not overlapping with existing vnet space.
 
-There are two ways we can query this to ipam APIs , using shell command or using 
+There are two ways we can query this to ipam APIs , using shell command or using postman
 
 #### Using shell commands
 
 Step 1 - Get the next available vnet space
 
-Replace `env`  to either `sbox` , `nonprod` or `prod` depending which environment you trying to create vnet for.
+Replace `env`  to either `sbox` , `nonprod` or `prod` depending which environment you are going to create new vnet for.
 
   ```bash
 
@@ -49,7 +49,7 @@ Replace `env`  to either `sbox` , `nonprod` or `prod` depending which environmen
   curl -X POST -H "Authorization: Bearer $bearer_token" -H "Content-Type: application/json" -d "$json_body" "$url"
   ```
 
-Reserve the next available vnet space if you happy with the space you got and going to use it.
+Reserve the next available vnet space if you are happy with the space you have got and going to use it.
 
 Please replace the `cidr` value with value you have got from above API call and `env`
 
@@ -102,10 +102,10 @@ If you are happy with the range you are getting, run the reservation command to 
 
 Please also reference the following GitHub repo link for more information regarding ipam:
 
-https://github.com/hmcts/ipam-manage/blob/master/README.md
+[READ ME](https://github.com/hmcts/ipam-manage/blob/master/README.md)
 
 ### Azure DevOps Pipeline
 
 The following Azure DevOps pipeline is run daily at 8:00 AM and can be manually run to sync the newly created VNET with ipam.
 
-https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=979&_a=summary
+[Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=979&_a=summary)

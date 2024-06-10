@@ -11,14 +11,14 @@ weight: 160
 
 This is in relation to a VNet peering issue due to address space clash and the user needed new available address space.  See ticket for more informatio:
 
-(Examlpe)[https://tools.hmcts.net/jira/browse/DTSPO-9414]
+[Example](https://tools.hmcts.net/jira/browse/DTSPO-9414)
 
 ### Check address space range
 
 Check the existing address space in use by checking the address space within virtual network in Azure portal.  For example /28 for vh-wowza-dev (10.50.10.32/28)
 
 
-### ipam for available address spaces
+### Use IPAM for available address spaces
 
 We can use [ipam](https://ipam.hmcts.net/) to find next available space which is not overlapping with existing vnet space.
 
@@ -49,7 +49,7 @@ Replace `env`  to either `sbox` , `nonprod` or `prod` depending which environmen
   curl -X POST -H "Authorization: Bearer $bearer_token" -H "Content-Type: application/json" -d "$json_body" "$url"
   ```
 
-Reserve the next available vnet space if you are happy with the space you have got and going to use it.
+Step 2 - Reserve the next available vnet space if you are happy with the space you have got and going to use it.
 
 Please replace the `cidr` value with value you have got from above API call and `env`
 

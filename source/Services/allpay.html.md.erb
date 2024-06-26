@@ -1,0 +1,39 @@
+---
+title: allpay
+last_reviewed_on: 2024-06-25
+review_in: 6 months
+weight: 5
+---
+
+# <%= current_page.data.title %>
+
+## Introduction
+AllPay (NatWesk Data Link) is a payment processor service. It has a database running on a single VM. There are also scheduled tasks that trigger every 5 minutes, to copy files to BAIS and the NDL Dashboard.
+
+## Management
+The infrastructure is managed by platform operations.
+
+As part of a public web service, users could be using the system on a 27x7x365 basis.  However Monday to Friday, 8am to 6 pm are more typical service hours.
+
+### Patching
+Azure Update Manager is used to apply updates to the VM and automatically reboot it outside of business hours.
+
+## Overview
+
+* Single Windows Server 2022 Datacenter VM
+* HMCTS Domain joined 
+
+GitHub Repo: [https://github.com/hmcts/allpay-infra](https://github.com/hmcts/allpay-infra)
+
+ADO Pipeline: PlatformOperations, hmcts.allpay-infra
+
+
+### Access to VMs
+Platops Admin already have access to the server. Add HMCTS users to the group DTS RDS AllPay PROD to provide admin access.  There is NO non-administrator connectivity.
+There is also a local user allpay_adm which is used to configure the application.
+
+The Windows desktop can be reached via RDS from JBOX01-PROD
+
+## Backups
+As a single VM, backup are very important. They are managed by a recovery services vault in Azure. These backups are taken daily at 8:00 AM and retained for 28 days.
+There is also have monthly backup job which is kept for 12 months.

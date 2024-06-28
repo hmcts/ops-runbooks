@@ -5,23 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>Azure Application Insights - HMCTS</title>
+    <title>DARTS-DETS migration - HMCTS</title>
 
     <link href="../stylesheets/manifest.css" rel="stylesheet" />
 
-    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/monitoring/app-insights.html">
+    <link rel="canonical" href="https://hmcts.github.io/ops-runbooks/DLRM/DARTS-DETS-migration.htm">
 
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:domain" content="hmcts.github.io" />
       <meta name="twitter:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
-      <meta name="twitter:title" content="Azure Application Insights - HMCTS" />
-      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/monitoring/app-insights.html" />
+      <meta name="twitter:title" content="DARTS-DETS migration - HMCTS" />
+      <meta name="twitter:url" content="https://hmcts.github.io/ops-runbooks/DLRM/DARTS-DETS-migration.htm" />
 
       <meta property="og:image" content="https://hmcts.github.io/ops-runbooks/images/govuk-large.png" />
       <meta property="og:site_name" content="HMCTS" />
-      <meta property="og:title" content="Azure Application Insights" />
+      <meta property="og:title" content="DARTS-DETS migration" />
       <meta property="og:type" content="object" />
-      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/monitoring/app-insights.html" />
+      <meta property="og:url" content="https://hmcts.github.io/ops-runbooks/DLRM/DARTS-DETS-migration.htm" />
 
     
   </head>
@@ -545,29 +545,42 @@
 
         <div class="app-pane__content toc-open-disabled" aria-label="Content" tabindex="0">
           <main id="content" class="technical-documentation" data-module="anchored-headings">
-            <h1 id="azure-application-insights">Azure Application Insights</h1>
-<h2 id="resources-in-the-azure-portal">Resources in the Azure Portal</h2>
-<p>AppInsights Resources generally share the same naming conventions as Key Vaults: Area followed by environment. So for CCD resources operating in AAT, the appropriate AppInsights Resource is called <code>ccd-aat</code>. The &lsquo;Overview&rsquo; dashboard displays some general information about the performance of the environment. Also displayed here is the Instrumentation Key, this is a UUID value that applications will use to send their telemetry data to this resource. While applications <em>can</em> report to AppInsights using only the Instrumentation Key, it&rsquo;s preferred to use the Connection String to do so instead. This can be found directly below the Instrumentation Key in the portal.</p>
-<h2 id="querying-appinsights">Querying AppInsights</h2>
-<p>AppInsights collects and reports several types of telemetry such as availability results, requests and traces. To view these in detail or perform analysis, one must make use of the Azure Data Explorer. This can be found by navigating to the AppInsights resource in the Azure Portal and going into <code>Monitoring &gt; Logs</code> in the panel on the left. Once the query editor is loaded, telemetry results can then be viewed, aggregated and manipulated by writing a query. These queries are somewhat similar to SQL <code>SELECT</code> statements, but make heavy use of pipe-like syntax to filter and manipulate data. In-depth documentation for this query language can be found in the <a href="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators">Microsoft documentation for the Azure Data Explorer Language</a>.</p>
-<h2 id="common-problems-and-troubleshooting">Common Problems and Troubleshooting</h2>
-<h3 id="why-do-logs-take-so-long-to-show-up-in-the-azure-portal">Why do logs take so long to show up in the Azure Portal?</h3>
-<p>It&rsquo;s normal for logs to take a few minutes between being sent to AppInsights and showing up in the Azure Portal. This is because of the ingestion process where data has to be analyzed and indexed before showing up in the Portal as well as the sheer volume of telemetry data being processed by Azure. If logs aren&rsquo;t showing up at all, this could point to a configuration problem with the application.</p>
-<h3 id="why-are-some-telemetry-items-not-showing-up-in-the-azure-portal">Why are some telemetry items not showing up in the Azure Portal?</h3>
-<p>This could be due to a feature called sampling. In short, AppInsights can be configured to purposefully omit a fixed percentage of tracked telemetry items from being transmitted in full. This is disabled by default for Java and Node.JS applications and is normally enabled by the team responsible for the service as a performance saving measure. If you&rsquo;re currently investigating a problem and find important requests or traces are missing, consider asking the team to check their AppInsights configuration to see if they&rsquo;ve enabled sampling.</p>
-<p>More information on sampling can be found in the <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/app/sampling">Microsoft docs for the subject</a>.</p>
+            <h1 id="darts-dets-migration">DARTS-DETS migration</h1>
+<p>DARTs currently stored ~680TiB of Data and needs to be migrated to Azure. In order to not impact current live services separate migration infrastructure has been provisioned.</p>
+<h2 id="dlrm-migration-express-route-circuit">DLRM Migration Express Route Circuit</h2>
+<p>A new DLRM Migration specific express route circuit has been deployed and connected to separate MyCloudGateway Fortigate firewalls in their Swindon DC.</p>
+<p>The new circuit is connected to the DLRM Migration VNET in Azure and in turn the production Virtual WAN and Hub.</p>
+<p>This circuit is provisioned via Terraform in the <a href="https://github.com/hmcts/azure-platform-virtualwan/blob/master/environments/prod/prod.tfvars">azure-platform-virtualwan</a> repository.</p>
+<p>The connectivity to the source dataset in the Vodafone DC will be unencrypted in transit, because of this an <a href="https://github.com/hmcts/azure-platform-virtualwan/blob/master/environments/prod/prod.tfvars#L264-L267">IPSeC VPN has been layered on top of the Express Route circuit</a>.</p>
+<h2 id="darts-migration-infrastructure">DARTS Migration Infrastructure</h2>
+<p>PlatOps have supported the DARTS team in provisioning the following Azure infrastructure:</p>
 
-              <div data-module='page-expiry' data-last-reviewed-on="2025-01-26">
+<ul>
+<li>5 Migration VMs</li>
+<li>Migration Storage Account</li>
+<li>Migration VNET</li>
+<li>Migration PostgreSQL Flexible instance</li>
+<li>Several supporting assessment/oracle/mongo VMs</li>
+</ul>
+<p>PlatOps are responsible for the configuration of a <a href="https://github.com/hmcts/darts-shared-infrastructure/blob/master/firewall.tf">DARTS specific Palo Alto IaaS Firewall</a>, this performs a number of activities but mainly:</p>
+
+<ul>
+<li>Restricts traffic to/from the DARTS Migration VMs to VF DC</li>
+<li>Performs NATs to allow the DARTS Migration VMs to access the Centera cluster in the Vodafone DC</li>
+</ul>
+<p>All the DARTs Migration Infrastructure is deployed from the <a href="https://github.com/hmcts/darts-shared-infrastructure">darts-shared-infrastructure</a> repository.</p>
+
+              <div data-module='page-expiry' data-last-reviewed-on="2025-06-28">
     <div class='page-expiry--not-expired'>
-      This page was last reviewed on 26 January 2024.
+      This page was last reviewed on 28 June 2024.
 
-        It needs to be reviewed again on 26 January 2025
+        It needs to be reviewed again on 28 June 2025
         by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>
         .
     </div>
 
     <div class='page-expiry--expired'>
-      This page was set to be reviewed before 26 January 2025
+      This page was set to be reviewed before 28 June 2025
        by the page owner <a href="https://hmcts-reform.slack.com/messages/platops-build-notices">platops-build-notices</a>.
       This might mean the content is out of date.
     </div>
@@ -577,8 +590,8 @@
 
           <aside>
               <ul class="contribution-banner">
-                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/monitoring/app-insights.html.md.erb">View source</a></li>
-                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27Azure+Application+Insights%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2Fmonitoring%2Fapp-insights.html%29&amp;labels=bug&amp;title=Re%3A+%27Azure+Application+Insights%27">Report problem</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/blob/master/source/DLRM/DARTS-DETS-migration.htm.md.erb">View source</a></li>
+                <li><a href="https://github.com/hmcts/ops-runbooks/issues/new?body=Problem+with+%27DARTS-DETS+migration%27+%28https%3A%2F%2Fhmcts.github.io%2Fops-runbooks%2FDLRM%2FDARTS-DETS-migration.htm%29&amp;labels=bug&amp;title=Re%3A+%27DARTS-DETS+migration%27">Report problem</a></li>
                 <li><a href="https://github.com/hmcts/ops-runbooks">GitHub Repo</a></li>
               </ul>
           </aside>

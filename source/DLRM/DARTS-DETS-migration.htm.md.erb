@@ -1,0 +1,37 @@
+---
+title: DARTS-DETS migration
+last_reviewed_on: 2024-06-28
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+DARTs currently stored ~680TiB of Data and needs to be migrated to Azure. In order to not impact current live services separate migration infrastructure has been provisioned.
+
+## DLRM Migration Express Route Circuit
+
+A new DLRM Migration specific express route circuit has been deployed and connected to separate MyCloudGateway Fortigate firewalls in their Swindon DC.
+
+The new circuit is connected to the DLRM Migration VNET in Azure and in turn the production Virtual WAN and Hub.
+
+This circuit is provisioned via Terraform in the [azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan/blob/master/environments/prod/prod.tfvars) repository.
+
+The connectivity to the source dataset in the Vodafone DC will be unencrypted in transit, because of this an [IPSeC VPN has been layered on top of the Express Route circuit](https://github.com/hmcts/azure-platform-virtualwan/blob/master/environments/prod/prod.tfvars#L264-L267).
+
+## DARTS Migration Infrastructure
+
+PlatOps have supported the DARTS team in provisioning the following Azure infrastructure:
+
+- 5 Migration VMs
+- Migration Storage Account
+- Migration VNET
+- Migration PostgreSQL Flexible instance
+- Several supporting assessment/oracle/mongo VMs
+
+PlatOps are responsible for the configuration of a [DARTS specific Palo Alto IaaS Firewall](https://github.com/hmcts/darts-shared-infrastructure/blob/master/firewall.tf), this performs a number of activities but mainly:
+
+- Restricts traffic to/from the DARTS Migration VMs to VF DC
+- Performs NATs to allow the DARTS Migration VMs to access the Centera cluster in the Vodafone DC
+
+All the DARTs Migration Infrastructure is deployed from the [darts-shared-infrastructure](https://github.com/hmcts/darts-shared-infrastructure) repository.

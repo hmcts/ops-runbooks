@@ -70,15 +70,17 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 * Verify system is up and running, check cpu, memory, check firewall's system resources, if high wait until it settles, should not take long
 * Download if not already and install next major release i.e. `v10.0.7` or `v10.1.x`
 * Verify system is up and running, check cpu, memory etc
-* ⚠️ Note: Prod update needs a `CR` raised and done out of office hours (ideally 8pm or after) as each vm will need to be rebooted to apply the new software version, comms must be sent out to platform-operations & cloud-native-announce prior to work being carried out.
+* ⚠️ Note: Prod update needs a `CR` raised and done out of office hours (ideally 8pm or after) as each vm will need to be rebooted to apply the new software version. Comms must be sent out to platform-operations & cloud-native-announce prior to work being carried out and advise CGI (neil.green@cgi.com) as they have an app associated to one palo fw.
+* Start with passive prod vm-1 and once that has been updated, check the [Prod LB](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Network/loadBalancers/hmcts-hub-prod-int-palo-lb/overview) monitoring->insights is showing the vm as green before starting work on the other prod vm.
 * 🔔 *Note:* After reboot, follow the steps in the [Disk space full messages](./palos-troubleshooting.html) to re-enable automatic disk usage cleanup by the VM (Very important)
-  -Looking to see if this can be automated in some way but for now please enable-
+* Please review that traffic is being received from the Palo's, once the above steps have been completed under monitor->logs->traffic on the UI.
+  - Looking to see if this can be automated in some way but for now please enable.
 
 ## Post Upgrade
 * Rerun pipeline to see if any issues between current config and new software version
 * Fix forward if any issues, config might need to be updated i.e new markup introduced
 * Deleting old installation files to save space and cleanup is a nice to have
-* Verify, via the cli, that disk usage cleanup is enabled
+* Verify via the cli, that disk usage cleanup is enabled only once the vm's software update has been done. This configuration is lost during the reboot, use the following document to keep the disk space below 90% [disk threshold implementation](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClaJCAS).
 * Move to `nonprod` after `sbox` is stable and pipeline runs well i.e. commits current config<br>
   Flow is: `sbox` -> `nonprod` -> `prod`
 * Let team members know that the upgrade was successful

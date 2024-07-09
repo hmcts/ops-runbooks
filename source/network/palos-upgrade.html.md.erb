@@ -73,6 +73,7 @@ e.g `v9.1.0-h3 -> 9.1.11-h3 before v10.0.0`
 * ⚠️ Note: Prod update needs a `CR` raised and done out of office hours (ideally 8pm or after) as each vm will need to be rebooted to apply the new software version. Comms must be sent out to platform-operations & cloud-native-announce prior to work being carried out and advise CGI (neil.green@cgi.com) as they have an app associated to one palo fw.
 * Start with passive prod vm-1 and once that has been updated, check the [Prod LB](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Network/loadBalancers/hmcts-hub-prod-int-palo-lb/overview) monitoring->insights is showing the vm as green before starting work on the other prod vm.
 * 🔔 *Note:* After reboot, follow the steps in the [Disk space full messages](./palos-troubleshooting.html) to re-enable automatic disk usage cleanup by the VM (Very important)
+* Please review that traffic is being received from the Palo's, once the above steps have been completed under monitor->logs->traffic on the UI.
   - Looking to see if this can be automated in some way but for now please enable.
 
 ## Post Upgrade

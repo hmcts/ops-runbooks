@@ -1,0 +1,57 @@
+---
+title: Incident Bot
+last_reviewed_on: 2024-01-26
+review_in: 12 months
+weight: 10
+---
+# <%= current_page.data.title %>
+
+We currently have a slack bot in place that people can use to report major incidents and open slack channels so everyone can huddle and work together to fix them.
+
+The incident bot is based on [monzo-response](https://github.com/monzo/response) but it has since been forked into our [own version](https://github.com/hmcts/response) so we can update its dependencies.
+
+The components of the incident bot are:
+
+- slack app
+- postgresql database
+- kubernetes pods, service and ingress
+
+The slack app is called [Incident Response](https://api.slack.com/apps/A013Q4742DV).
+
+The app has been configured according to the instructions set out in the monzo-response repo.
+
+The main functions of the app are the slash command, the interactivity and the event subscriptions.
+
+To use the bot, someone simply runs `/incident` in their local slack desktop app and they will be presented with a form to complete.
+
+More info on this can be found on [confluence](https://tools.hmcts.net/confluence/display/RPE/Incident+Bot+Usage+Guide).
+
+The slash command is passed to a response URL which has been exposed externally via [app-proxy](https://github.com/hmcts/azure-app-proxy/blob/6ca895f6f75ed116038f010a967c9d3e656c5ea7/apps.yaml#L16-L29).
+
+This URL points to a kubernetes ingress resource on the cft-ptl AKS cluster which forwards to a service which forwards to a set of pods.
+
+Every slack app has an oauth token and a signing secret. These are used by Slack to generate a request signaure. When a request is made to the app via a slash command, the python application running in the kubernetes pod generates a signature using the same secrets and compares them.
+
+If the two signatures match, the request is allowed and the process continues. This is the authentication mechanism that ensures no third party can use the response API.
+
+When the user completes and submits the form, it is processed and a new slack channel called `#inc-abcd-wxyz-1234` is created.
+
+People can join the channel to huddle and troubleshoot the issue.
+
+Certain events will trigger the app to take action, such as a comment being pinned. This is the event subscription at work.
+
+All of the information is stored in a [postgres database](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/hmcts-incident-response-flexible-data-ptl/providers/Microsoft.DBforPostgreSQL/flexibleServers/hmcts-incident-response-flexible-ptl/overview).
+
+A frontend service also exists to allow you to view the stored information in a user friendly way.
+
+[Here](https://incidents.hmcts.net/incident/76) is an example incident you can review to see what it looks like.
+
+### Useful links
+
+[Response infra](https://github.com/hmcts/incident-response-infra)
+
+[Response frontend](https://github.com/hmcts/incident-response-frontend)
+
+[Response backend](https://github.com/hmcts/incident-response-api)
+
+[Response fork](https://github.com/hmcts/response)

@@ -18,8 +18,8 @@ This document provides a detailed outline of the procedure, offering guidance fo
 XDR agent and collector aren’t publicly available to download and install, it will need to be downloaded from XSIAM console.  We in HMCTS do not have access to the console hence we need liaise with MOJ Secops engineers.  
 
 This are the few Engineers whom we messaged on MS Teams to get hold of installers.
-    Nabil Ahmed = Delivery Manager
-    Touhidul Islam = Engineer
+    Nabil Ahmed = Delivery Manager,
+    Touhidul Islam = Engineer,
     Zubair Mohammed = Engineer
     
 We got all the information we needed from Touhidul Islam.
@@ -34,7 +34,7 @@ az role assignment create --assignee <ClientAppID> --role Contributor --scope "/
     
 ## Windows
 
-We have installed the agent and collector on various windows VM to prepare this POC, that includes NEXT-CGI-M-VM-W, martha-vm1-stg and martha-vm1-stg. 
+We have installed the agent and collector on various windows VM to prepare this POC, that includes `NEXT-CGI-M-VM-W`, `martha-vm1-stg` and `martha-vm1-stg`. 
 
 We have confirmed installation of agent and collector and the installation is done though using RunCommand Extension for Windows.
 
@@ -65,8 +65,7 @@ Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm tha
 
 In order to fix this, you will have to run AZ cli command from your local to remove the extension.
 
-**Make sure you are on the correct subscription**
-Then run this,  it will take few minutes to finish running this command.
+**Make sure you are on the correct subscription**, then run this,  it will take few minutes to finish running this command.
 
 ```bash
 az vm run-command invoke  --command-id RemoveRunCommandWindowsExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>
@@ -108,7 +107,7 @@ For Linux Ubuntu VM,
 
 ```bash
 dpkg -l | grep -i cortex-agent
-dpkg -l | grep -i xdr-collector 
+dpkg -l | grep -i xdr-collector # run this only if you have installed collector
 ```
 
 <img src="images/xdr-linux.png" style="width:600px;">
@@ -121,8 +120,7 @@ Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm tha
 
 In order to fix this, you will have to run AZ cli command from your local to remove the staled extension.
 
-**Make sure you are on the correct subscription**
-Then run this,  it will take few minutes to finish running this command.
+**Make sure you are on the correct subscription** then run this,  it will take few minutes to finish running this command.
 
 ```bash
 az vm run-command invoke  --command-id RemoveRunCommandLinuxExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>

@@ -12,8 +12,3 @@ podName=[^\s\/]+
 .*.yaml
 ## Ignore internal links as page names might be concatenated words
 \(.*html\)
-## Ignore code example regex for image names
-^prod-[a-f0-9]+-(?P<ts>[0-9]
-## Ignore example DNS for Certificate validation
-^[A-Fa-f0-9]{32}\.[A-Fa-f0-9]{32}$
-^_[A-Fa-f0-9]{32}$

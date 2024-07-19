@@ -17,5 +17,3 @@ podName=[^\s\/]+
 ## Ignore example DNS for Certificate validation
 ^[A-Fa-f0-9]{32}\.[A-Fa-f0-9]{32}$
 ^_[A-Fa-f0-9]{32}$
-## Ignore all code blocks
-```[a-z]*\n[\s\S]*?\n```

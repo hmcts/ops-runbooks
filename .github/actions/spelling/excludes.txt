@@ -5,4 +5,5 @@ ignore$
 \.t$
 ^LICENSE\.txt$
 ^\.github/
+(?:^|/)accounts\.html\.erb$
 ^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$

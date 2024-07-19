@@ -59,7 +59,7 @@ Connect to Elastic Search node:
 ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 ```
 
-5) Appliction team may shutter the service
+5) Application team may shutter the service
 
 6) List all indices prior to deletion
 
@@ -172,7 +172,7 @@ or
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
 ```
 
-The overall indexing count should be approximatley the same as the overall DB count to confirm when completed:
+The overall indexing count should be approximately the same as the overall DB count to confirm when completed:
 
 ```
 SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';

@@ -1,12 +1,19 @@
 # Excluded patterns per line in Perl regex
 
-# Catch lines with https:// urls
+## Catch lines with https:// urls
 .*https?://\S+
-# Catch pod names (containing dashes and chars)
+## Catch pod names (containing dashes and chars)
 podName=[^\s\/]+
-# Catch container names
+## Catch container names
 .*containerd(.*)$
-# Google analytics ID
+## Google analytics ID
 .*UA-.*$
 .*.yml
 .*.yaml
+## Ignore internal links as page names might be concatenated words
+\(.*html\)
+## Ignore code example regex for image names
+^prod-[a-f0-9]+-(?P<ts>[0-9]
+## Ignore example DNS for Certificate validation
+^[A-Fa-f0-9]{32}\.[A-Fa-f0-9]{32}$
+^_[A-Fa-f0-9]{32}$

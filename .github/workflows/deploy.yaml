@@ -38,6 +38,11 @@ jobs:
             cspell:r/src/r.txt
             cspell:html-symbol-entities/entities.txt
             cspell:java/src/java.txt
+            cspell:software-terms/dict/softwareTerms.txt
+            cspell:python/src/python/python-lib.txt
+            cspell:node/dict/node.txt
+            cspell:aws/aws.txt
+            cspell:python/src/common/extra.txt
   build:
     runs-on: ubuntu-latest
     name: 'Build and Test'

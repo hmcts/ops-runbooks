@@ -5,3 +5,4 @@ ignore$
 \.t$
 ^LICENSE\.txt$
 ^\.github/
+^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$

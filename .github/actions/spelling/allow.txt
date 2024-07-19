@@ -48,7 +48,6 @@ Frontdoors
 servolux
 Vnets
 autoconfigure
-@U1234ABCD
 ABCD
 nsenter
 autoscaler
@@ -62,6 +61,7 @@ paa
 Intelli
 azurerm
 backports
+BAIS
 barrelsby
 bfaac
 bitnami
@@ -99,6 +99,8 @@ deserialise
 dts
 dtspo
 dynatrace
+Entra
+entra
 envsubst
 erb
 erubis
@@ -187,6 +189,7 @@ ngmodules
 ngrx
 nokogiri
 NONINFRINGEMENT
+nonprod
 npmjs
 onboarded
 onpush

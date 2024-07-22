@@ -306,7 +306,7 @@ mswin
 multipage
 myaccess
 myapps
-Nabil 
+Nabil
 ncsc
 neil
 Neuvector
@@ -497,7 +497,7 @@ tnc
 toboardingextnonprodstor
 toc
 toml
-Touhidul 
+Touhidul
 TProgress
 traefik
 Traefik
@@ -553,4 +553,7 @@ xuimanag
 yamls
 yml
 zalando
-Zubair 
+Zubair
+NATs
+NCAPS
+NCMAN

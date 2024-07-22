@@ -6,4 +6,4 @@ ignore$
 ^LICENSE\.txt$
 ^\.github/
 ^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$
-(?:^|/)accounts\.html\.erb$
+(?:^|/)accounts\.html\.md\.erb$

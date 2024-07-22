@@ -5,6 +5,6 @@ ignore$
 \.t$
 ^LICENSE\.txt$
 ^\.github/
-^\.Gemfile*
+^\Gemfile*
 ^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$
 (?:^|/)accounts\.html\.md\.erb$

@@ -4,7 +4,7 @@ DOT_REMOVER(){
 }
 
 CHECK_CHART(){
-    VERSION=$(echo $1 | tr -d "phelm.sh/chart=:$3.- ")
+    VERSION=$(echo $1 | tr -d "helm.sh/chart=:$3.- ")
     # Check version is at least the recommended one
     [[ "$(( $VERSION - $2 ))" -ge 0 ]]
 }

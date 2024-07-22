@@ -11,7 +11,7 @@ This document covers a high level patching example for the KEDA app patching. Pl
 
 KEDA is patched globally, rather than starting in sbox and working up through the environments, due to its limited use. There should be PRs raised by renovate for both SDS and CFT
 
-KEDA is used to autoscale pods on a cluster. A couple of examples of this are:
+KEDA is used to auto scale pods on a cluster. A couple of examples of this are:
 
 - Azure DevOps agent pods: we use a KEDA scaled job to monitor for new pipeline builds in Azure DevOps and create a pod on the PTL or PTLSBOX clusters to run the pipeline.
 - Jenkins webhook agent: we use a KEDA scaled job to poll Azure Service Bus for new messages when an event is triggered from a repo in GitHub. A pod is then scheduled to process the message and send it to Jenkins to kick off a build.

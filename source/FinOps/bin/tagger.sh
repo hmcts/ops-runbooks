@@ -35,7 +35,7 @@ ALLOWED_APPLICATION_VALUES=("probate" "template-management" "c100" "cloud-video-
                     "applications-register" "glimr" "ifas" "crime-portal" "martha" "crest-legacy-functions" "am-dashboard" "libra-gob" "heritage-small-systems") 
 ALLOWED_ENV_VALUES=("sandbox" "development" "testing" "demo" "ithc" "staging" "production" "development" "system-integration-testing" 
                     "non-functional-testing" "pre-production" "production" "non-live-management" "live-management")
-ALLOWED_BUSSINESS_AREAS=("CFT" "crime" "cross-cutting")
+ALLOWED_BUSINESS_AREAS=("CFT" "crime" "cross-cutting")
 
 
 # Function to check if a tag value matches requirements
@@ -83,7 +83,7 @@ Allowance_Checker ALLOWED_APPLICATION_VALUES ${APPLICATION}
 read -p "Input the environment this Resource Group exists in: " ENV
 Allowance_Checker ALLOWED_ENV_VALUES ${ENV}
 read -p "Input business Area: " BUSINESS_AREA
-Allowance_Checker ALLOWED_BUSSINESS_AREAS ${BUSINESS_AREA}
+Allowance_Checker ALLOWED_BUSINESS_AREAS ${BUSINESS_AREA}
 # No restrictions for this tag just needs including
 read -p "Input builtfrom tag (Git repository these resources are built from): " BUILT_FROM
 # Check tag is not empty

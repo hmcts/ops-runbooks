@@ -1,5 +1,5 @@
 ---
-title: BAIS NWindows Firewall Rules
+title: BAIS Windows Firewall Rules
 last_reviewed_on: 2024-01-26
 review_in: 12 months
 weight: 140
@@ -31,17 +31,17 @@ git clone https://github.com/hmcts/globalscape-azure-infrastructure
 ```bash
 git checkout -b BRANCH-NAME
 ```
-4. Navigate to newansible/files where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)
+4. Navigate to `newansible/files` where you will see 4 CSV files containing firewall rules. (2 NLE and 2 Prod)
 5. Modify the CSV file for the required environment looking to existing rules for formatting guidance. Note: removing rules from the CSV will remove them from the server.
 6. Push your new branch
 ```bash
 git push --set-upstream origin BRANCH-NAME
 ```
 7. Create a Pull Request and review changes compared with master.
-* Look out for typical formatting issues such as extra spaces or unusual characters. 
+* Look out for typical formatting issues such as extra spaces or unusual characters.
 * Specifically the '-' in port ranges can often need deleted and retyped depending on how CGI have exported the CSV.
 
-8. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+8. CI will run automatically across STG after the PR is raised. [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
 * Review build log and investigate any issues, pushing corrections to the pipeline will auto trigger another CI build.
 
 9. Raise a BAU ticket with the PlatOps team requesting PR approval and execution.
@@ -50,7 +50,7 @@ git push --set-upstream origin BRANCH-NAME
 
 10. Review PR
 11. If terraform Plan is successful:
-In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432) 
+In [Azure DevOps](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=432)
 * 'Run Pipeline'
 * Branch/tag: Your new branch name
 * Commit: Blank

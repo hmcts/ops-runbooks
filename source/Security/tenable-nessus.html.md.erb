@@ -11,9 +11,9 @@ to scan devices and check them against the nessus database that contains thousan
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
 and the agents. This runbook will cover the following
 
-- Tenable anvironments 
+- Tenable environments 
 - Deploying agents
-- Verifiying agent installation. 
+- Verifying agent installation. 
 
 This runbook does not cover the finer details of the Terraform bootstrap module.
 
@@ -46,7 +46,7 @@ resource group.
 
 The agent is deployed using terraform bootstrap module  [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap). The module is designed to install to Linux and Windows machines.
 
-> The example given below is specific to the Heritage environemnt.
+> The example given below is specific to the Heritage environment.
 
 #### Steps to setup deployment
 
@@ -115,7 +115,7 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
 ```
 
-- Start port-forwading/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
+- Start port-forwarding/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
 
 ```bash
 ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod

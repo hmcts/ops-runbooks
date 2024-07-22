@@ -29,7 +29,7 @@ It's important to note I've been unable to find any documentation for this modul
 ## Adding Rules
 FSLogix rules can then be added via the Add-FslRule command:
 Add-FslRule -Path "C:\Program Files\FSLogix\Apps\Rules\HideNotepad.fxr" -HidingType FileOrValue -FullName "C:\Windows\system32\notepad.exe"
-The Path parameter specifies the path to the FSLogix rule file. Here we write directly to the FSLogix program directory where it reads it's rules from. This will require administrator priviliges. If said priviliges are not available, it may be desirable to create the files to a different directory and then copy them over later.
+The Path parameter specifies the path to the FSLogix rule file. Here we write directly to the FSLogix program directory where it reads it's rules from. This will require administrator privileges. If said privileges are not available, it may be desirable to create the files to a different directory and then copy them over later.
 The HidingType parameter is an enum and specifies the type of object we're hiding. This can be any of:
 •	FolderOrKey
 •	FileOrValue

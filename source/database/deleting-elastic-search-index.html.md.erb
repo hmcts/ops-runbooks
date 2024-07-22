@@ -181,7 +181,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 If the progress is taking too long check to see if the logstash pods are running on the CCD namespace for CFT AKS cluster and has not crashed with OOM and restarted.
 Check the pod status and logs.
 
-The limits applied above should prevent this from happening so not too many cases are beingn ingested at once.
+The limits applied above should prevent this from happening so not too many cases are being ingested at once.
 
 For example - ccd-logstash-logstash-0. This is an example where the logstash pod crashed due to OOM:
 

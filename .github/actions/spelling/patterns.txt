@@ -12,3 +12,7 @@ podName=[^\s\/]+
 .*.yaml
 ## Ignore internal links as page names might be concatenated words
 \(.*html\)
+## Ignore all storage account references
+\b[a-z0-9]+\.blob\.core\.windows\.net\b
+## Ignore image references
+!\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)

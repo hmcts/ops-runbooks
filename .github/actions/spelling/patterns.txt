@@ -14,6 +14,9 @@ podName=[^\s\/]+
 \(.*html\)
 ## Ignore all storage account references
 \b[a-z0-9]+\.blob\.core\.windows\.net\b
+## Ignore azurewebsite links
+\b[a-z0-9]+\.azurewebsites\.net\b
+azurewebsites.net
 ## Ignore image references
 !\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)
 <\s*img\s+[^>]*src\s*=\s*.*

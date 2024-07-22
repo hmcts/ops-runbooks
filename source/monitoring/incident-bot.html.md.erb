@@ -30,7 +30,7 @@ The slash command is passed to a response URL which has been exposed externally 
 
 This URL points to a kubernetes ingress resource on the cft-ptl AKS cluster which forwards to a service which forwards to a set of pods.
 
-Every slack app has an oauth token and a signing secret. These are used by Slack to generate a request signaure. When a request is made to the app via a slash command, the python application running in the kubernetes pod generates a signature using the same secrets and compares them.
+Every slack app has an oauth token and a signing secret. These are used by Slack to generate a request signature. When a request is made to the app via a slash command, the python application running in the kubernetes pod generates a signature using the same secrets and compares them.
 
 If the two signatures match, the request is allowed and the process continues. This is the authentication mechanism that ensures no third party can use the response API.
 

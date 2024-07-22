@@ -47,7 +47,7 @@ The following powershell will download everything from the connected file share,
 New-Item -Path "C:\AppAttach" -ItemType Directory
 Set-Location "C:\AppAttach"
 
-# Copy contents of file shre to local directory
+# Copy contents of file share to local directory
 # powershell scripts will need to be local in order to be ran
 # MSIX packages will need to be local in order to be mounted
 Get-ChildItem -Path "Z:\" -Recurse | Copy-Item -Destination "C:\AppAttach"

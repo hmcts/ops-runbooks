@@ -115,7 +115,7 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
 ```
 
-- Start port-forwading/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
+- Start port-forwarding/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
 
 ```bash
 ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod

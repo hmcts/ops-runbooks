@@ -16,3 +16,4 @@ podName=[^\s\/]+
 \b[a-z0-9]+\.blob\.core\.windows\.net\b
 ## Ignore image references
 !\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)
+<\s*img\s+[^>]*src\s*=\s*.*

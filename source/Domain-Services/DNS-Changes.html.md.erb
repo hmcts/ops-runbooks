@@ -7,19 +7,19 @@ weight: 10
 
 # <%= current_page.data.title %>
 
-This document describes how to add/remove/edit DNS for the Azure Active Directory Daomin Services environment. All records are managed through automation in this [Repo](https://github.com/hmcts/dtspo-aad-domain-services).
+This document describes how to add/remove/edit DNS for the Azure Active Directory Domain Services environment. All records are managed through automation in this [Repo](https://github.com/hmcts/dtspo-aad-domain-services).
 
 Rules should be adjusted by the project team on a self-service basis.
 
 ## Prerequisites
 
-* GitHub write access to [Azure Active Directory Daomin Services Repo](https://github.com/hmcts/dtspo-aad-domain-services)
+* GitHub write access to [Azure Active Directory Domain Services Repo](https://github.com/hmcts/dtspo-aad-domain-services)
 * Azure DevOps access to [Azure DevOps Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=416)
 
 ## Limitations 
 
 * At the time of writing this document, this automation does NOT support anything other than A records.
-* Azure Active Directory Daomin Services can only be deployed once within an Azure tenant. This means there is only a production environment. 
+* Azure Active Directory Domain Services can only be deployed once within an Azure tenant. This means there is only a production environment. 
 
 ## Process
 
@@ -28,7 +28,7 @@ See steps 1 to 7 for details on raising a PR.
 
 ## Self-Service Steps
 
-1. Clone [Azure Active Directory Daomin Services Repo](https://github.com/hmcts/dtspo-aad-domain-services) to your local machine.
+1. Clone [Azure Active Directory Domain Services Repo](https://github.com/hmcts/dtspo-aad-domain-services) to your local machine.
 ```bash
 git clone https://github.com/hmcts/dtspo-aad-domain-services
 ```

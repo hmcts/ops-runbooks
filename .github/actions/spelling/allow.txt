@@ -1,4 +1,5 @@
 
+
 AAD
 aad
 aat
@@ -344,6 +345,7 @@ mafr
 mailrelay
 makepfx
 mangan
+Mangans
 maxed
 maxsize
 mcol
@@ -475,7 +477,7 @@ pwpush
 QAs
 racc
 Rawstorne
-rb-inotify
+inotify
 rdbms
 rdo
 RDWEB

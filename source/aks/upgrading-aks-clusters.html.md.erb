@@ -131,7 +131,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 
-  - Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be seperate PR and then pipeline build
+  - Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be separate PR and then pipeline build
 
             1. Remove 00 Cluster IP
             2. Put back 00 Cluster IP after successful upgrade
@@ -210,7 +210,7 @@ We've seen quite a few failures with Windows node pools and attaching NICs to VM
 
 ### Old Chart being used
 
-On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on `pluto` that those CronJobs are using depricated kubernetes apis but the problem was that it has not got updated chart.
+On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on `pluto` that those CronJobs are using deprecated kubernetes apis but the problem was that it has not got updated chart.
 
 The only way we managed to fix and get updated chart for the CronJobs is by following [this blog post](https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b) by running helm uninstall and then removing the helm release.
 

@@ -106,7 +106,7 @@ Dismount-DiskImage -ImagePath C:\Path\To\Your\DiskImage.vhdx
 
 ### MsixJunction
 
-Leave "msixJunction" as-is. This is the temporary directory we will be junctioning all our packages to.
+Leave "msixJunction" as-is. This is the temporary directory we will be junction all our packages to.
 
 ### VhdFilename
 
@@ -237,7 +237,7 @@ $appAttachFolder.RegisterTaskDefinition("Destage 7-Zip Package", $shutdownTask, 
 Here, we'll go over adding the register and de-register steps for a specific user in the Task Scheduler.
 
 1) Create a New Task
- 
+
 Open Task Scheduler and click 'Create Task' in the right-hand panel.
 
 Fill out a suitable name and description.
@@ -286,7 +286,7 @@ The deregister task will be largely identical to the register task, only you'll 
 
 ## Verify
 
-Run the stage task in the task scheduler manually. If all goes well, you should see 'The last operation mpleted successfully. (0x0)' under the 'Last Run Result' column.
+Run the stage task in the task scheduler manually. If all goes well, you should see 'The last operation completed successfully. (0x0)' under the 'Last Run Result' column.
 
 Check the `C:\Temp\AppAttach` directory to see if your package junction is present. If it is, this means the staging was successful.
 

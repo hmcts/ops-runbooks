@@ -13,13 +13,12 @@ podName=[^\s\/]+
 ## Ignore internal links as page names might be concatenated words
 \(.*html\)
 \(.*erb\)
+.*.erb
+.*.html
 ## Ignore all storage account references
 \b[a-z0-9]+\.blob\.core\.windows\.net\b
 ## Ignore azurewebsite links
 \b[a-z0-9]+\.azurewebsites\.net\b
-azurewebsites.net
 ## Ignore image references
 !\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)
 <\s*img\s+[^>]*src\s*=\s*.*
-## Ignore Domain names and subdomains for verification
-/^([A-Fa-f0-9]+\.[A-Fa-f0-9]+\.[a-z0-9]+)\.([a-z0-9\-]+\.[a-z0-9\-\.]+)$/

@@ -20,3 +20,5 @@ azurewebsites.net
 ## Ignore image references
 !\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)
 <\s*img\s+[^>]*src\s*=\s*.*
+## Ignore Domain names and subdomains for verification
+/^([A-Fa-f0-9]+\.[A-Fa-f0-9]+\.[a-z0-9]+)\.([a-z0-9\-]+\.[a-z0-9\-\.]+)$/

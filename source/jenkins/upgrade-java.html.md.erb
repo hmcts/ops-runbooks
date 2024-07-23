@@ -1,0 +1,76 @@
+---
+title: Upgrade Java for Jenkins
+last_reviewed_on: 2024-07-15
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+It is always a good idea to test things in SBOX before doing them in PROD, upgrading Java for Jenkins is no exception.
+Upgrade the agents first and then the built in controller node.
+
+## Upgrade Jenkins agents
+
+1. Create a PR in the [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile)  with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
+2. Creating the PR should have automatically created a docker image with a pr- in it's name.
+3. Check the [container registry](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
+4. Alter the path to the java runtime to point to the upgraded java version for [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins-azure-vm-agent.yaml) or [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/sbox/jenkins-azure-vm-agent.yaml) if depending on what you are upgrading.
+5. After 10 - 15 minutes verify that the upgrade was successful by running [Plum tests](https://build.hmcts.net/job/HMCTS_a_to_c/job/cnp-plum-frontend/job/master/) or [Toffee tests](https://sds-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/) if you are upgrading SDS.
+
+#### Production
+
+Same steps as above but instead use the following for [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-azure-vm-agent.yaml) or [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-azure-vm-agent.yaml)
+
+#### Rollback
+Revert changes to [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-azure-vm-agent.yaml) and [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-azure-vm-agent.yaml)).
+Decrement the docker image version [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile).
+
+#### Notes
+
+Unless you are also changing the default java version running `java -version` on the nodes will not tell you accurate info. To confirm the upgrade has occured go under system information on Jenkins for one of the nodes.
+
+## Upgrade built in controller node
+
+To upgrade SDS SBOX do the following:
+
+1. If you have not already done so create a PR in the [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile) with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
+2. Creating the PR should have automatically created a docker image with a pr- in it's name.
+3. Check the [container registry](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
+4. Point the SDS flux config to use that new tag by updating [PTLSBOX](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-controller-version.yaml).
+5. Then verify that SDS Jenkins is working as expected by running [Toffee tests](https://sds-sandbox-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/).
+
+Do the same for CFT by running the Plum tests.
+If everything is working as expected, you can proceed with the PROD upgrade.
+
+## Upgrade PROD SDS Jenkins
+A change request should not be needed for this, but be vigilant of any issues by checking slack and monitoring the deployment.
+
+Firstly merge in the changes to the Docker image that you made earlier. Make note of the tag that is created when you merge it in by checking the build log.
+This alone won't upgrade the Java version as you will need to update the tag that is used. Upon merge, check the [container registry](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag. You should also be able to see it in the build log when you merge your changes.
+
+1. If you have not already done so create a PR in the [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile) with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
+2. Bump the Docker image tag for [PTLSBOX](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-controller-version.yaml)
+3. Bump the Docker image tag for [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml)
+4. Point the SDS flux config to use that new tag by updating [this]([PROD](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml))
+5. After 10 - 15 minutes verify that the upgrade was successful by running [Toffee tests](https://sds-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/).
+
+## Upgrade PROD CFT Jenkins
+Firstly merge in the changes to the Docker image that you made earlier. Make note of the tag that is created when you merge it in.
+
+1. If you have not already done so create a PR in the [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile) with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
+2. Bump the Docker image tag for [PTLSBOX](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-controller-version.yaml)
+3. Bump the Docker image tag for [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml)
+4. Point the CFT flux config to use that new tag by updating [this]([PROD](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml))
+5. After 10 - 15 minutes verify that the upgrade was successful by running [Plum tests](https://build.hmcts.net/job/HMCTS_a_to_c/job/cnp-plum-frontend/job/master/).
+
+#### Rollback
+Revert changes to [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) and [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml).
+Decrement the docker image version [CNP Jenkins repo](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile).
+
+#### Examples
+[SDS Agent node](https://github.com/hmcts/sds-flux-config/pull/5055/)
+[SDS Controller](https://github.com/hmcts/sds-flux-config/pull/5017)
+
+[CFT agent node](https://github.com/hmcts/cnp-flux-config/pull/33053/)
+[CFT Controller](https://github.com/hmcts/cnp-flux-config/pull/33082)

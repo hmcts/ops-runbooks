@@ -8,13 +8,13 @@ weight: 10
 # <%= current_page.data.title %>
 
 It is always a good idea to test things in SBOX before doing them in PROD, upgrading Java for Jenkins is no exception.
-Upgrade the agents first and then the built in controller node.
+Upgrade the agents first and then the built-in controller node.
 
 ## Upgrade SBOX Jenkins agents
 
 1. Create a PR in the [CNP Jenkins Docker](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile)  with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
 2. Creating the PR should have automatically created a docker image with a pr- in it's name.
-3. Check the [container registry](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
+3. Check [jenkins/jenkins repository](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
 4. To test the agents with the new java version alter the path to the java runtime to point to the upgraded java version for [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins-azure-vm-agent.yaml) or [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/sbox/jenkins-azure-vm-agent.yaml) if depending on what you are upgrading.
 5. Keep checking for new agents(this may take 15 minutes) and then look under system information to find out what runtime is being used. Verify the log of the new agents to see if they started correctly.
 6. After you can see new agents are running verify that the upgrade was successful by running [Plum tests](https://build.hmcts.net/job/HMCTS_a_to_c/job/cnp-plum-frontend/job/master/) or [Toffee tests](https://sds-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/) if you are upgrading SDS.
@@ -30,7 +30,7 @@ To upgrade SDS SBOX do the following:
 
 1. If you have not already done so create a PR in the [CNP Jenkins Docker](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile) with the Java version incremented. You can find updated Jenkins Base image tag from the [Jenkins dockerhub repo](https://hub.docker.com/r/jenkins/jenkins/tags).
 2. Creating the PR should have automatically created a docker image with a pr- in it's name.
-3. Check the [jenkins/jenkins container registry](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
+3. Check the [jenkins/jenkins repository](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag.
 4. Point the SDS flux config to use that new tag by updating [PTLSBOX](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-controller-version.yaml).
 5. Then verify that SDS Jenkins is working as expected by running [Toffee tests](https://sds-sandbox-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/).
 

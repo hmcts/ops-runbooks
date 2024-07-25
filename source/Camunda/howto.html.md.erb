@@ -102,7 +102,7 @@ Its possible to select only specific records in the list of results or by select
 
 ## Removing Historic Process and Decision Instances
 
-Removing historic process and decision instances will improve the performance of Camunda and prevent the database from becoming too large. Going forward, manual clearing should be less necessary as new process and decision instances will automatically have a TTL (Time to Live) value set. This TTL is 90 days for production environments and 30 days for all non-production environments.
+There are two types of instances that needs to be cleared out in Camunda, historic process instances and historic decision instances. Removing historic process and decision instances will improve the performance of Camunda and prevent the database from becoming too large. Going forward, manual clearing should be less necessary as new process and decision instances will automatically have a TTL (Time to Live) value set. This TTL is 90 days for production environments and 30 days for all non-production environments.
 
 However, TTL values have not been set for all existing instances, and only some teams have adopted the practice of setting TTLs. As a result, manual cleanups may still be required until all teams have updated existing instances and fully embraced the process.
 
@@ -119,7 +119,7 @@ Setting a records removal time will control when that record will be removed fro
 
 ### Process Instance
 
-To run a removal time operation on process instance you can:
+To run a removal time operation on process instances you can:
 
 - Log into Camunda and select the `Cockpit` option
 
@@ -133,16 +133,70 @@ To run a removal time operation on process instance you can:
 
     <img src="images/batchOperationOptions.png" style="width:300px;">
 
-- Select one of the `Set removal time to historic X` options that applies to your need.
+- Select `Set removal time to historic process instances`. Ensure you select all options as per the below screenshot. Double check that Absolute, Hierarchical and Query are selected.
 
-- Initially this will search the database for all historic records for your chosen option e.g. all completed process instances. You can reduce the time to return results by using search criteria.
+    <img src="images/processInstanceRemovalTime.png">
 
-- To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options such as start date, finish date, `incident status` and a host of `IDs` options.
+- Initially this will search the database for all historic records of process instances. You can reduce the time to return results by using search criteria.
 
-    <img src="images/searchCriteria.png" style="width:600px;">
+- To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options such as start date, finish date, `incident status` and a host of `IDs` options. For the purposes of cleanup, you can chose 'Finished Only' and 'Finish Date' with value set to before a particular date. If you are getting lot of results or if the results are taking a long time to load, simply set the finish date to an older date to reduce the number of results being returned.
+
+    <img src="images/processInstanceFilters.png">
+
+- You can also save your query as shown in the screenshot below for later use. However, this query is not available across different users as it is stored in the browser cache of the user.
+
+    <img src="images/saveQuery.png">
+
+- Ensure you have the right dates and filters applied and then select "Set removal time to historic process instances all Instances in Filter".
+
+- On the next screen select "Execute Operation" to proceed with setting the removal times.
+
+- Finally you can track progress of the operation by navigating to the menu and select `more` then `batches`
 
 ### Decision Instance
 
+To run a removal time operation on decision instances you can:
+
+- Log into Camunda and select the `Cockpit` option
+
+    <img src="images/cockpit.png" style="height:100px;">
+
+- Navigate to the menu and select `more` then `batch operation`
+
+    <img src="images/batchOperation.png" style="width:150px;">
+
+- On this page you will find a number of fields, selecting `operation` will show a dropdown of available options
+
+    <img src="images/batchOperationOptions.png" style="width:300px;">
+
+- Select `Set removal time to historic decision instances`. Ensure you select all options as per the below screenshot. Double check that Absolute and Query are selected and importantly Hierarchical is deselected. This differs slightly from the steps from process decisions. If you select Hierarchical the whole operation will run extremely slowly, so ensure it is not selected as it is selected by default.
+
+    <img src="images/decisionInstanceRemovalTime.png">
+
+- Initially this will search the database for all historic records of decision instances. You can reduce the time to return results by using search criteria.
+
+- To narrow down these results you can add search criteria. Clicking in the `add criteria` search box will show a list of available options. For the purposes of cleanup, you can chose 'Evaluation Date' with value set to before a particular date. Evaluation Date is the equivalent of Finished Date when it comes to decision instances. If you are getting lot of results or if the results are taking a long time to load, simply set the evaluation date to an older date to reduce the number of results being returned.
+
+    <img src="images/decisionInstanceFilters.png">
+
+- You can also save your query as shown in the screenshot below for later use. However, this query is not available across different users as it is stored in the browser cache of the user.
+
+    <img src="images/saveQuery.png">
+
+- Ensure you have the right dates and filters applied and then select "Set removal time to historic decision instances all Instances in Filter".
+
+- On the next screen select "Execute Operation" to proceed with setting the removal times.
+
+- Finally you can track progress of the operation by navigating to the menu and select `more` then `batches`
+
+### Cleanup Job
+
+Once the removal times are set, you can confirm this by checking the batches to see if the set removal time jobs have completed. Now you can either wait for the next schedule clean up to complete or you can manually run the cleanup job by navigating to the menu and selecting `more` then `cleanup`. Click on cleanup to trigger the job. Once the cleanup is complete which may take a while depending on the number of instances to clean up, you can run the same queries as before from the batch operation menu. If the cleanup job has completed correctly, the queries should return empty results.
+
 ## Delete the Process or Decision Instance
 
-<img src="images/processInstanceRemovalTime.png">
+Instead of setting a removal time and waiting for cleanup jobs, you can directly delete a historic process or decision instance. However, this approach is riskier because there is no option to revert in the event of an incorrect execution. This direct deletion is a single operation on the database, whereas the other option (Setting Removal Times) involves first updating and then deleting the instance.
+
+- Running a Delete operation is pretty similar to running a Set Removal Time operation, except you should select "Delete finished process instances" or "Delete decision instances"
+
+    <img src="images/deleteOperations.png">

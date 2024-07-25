@@ -86,7 +86,7 @@ If you know the name of the definition you can search for it via the Camunda Coc
 
 <img src="images/processInstances.png" style="height:300px;">
 
-Once you've found it you can select the process to see more details about it including a list of process instances for this specific process definition.
+Once you have found it, you can select the process to see more details about it including a list of process instances for this specific process definition.
 
 Within the definition page there is a `delete running instances` option
 
@@ -100,13 +100,26 @@ Enter a reason for the deletion e.g. the Jira ticket number and then use the sea
 
 Its possible to select only specific records in the list of results or by selecting `Query` it will select all records found, **ALL** records means across all pages shown now just the current page, remember these are SQL queries in the background!
 
-## Update removal time on a record
+## Removing Historic Process and Decision Instances
+
+Removing historic process and decision instances will improve the performance of Camunda and prevent the database from becoming too large. Going forward, manual clearing should be less necessary as new process and decision instances will automatically have a TTL (Time to Live) value set. This TTL is 90 days for production environments and 30 days for all non-production environments.
+
+However, TTL values have not been set for all existing instances, and only some teams have adopted the practice of setting TTLs. As a result, manual cleanups may still be required until all teams have updated existing instances and fully embraced the process.
+
+There are two ways to remove historic process and decision instances:
+
+- Set removal time on process or decision instance (preferable)
+- Delete the process or decision instance
+
+## Set Removal Time on a Process or Decision Instance
 
 Camunda removal time updates are a batch operation that can be carried out via the Camunda Cockpit UI.
 
-Updating a records removal time will control when that record will be removed from the Camunda database by the nightly Camunda clean up task.
+Setting a records removal time will control when that record will be removed from the Camunda database by the Camunda clean up task.
 
-To run a removal time operation you can:
+### Process Instance
+
+To run a removal time operation on process instance you can:
 
 - Log into Camunda and select the `Cockpit` option
 
@@ -128,11 +141,8 @@ To run a removal time operation you can:
 
     <img src="images/searchCriteria.png" style="width:600px;">
 
-- For set removal time batch operations there are a number of additional options provided:
+### Decision Instance
 
-    - **Cleared** - removes the removal time of the select records, there should be no reason to use this.
-    - **Calculated** - Uses either the Time To Live of the definition that created this record OR the system default of 30 days where no TTL is available. The value is calculated by Camunda an will likely be in the future by at least 30 days.
-    - **Absolute** - An absolute date chosen by the user to set for each record selected, a calendar input appears for this option and it can be set to any date past or present. Past simply means the record will be removed during the next clean up task.
-    - **Hierarchical** - Sets the removal time across all instances of the hierarchy
-    - **Update in chunks** - Will stream the changes slowly to ensure the database is not overloaded. It is very advisable to use this option.
-    - **Chunk Size** - this option will appear when `Update in chunks` is select and should be set to a reasonable number to maintain normal functionality of the service but still achieve the desired outcome.
+## Delete the Process or Decision Instance
+
+<img src="images/processInstanceRemovalTime.png">

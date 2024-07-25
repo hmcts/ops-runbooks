@@ -124,16 +124,15 @@ The application components are deployed to AKS via [Flux](https://github.com/hmc
 
 Whilst the deployments are architecturally the same they differ in configuration. UI is similar across all environments but API has custom configuration specifically for Production and Demo which are the ones like to see the most end user traffic.
 
-For Demo and Production we have setup controlled clean up configuration.
-The application has default values for these built in however due to the nature of Production these defaults have been overridden.
+For all non-production environments, we have set up controlled cleanup configuration via [Flux](https://github.com/hmcts/cnp-flux-config/tree/master/apps/camunda/camunda-api). It is important to note that regarding the cleanup start and end times, any configuration specified via Flux is an additional schedule, not an override. A default schedule is already specified in the source files [here](https://github.com/hmcts/camunda-bpm/blob/master/src/main/resources/application.yaml). An additional schedule, like the one below, has been configured for non-production environments since these environments are usually offline or shut down outside of working hours, which is when the default schedule runs for production.
 
 ```YAML
   CAMUNDA_BATCH_HISTORY_TTL: "P30D"
   CAMUNDA_BATCH_OPERATIONS: "P30D"
   CAMUNDA_HISTORY_TTL: "P30D"
   CAMUNDA_HISTORY_JOBLOG__TTL: "P30D"
-  CAMUNDA_HISTORY_CLEANUP_START_TIME: "00:30+0100"
-  CAMUNDA_HISTORY_CLEANUP_END_TIME: "06:00+0100"
+  CAMUNDA_HISTORY_CLEANUP_START_TIME: "12:00+0100"
+  CAMUNDA_HISTORY_CLEANUP_END_TIME: "14:00+0100"
   CAMUNDA_HISTORY_CLEANUP_STRATEGY: "removalTimeBased"
   CAMUNDA_PARALLELISM: 1
 ```

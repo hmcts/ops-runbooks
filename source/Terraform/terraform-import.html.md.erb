@@ -21,7 +21,7 @@ This message can pop up for several reasons - most often it is because the resou
 
 ## The `import` Block
 
-Terraform 1.5.0 introduces the [import block](https://developer.hashicorp.com/terraform/language/import). This is a line of code that can be inserted into your terraform code to specify an externally managed resource that is to be brought into the terraform state. This is not to be confused with `terraform import`, the command-line argument that performs the same operation. Compared to `terraform import`, an `import` block is easier and safer to execute, as it integrates seemlessly into existing `terraform apply` stages in your pipeline and does not require manual tinkering with the state file.
+Terraform 1.5.0 introduces the [import block](https://developer.hashicorp.com/terraform/language/import). This is a line of code that can be inserted into your terraform code to specify an externally managed resource that is to be brought into the terraform state. This is not to be confused with `terraform import`, the command-line argument that performs the same operation. Compared to `terraform import`, an `import` block is easier and safer to execute, as it integrates seamlessly into existing `terraform apply` stages in your pipeline and does not require manual tinkering with the state file.
 
 After applying the import, the import block can be safely removed from your code. Attempting to import a resource into the same address again is a harmless no-op and should not affect your configuration.
 
@@ -31,7 +31,7 @@ An import block can be inserted anywhere into your terraform code. You will need
 
 #### Resource ID
 
- The resource ID is the unique identifier of the resource in Azure. It's also part of the URL used to visit the ID in the azure portal. Some pipelines censor the subscription ID of the resource in the error message. You will need to know the full resource ID in order to import the resource. The subscription ID of the resource can more often than not be interpolated using terraform variables as will be shown in the example comfiguration later on.
+ The resource ID is the unique identifier of the resource in Azure. It's also part of the URL used to visit the ID in the azure portal. Some pipelines censor the subscription ID of the resource in the error message. You will need to know the full resource ID in order to import the resource. The subscription ID of the resource can more often than not be interpolated using terraform variables as will be shown in the example configuration later on.
  
  Resource IDs will always take the following form:
 
@@ -41,7 +41,7 @@ An import block can be inserted anywhere into your terraform code. You will need
 
  #### Resource Address
 
- The resource address is the internal identifier terraform uses to reference the resource in code. What this will look like will depend entirely on your configuration and where the error is occuring. If the error is occuring in a module (as it often does) the resource address may be significantly longer than the example below.
+ The resource address is the internal identifier terraform uses to reference the resource in code. What this will look like will depend entirely on your configuration and where the error is occurring. If the error is occurring in a module (as it often does) the resource address may be significantly longer than the example below.
 
  ```
  azurerm_example_resource.my_resource
@@ -49,7 +49,7 @@ An import block can be inserted anywhere into your terraform code. You will need
 
  #### Environment Filtering
 
-Your error will be occuring in a specific subscription in a specific environment. As most pipelines throughout HMCTS are multi-environment, it will be necessary to restrict the `import` block to the specific environment where the error is occuring. Failure to do this will mean that the pipeline will import the wrong resources when running in other environments.
+Your error will be occurring in a specific subscription in a specific environment. As most pipelines throughout HMCTS are multi-environment, it will be necessary to restrict the `import` block to the specific environment where the error is occurring. Failure to do this will mean that the pipeline will import the wrong resources when running in other environments.
 
  #### Import Multiple Resources
 

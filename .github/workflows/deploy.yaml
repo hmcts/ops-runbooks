@@ -1,90 +1,49 @@
-name: Static site build and publish
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
 
 on:
-  pull_request:
-    branches:
-      - master
+  # Runs on pushes targeting the default branch
   push:
-    branches:
-      - master
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  spellcheck:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    name: Check spelling
     steps:
-      - name: Spell-Check
-        uses: check-spelling/check-spelling@v0.0.22
-        with:
-          checkout: true
-          extra_dictionaries:
-            cspell:npm/dict/npm.txt
-            cspell:fullstack/dict/fullstack.txt
-            cspell:php/dict/php.txt
-            cspell:k8s/dict/k8s.txt
-            cspell:html/dict/html.txt
-            cspell:typescript/dict/typescript.txt
-            cspell:golang/dict/go.txt
-            cspell:dotnet/dict/dotnet.txt
-            cspell:mnemonics/src/mnemonics.txt
-            cspell:rust/dict/rust.txt
-            cspell:clojure/src/clojure.txt
-            cspell:monkeyc/src/monkeyc_keywords.txt
-            cspell:cryptocurrencies/cryptocurrencies.txt
-            cspell:scala/dict/scala.txt
-            cspell:ruby/dict/ruby.txt
-            cspell:lua/dict/lua.txt
-            cspell:css/dict/css.txt
-            cspell:r/src/r.txt
-            cspell:html-symbol-entities/entities.txt
-            cspell:java/src/java.txt
-            cspell:software-terms/dict/softwareTerms.txt
-            cspell:python/src/python/python-lib.txt
-            cspell:node/dict/node.txt
-            cspell:aws/aws.txt
-            cspell:python/src/common/extra.txt
-  build:
-    runs-on: ubuntu-latest
-    name: 'Build and Test'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1.1
           architecture: 'x64'
           bundler-cache: true
-      - name: Build
-        run: bundle exec middleman build
-      - name: 'Check for broken links'
-        run: bundle exec rake check_urls
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    name: 'Publish Site'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Build site
+        run: bundle exec rake build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          ruby-version: 3.1.1
-          architecture: 'x64'
-          bundler-cache: true
-      - name: Publish
-        run: |
-          rm -rf build
-          git status
-          git diff
-          git config --global user.email "PlatformTeam@HMCTS.NET"
-          git config --global user.name "Platform Team"
-          git remote set-url origin https://nobody:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          bundle exec rake publish
-        if: github.ref == 'refs/heads/master'
-
-
+          path: 'build/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

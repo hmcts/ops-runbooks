@@ -1,9 +1,6 @@
 require 'middleman-gh-pages'
 require 'html-proofer'
 
-ENV["COMMIT_MESSAGE_SUFFIX"] = "[skip ci]"
-ENV["BRANCH_NAME"] = "ghpages"
-
 task :check_urls do
     proofer = HTMLProofer.check_directory("./build",
         {

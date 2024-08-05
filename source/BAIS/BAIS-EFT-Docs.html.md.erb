@@ -7,7 +7,7 @@ weight: 5
 
 # <%= current_page.data.title %>
 
-## Globalscape Deployment Details
+## Globalscale Deployment Details
 
 The BAIS EFT Globalscape instance is deployed in STG and Prod across several virtual machines.
 In each environment, there are two DMZ machines that act as a gateway and two EFT machines that host the EFT application itself.
@@ -16,10 +16,10 @@ In each environment, there are two DMZ machines that act as a gateway and two EF
 
 | Machine | Environment | EFT Version | License start date | Licence end date | 
 |-|-|-|-|-|
-| eftbais01_prod | Prod | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
-| eftbais02_prod | Prod | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
-| eftbais01_stg | Staging | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
-| eftbais02_stg | Staging | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
+| `eftbais01_prod` | Prod | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
+| `eftbais02_prod` | Prod | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
+| `eftbais01_stg` | Staging | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
+| `eftbais02_stg` | Staging | 8.0.4.27 | 01-APR-2024 | 31-MAR-2025 |
 
 The following additional modules are installed on all EFT instances:
 
@@ -31,13 +31,18 @@ The following additional modules are installed on all EFT instances:
 
 ## Deployed Event Rules
 
-Currently, PlatOps maintain a set of event rules for Probate in Production.
-The event rules pull files from `probate-aat` and `probate-prod` containers on the `green` storage account. The prod rules then upload the rules to IronMountain.
+Currently, PlatOps maintain a set of event rules for Probate in Production and AAT.
+These rules reside in the PlatOps-Hub directory on `eftbais01_prod` and `eftbais02_prod` (the AAT rules also reside on the Prod machines).
+The event rules pull files from `probate-aat` and `probate-prod` containers on the `green` storage account in `rdo-hub-sftp-prod`.
+The prod rules then upload the rules to IronMountain via SFTP and the AAT rules simply keep the files on disk and delete them after a week.
+
+A currently unknown problem with EFT causes the event rules to fail to pull certain files from the storage account when running on both EFT nodes.
+To get around this, the prod rules are currently set to run on `eftbais01_prod` only. CGI have an open support ticket with Pro2Col to investigate the issue.
+More details in [this jira ticket](https://tools.hmcts.net/jira/browse/DTSPO-16891).
 
 ## Pro2Col Contact
 
 For queries or technical support about EFT itself, our contact with Pro2Col is [Iain Spooner](mailto:iain.spooner@pro2colgroup.com)
-
 
 Technical support tickets can also be opened with [Pro2Col](mailto:support@pro2colgroup.com) directly available Mon-Fri 09:00–17:30 GMT/BST (Excluding bank holidays)
 

@@ -1,0 +1,29 @@
+---
+title: F5 Client Troubleshooting
+last_reviewed_on: 2024-08-06
+review_in: 6 months
+weight: 15
+---
+
+# <%= current_page.data.title %>
+
+## Windows 
+
+While it is possible to install the F5 client software on Windows computers, local administrator permissions are required to complete the process.
+Problems with DNS name resolution will be encountered by non-admin users.
+https://my.f5.com/manage/s/article/K32311645#link_01_01
+
+
+## MacOS
+
+Users have reported problems when using the F5 VPN if other VPNs are also installed. Such as MoJs Global Protect VPN. Turning off the unrequired VPN, will resolve the issue.
+By opening a terminal on the mac and using the command 'scutil --dns' the local DNS configuration can be seen.
+
+## DNS Resolvers
+
+Split tunnel is used by the HMCTS F5 VPN, with IPv4 Primary (10.11.75.4) and Secondary (168.63.129.19) name servers, assigned as part of the netacl_mojvpn configuration.
+
+F5 Admin Portal >> Access  ››  Connectivity / VPN : Network Access (VPN) : Network Access Lists  ››  netacl_mojvpn
+
+10.11.75.4 is the Azure DNS private resolver 'private-dns-resolver-uksouth-prod-int'.  Before Azure private DNS zones or DNS zones are visible to clients, the zones vNET must be linked to mgmt-vpn-2-vnet in Azure portal.
+

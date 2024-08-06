@@ -659,3 +659,4 @@ privatelink
 azuresynapse
 dfs
 vaultcore
+svcs

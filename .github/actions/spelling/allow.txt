@@ -655,3 +655,8 @@ yml
 zalando
 zeitwerk
 Zubair
+privatelink
+azuresynapse
+dfs
+vaultcore
+svcs

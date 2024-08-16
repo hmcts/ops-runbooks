@@ -1,3 +1,7 @@
+Bance
 cdef
+Enda
+Qube
 toset
 TTLs
+wiriting

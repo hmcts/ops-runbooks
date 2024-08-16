@@ -4,4 +4,3 @@ Enda
 Qube
 toset
 TTLs
-wiriting

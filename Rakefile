@@ -13,7 +13,7 @@ task :check_urls do
                 # App health should not affect runbook PRs
                 %r{.*.platform.hmcts.net},
                 # These return 405s in a browser, which is expected
-                %r{*/sonarqube-webhook/},
+                %r{.*.hmcts.net/sonarqube-webhook/},
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
                 %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html},
                 # This handles new files that haven't been merged to master branch yet for this repo in a PR

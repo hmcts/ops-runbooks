@@ -1,0 +1,88 @@
+---
+title: Hub Palos NAT Considerations
+last_reviewed_on: 2024-08-30
+review_in: 12 months
+weight: 160
+---
+# <%= current_page.data.title %>
+
+## Assumptions
+This documentation does not explain some key technologies/concepts that it references, we recommend having some knowledge around the following topics:
+- Network Address Translation
+- Firewall High-Availability / Network "State" / Translation Tables
+- Routing
+
+## Why would we need NATs in the first place?
+
+Unfortunately alot of the address space we use in HMCTS Azure overlaps with networks that are part of the MoJ WAN. There are a few exceptions to this where the MoJ have isued IP ranges to use for use;
+- Heritage (10.24.240.0/20 & 10.24.240.0/20)
+- BAIS (10.224.240.0/20 & 10.225.240.0/20)
+
+Some key areas where we have overlap is with SDS, several of the SDS virtual networks clash with some MoJ Sites (SDS STG clashes with Probate for example).
+
+NATs are a way to get around IP address overlap.
+
+## What was implemented?
+
+Source NATs were put in place for traffic egressing from the SDS AKS Clusters and Destination NATs put in place for the Application Gateway front end IP addresses in front of the AKS clusters.
+
+The native ranges and the respective NATs put in place can be found below:
+
+| Environment | Ingress/Egress | New Range      | Native Range(s)                |
+|-------------|----------------|----------------|--------------------------------|
+| Dev         | Ingress        | 10.25.32.0/27  | 10.145.32.128/25               |
+| Test        | Ingress        | 10.25.32.32/27 | 10.141.32.128/25               |
+| ITHC        | Ingress        | 10.25.32.64/27 | 10.143.32.128/25               |
+| Demo        | Ingress        | 10.25.32.96/27 | 10.51.96.128/25                |
+| Staging     | Ingress        | 10.24.32.0/27  | 10.148.32.128/25               |
+| Production  | Ingress        | 10.24.32.32/27 | 10.144.32.128/25               |
+| Dev         | Egress         | 10.25.33.0/27  | 10.145.0.0/20 & 10.145.16.0/20 |
+| Test        | Egress         | 10.25.33.32/27 | 10.141.0.0/20 & 10.141.16.0/20 |
+| ITHC        | Egress         | 10.25.33.64/27 | 10.143.0.0/20 & 10.143.16.0/20 |
+| Demo        | Egress         | 10.25.33.96/27 | 10.51.64.0/20 & 10.51.80.0/20  |
+| Staging     | Egress         | 10.24.33.0/27  | 10.148.0.0/20 & 10.148.16.0/20 |
+| Production  | Egress         | 10.24.33.32/27 | 10.144.0.0/20 & 10.144.16.0/20 |
+
+The NAT rules were implemented on our Hub Palo Alto Firewalls, the specifics can be found in `nat-policy-rules/04-policy-rules-prod.tf` & `nat-policy-rules/03-policy-rules-nonprod.tf` in `hub-panorama-terraform`
+
+## Whats the problem?
+
+Our Hub Palo Altos run in an active-active setup, but do not implement a traditional HA firewall configuration. You can think of our currently active-active setup as two firewalls that no nothing about the other, with configuration syncd between the two.
+
+This works with no issue for stateless network traffic, but unfortunately for NATs the same firewall that did the original translation needs to process the return trafifc, or the session state/XLATES tables need to be shared between firewall instances.
+
+For example, if firewall 1 processed outbound traffic from SDS and performs a Source NAT, but firewall 2 recevied the response traffic. Firewall two has no knowledge of the NAT performed by Firewall 1 and drops the traffic.
+
+## Current work around
+
+The current work around is to modify the SDS route tables and the routes in the VWAN to "pin" traffic that is NATted to a single firewall, rather than send it via the Load Balancer.
+
+This unfortunately leaves us with a single point of failure in the network path, and introduces additional overhead in planned downtime.
+
+## Potential Solutions
+
+### Move the NATs to Cloud Gateway
+
+All traffic that needs to be translated will traverse Cloud Gateway, a "simple" fix would be to move the NAT rules up one layer to Cloud Gateway, where the NATs can be applied whilst retaining High-Availability.
+
+As part of this we would want to re-do the routes for the SDS ranges in our VWAN so that they traverse the trusted interface of the Hub Palo Altos, and remove the existing NAT rules. Requesting CloudGateway implement similar rules via the Service Request.
+
+### Re-IP SDS VNets
+
+If the MoJ are able to issue us 4 /18 CIDR ranges we could remove the requirement for NATs entirely. As the SDS platform is all IaC a re-ip could be completely relatively easily. The assigned IP address ranges could then be re-used when we implement the Platform Consolitation work.
+
+### Switch to an active-passive setup for our Hub Palo Altos
+
+Palo Alto support active-passive HA configuration in Azure and this would involve session/state sharing. Unfortunately this comes with some significant downsides:
+- Increased failover time - unknown how quickly the passive becomes active if the active were to fall over.
+- Increased cost - as all traffic will flow through a single VM and currently the VMs peak at ~80% utilisation during key business hours, the size of the VM would need to be bolstered signficantly. 
+- Paying for a "hot-spare" - we have to have an identical VM act as the passive, whilst not actively serving traffic, effectively a hot spare. This increases cost further.
+- Reduced scaling options - currently we have the option of adding additional firewall instances, we could do this with an active-passive setup, the only scale option would be to increase the size of the VMs.
+
+More info: https://docs.paloaltonetworks.com/vm-series/11-0/vm-series-deployment/set-up-the-vm-series-firewall-on-azure/configure-activepassive-ha-for-vm-series-firewall-on-azure
+
+### Switch Firewall provider
+
+Fortinet Fortigates support active-active HA in Azure which appears to include session/state. This would be a signficant amount of work, and has the potential to be very dissruptive.
+
+More info: https://docs.fortinet.com/document/fortigate-public-cloud/7.0.0/azure-administration-guide/983245/ha-for-fortigate-vm-on-azure

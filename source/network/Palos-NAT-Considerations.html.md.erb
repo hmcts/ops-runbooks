@@ -47,7 +47,7 @@ The NAT rules were implemented on our Hub Palo Alto Firewalls, the specifics can
 
 ## Whats the problem?
 
-Our Hub Palo Altos run in an active-active setup, but do not implement a traditional HA firewall configuration. You can think of our currently active-active setup as two firewalls that no nothing about the other, with configuration syncd between the two.
+Our Hub Palo Altos run in an active-active setup, but do not implement a traditional HA firewall configuration. You can think of our currently active-active setup as two firewalls that no nothing about the other, with configuration synchronised between the two.
 
 This works with no issue for stateless network traffic, but unfortunately for NATs the same firewall that did the original translation needs to process the return traffic, or the session state/XLATES tables need to be shared between firewall instances.
 

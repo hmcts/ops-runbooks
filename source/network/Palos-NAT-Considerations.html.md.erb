@@ -14,7 +14,7 @@ This documentation does not explain some key technologies/concepts that it refer
 
 ## Why would we need NATs in the first place?
 
-Unfortunately alot of the address space we use in HMCTS Azure overlaps with networks that are part of the MoJ WAN. There are a few exceptions to this where the MoJ have isued IP ranges to use for use;
+Unfortunately a lot of the address space we use in HMCTS Azure overlaps with networks that are part of the MoJ WAN. There are a few exceptions to this where the MoJ have issued IP ranges to use for use;
 - Heritage (10.24.240.0/20 & 10.24.240.0/20)
 - BAIS (10.224.240.0/20 & 10.225.240.0/20)
 
@@ -49,9 +49,9 @@ The NAT rules were implemented on our Hub Palo Alto Firewalls, the specifics can
 
 Our Hub Palo Altos run in an active-active setup, but do not implement a traditional HA firewall configuration. You can think of our currently active-active setup as two firewalls that no nothing about the other, with configuration syncd between the two.
 
-This works with no issue for stateless network traffic, but unfortunately for NATs the same firewall that did the original translation needs to process the return trafifc, or the session state/XLATES tables need to be shared between firewall instances.
+This works with no issue for stateless network traffic, but unfortunately for NATs the same firewall that did the original translation needs to process the return traffic, or the session state/XLATES tables need to be shared between firewall instances.
 
-For example, if firewall 1 processed outbound traffic from SDS and performs a Source NAT, but firewall 2 recevied the response traffic. Firewall two has no knowledge of the NAT performed by Firewall 1 and drops the traffic.
+For example, if firewall 1 processed outbound traffic from SDS and performs a Source NAT, but firewall 2 received the response traffic. Firewall two has no knowledge of the NAT performed by Firewall 1 and drops the traffic.
 
 ## Current work around
 
@@ -69,11 +69,11 @@ As part of this we would want to re-do the routes for the SDS ranges in our VWAN
 
 ### Re-IP SDS VNets
 
-If the MoJ are able to issue us 4 /18 CIDR ranges we could remove the requirement for NATs entirely. As the SDS platform is all IaC a re-ip could be completely relatively easily. The assigned IP address ranges could then be re-used when we implement the Platform Consolitation work.
+If the MoJ are able to issue us 4 /18 CIDR ranges we could remove the requirement for NATs entirely. As the SDS platform is all IaC a re-ip could be completely relatively easily. The assigned IP address ranges could then be re-used when we implement the Platform Consolidation work.
 
 ### Switch to an active-passive setup for our Hub Palo Altos
 
-Palo Alto support active-passive HA configuration in Azure and this would involve session/state sharing. Unfortunately this comes with some significant downsides:
+Palo Alto support active-passive HA configuration in Azure and this would involve session/state sharing. Unfortunately this comes with some significant considerations:
 - Increased failover time - unknown how quickly the passive becomes active if the active were to fall over.
 - Increased cost - as all traffic will flow through a single VM and currently the VMs peak at ~80% utilisation during key business hours, the size of the VM would need to be bolstered signficantly. 
 - Paying for a "hot-spare" - we have to have an identical VM act as the passive, whilst not actively serving traffic, effectively a hot spare. This increases cost further.
@@ -83,6 +83,6 @@ More info: https://docs.paloaltonetworks.com/vm-series/11-0/vm-series-deployment
 
 ### Switch Firewall provider
 
-Fortinet Fortigates support active-active HA in Azure which appears to include session/state. This would be a signficant amount of work, and has the potential to be very dissruptive.
+Fortinet Fortigates support active-active HA in Azure which appears to include session/state. This would be a signficant amount of work, and has the potential to be very disruptive.
 
 More info: https://docs.fortinet.com/document/fortigate-public-cloud/7.0.0/azure-administration-guide/983245/ha-for-fortigate-vm-on-azure

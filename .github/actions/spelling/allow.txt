@@ -660,3 +660,10 @@ azuresynapse
 dfs
 vaultcore
 svcs
+XLATES
+VWAN
+VNets
+Tted
+Fortigates
+Fortinet
+synchronised

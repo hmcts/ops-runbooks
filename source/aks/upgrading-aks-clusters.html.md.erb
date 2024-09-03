@@ -153,9 +153,7 @@ Subsequently, please verify the status of [Jenkins instances] for CFT (https://b
 
 We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place upgrade on the current live cluster. This means we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the [Rebuilding AKS Clusters guide](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#environment-specific).
 
-- Update Ptlsbox Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
-
-  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
+- Once in-place upgeaded has been completed, edit the code to reflect the new version. 
 
 - Update AAT Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
 

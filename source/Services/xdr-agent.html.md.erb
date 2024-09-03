@@ -80,7 +80,7 @@ az vm run-command invoke  --command-id RemoveRunCommandWindowsExtension --name <
 
 Also, the actual downloaded script should be located in the `C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\1.1.18\Downloads` folder, you should also able to re-run this script on VM as admin user to find problems.
 
-### Uninstall
+## Uninstall
 
 In order to uninstall XDR agent from Windows, we have to first disable the Cortex XDR agent security protection.  This can be done using `cytool` command line which got installed part of the cortex installation.
 
@@ -89,6 +89,7 @@ Please go to `C:\Program Files\Palo Alto Networks\Traps` and run the command pro
 Please note that running above command will ask for Supervisor password, we have to ask this password to MOJ Engineers as we do not keep hold of it.
 
 After successfully disabling securtiy protection, simply open `Control Panel` -> `Program and Features` -> 'Uninstall Program'  and then uninstall `Cortex Agent`
+
 
 ## Linux
 
@@ -156,6 +157,30 @@ You can find the output of the script in this location here, hopefully this outp
 There is also some log available here but not very useful
 
 `/var/log/azure/run-command/`
+
+## Uninstall
+
+To uninstall the XDR agent from a Red Hat Linux machine we will perform the following
+
+Verify agent is installed
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+If installed, run the rpm erase command
+```bash
+rpm -e cortex-agent
+```
+
+If this fails to work, you may need to specifiy the full version (this will have been output from the first command).
+
+For example
+```bash
+rpm —e cortex-agent-8.5.0.125392-1.x86_64
+```
+
+This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)
+
 
 ### XDR Collector
 

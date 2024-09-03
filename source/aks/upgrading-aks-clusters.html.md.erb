@@ -51,6 +51,13 @@ If there are deprecations, create a plan to address them before upgrading any cl
 
 If there are no apiVersions being deprecated, then you can proceed with the upgrade, going through the environments above in order.
 
+## Patch Version
+
+Don’t worry about patch versions. As long as the clusters are on the same minor version, it should be fine. For example, if one cluster is on version 1.30.2 and another is on 1.30.0, this is acceptable as both are on the 1.30 minor version.
+
+For more information, refer to the [Azure Kubernetes Service (AKS) supported Kubernetes versions](https://learn.microsoft.com/en-us/azure/aks/supported-kubernetes-versions?tabs=azure-cli#alias-minor-version).
+
+
 ## Notify teams
 
 Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for announcements rather than notification).
@@ -76,7 +83,8 @@ Three files will be saved in the directory from which you are running the above 
 - Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. 
 
 ```command
-kubectl get helm --all-namespaces / kubectl get pods --all-namespaces
+kubectl get pods --all-namespaces
+kubectl get hr --all-namespaces
 ```
 
 - Check if these pods have pod disruption budgets 
@@ -108,13 +116,15 @@ helm history <chart name> -n <namespace>
 - To roll back helm chart to a prior version or specific version
 
 ```command
-helm rollback <chart name> -n <namespace> / helm rollback <chart name> <version number> -n <namespace>
+helm rollback <chart name> -n <namespace> 
+helm rollback <chart name> <version number> -n <namespace>
 ```
 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
 
 ```command
-helm rollback <chart name> -n <namespace> / helm rollback <chart name>  <version number> -n <namespace>
+helm rollback <chart name> -n <namespace> 
+helm rollback <chart name>  <version number> -n <namespace>
 ```
 
 - For pods where images beginning with pr- are not found this is often due to the image no longer existing in the ACR. In these, instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this [one](https://github.com/hmcts/cnp-flux-config/pull/17115/files) done previously.

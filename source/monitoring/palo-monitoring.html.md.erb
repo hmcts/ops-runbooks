@@ -1,0 +1,41 @@
+---
+title: Dynatrace & Palo Alerting 
+weight: 100
+last_reviewed_on: 2024-9-8
+review_in: 3 months
+---
+# <%= current_page.data.title %>
+
+The Palo Firewalls required enhanced monitoring and alerting to help manage issues pro-actively for the Platfrom Operations Team.
+
+Palo Alto virtual machines generate logs both system and network that is stored in Panorama/Splunk.
+
+### Dynatrace Alerts
+We have the below configured in IAC infrastructure in hub-panorama-terraform repo[here](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
+
+- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf)
+- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf)
+- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf)
+- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf)
+- [Palo Alto VM CPU MGMT - SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf)
+- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf)
+- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf)
+- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf)
+- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf)
+
+
+
+
+### Update Process
+
+The Panorama's need to updated in the above order under current estate.
+
+TO Do
+test area
+explain how threshold
+explain metric key
+link to alerts
+provide examples to use
+
+Profiles
+slack intergration

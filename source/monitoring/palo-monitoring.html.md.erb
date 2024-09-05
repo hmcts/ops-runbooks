@@ -6,7 +6,7 @@ review_in: 3 months
 ---
 # <%= current_page.data.title %>
 
-The Palo Firewalls required enhanced monitoring and alerting to help manage issues pro-actively for the Platfrom Operations Team.
+The Palo Firewalls required enhanced monitoring and alerting to help manage issues pro-actively for the Platform Operations Team.
 
 Palo Alto virtual machines generate logs both system and network that is stored in Panorama/Splunk.
 
@@ -23,7 +23,10 @@ We have the below configured in IAC infrastructure in hub-panorama-terraform rep
 - [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf)
 - [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf)
 
-
+### Manual Alert Testing
+The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dahsboard you're on) prior to being committed to IAC.
+They can be found under Manage -> settings -> Anomaly detection -> Metric events, within the filter type palo to see prior examples. 
+Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics added and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
 
 
 ### Update Process

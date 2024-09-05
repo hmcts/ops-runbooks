@@ -27,18 +27,17 @@ We have the below configured in IAC infrastructure in hub-panorama-terraform rep
 The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dahsboard you're on) prior to being committed to IAC.
 They can be found under Manage -> settings -> Anomaly detection -> Metric events, within the filter type palo to see prior examples. 
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics added and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
-
+You need to set the threshold above or below the expected, ie CPU below 90% to trigger a problem. 
 
 ### Update Process
 
-The Panorama's need to updated in the above order under current estate.
 
-TO Do
-test area
-explain how threshold
-explain metric key
-link to alerts
-provide examples to use
+# TO Do
+# test area
+# explain how threshold
+# explain metric key
+# link to alerts
+# provide examples to use
 
-Profiles
-slack intergration
+# Profiles
+# slack intergration

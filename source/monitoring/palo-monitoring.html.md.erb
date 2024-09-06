@@ -13,6 +13,8 @@ Palo Alto virtual machines generate logs both system and network that is stored 
 ### Dynatrace Alerts
 We have the below configured in IAC infrastructure in hub-panorama-terraform repo[here](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
 
+These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90.
+
 - [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf)
 - [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf)
 - [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf)
@@ -25,11 +27,16 @@ We have the below configured in IAC infrastructure in hub-panorama-terraform rep
 
 ### Manual Alert Testing
 The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dashboard you're on) prior to being committed to IAC.
+You'll find the Terraform resource for new metric events [here](https://registry.terraform.io/providers/dynatrace-oss/dynatrace/latest/docs/resources/metric_events).
+
 Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type palo to see prior examples. 
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
-You need to set the threshold above or below the expected, i.e. CPU below 90% to trigger a problem. 
+You need to set the threshold above or below the expected, i.e. CPU below 90% to trigger a problem, through using metric events outlines [here](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).
 
-### U
+
+<img src=images/dynatrace-non-prod.png  width="600">
+
+### 
 
 
 # TO Do

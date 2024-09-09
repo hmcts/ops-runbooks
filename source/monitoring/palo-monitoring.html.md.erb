@@ -1,7 +1,7 @@
 ---
 title: Dynatrace & Palo Alerting 
 weight: 100
-last_reviewed_on: 2024-9-8
+last_reviewed_on: 2024-09-12
 review_in: 3 months
 ---
 # <%= current_page.data.title %>
@@ -27,17 +27,17 @@ We have the below configured in IAC infrastructure in hub-panorama-terraform rep
 
 These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90, for non-prod & prod.
 
-- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100%.
-- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100%. 
-- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf) - threshold for an alert is above 26 mb
-- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf) - threshold for an alert is above 80.
-- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf) - threshold for an alert is above 80.
-- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf) - threshold for an alert is above 80.
-- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k
-- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k
+- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100% availabilty.
+- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100% availabilty. 
+- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf) - threshold for an alert is above 26 mb memory utilisation.
+- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf) - threshold for an alert is above 80 based CPU from Azure Metrics.
+- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf) - threshold for an alert is above 80 for Palo Alto management CPU alert on SNMP data.
+- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf) - threshold for an alert is above 80 Palo Alto metric alert bases on SNMP traps data
+- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k session count.
+- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k session count.
 
 ### Slack Alerts
-When a threshold has been violated it will posted on the below slack channels to viewed with information about the alert to start troubleshooting.
+When a threshold has been violated it will posted on the below slack channels to viewed with the information about the alert to start review.
 
 Please note you'll need to be invited to the channel for access from a member of the Red Squad.
 
@@ -55,18 +55,19 @@ You'll find the Terraform resource for new metric events [here](https://registry
 
 <img src=images/dynatrace-non-prod.png width="600">
 
+Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type 'palo" to see prior examples.
 
-Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type 'palo" to see prior examples
+<img src=images/anomaly-detection.png width="600">
 
-<img src=images/anomaly-detection.png width=600>
+Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics, example of load balancing [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin). 
 
-Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
+You will know the alert has been triggered as it will show up as a problme in the top right corner of the dashboard in a red box containing a exclamation mark.
 
-You need to set the threshold above or below the expected, i.e. CPU below 90% to trigger a problem, through using metric events outlines [here](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).
+<img src=images/dynatrace-problem.png width="600">
 
-Dyntrace provide documentation metric key events based on incoming raw measurements of a single metric [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events/metric-key-events) and this will provide the fields required in the terraform block of code.
+You need to set the threshold above or below the expected, i.e. CPU below 10% to trigger a problem, through using metric events outlines [here](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).
 
-
+Dyntrace provide documentation on metric key events based on incoming raw measurements of a single metric [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events/metric-key-events) and this will provide the fields required in the terraform block of code once tested.
 
 
 ### Slack Integration

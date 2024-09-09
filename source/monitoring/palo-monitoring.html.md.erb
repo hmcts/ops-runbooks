@@ -27,8 +27,8 @@ We have the below configured in IAC infrastructure in hub-panorama-terraform rep
 
 These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90, for non-prod & prod.
 
-- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100% availabilty.
-- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100% availabilty. 
+- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100% availability.
+- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100% availability. 
 - [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf) - threshold for an alert is above 26 mb memory utilisation.
 - [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf) - threshold for an alert is above 80 based CPU from Azure Metrics.
 - [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf) - threshold for an alert is above 80 for Palo Alto management CPU alert on SNMP data.
@@ -61,7 +61,7 @@ Test metrics can be found on the left side panel, Manage -> settings -> Anomaly 
 
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics, example of load balancing [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin). 
 
-You will know the alert has been triggered as it will show up as a problme in the top right corner of the dashboard in a red box containing a exclamation mark.
+You will know the alert has been triggered as it will show up as a problem in the top right corner of the dashboard in a red box containing a exclamation mark.
 
 <img src=images/dynatrace-problem.png width="600">
 
@@ -75,5 +75,5 @@ Dyntrace provide documentation on metric key events based on incoming raw measur
 The following documents provide the steps to set up integration with slack
 - Set up a slack channel [link](https://slack.com/intl/en-gb/help/articles/201402297-Create-a-channel).
 - Http log intergartion [link](https://live.paloaltonetworks.com/t5/log-forwarding-articles/pan-os-8-0-http-log-integration-with-slack/ta-p/172093) is set up on sbox, non-prod and prod.
-- Integrating Slack and Palo Alto Network Firewalls [link](https://www.sunmanagement.net/wp-content/uploads/2021/03/Lab12-FieldNotes-Slack-integration-with-Palo-Alto-Networks-v2.pdf), this document provides the steps to get notificationd in Slack for alerts from our palo alto firewalls. 
+- Integrating Slack and Palo Alto Network Firewalls [link](https://www.sunmanagement.net/wp-content/uploads/2021/03/Lab12-FieldNotes-Slack-integration-with-Palo-Alto-Networks-v2.pdf), this document provides the steps to get notifications in slack for alerts from our palo alto firewalls. 
 - Web Hooks for slack [link](https://api.slack.com/messaging/webhooks) step to send messages to slack.

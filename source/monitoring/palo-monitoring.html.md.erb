@@ -72,8 +72,13 @@ Dyntrace provide documentation on metric key events based on incoming raw measur
 
 ### Slack Integration
 
-The following documents provide the steps to set up integration with slack
+The following documents provide the steps to set up integration with slack.
+
 - Set up a slack channel [link](https://slack.com/intl/en-gb/help/articles/201402297-Create-a-channel).
-- Http log intergartion [link](https://live.paloaltonetworks.com/t5/log-forwarding-articles/pan-os-8-0-http-log-integration-with-slack/ta-p/172093) is set up on sbox, non-prod and prod.
+- Http log intergartion [link](https://live.paloaltonetworks.com/t5/log-forwarding-articles/pan-os-8-0-http-log-integration-with-slack/ta-p/172093) is set up on sbox, non-prod and prod palo alto vm's.
 - Integrating Slack and Palo Alto Network Firewalls [link](https://www.sunmanagement.net/wp-content/uploads/2021/03/Lab12-FieldNotes-Slack-integration-with-Palo-Alto-Networks-v2.pdf), this document provides the steps to get notifications in slack for alerts from our palo alto firewalls. 
 - Web Hooks for slack [link](https://api.slack.com/messaging/webhooks) step to send messages to slack.
+
+These will notify of any palo alto system issues that are of critical and or high severity. The alert set up can be found on the Panorama under Device -> log settings.
+
+You can view these alerts under the monitor -> system and filter the criteria with (severity eq high) or (severity eq critical) query.

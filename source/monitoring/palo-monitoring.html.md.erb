@@ -13,17 +13,16 @@ Palo Alto virtual machines generate logs both system and network that is stored 
 ### Dynatrace Alerts
 We have the below configured in IAC infrastructure in hub-panorama-terraform repo[here](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
 
-These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90.
+These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90, for non-prod & prod.
 
-- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf)
-- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf)
-- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf)
-- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf)
-- [Palo Alto VM CPU MGMT - SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf)
-- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf)
-- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf)
-- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf)
-- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf)
+- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100%.
+- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100%. 
+- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf) - threshold for an alert is above 26 mb
+- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf) - threshold for an alert is above 80.
+- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf) - threshold for an alert is above 80.
+- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf) - threshold for an alert is above 80.
+- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k
+- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k
 
 ### Manual Alert Testing
 The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dashboard you're on) prior to being committed to IAC.

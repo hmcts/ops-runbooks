@@ -11,7 +11,7 @@ The Palo Firewalls required enhanced monitoring and alerting to help manage issu
 Palo Alto virtual machines generate logs both system and network that is stored in Panorama/Splunk.
 
 
-### Dyntrace Access
+### Dynatrace Access
 If you require access to the Dynatrace dashboard, you will need to raise a servicenow ticket [link](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=e8e40cb01b74b014987d1fc3b24bcba4contact)
 - provide your email address (justice)
 - dashboard (non-prod)
@@ -36,8 +36,8 @@ These events are triggered when threshold is surpassed 3 times out of 5 in the s
 - [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k
 - [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k
 
-###Slack Alerts
-When a threshold has been violated it will posted on the below skac channels to viewed with information about the alert to start troubelshooting.
+### Slack Alerts
+When a threshold has been violated it will posted on the below slack channels to viewed with information about the alert to start troubleshooting.
 
 Please note you'll need to be invited to the channel for access from a member of the Red Squad.
 
@@ -54,15 +54,26 @@ The above metrics were tested manually on Dynatrace dashboard (non-prod - click 
 You'll find the Terraform resource for new metric events [here](https://registry.terraform.io/providers/dynatrace-oss/dynatrace/latest/docs/resources/metric_events).
 
 Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type palo to see prior examples. 
+
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
+
 You need to set the threshold above or below the expected, i.e. CPU below 90% to trigger a problem, through using metric events outlines [here](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).
 
-<img src=images/dynatrace-non-prod.png  width="600">
+Dyntrace provide documentation metric key events based on incoming raw measurements of a single metric [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events/metric-key-events) and this will provide the fields required in the terraform block of code.
 
-# TO Do
-# test area
-# explain how threshold
-# explain metric key
+<img src=images/dynatrace-non-prod.png width="600">
+
+
+### Slack Intergration
+
+The following doucments provde the steps to set up intergration with slack, please you need a slack channel set up prior.
+- http log intergartion [link](https://live.paloaltonetworks.com/t5/log-forwarding-articles/pan-os-8-0-http-log-integration-with-slack/ta-p/172093)
+- Intergrating Slack and Palo Alto Network Firewalls [link](Integrating Slack and Palo Alto Networks firewalls)
+- Web Hooks for slack [link](https://api.slack.com/messaging/webhooks).
+
+
+PAN-OS 8.0 HTTP Log Integration with Slack
+
 # link to alerts
 # provide examples to use
 

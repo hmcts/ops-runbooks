@@ -10,6 +10,21 @@ The Palo Firewalls required enhanced monitoring and alerting to help manage issu
 
 Palo Alto virtual machines generate logs both system and network that is stored in Panorama/Splunk.
 
+
+### Dyntrace Access
+If you require access to the Dynatrace dashboard, you will need to raise a servicenow ticket [link](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=e8e40cb01b74b014987d1fc3b24bcba4contact)
+- provide your email address (justice)
+- dashboard (nonm-prod)
+- reason for access (manage / access alerts)
+- team you're in (platops)
+
+Then contact Jonathan Forster on the dyntrace-help-admins slack channel - [link](https://moj.enterprise.slack.com/archives/C03E1092B0S) and provide your ticket number, he will then advise access is provided via slack.
+
+Use your email address to login, no password is required and this is the palo dashboard can be accessed [here](https://yrk32651.live.dynatrace.com/index.jsp?state=D3s8xiGfmKmXBw8vbEikmFeg_oC0ccrpqcLrMRaBb9M&code=547f0790-c8a5-4b2d-bb6f-eded5e6cb8d4#dashboard;id=ab163c60-07f5-7e82-40d5-35cd6a8be991;gf=all;gtf=-2h).  
+
+
+
+
 ### Dynatrace Alerts
 We have the below configured in IAC infrastructure in hub-panorama-terraform repo[here](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
 
@@ -32,11 +47,7 @@ Test metrics can be found on the left side panel, Manage -> settings -> Anomaly 
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
 You need to set the threshold above or below the expected, i.e. CPU below 90% to trigger a problem, through using metric events outlines [here](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).
 
-
 <img src=images/dynatrace-non-prod.png  width="600">
-
-### 
-
 
 # TO Do
 # test area

@@ -53,7 +53,12 @@ Please note you'll need to be invited to the channel for access from a member of
 The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dashboard you're on) prior to being committed to IAC.
 You'll find the Terraform resource for new metric events [here](https://registry.terraform.io/providers/dynatrace-oss/dynatrace/latest/docs/resources/metric_events).
 
-Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type palo to see prior examples. 
+<img src=images/dynatrace-non-prod.png width="600">
+
+
+Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type 'palo" to see prior examples
+
+<img src=images/anomaly-detection.png width=600>
 
 Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics and the following link has an example for LB [here](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin).
 
@@ -61,7 +66,7 @@ You need to set the threshold above or below the expected, i.e. CPU below 90% to
 
 Dyntrace provide documentation metric key events based on incoming raw measurements of a single metric [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events/metric-key-events) and this will provide the fields required in the terraform block of code.
 
-<img src=images/dynatrace-non-prod.png width="600">
+
 
 
 ### Slack Integration

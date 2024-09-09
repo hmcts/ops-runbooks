@@ -14,16 +14,13 @@ Palo Alto virtual machines generate logs both system and network that is stored 
 ### Dyntrace Access
 If you require access to the Dynatrace dashboard, you will need to raise a servicenow ticket [link](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=e8e40cb01b74b014987d1fc3b24bcba4contact)
 - provide your email address (justice)
-- dashboard (nonm-prod)
+- dashboard (non-prod)
 - reason for access (manage / access alerts)
 - team you're in (platops)
 
 Then contact Jonathan Forster on the dyntrace-help-admins slack channel - [link](https://moj.enterprise.slack.com/archives/C03E1092B0S) and provide your ticket number, he will then advise access is provided via slack.
 
-Use your email address to login, no password is required and this is the palo dashboard can be accessed [here](https://yrk32651.live.dynatrace.com/index.jsp?state=D3s8xiGfmKmXBw8vbEikmFeg_oC0ccrpqcLrMRaBb9M&code=547f0790-c8a5-4b2d-bb6f-eded5e6cb8d4#dashboard;id=ab163c60-07f5-7e82-40d5-35cd6a8be991;gf=all;gtf=-2h).  
-
-
-
+Use your email address to login, no password is required and this is the palo dashboard can be accessed [here](https://yrk32651.live.dynatrace.com/index.jsp?state=D3s8xiGfmKmXBw8vbEikmFeg_oC0ccrpqcLrMRaBb9M&code=547f0790-c8a5-4b2d-bb6f-eded5e6cb8d4#dashboard;id=ab163c60-07f5-7e82-40d5-35cd6a8be991;gf=all;gtf=-2h).
 
 ### Dynatrace Alerts
 We have the below configured in IAC infrastructure in hub-panorama-terraform repo[here](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
@@ -38,6 +35,19 @@ These events are triggered when threshold is surpassed 3 times out of 5 in the s
 - [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf) - threshold for an alert is above 80.
 - [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k
 - [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k
+
+###Slack Alerts
+When a threshold has been violated it will posted on the below skac channels to viewed with information about the alert to start troubelshooting.
+
+Please note you'll need to be invited to the channel for access from a member of the Red Squad.
+
+- paloalto-dynatrace-alerts [link](https://moj.enterprise.slack.com/archives/C06ADKG1LAG).
+
+<img src=images/paloalto-dynatrace-alerts.png width=600>
+
+- paloalto-system-alerts [link](https://moj.enterprise.slack.com/archives/C073RKWSQ0N)
+
+<img src=images/paloalto-system-alerts.png width=600>
 
 ### Manual Alert Testing
 The above metrics were tested manually on Dynatrace dashboard (non-prod - click on the top right head icon to see which dashboard you're on) prior to being committed to IAC.

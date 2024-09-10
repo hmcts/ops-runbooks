@@ -1,0 +1,111 @@
+---
+title: Using IPAM to get available address space
+last_reviewed_on: 2024-06-10
+review_in: 12 months
+weight: 160
+---
+
+# <%= current_page.data.title %>
+
+## VNet peering issue due to address space clash
+
+This is in relation to a VNet peering issue due to address space clash and the user needed new available address space.  See ticket for more information:
+
+[Example](https://tools.hmcts.net/jira/browse/DTSPO-9414)
+
+### Check address space range
+
+Check the existing address space in use by checking the address space within virtual network in Azure portal.  For example /28 for vh-wowza-dev (10.50.10.32/28)
+
+
+### Use IPAM for available address spaces
+
+We can use [ipam](https://ipam.hmcts.net/) to find next available space which is not overlapping with existing vnet space.
+
+There are two ways we can query this to ipam APIs , using shell command or using postman
+
+#### Using shell commands
+
+Step 1 - Get the next available vnet space
+
+Replace `env`  to either `sbox` , `nonprod` or `prod` depending which environment you are going to create new vnet for.
+
+  ```bash
+
+    env="sbox"
+
+    bearer_token=$(az account get-access-token --resource=api://3fa0259b-86c8-4cd7-bd2a-e5ab28625fe7 --query accessToken --output tsv)
+  json_body='{
+    "space": "'"$env"'",
+    "blocks": [
+      "'"$env"'_10"
+    ],
+    "size": 22,
+    "reverse_search": false,
+    "smallest_cidr": false
+  }'
+  url="https://ipam.hmcts.net/api/tools/nextAvailableVNet"
+
+  curl -X POST -H "Authorization: Bearer $bearer_token" -H "Content-Type: application/json" -d "$json_body" "$url"
+  ```
+
+Step 2 - Reserve the next available vnet space if you are happy with the space you have got and going to use it.
+
+Please replace the `cidr` value with value you have got from above API call and `env`
+
+  ```bash
+  cidr="<CIDR>"
+  env="sbox"
+
+  bearer_token=$(az account get-access-token --resource=api://3fa0259b-86c8-4cd7-bd2a-e5ab28625fe7 --query accessToken --output tsv)
+  json_body='{
+      "cidr": "'"$cidr"'",
+      "desc": "New CIDR"
+  }'
+  url="https://ipam.hmcts.net/api/spaces/$env/blocks/$env""_10/reservations"
+
+  curl -X POST -H "Authorization: Bearer $bearer_token" -H "Content-Type: application/json" -d "$json_body" "$url"
+  ```
+
+#### Using Postman
+
+Get the Token after you logged in to the [IPAM portal](https://ipam.hmcts.net/)
+
+  <img src=images/token.png width="400">
+
+On the Postman, select POST method and enter this API  https://ipam.hmcts.net/api/tools/nextAvailableVNet
+
+And then, select Bearer Token in Authorization and paste your above copied token there.
+
+  <img src=images/token-2.png width="400">
+
+In the Body section, select Raw and Json type. You can then copy the body data from the [IPAM API Docs](https://ipam.hmcts.net/api/docs#/tools/next_available_vnet_api_tools_nextAvailableVNet_post) and paste it in the body. Replace the values depending upon the size and in the environment you are looking to find nextAvailable VNet space.
+
+  <img src=images/body-ipam-api.png width="400">
+
+
+If you are happy with the range you are getting, run the reservation command to reserve the address space.
+
+  POST API call to `https://ipam.hmcts.net/api/spaces/sbox/blocks/sbox_10/reservations`
+  
+  Body of the request should be in below format.  Please replace the `cidr` value with value you have got from above API call.
+  
+  ```json
+  {
+      "cidr": "10.0.100.0/24",
+      "desc" "New CIDR"
+  }
+  ```
+
+  <img src=images/body-ipam-reservation.png width="400">
+
+
+Please also reference the following GitHub repo link for more information regarding ipam:
+
+[READ ME](https://github.com/hmcts/ipam-manage/blob/master/README.md)
+
+### Azure DevOps Pipeline
+
+The following Azure DevOps pipeline is run daily at 8:00 AM and can be manually run to sync the newly created VNET with ipam.
+
+[Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=979&_a=summary)

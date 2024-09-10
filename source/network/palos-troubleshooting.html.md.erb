@@ -1,7 +1,7 @@
 ---
 title: Palo Alto Troubleshooting
 weight: 20
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2024-07-12
 review_in: 6 months
 ---
 
@@ -122,7 +122,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
    ```
    At the moment, setting is only available via the terminal. There is a possibility that this gets lost between major version upgrades or vm restarts
 4. In above command give no output then there is need to enable it per vm. chose `y` option to remove all old file. SysLog information would have already been
-   sent to Panorama log collector, run the bellow command in the terminal
+   sent to Panorama log collector, run the below command in the terminal
    ```cmd
    debug software disk-usage aggressive-cleaning enable
    ```
@@ -146,6 +146,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 
 6. Perform other clean up tasks described in the documentation links below
 
-Link with further details,
+Link with further details
+
 - [High Disk Space Usage on / root partition and How To Clear](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClaJCAS)
 - [AnalysisMan](https://www.analysisman.com/2020/08/pan-diskspace.html)

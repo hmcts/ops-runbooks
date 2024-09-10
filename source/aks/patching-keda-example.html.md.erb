@@ -9,9 +9,13 @@ review_in: 12 months
 
 This document covers a high level patching example for the KEDA app patching. Please see [Patching AKS Apps - Traefik](patching-aks-apps.html) for a lower level example with more information.
 
-KEDA is patched globally, rather than starting in sbox and working up through the environments, due to its limited use. There should be PRs raised by renovate for both SDS and CFT
+KEDA is deployed globally, rather than starting in sbox and working up through the environments, due to its limited use.
 
-KEDA is used to autoscale pods on a cluster. A couple of examples of this are:
+It is possible to patch only a specific environment by created a patch file within the KEDA namespace in Flux and applying this patch to the specific environment you want to modify.
+
+**Example:** Flux [PR](https://github.com/hmcts/cnp-flux-config/pull/33376/files) example of creating a patch file and applying to a single environment/cluster.
+
+KEDA is used to auto scale pods on a cluster. A couple of examples of this are:
 
 - Azure DevOps agent pods: we use a KEDA scaled job to monitor for new pipeline builds in Azure DevOps and create a pod on the PTL or PTLSBOX clusters to run the pipeline.
 - Jenkins webhook agent: we use a KEDA scaled job to poll Azure Service Bus for new messages when an event is triggered from a repo in GitHub. A pod is then scheduled to process the message and send it to Jenkins to kick off a build.
@@ -20,40 +24,102 @@ KEDA is used to autoscale pods on a cluster. A couple of examples of this are:
 
 Review [KEDA Releases](https://github.com/kedacore/charts/releases) page to check for breaking changes.
 
-###SDS
-Create a PR in sds-flux-config to patch KEDA in SDS.
+### No Production
 
-[Example PR](https://github.com/hmcts/sds-flux-config/pull/3572)
+As shown previously it is possible to patch individual environments or multiple environments without patching KEDA in all environments even though it is deployed globally: [example PR](https://github.com/hmcts/cnp-flux-config/pull/33376/files).
 
-###CFT
-Create a PR in cnp-flux-config to patch KEDA in CFT.
+Using a patch file as shown in this sample PR you can patch one environment at a time until all non-production environments are completed.
 
-[Example PR](https://github.com/hmcts/cnp-flux-config/pull/25236)
+Testing after the first environment is highly recommended before moving to any other environments.
 
-### Checks
+ITHC or Demo are the best options to start with as both contain KEDA and also contain `plum-recipe-receiver` which is discussed in the checks section below.
 
-To make sure KEDA scaledjobs are working, connect to the PTL and PTLSBOX clusters.
+### Production
+
+For production you should merge your patch file changes, the updates to KEDA, into the main `keda.yaml` file and remove the patch file you created for non-production.
+
+You will also need to remove the patches to each non-production environment as the file will no longer exists: [example PR](https://github.com/hmcts/cnp-flux-config/pull/33455/files).
+
+#### SDS
+
+Create a PR in sds-flux-config to patch KEDA in SDS: [example PR](https://github.com/hmcts/sds-flux-config/pull/3572).
+
+#### CFT
+
+Create a PR in cnp-flux-config to patch KEDA in CFT: [example PR](https://github.com/hmcts/cnp-flux-config/pull/25236).
+
+### Post Patching Checks
+
+To make sure KEDA is working we check the resource type `scaledjobs` are working correctly.
+
+There are 3 services we can use to check if KEDA is working correctly:
+
+- Azure DevOps agents
+- Jenkins agents
+- [Recipe Receiver](https://github.com/hmcts/recipe-receiver)
+
+The most useful of these is `Recipe Receiver` because it is deployed across more clusters than the other options.
+
+#### Recipe Receiver
+
+Recipe Receiver is an app created for Platform Operations and deployed to both CFT and SDS AKS clusters but under different namespaces:
+
+- CFT - [plum-recipe-receiver](https://github.com/hmcts/cnp-flux-config/tree/master/apps/cnp/plum-recipe-receiver)
+- SDS - [toffee-recipe-receiver](https://github.com/hmcts/sds-flux-config/tree/master/apps/toffee/recipe-receiver)
+
+These are both deployed the same way and have the same setup, resources and testing steps.
+
+The resources in question that matter for this testing are `Azure Service Bus Queues`, each environment has a service bus with a queue that the `recipe-receiver` monitors for messages and will scale out when messages are added to the queue i.e. If `KEDA` is working correctly, the messages should be processed from the queue by the `scaledJob` of the recipe-receiver which creates `pods` to do the processing.
+
+The service bus naming convention is `<app>-servicebus-<environment>` e.g. `plum-servicebus-aat` and the queue is called `recipes`.
+
+Within the [Recipe Receiver](https://github.com/hmcts/recipe-receiver) repository there is a Golang [script](https://github.com/hmcts/recipe-receiver/blob/master/messageGenerator/main.go) that can be used to generate messages for a specific service bus/queue and then monitors those messages until they reach zero, this is perfect for testing the `recipe-receiver` app and `KEDA`.
+
+There are [examples](https://github.com/hmcts/recipe-receiver?tab=readme-ov-file#examples-2) of how to use this script within the repository itself but the general usage is:
+
+```bash
+go run messageGenerator/main.go -service-bus <app>-servicebus-<environment>.servicebus.windows.net -queue recipes -messages 50 -watch
+```
+
+>Please note the use of `go` in the command, you will need Golang installed locally: [instructions](https://go.dev/doc/install)
+
+This script is very reusable across environments simply by changing the app or environment name to suit whichever AKS cluster you are testing.
+
+Steps to test KEDA updates:
+
+- Run the above script first before the update to make sure `Recipe-Receiver` is working first.
+- Once confirmed, make your Flux updates and raise a PR with the patch to a specific environment e.g. ITHC or Demo.
+- Have your PR reviewed and merge when approved.
+- When the KEDA release has been updated and new pods are running you can re-run the test again.
+    - To check the KEDA release has updated you can run: `kubectl get hr -n keda` which will show the Helm Release and if updated correctly should show the new version you applied via Flux.
+- Run the script again and monitor the script output to see if the queue message count drops as expected.
+
+Once you are happy that KEDA is working across this environment you can deploy the patch to another non-production environment until you completed all non-production environments. Remember to test each environment after the update.
+
+#### Azure DevOps/Jenkins
 
 Check that the helm releases for `azure-devops-agent` in the `azure-devops` namespace and `jenkins-webhook-relay` in the `jenkins` namespace have successfully upgraded.
 
-The scaled jobs created by these helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.
+The scaledJobs created by these Helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.
 
 If these are not working, they will cause many issues for application teams and result in BAU tickets being submitted.
 
-Get the list of scaled jobs in these namespaces using `kubectl get scaledjob -n <NAMESPACE`.
+Get the list of scaled jobs in these namespaces using: `kubectl get scaledjob -n <NAMESPACE>`.
 
-Describe the scaled job by running `kubectl describe scaledjob <SCALED JOB NAME`.
+Describe the scaled job by running: `kubectl describe scaledjob <SCALED JOB NAME>`.
 
 You should see events saying new jobs were created with the reason `KEDAJobsCreated`.
 
 You should also see new pods being created in the namespaces. They will be named after the job e.g. if the scaled job is called `azure-devops-agent-function`, the pods will be called `azure-devops-agent-function-<UNIQUE ID>`.
 
+You can list the pods in the namespace based on its creation time, this makes it easy to see if new pods are being created after your updates:
+
+`kc get pods --sort-by=.metadata.creationTimestamp -n <NAMESPACE>`
+
 Some application teams may have scaledjobs but if the azure devops agent and jenkins webhook relay jobs are working, we can expect other jobs to be working also.
 
-Keep an eye on #platops-help for any tickets that may come in from application teams using scaled jobs.
+Keep an eye on `#platops-help` for any tickets that may come in from application teams using scaled jobs.
 
 ### Other links
 
 You can find info on how the jenkins webhook relay works [here](../jenkins/builds-starting-slowly.html#builds-not-being-triggered-at-all).
-
-

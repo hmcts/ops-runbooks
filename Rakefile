@@ -1,23 +1,24 @@
 require 'middleman-gh-pages'
 require 'html-proofer'
 
-ENV["COMMIT_MESSAGE_SUFFIX"] = "[skip ci]"
-ENV["BRANCH_NAME"] = "ghpages"
-
 task :check_urls do
     proofer = HTMLProofer.check_directory("./build",
         {
             :check_external_hash => false,
             :ignore_missing_alt => true,
             :ignore_status_codes => [0, 401, 403],
-            :disable_external => true,
             :ignore_urls =>  [
                 # Ignore pulls/branches as these do not translate to raw content
                 %r{github\.com/hmcts/(?=.*(?:pull|tree|commit))},
+                # App health should not affect runbook PRs
+                %r{.*.platform.hmcts.net},
+                # These return 405s in a browser, which is expected
+                %r{.*.hmcts.net/sonarqube-webhook/},
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
-                %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html}
-            ],
-            :new_files_ignore => true
+                %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html},
+                # This handles new files that haven't been merged to master branch yet for this repo in a PR
+                %r{(?=.*ops-runbooks)(?=.*github)}
+            ]
         })
 
     token = ENV.fetch('GH_TOKEN', nil)

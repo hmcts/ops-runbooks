@@ -66,7 +66,7 @@ $cert = New-SelfSignedCertificate -Type Custom -Subject $certSubject -KeyUsage D
 
 We need to export the certificate and its' private key to a PFX file to sign the MSIX package. This can be done with the powershell below or in the certificate manager.
 
-PFX files are password-protected so we must provide one here. Keep the password and `.pfx` file to hand as we will need to install the pfx file on the target machine later. You may also want to store the password of the certificate in a key vault if you intend to re-use the PFX file in the future.
+PFX files are password-protected so we must provide one here. Keep the password and `.pfx` file to hand as we will need to install the pfx file on the target machine later. You may also want to store the password of the certificate in a key vault if you intend to reuse the PFX file in the future.
 
 ```powershell
 # Change this certificate password

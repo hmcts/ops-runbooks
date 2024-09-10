@@ -1,0 +1,24 @@
+# Excluded patterns per line in Perl regex
+
+## Catch lines with https:// urls
+.*https?://\S+
+## Catch pod names (containing dashes and chars)
+podName=[^\s\/]+
+## Catch container names
+.*containerd(.*)$
+## Google analytics ID
+.*UA-.*$
+.*.yml
+.*.yaml
+## Ignore internal links as page names might be concatenated words
+\(.*html\)
+\(.*erb\)
+.*.erb
+.*.html
+## Ignore all storage account references
+\b[a-z0-9]+\.blob\.core\.windows\.net\b
+## Ignore azurewebsite links
+\b[a-z0-9]+\.azurewebsites\.net\b
+## Ignore image references
+!\[[^\]]*\]\((.*?)\s*("(?:.*[^"])")?\s*\)
+<\s*img\s+[^>]*src\s*=\s*.*

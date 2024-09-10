@@ -144,7 +144,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
-We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
+We upgrade PTL/PTLSbox and Preview/Dev/Ithc in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 
 ### Ptlsbox, Ptl, AAT
 
@@ -213,8 +213,6 @@ We've seen quite a few failures with Windows node pools and attaching NICs to VM
 On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on `pluto` that those CronJobs are using depricated kubernetes apis but the problem was that it has not got updated chart.
 
 The only way we managed to fix and get updated chart for the CronJobs is by following [this blog post](https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b) by running helm uninstall and then removing the helm release.
-
-### cft-preview cluster needed swapping because address does not have enough capacity for 2301 IP addresses
 
 On the `cft-preview-01-aks` cluster, while upgrading on Azure portal, it thrown below error.
 

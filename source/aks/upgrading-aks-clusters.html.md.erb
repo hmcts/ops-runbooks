@@ -154,8 +154,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
 
 ##  Environment Specific Steps
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
-We upgrade PTL/PTLSbox and Preview/Dev/ITHC in-place, meaning we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
-
+We upgrade PTL/PTLSbox and Preview/Dev/ITHC (only because we have one cluster currently) in-place, meaning we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 ### Ptlsbox, Ptl, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
@@ -167,7 +166,7 @@ We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place up
 
 - If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
-###aat
+### aat
 
 Before you upgrade the cft-aat-00-aks and cft-aat-01-aks environments, please follow this process: [disable active jenkins](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging) before removing it from the app gateway and upgrading the cluster.
 

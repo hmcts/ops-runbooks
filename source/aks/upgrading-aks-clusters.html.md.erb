@@ -168,7 +168,7 @@ We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place up
 
 ### aat
 
-Before you upgrade the cft-aat-00-aks and cft-aat-01-aks environments, please follow this process: [disable active jenkins](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging) before removing it from the app gateway and upgrading the cluster.
+Before you upgrade a cluster in the AAT environment, please check which is the active cluster being used by Jenkins before removing either from the application gateway. This process is detailed in the [rebuild guides](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging).
 
 Make sure to disable it before removing it from the app gateway and upgrading the cluster. See example PR here https://github.com/hmcts/cnp-flux-config/pull/19886/files
 

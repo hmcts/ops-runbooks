@@ -170,8 +170,6 @@ We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place up
 
 Before you upgrade a cluster in the AAT environment, please check which is the active cluster being used by Jenkins before removing either from the application gateway. This process is detailed in the [rebuild guides](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging).
 
-Make sure to disable it before removing it from the app gateway and upgrading the cluster. See example PR here https://github.com/hmcts/cnp-flux-config/pull/19886/files
-
 ### perftest
 
 If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand. 

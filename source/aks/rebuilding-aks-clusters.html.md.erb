@@ -46,7 +46,7 @@ Click on **Run** to start the pipeline.
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .
   - After merging above PR, if Jenkins is not updated [Check Here](https://build.platform.hmcts.net/configure), you MUST manually change Jenkins config to use the other cluster.
 - If it is a preview environment, swap external DNS active cluster, e.g. [cnp-flux-config#19889](https://github.com/hmcts/cnp-flux-config/pull/19889)
-- If it is an AAT Environment, you will need to update the Private DNS record to point to the new cluster. [Prvate DNS PR](https://github.com/hmcts/azure-private-dns/pull/833/)
+- If it is an AAT Environment, you will need to update the Private DNS record to point to the new cluster. [Prvate DNS PR](https://github.com/hmcts/azure-private-dns/pull/833/). The private dns should be set to the kubernetes internal loadbalancer IP (Traefik). See [common upgrade](https://hmcts.github.io/ops-runbooks/aks/upgrading-aks-clusters.html#pods-and-hrs-health-checks) steps for how to retrieve the IP address"
 - Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service) . [example PR](https://github.com/hmcts/rpe-pdf-service/pull/318)
   - Check this PR in Jenkins has successfully ran through stage [AKS deploy - preview](https://build.platform.hmcts.net/job/HMCTS_Platform/job/rpe-pdf-service/view/change-requests/job/PR-318/)
 - Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example announcement:-

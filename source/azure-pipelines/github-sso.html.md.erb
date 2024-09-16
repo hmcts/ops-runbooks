@@ -25,10 +25,12 @@ GitHub have an official guide on how to do this which can be found [here](https:
 
 ## Which account are PATs created under?
 
-We have a central account that we use to create PATs that will be used by multiple pipelines within the Azure DevOps organisation.
+We have a central account `HMCTS Platform Operations` that we use to create PATs that will be used by multiple pipelines within the Azure DevOps
+organisation, applications used by SOC team, etc.
 
-The sign in details for this account can be found in the `rpe-prod` Azure Key Vault.
+The sign in details for this account can be found in the `rpe-prod` Azure Key Vault. You will need to find three secrets:
+`github-bot-owner-username`, `github-bot-owner-password`, and `github-bot-owner-recovery-codes`.
+The username is currently set as `hmcts-platform-operations`.
 
-Search for `github-bot-owner-sso` and you will find the relevant details.
-
-Once you get signed into GitHub with this account, follow the linked procedure for authorising PATs and the error should be corrected.
+Once you get signed into GitHub with this account, go to `Settings` > `Developer settings` > `Personal access tokens`
+and view existing PAT tokens or create a new one.

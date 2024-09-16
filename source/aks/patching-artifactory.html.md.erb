@@ -13,9 +13,9 @@ The steps below will show you how to check and update **self-hosted version** of
 
 Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to the [Artifactory repo](https://github.com/hmcts/cnp-flux-config) containing configuration files, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below. In addition, checking Artifactory pods are healthy and access to [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is available.
 
-[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes.
+[Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes.
 
-[Exampe PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX.
+[Example PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX.
 
 If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
@@ -25,7 +25,7 @@ If any issues arise during the update process, troubleshooting steps are provide
 
   • [Connect to PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
-  • Make the changes to the 'kustomization.yaml' and create a new file named 'artifactory-sbox.yaml' following the [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and updating the leatest version.
+  • Make the changes to the 'kustomization.yaml' and create a new file named 'artifactory-sbox.yaml' following the [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and updating the latest version.
 
   • **Note** the file path of 'kustomization.yaml' and 'artifactory-sbox.yaml' in the PR.
 

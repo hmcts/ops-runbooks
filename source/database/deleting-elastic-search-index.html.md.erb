@@ -59,7 +59,7 @@ Connect to Elastic Search node:
 ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 ```
 
-5) Appliction team may shutter the service
+5) Application team may shutter the service
 
 6) List all indices prior to deletion
 
@@ -172,7 +172,7 @@ or
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
 ```
 
-The overall indexing count should be approximatley the same as the overall DB count to confirm when completed:
+The overall indexing count should be approximately the same as the overall DB count to confirm when completed:
 
 ```
 SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
@@ -181,7 +181,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 If the progress is taking too long check to see if the logstash pods are running on the CCD namespace for CFT AKS cluster and has not crashed with OOM and restarted.
 Check the pod status and logs.
 
-The limits applied above should prevent this from happening so not too many cases are beingn ingested at once.
+The limits applied above should prevent this from happening so not too many cases are being ingested at once.
 
 For example - ccd-logstash-logstash-0. This is an example where the logstash pod crashed due to OOM:
 

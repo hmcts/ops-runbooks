@@ -16,13 +16,13 @@ weight: 40
 
 ### Overview
 
-A total of four storage accounts have been deployed, an internal and an external account in both the NonProd and Prod environments. The external account is directly accessible from RDWeb and is enabled for SFTP. The internal account is mounted as anetwork drive to the Jumpbox for that environment.
+A total of four storage accounts have been deployed, an internal and an external account in both the NonProd and Prod environments. The external account is directly accessible from RDWeb and is enabled for SFTP. The internal account is mounted as a network drive to the Jumpbox for that environment.
 
-These accounts allow the transfer of data in and out of the HMCTS Azure environments withan audit trail. 
+These accounts allow the transfer of data in and out of the HMCTS Azure environments with an audit trail.
 
 ### Copying Data from RDWeb to the external storage accounts
 
-Both the production and non-production external storage accounts can be SFTPd to fromRDWEB. The connection strings are below:
+Both the production and non-production external storage accounts can be accessed via SFTP from RDWEB. The connection strings are below:
 
 * Nonprod: boardingextnonprodstor.blob.core.windows.net
 * Prod: boardingextprodstor.blob.core.windows.net

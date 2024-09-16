@@ -1,6 +1,6 @@
 ---
 title: Camunda Troubleshooting
-last_reviewed_on: 2024-04-27
+last_reviewed_on: 2024-07-25
 review_in: 12 months
 weight: 55
 ---
@@ -19,15 +19,15 @@ Camunda application config is stored in 3 distinct areas:
 
 - [Flux](https://github.com/hmcts/cnp-flux-config/tree/master/apps/camunda/camunda-api) - Flux is the final possible configuration option before deployment to AKS. There are 2 deployments via Flux, UI and API, and both have their own distinct configuration settings.
 
-Its important to remember that this list is heirarchical i.e. Flux will override Helm Chart which will override Camunda source code. When troubleshooting, start with the Flux configuration options and work backwards to see if any issues arise.
+Its important to remember that this list is hierarchical i.e. Flux will override Helm Chart which will override Camunda source code. When troubleshooting, start with the Flux configuration options and work backwards to see if any issues arise.
 
 ## Database Performance
 
-There are many reasons a database cant become a bottleneck for any service so we cannot document all of them here but we can document those issues that we've seen and resolved.
+There are many reasons a database cannot become a bottleneck for any service so we cannot document all of them here but we can document those issues that we have seen and resolved.
 
 ### Database size
 
-We've observed that the Camunda interface can become sluggish and unresponsive, leading to service timeouts and eventual 504 responses.
+We have observed that the Camunda interface can become sluggish and unresponsive, leading to service timeouts and eventual 504 responses.
 
 Our initial solution was to increase the DB SKU, thereby allocating more resources for the service to use. However, this is a temporary fix, not a long-term solution.
 
@@ -65,8 +65,8 @@ Its possible to find the number of historical records held in the database in th
 
         <img src="images/differentCleanableTypes.png" style="width:300px;">
 
-    - If `History Time To Live` for a definition is `Null` that is a **problem**, those records will never be clean up by Camunda because Camunda cannot calculate a `removal time` value. See [this](howto.html#update-removal-time-on-a-record) guide on adding removal times to records.
-    - If the `finished` count is large and the `cleanable` count is 0 that doesnt mean the records will not be removed, if there is a `History Time To Live` value set then it means that those finished records cannot be cleaned up **yet** but will be in future.
+    - If `History Time To Live` for a definition is `Null` that is a **problem**, those records will never be clean up by Camunda because Camunda cannot calculate a `removal time` value. See [this](howto.html#set-removal-time-on-a-process-or-decision-instance) guide on adding removal times to records.
+    - If the `finished` count is large and the `cleanable` count is 0 that does not mean the records will not be removed, if there is a `History Time To Live` value set then it means that those finished records cannot be cleaned up **yet** but will be in future.
 
          <img src="images/cleanableRecords.png" style="width:200px;">
 

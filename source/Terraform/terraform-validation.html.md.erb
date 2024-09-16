@@ -1,0 +1,85 @@
+---
+title: Terraform Variable Validation
+last_reviewed_on: 2024-07-26
+review_in: 12 months
+weight: 210
+---
+
+# <%= current_page.data.title %>
+
+## What is it & Why is it useful?
+
+• Variable validation in Terraform is a feature that helps ensure the values assigned to variables meet specific criteria set in the code. This feature has been available since Terraform version 0.13.0.
+
+• Restricting user input prevents users from entering invalid data or catching misconfigured code, which can help avoid errors and correct mistakes in the code early on.
+
+• Finally, improving code quality and resiliency by ensuring that only valid data is used, the overall quality and reliability of the code are enhanced.
+
+## Recent Enhancements
+
+• Recent updates (as of Terraform 1.9) have improved variable validation by allowing variables to reference other variables outside of their own scope. This means you can create more complex and interdependent validation rules. [Find more info on Hashicorp blog post](https://www.hashicorp.com/blog/terraform-1-9-enhances-input-variable-validations#).
+
+
+## Example usage
+
+### Validating aks node os maintenance window
+
+```terraform
+variable "node_os_maintenance_window_config" {
+  type = object({
+    frequency   = optional(string, "Weekly")
+    interval    = optional(number, 1)
+    duration    = optional(number, 4)
+    day_of_week = optional(string, "Monday")
+    start_time  = optional(string, "23:00")
+    utc_offset  = optional(string, "+00:00")
+    start_date  = optional(string, null)
+    is_prod     = optional(bool, true)
+  })
+  default = {}
+
+  ...
+
+  validation {
+    condition     = var.node_os_maintenance_window_config.duration >= 4
+    error_message = "Maintenance window duration must be at least 4 hours when node_os_channel_upgrade is enabled."
+  }
+
+  validation {
+    condition     = try(contains(["Daily", "Weekly"], var.node_os_maintenance_window_config.frequency), false)
+    error_message = "Maintenance window frequency must be set to 'Daily' or 'Weekly'."
+  }
+
+  validation {
+    condition     = var.node_os_maintenance_window_config.interval >= 1
+    error_message = "Maintenance window interval must be at least 1."
+  }
+...
+}
+```
+
+## Explanation
+
+In the code above we can validate the object variable to follow certian inputs that we want. For the full code follow the [link here](https://github.com/hmcts/aks-module-kubernetes/blob/1f358466d410b4bdcf3d053477af4de5315a3c82/10-kubernetes-inputs.tf#L100) to access the repo.
+
+```terraform
+  validation {
+    condition     = var.node_os_maintenance_window_config.duration >= 4
+    error_message = "Maintenance window duration must be at least 4 hours when node_os_channel_upgrade is enabled."
+  }
+```
+
+With the following code above we want to ensure that maintenance window duration is at least 4 hours as per requirements in the docs, we can validate the inputs before the terraform planning stage.
+
+```terraform
+  validation {
+    condition     = try(contains(["Daily", "Weekly"], var.node_os_maintenance_window_config.frequency), false)
+    error_message = "Maintenance window frequency must be set to 'Daily' or 'Weekly'."
+  }
+```
+
+For the above code we want to ensure that the frequency is set to "Daily" or "Weekly" explicitly to ensure no misconfiguration in the maintenance window.
+
+### More examples
+
+Further explanation and examples can be found here at [Hashicorps website](https://developer.hashicorp.com/terraform/language/values/variables#custom-validation-rules).

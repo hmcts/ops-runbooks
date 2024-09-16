@@ -8,7 +8,7 @@ weight: 10
 
 ## Overview
 
-The purpose of this documentation is to provide engineers with some additional details on how the data disk configuration has been setup in the splunk infrastructure, where the configuration of this can seem obscure to those who havent worked in this space before.
+The purpose of this documentation is to provide engineers with some additional details on how the data disk configuration has been setup in the splunk infrastructure, where the configuration of this can seem obscure to those who haven't worked in this space before.
 
 You can find all code related to the splunk infrastructure in the [hmcts/soc](https://github.com/hmcts/soc) repository, the terraform for this lives side-by-side with Tenable nessus scanner and EventHub configurations.
 
@@ -27,10 +27,10 @@ Notes:
 - The script is executed as a Custom Script Extension.
 - /splunkdata for disk sizes < 1 TB, 2 TB or 15.6 TB in size.
 - /splunkcolddata for disk sizes 3.9T or 12.7 TB.
-- Sizes are read from fdisk command, this is incase the LUN numbers arent always consistent between the datadisks.
+- Sizes are read from fdisk command, this is in case the LUN numbers aren't always consistent between the datadisks.
 - Disk size has to match exactly that from fdisk in order for this to work.
 - Disks are created within logical volume groups, so you could technically mount more than one disk a to given directory.
-- If a disk is already matched and mounted to a directory, then the script will bypass doing anything (i.e. it wont modify any existing configurations).
+- If a disk is already matched and mounted to a directory, then the script will bypass doing anything (i.e. it won't modify any existing configurations).
 
 ## local.tf
 
@@ -39,7 +39,7 @@ The [local.tf](https://github.com/hmcts/soc/blob/master/components/splunk/local.
 Notes:
 
 - Object 'vmdisks' is where disks configurations should be placed, or referenced from the sbox.tfvars | prod.tfvars file.
-- Object 'disk_list' parases the vmdisks object into a map, such that it can be read by the terraform resource in datadisks.tf, without the need for complicated logic.
+- Object 'disk_list' parses the vmdisks object into a map, such that it can be read by the terraform resource in datadisks.tf, without the need for complicated logic.
 
 ## datadisks.tf
 

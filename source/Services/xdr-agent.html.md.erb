@@ -187,6 +187,21 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
 
+### VMSS
+
+If the XDR agent is being added to a VMSS, it is important to run an update instance command to complete the installation.
+
+There are two versions of this command that can be used depending on the rollout approach.
+
+For all VMSS instances:
+```bash
+az vmss update-instances --resource-group <VMSS_RESOURCE_GROUP> --name <VMSS_RESOURCE_NAME> --instance-ids "*"
+```
+
+For one specific VMSS instance:
+```bash
+az vmss update-instances --resource-group <VMSS_RESOURCE_GROUP> --name <VMSS_RESOURCE_NAME> --instance-ids "<INSTANCE_ID>"
+```
 
 ### XDR Collector
 

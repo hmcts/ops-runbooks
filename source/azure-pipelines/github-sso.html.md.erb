@@ -34,3 +34,31 @@ The username is currently set as `hmcts-platform-operations`.
 
 Once you get signed into GitHub with this account, go to `Settings` > `Developer settings` > `Personal access tokens`
 and view existing PAT tokens or create a new one.
+
+To avoid using the recovery codes, you can set up MFA on your phone.
+
+For MFA, the secret key and account name have been saved in the keyvault as well. Look for `github-bot-owner-totp-secret`.
+
+You can set up the MFA code on your phone on an authenticator app of your choosing.
+
+Select the option to create the code manually in the app rather than scanning a QR code.
+
+You should then have the codes being generated on your phone that you can use to authenticate.
+
+If you only need this one time, it would be best to remove this from your phone again.
+
+## How can I perform single-sign-on to GitHub with the owner account?
+
+The github bot owner account is backed by an Entra ID account. The details for this are also in the keyvault.
+
+Just look for `sso` in the secret name. There is a username and password.
+
+For MFA, the secret key (github-bot-owner-sso-totp-secret) and account name github-bot-owner-sso-totp-account-name) have been saved in the keyvault as well.
+
+You can set up the MFA code on your phone on an authenticator app of your choosing.
+
+Select the option to create the code manually in the app rather than scanning a QR code.
+
+You should then have the codes being generated on your phone that you can use to authenticate.
+
+If you only need this one time, it would be best to remove this from your phone again.

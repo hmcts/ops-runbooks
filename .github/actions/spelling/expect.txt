@@ -1,7 +1,9 @@
 Bance
 cdef
 Enda
+Jacomb
 Qube
 toset
+totp
 TTLs
 utilisation

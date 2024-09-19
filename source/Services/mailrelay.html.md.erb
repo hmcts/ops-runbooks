@@ -84,19 +84,21 @@ After making changes to Exim.conf you may need to test that emails are going thr
 
 ### Test unauthenticated relay
 
-**1.** Spin up a temporary pod in the Kubernetes Cluster
+**1.** Get the IP address and port number from the mailrelay/mailrelay2  namespace
+
+```bash
+kubectl get svc -n <namespace>
+```
+
+**2.** Spin up a temporary pod on the same namespace to send test email
 
 ```bash
 kubectl run -it --rm --restart=Never -n admin busybox --image=radial/busyboxplus:curl
 ```
 
-**2.** Get the IP address
 
-```bash
-Kubectl get svc -n <namespace>
-```
 
-**3.** Send email from pcol to chosen email
+**3.** Send email from pcol to chosen email. Please note that each command below need to enter separately one at time, please see example below.
 
 ```bash
 telnet <ip:port>
@@ -110,6 +112,10 @@ test test test
 ```
 
 * Note - For dev clusters, unauthenticated relay should be turned off and you should receive a 550 unauthenticated relay response
+
+#### example
+
+<img src="images/mailrelaytest.png" style="width:600px;">
 
 ### Test TLS connection using SWAKS
 

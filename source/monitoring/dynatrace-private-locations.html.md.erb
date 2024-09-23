@@ -73,3 +73,12 @@ Then do the following:
     ```
 
 You can get the API token and the latest version number from the Dynatrace team, i.e. whoever raised the ticket.
+
+If you get an error about lack of space, you can try clearing down the journal file:
+
+```
+du -h /var/log -d 1
+sudo journalctl --vacuum-time=10d
+```
+
+This will remove any logs older than 10 days.

@@ -1,7 +1,9 @@
 Bance
 cdef
+EDB
 Enda
 Jacomb
+journalctl
 Qube
 toset
 totp

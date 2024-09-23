@@ -1,7 +1,7 @@
 ---
 title: Dynatrace Patching Example
 weight: 30
-last_reviewed_on: 2024-02-15
+last_reviewed_on: 2024-09-20
 review_in: 6 months
 ---
 
@@ -41,7 +41,7 @@ You can see the hash from flux-config here to see if your commit has been picked
 Below, you can see below my revision is yet to be applied, wait for it to be applied before you start checking more closely on the deployment.
 ![](Images/kustomizations.png)
 
-Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running: 
+Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running:
 
 ```bash
 kubectl get hr -n dynatrace

@@ -11,13 +11,9 @@ Artifactory is utilized in the context of managing and updating software depende
 
 The steps below will show you how to check and update **self-hosted version** of Artifactory being used. This process involves accessing [Artifactory's website](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) to determine the latest version available.
 
-Before applying the update on PTL AKS Cluster, a testing process is initiated and is conducted on PTLSBOX AKS Cluster. This involves raising a PR to the [Artifactory repo](https://github.com/hmcts/cnp-flux-config) containing configuration files, creating 'artifactory-sbox.yaml' file and editing 'kustomization.yaml' files with your changes as seen in the example PR below. In addition, checking Artifactory pods are healthy and access to [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is available.
+Before applying the patch on the PTL environment, testing is conducted in PTLSBOX environment. This involves raising a PR to the [Artifactory repo](https://github.com/hmcts/cnp-flux-config) containing configuration files, creating `artifactory-sbox.yaml` file and editing `kustomization.yaml` files with your changes later in the documentation. In addition, verifying that the Artifactory pods are healthy and access to [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is available.
 
-[Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) of PTLSBOX changes.
-
-[Example PR](https://github.com/hmcts/cnp-flux-config/pull/32191/files) of PTL changes after testing on PTLSBOX.
-
-If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
+If any issues arise during the update process, troubleshooting steps are provided at the bottom of this page. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
 ## Artifactory Patching Process
 
@@ -25,11 +21,33 @@ If any issues arise during the update process, troubleshooting steps are provide
 
   • [Connect to PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
-  • Make the changes to the 'kustomization.yaml' and create a new file named 'artifactory-sbox.yaml' following the [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and updating the latest version.
+  • Create a new file named `artifactory-sbox.yaml` in the [artifactory directory](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory), add the following and update to the latest version.
 
-  • **Note** the file path of 'kustomization.yaml' and 'artifactory-sbox.yaml' in the PR.
+  ```yaml
+  apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    name: artifactory-oss
+    namespace: artifactory
+  spec:
+    chart:
+        spec:
+          chart: artifactory-oss
+          version: 107.90.9 <- update to latest version
+  ```
 
-  • Raise a PR similar to the [Example PR](https://github.com/hmcts/cnp-flux-config/pull/32185/files) and get your PR approved and merged.
+  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.90.9`
+
+  • Make the changes to the bottom of `kustomization.yaml` file found in [sbox-intsvc directory](https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml).
+
+  ```yaml
+  ...
+
+  patchesStrategicMerge:
+    - ../../artifactory/artifactory-sbox.yaml
+  ```
+
+  • Submit your PR and ensure it gets reviewed and merged.
 
 ### 2. Check new version on CFT PTLSBOX
   
@@ -70,3 +88,4 @@ If any issues arise during the update process, troubleshooting steps are provide
   [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) **Note** you will need to be connected to F5 VPN to access this link.
 
   [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)
+kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status && kubectl get pdb -A > pdb_status && kubectl get hr --all-namespaces | awk '/(Unknown|False)/' > hr_failed_status

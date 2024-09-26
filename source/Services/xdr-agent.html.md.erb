@@ -55,7 +55,7 @@ If the repo you are working on already using above module, its best fit to insta
 If the repo is already using the runcommand extension, you would not able to use above module’s runcommand extension as it will conflict and you can only have one extension at time.  Hence you would have to copy across the scripts from here ([PowerShell Script](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/master/scripts/windows_run_script.ps1)) to the repo and then implement runcommand extension accordingly.
 
 
-### Verify Installation
+### Verify Installation - Windows
 
 Once you managed to install agent, login to the VM in question and open “Program and Features” to verify the installation of the tools are successful.  
 Below are the tools you are looking for..
@@ -63,6 +63,17 @@ Below are the tools you are looking for..
 <img src="images/xdr-windows.png" style="width:600px;">
 
 Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm that the VM is reporting to XSIAM console correctly.  May be if you are working on list of VMs, only send them a smaller amount of list at the end of the task.
+
+### Verify Installation - Linux
+
+You can check if the install has been unsuccessful in settings->extensions and will have the sayinng 'scriptlet failed'
+
+<img src=images/xdr-linux-azure-portal-extensions-fail.png  width="600">
+
+If it has been successful then you'll see the below in settings->extensions 100.0000%
+
+<img src=images/xdr-linux-portal-extension-successful.png  width="600">
+
 
 ### Troubleshooting
 
@@ -175,7 +186,7 @@ To uninstall the XDR agent from a Red Hat Linux machine we will perform the foll
 Verify agent is installed
 
 ```bash
-  rpm -qa | grep -i cortex-agent
+rpm -qa | grep -i cortex-agent
 ```
 
 If installed, run the rpm erase command
@@ -195,6 +206,7 @@ rpm —e cortex-agent-8.5.0.125392-1.x86_64
 This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
+
 
 ### VMSS
 

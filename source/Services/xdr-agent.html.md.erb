@@ -172,19 +172,19 @@ To uninstall the XDR agent from a Red Hat Linux machine we will perform the foll
 
 Verify agent is installed
 ```bash
-rpm -qa | grep -i cortex-agent
+  rpm -qa | grep -i cortex-agent
 ```
 
 If installed, run the rpm erase command
 ```bash
-rpm -e cortex-agent
+  rpm -e cortex-agent
 ```
 
 If this fails to work, you may need to specify the full version (this will have been output from the first command).
 
 For example
 ```bash
-rpm —e cortex-agent-8.5.0.125392-1.x86_64
+  rpm —e cortex-agent-8.5.0.125392-1.x86_64
 ```
 
 This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)

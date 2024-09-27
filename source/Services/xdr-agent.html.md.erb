@@ -55,7 +55,7 @@ If the repo you are working on already using above module, its best fit to insta
 If the repo is already using the runcommand extension, you would not able to use above module’s runcommand extension as it will conflict and you can only have one extension at time.  Hence you would have to copy across the scripts from here ([PowerShell Script](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/master/scripts/windows_run_script.ps1)) to the repo and then implement runcommand extension accordingly.
 
 
-### Verify Installation
+### Verify Installation - Windows
 
 Once you managed to install agent, login to the VM in question and open “Program and Features” to verify the installation of the tools are successful.  
 Below are the tools you are looking for..
@@ -64,9 +64,26 @@ Below are the tools you are looking for..
 
 Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm that the VM is reporting to XSIAM console correctly.  May be if you are working on list of VMs, only send them a smaller amount of list at the end of the task.
 
+
+### Verify Installation - Linux
+
+You can check if the install has been unsuccessful or successful with the azure portal for the machine in question - settings->extensions 
+
+A unsuccessful install will state 'scriptlet failed'.
+
+<img src=images/xdr-linux-azure-portal-extensions-fail.png  width="600">
+
+A successful will not state 'scriptlet failed'.
+
+<img src=images/xdr-linux-portal-extension-successful.png  width="600">
+
+
+
 ### Troubleshooting
 
 **1.** Please note that while working on this, we found that there may be staled runcommand extension on the VM which we may not able to see from the Azure portal but its showing when we go to `C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\1.1.18` folder.   You will get error message on the terraform that runcommand is conflicting with existing runcommand.
+
+<img src=images/xdr-linux-azure-portal-extensions-fail.png  width="600">
 
 In order to fix this, you will have to run AZ cli command from your local to remove the extension.
 
@@ -171,11 +188,13 @@ There is also some log available here but not very useful
 To uninstall the XDR agent from a Red Hat Linux machine we will perform the following
 
 Verify agent is installed
+
 ```bash
 rpm -qa | grep -i cortex-agent
 ```
 
 If installed, run the rpm erase command
+
 ```bash
 rpm -e cortex-agent
 ```
@@ -183,6 +202,7 @@ rpm -e cortex-agent
 If this fails to work, you may need to specify the full version (this will have been output from the first command).
 
 For example
+
 ```bash
 rpm —e cortex-agent-8.5.0.125392-1.x86_64
 ```
@@ -190,6 +210,46 @@ rpm —e cortex-agent-8.5.0.125392-1.x86_64
 This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
+
+
+### Uninstall when VM not showing on XSIAM portal
+
+ssh on to the machine, connect to the bastions (NonProd or Prod) and connect to VM - [link](https://hmcts.github.io/ops-runbooks/heritage/accessing_extsvc_vm.html#6-ssh-into-the-spoke-vm)
+
+Start cortex agent
+
+```bash
+systemctl start cortex-agent
+```
+
+Stop cortex agent
+
+```bash
+systemctl stop cortex-agent
+```
+
+Check the agent installed
+
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+If installed, run the rpm erase command and should appear as the below image on the cli
+
+```bash
+rpm -e cortex-agent
+```
+
+<img src=images/xdr-linux-portal-extension-successful.png  width="600">
+
+**Make sure you are on the correct subscription** then run this,  it will take few minutes to finish running this command.
+
+```bash
+az vm run-command invoke  --command-id RemoveRunCommandLinuxExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>
+```
+
+Then run the ADO pipeline to install the extension again and check if the VM in question has appears on the XSIAM portal.
+
 
 ### VMSS
 

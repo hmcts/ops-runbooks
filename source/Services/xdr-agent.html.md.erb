@@ -209,6 +209,43 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
 
+### Uninstall when VM not showing on XSIAM portal
+
+ssh on to the machine, connect to the bastions (NonProd or Prod) and connect to VM - [link](https://hmcts.github.io/ops-runbooks/heritage/accessing_extsvc_vm.html#6-ssh-into-the-spoke-vm)
+
+Start cortex agent
+
+```bash
+systemctl start cortex-agent
+```
+
+Stop cortex agent
+
+```bash
+systemctl stop cortex-agent
+```
+
+Check the agent installed
+
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+If installed, run the rpm erase command and should appear as the below image on the cli
+
+```bash
+rpm -e cortex-agent
+```
+
+<img src=images/xdr-linux-portal-extension-successful.png  width="600">
+
+**Make sure you are on the correct subscription** then run this,  it will take few minutes to finish running this command.
+
+```bash
+az vm run-command invoke  --command-id RemoveRunCommandLinuxExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>
+```
+
+Then run the ADO pipeline to install the extensiom again and check if the VM in question has appears on the XSIAM portal.
 
 ### VMSS
 

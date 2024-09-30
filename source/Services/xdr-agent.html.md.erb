@@ -129,6 +129,7 @@ If the repo you are working on already using above module, its best fit to insta
 
 [Example](https://github.com/hmcts/oracle-azure-infrastructure/pull/942/files)
 
+
 **2.** 	Use RunCommandExtension directly on the Repo (Not  Preferred)
 
 If the repo is already using the runcommand extension, you would not able to use above module runcommand extension as it will conflict and you can only have one extension at time.  Hence you would have to copy across the scripts from here ([Bash Script](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/master/scripts/linux_run_script.sh)) to the repo and then implement runcommand extension accordingly.

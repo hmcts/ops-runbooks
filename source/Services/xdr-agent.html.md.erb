@@ -73,6 +73,7 @@ A unsuccessful install will state 'scriptlet failed'.
 
 <img src=images/xdr-linux-azure-portal-extensions-fail.png  width="600">
 
+
 A successful will not state 'scriptlet failed'.
 
 <img src=images/xdr-linux-portal-extension-successful.png  width="600">
@@ -118,7 +119,7 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 ## Linux
 
-Almost like Windows installation above, we have done this POC on the basis of installation on couple of Heritage Redhat Linux VMs (`NPCOL-WEB-VM01, NPCOL-WEB-VM02`) and then deployed separate Ubuntu VM to implement the installation.  
+Almost like Windows installation above, we have done this POC on the basis of installation on couple of Heritage Redhat Linux VMs (`NPCOL-WEB-VM01, NPCOL-WEB-VM02`) and then deployed separate Ubuntu VM to implement the installation (all PCOL machines now have the agent installed).  
 
 There are two ways to install this tools using runcommand extension
 
@@ -150,6 +151,7 @@ dpkg -l | grep -i cortex-agent
 ```
 
 <img src="images/xdr-linux.png" style="width:600px;">
+
 
 Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm that the VM is reporting to XSIAM console correctly.  May be if you are working on list of VMs, only send them a smaller amount of list at the end of the task.
 
@@ -214,7 +216,7 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 ### Uninstall when VM not showing on XSIAM portal
 
-ssh on to the machine, connect to the bastions (NonProd or Prod) and connect to VM - [link](https://hmcts.github.io/ops-runbooks/heritage/accessing_extsvc_vm.html#6-ssh-into-the-spoke-vm)
+ssh on to the machine, create an access package [link](https://tools.hmcts.net/confluence/display/DTSPO/Access+HMCTS+Bastions), connect to the bastions (non-prod or prod) and then ssh on to VM.
 
 Start cortex agent
 
@@ -242,13 +244,14 @@ rpm -e cortex-agent
 
 <img src=images/xdr-linux-portal-extension-successful.png  width="600">
 
-**Make sure you are on the correct subscription** then run this,  it will take few minutes to finish running this command.
+
+**Make sure you are on the correct subscription** then run this (check the Azure Portal), it will take few minutes to finish running this command.
 
 ```bash
 az vm run-command invoke  --command-id RemoveRunCommandLinuxExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>
 ```
 
-Then run the ADO pipeline to install the extension again and check if the VM in question has appears on the XSIAM portal.
+Then run the ADO pipeline to install the extension again and check if the VM appears on the XSIAM portal.
 
 
 ### VMSS

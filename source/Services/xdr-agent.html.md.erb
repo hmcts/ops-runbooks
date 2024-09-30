@@ -52,7 +52,7 @@ If the repo you are working on already using above module, its best fit to insta
 [Example](https://github.com/hmcts/martha-infra/pull/84/files )
 
 **2.** Use RunCommandExtension directly on the Repo (Not  Preferred)
-If the repo is already using the runcommand extension, you would not able to use above module’s runcommand extension as it will conflict and you can only have one extension at time.  Hence you would have to copy across the scripts from here ([PowerShell Script](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/master/scripts/windows_run_script.ps1)) to the repo and then implement runcommand extension accordingly.
+If the repo is already using the runcommand extension, you would not able to use above modules runcommand extension as it will conflict and you can only have one extension at time.  Hence you would have to copy across the scripts from here ([PowerShell Script](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/master/scripts/windows_run_script.ps1)) to the repo and then implement runcommand extension accordingly.
 
 
 ### Verify Installation - Windows
@@ -77,7 +77,6 @@ A unsuccessful install will state 'scriptlet failed'.
 A successful will not state 'scriptlet failed'.
 
 <img src=images/xdr-linux-portal-extension-successful.png  width="600">
-
 
 
 ### Troubleshooting

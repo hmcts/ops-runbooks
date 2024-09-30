@@ -153,6 +153,11 @@ dpkg -l | grep -i cortex-agent
 
 <img src="images/xdr-linux.png" style="width:600px;">
 
+To check the agent is running on the VM, you can run below command.
+
+```bash
+systemctl status traps_pmd.service
+```
 
 Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm that the VM is reporting to XSIAM console correctly.  May be if you are working on list of VMs, only send them a smaller amount of list at the end of the task.
 
@@ -209,6 +214,12 @@ For example
 
 ```bash
 rpm —e cortex-agent-8.5.0.125392-1.x86_64
+```
+
+If you are uninstall it on Ubuntu machine, you can run below command to remove the agent.
+
+```bash
+dpkg --purge cortex-agent
 ```
 
 This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)

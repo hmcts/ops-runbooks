@@ -208,12 +208,6 @@ If installed, run the rpm erase command
 rpm -e cortex-agent
 ```
 
-If you are uninstall it on Ubuntu machine, you can run below command to remove the agent.
-
-```bash
-dpkg --purge cortex-agent
-```
-
 If this fails to work, you may need to specify the full version (this will have been output from the first command).
 
 For example
@@ -222,11 +216,56 @@ For example
 rpm —e cortex-agent-8.5.0.125392-1.x86_64
 ```
 
+If you are uninstall it on Ubuntu machine, you can run below command to remove the agent.
+
+```bash
+dpkg --purge cortex-agent
+```
+
 This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
 
-After uninstalling the agent, you will need to uninstall the Linux Run Command extension on the server, and then reinstall the agent.
+
+### Uninstall when VM not showing on XSIAM portal
+
+ssh on to the machine, create an access package [link](https://tools.hmcts.net/confluence/display/DTSPO/Access+HMCTS+Bastions), connect to the bastions (non-prod or prod) and then ssh on to VM.
+
+Start cortex agent
+
+```bash
+systemctl start cortex-agent
+```
+
+Stop cortex agent
+
+```bash
+systemctl stop cortex-agent
+```
+
+Check the agent installed
+
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+If installed, run the rpm erase command and should appear as the below image on the cli
+
+```bash
+rpm -e cortex-agent
+```
+
+<img src=images/xdr-linux-portal-extension-successful.png  width="600">
+
+
+**Make sure you are on the correct subscription** then run this (check the Azure Portal), it will take few minutes to finish running this command.
+
+```bash
+az vm run-command invoke  --command-id RemoveRunCommandLinuxExtension --name <VM-NAME> -g  <VM-RESOURCE-GROUP>
+```
+
+Then run the ADO pipeline to install the extension again and check if the VM appears on the XSIAM portal.
+
 
 ### VMSS
 

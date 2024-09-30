@@ -31,31 +31,31 @@ An import block can be inserted anywhere into your terraform code. You will need
 
 #### Resource ID
 
- The resource ID is the unique identifier of the resource in Azure. It's also part of the URL used to visit the ID in the azure portal. Some pipelines censor the subscription ID of the resource in the error message. You will need to know the full resource ID in order to import the resource. The subscription ID of the resource can more often than not be interpolated using terraform variables as will be shown in the example configuration later on.
+The resource ID is the unique identifier of the resource in Azure. It's also part of the URL used to visit the ID in the azure portal. Some pipelines censor the subscription ID of the resource in the error message. You will need to know the full resource ID in order to import the resource. The subscription ID of the resource can more often than not be interpolated using terraform variables as will be shown in the example configuration later on.
  
- Resource IDs will always take the following form:
+Resource IDs will always take the following form:
 
- ```
- /subscriptions/01234567-89ab-cdef-0123-456789abcdef/resourceGroups/my-awesome-rg/providers/Microsoft.Something/exampleResource/my-resource
- ```
+```
+/subscriptions/01234567-89ab-cdef-0123-456789abcdef/resourceGroups/my-awesome-rg/providers/Microsoft.Something/exampleResource/my-resource
+```
 
- #### Resource Address
+#### Resource Address
 
- The resource address is the internal identifier terraform uses to reference the resource in code. What this will look like will depend entirely on your configuration and where the error is occurring. If the error is occurring in a module (as it often does) the resource address may be significantly longer than the example below.
+The resource address is the internal identifier terraform uses to reference the resource in code. What this will look like will depend entirely on your configuration and where the error is occurring. If the error is occurring in a module (as it often does) the resource address may be significantly longer than the example below.
 
- ```
- azurerm_example_resource.my_resource
- ```
+```
+azurerm_example_resource.my_resource
+```
 
- #### Environment Filtering
+#### Environment Filtering
 
 Your error will be occurring in a specific subscription in a specific environment. As most pipelines throughout HMCTS are multi-environment, it will be necessary to restrict the `import` block to the specific environment where the error is occurring. Failure to do this will mean that the pipeline will import the wrong resources when running in other environments.
 
- #### Import Multiple Resources
+#### Import Multiple Resources
 
 Import blocks import a single resource. If there are multiple resources that require importing, you will need multiple import blocks. This can also be accomplished by [clever use of a for_each](https://developer.hashicorp.com/terraform/language/import#import-multiple-instances-with-for_each) but the example provided here will not be covering that.
 
- ## Example configuration
+## Example configuration
 
 The following is an example import block that can be placed into your code. Take care to ensure that the resource ID and resource address are correct before running. A `terraform plan` can be run to verify that the import block will function as expected before running `apply`.
 

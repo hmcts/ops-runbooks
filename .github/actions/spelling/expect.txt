@@ -1,7 +1,12 @@
 Bance
 cdef
 Enda
+jfmd
+jfrou
+jfrt
+pvc
 Qube
+statefulset
 toset
 TTLs
 utilisation

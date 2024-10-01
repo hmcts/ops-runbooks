@@ -17,6 +17,10 @@ on .components/foo/myfile.tf line 25, in resource "azurerm_example_resource" "my
 25: resource "azurerm_example_resource"
 ```
 
+### Example from ADO Pipeline
+<img src=images/missing-TF-resource-error.png  width="800">
+
+
 This message can pop up for several reasons - most often it is because the resource identified by the error has been either created, re-created or modified outside of terraform. This means the object needs to be "imported" before terraform can perform certain operations on it. Thankfully there is an easy, self-serviceable way to do this that this document will detail.
 
 ## The `import` Block
@@ -34,7 +38,7 @@ An import block can be inserted anywhere into your terraform code. You will need
 The resource ID is the unique identifier of the resource in Azure. It's also part of the URL used to visit the ID in the azure portal. Some pipelines censor the subscription ID of the resource in the error message. You will need to know the full resource ID in order to import the resource. The subscription ID of the resource can more often than not be interpolated using terraform variables as will be shown in the example configuration later on.
  
 Resource IDs will always take the following form:
-
+ 
 ```
 /subscriptions/01234567-89ab-cdef-0123-456789abcdef/resourceGroups/my-awesome-rg/providers/Microsoft.Something/exampleResource/my-resource
 ```
@@ -47,6 +51,54 @@ The resource address is the internal identifier terraform uses to reference the 
 azurerm_example_resource.my_resource
 ```
 
+# Quick Fix Example
+This example is based on this ADO error message and is importing a single resource into the DEV environment. Before starting, the Azure portal was used to check that the resource described in the error, was deployed and valid.
+
+```
+ Error: A resource with the ID "/subscriptions/********-****-*****-****-********/resourceGroups/RG-DEV-SVC-01/providers/Microsoft.Network/privateEndpoints/blob-pe-SN-DEV-SA-01-sa********01" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_private_endpoint" for more information.
+ 
+   with module.storage_account["sa********01"].azurerm_private_endpoint.endpoint_blob["1"],
+   on .terraform/modules/storage_account/main.tf line 59, in resource "azurerm_private_endpoint" "endpoint_blob":
+   59: resource "azurerm_private_endpoint" "endpoint_blob" {
+```
+
+The code bellow was added to the top of the main.tf file and run the plan/apply stages again, against the problem environment.
+
+```
+import {
+  # Specify the resource address to import to
+  to = module.storage_account["sa********01"].azurerm_private_endpoint.endpoint_blob["1"]
+  # Specify the resource ID to import from
+  id = "/subscriptions/********-****-****-*****-********/resourceGroups/RG-DEV-SVC-01/providers/Microsoft.Network/privateEndpoints/blob-pe-SN-DEV-SA-01-sa********01"
+}
+```
+
+
+Once the pipeline's missing resource issue has been cleared, remove the import code block and run the pipeline again, to prove it has been repaired.  The resource has now been successfully imported. 
+
+
+### Additional Error Messages on Import
+
+```
+╷
+│ Error: Cannot import to non-existent resource address
+│ 
+│ Importing to resource address
+│ module.storage_account["sa********01"].azurerm_private_endpoint.endpoint_blob["1"]
+│ is not possible, because that address does not exist in configuration.
+│ Please ensure that the resource key is correct, or remove this import
+│ block.
+╵
+```
+
+Has the ADO pipeline been run against the correct environment?  ie SIT when problem is in DEV
+
+
+## Example configuration 2
+
+The following is an example import block for more complex problems, which can be placed into your code. Take care to ensure that the resource ID and resource address are correct before running. A `terraform plan` can be run to verify that the import block will function as expected before running `apply`.
+
+
 #### Environment Filtering
 
 Your error will be occurring in a specific subscription in a specific environment. As most pipelines throughout HMCTS are multi-environment, it will be necessary to restrict the `import` block to the specific environment where the error is occurring. Failure to do this will mean that the pipeline will import the wrong resources when running in other environments.
@@ -55,9 +107,6 @@ Your error will be occurring in a specific subscription in a specific environmen
 
 Import blocks import a single resource. If there are multiple resources that require importing, you will need multiple import blocks. This can also be accomplished by [clever use of a for_each](https://developer.hashicorp.com/terraform/language/import#import-multiple-instances-with-for_each) but the example provided here will not be covering that.
 
-## Example configuration
-
-The following is an example import block that can be placed into your code. Take care to ensure that the resource ID and resource address are correct before running. A `terraform plan` can be run to verify that the import block will function as expected before running `apply`.
 
 ```terraform
 # Obtain the subscription ID of the problematic resource

@@ -5,8 +5,10 @@ jfmd
 jfrou
 jfrt
 pvc
+Jacomb
 Qube
 statefulset
 toset
+totp
 TTLs
 utilisation

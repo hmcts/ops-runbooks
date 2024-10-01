@@ -1,11 +1,13 @@
 Bance
 cdef
+EDB
 Enda
 jfmd
 jfrou
 jfrt
 pvc
 Jacomb
+journalctl
 Qube
 statefulset
 toset

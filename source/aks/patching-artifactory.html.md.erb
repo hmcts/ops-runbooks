@@ -157,7 +157,7 @@ kubectl logs -n artifactory -c artifactory artifactory-oss-0
 
 ### Join / Master key errors
 
-Join / Master key errors **can be a false error** and point to a separate issue. Investigate the `artifactory` container first before attempting to look at other areas of artifactory as this can be a bootstrapping error upon startup of artifactory. Artifactory masks most issues with `join-key` or `master-key` so it is a good case to check artifactory container first. More info can be found in this [GitHub comment](https://github.com/jfrog/charts/issues/1917#issuecomment-2342990400) where a more in depth explanation can be found, but is not relevant to this documentation.
+Join / Master key errors **can be a false error** and point to a separate issue. Investigate the `artifactory` container first before attempting to look at other areas of artifactory as this can be a bootstrapping error upon startup. Artifactory masks most issues with `join-key` or `master-key` so it is a good case to check artifactory container first. More info can be found in this [GitHub comment](https://github.com/jfrog/charts/issues/1917#issuecomment-2342990400) where a more in depth explanation can be found, but is not relevant to this documentation.
 
 ```json
 [jfrou] Cluster join: Access Service ping failed, will retry. Error: cluster join: error from service registry on ping:

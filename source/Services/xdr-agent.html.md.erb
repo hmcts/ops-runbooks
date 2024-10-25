@@ -160,6 +160,16 @@ systemctl status traps_pmd.service
 
 Also, speak to MOJ Engineers (listed in the Pre-Requisites above) to confirm that the VM is reporting to XSIAM console correctly.  May be if you are working on list of VMs, only send them a smaller amount of list at the end of the task.
 
+To install the xdr agent on ubuntu vm's with a script, you will need to connect to the vm in question. Find a suitable file path ie cd /var/lib/waagent/ and make a directory e.g. run_command, then create a file with a script from here [terraform-module-vm-bootstrap module](https://github.com/hmcts/terraform-module-vm-bootstrap).
+Then chmod +x ./(name of the file) to provide execute permissions, then add the required variables below and the run the script.
+
+- export RUN_XDR_AGENT=true
+- export STORAGE_ACCOUNT_KEY="key"
+- export XDR_TAGS="required tags"
+
+Once that has executed, check the XSIAM portal to ensure the machine has registered.
+
+
 ### Troubleshooting
 
 **1.** Please note that while working on this, we found that there may be staled runcommand extension on the VM which we may not able to see from the Azure portal.   You will get error message on the terraform that runcommand is conflicting with existing runcommand.

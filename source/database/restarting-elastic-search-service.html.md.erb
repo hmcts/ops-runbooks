@@ -18,11 +18,13 @@ az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 ssh bastion-nonprod.platform.hmcts.net
 ```
 
-3) SSH into the Elastic Search node (there are generally 4 per environment)
+3) SSH into the Elastic Search node (there are generally 4 VMs per environment named `ccd-data-0` to `ccd-data-3`)
 
 ``` 
-ssh -i <logstash ssh key> elkadmin@<ip address>
+ssh -i <logstash ssh key> elkadmin@<private ip address of VM>
 ```	
+
+**Note:** Generally it is best to check all 4 servers to ensure the service is running on each.
 
 4) Check the status of the Elastic Search service
 

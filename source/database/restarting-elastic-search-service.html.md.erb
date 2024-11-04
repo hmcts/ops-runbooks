@@ -18,7 +18,7 @@ az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 ssh bastion-nonprod.platform.hmcts.net
 ```
 
-3) SSH into the Elastic Search node (there are generally 4 VMs per environment named `ccd-data-0` to `ccd-data-3`)
+3) SSH into the Elastic Search node (there are 4 VMs per environment named `ccd-data-0` to `ccd-data-3`)
 
 ``` 
 ssh -i <logstash ssh key> elkadmin@<private ip address of VM>

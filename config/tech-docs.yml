@@ -35,7 +35,7 @@ prevent_indexing: false
 
 show_contribution_banner: true
 github_repo: hmcts/ops-runbooks
-github_branch: master
+github_branch: main
 
 owner_slack_workspace: hmcts-reform
 default_owner_slack: platops-build-notices

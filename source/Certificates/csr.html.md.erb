@@ -17,7 +17,7 @@ Example Csr.yml files can be found on the openssl-mac-branch branch
 
 ## Running the CSR generator
 
-Ensure you are logged into the azurecli
+Ensure you are logged into the azure cli
 
 > az login
 
@@ -37,18 +37,18 @@ Alternatively run
 The vault used to process certificates for renewal is infra-cert-prod 
 Note: this can configuring by changing the subscription + vault in the generate_csr script (change variables at the top)
 
-Generate the csr:
+Generate the certificate signing request:
 
 > ./generate_csr
 
-The certificate requests will be output to the archive_csr/\<date\> folder
-(wildcard CSRs e.g. *.platform.hmcts.net are generated as wildcard-platform-hmcts-net in the archive folder)
+The certificate requests will be output to the `archive_csr/\<date\>` folder
+(wildcard certificate signing request e.g. *.platform.hmcts.net are generated as wildcard-platform-hmcts-net in the archive folder)
 
-The generated CSRs can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download CSR.
+The generated certificate signing requests can also be downloaded again from the key vault under the certificates section should they be lost - click certificate operation, and download certificate signing request.
 
 ## Submit request form
 
-Once you have generated a CSR, you can raise a request with the HMCTS OPS Procurement team via [ServiceNow](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=8d7207ce1b1d6d1049c38732f54bcb20).
+Once you have generated a certificate signing request, you can raise a request with the HMCTS OPS Procurement team via [ServiceNow](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=8d7207ce1b1d6d1049c38732f54bcb20).
 
 You'll be asked to provide the following information:
 

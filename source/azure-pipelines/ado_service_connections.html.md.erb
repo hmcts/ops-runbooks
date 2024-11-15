@@ -10,3 +10,39 @@ weight: 35
 An Excel document with the list of service connections for Platform Operations and CNP. 
 
 [ADO-Service-Connections](https://justiceuk.sharepoint.com/:f:/r/sites/DTSPlatformOperations/Shared%20Documents/General/ADO%20-%20Service%20Connections?csf=1&web=1&e=5M32LL)
+
+## Create a SonarCloud Service Connection with PlatOps Github account
+
+### Get Platform Operations Github account credentials
+
+The credentials stored in the Azure Key Vault `rpe-prod`. See the table below for the secrets.
+
+| Credential    | Secret |
+| ---------------| ------- |
+| Username       | github-bot-owner-username    |
+| Password       | github-bot-owner-password     |
+| Recovery codes |   github-bot-owner-recovery-codes  |
+
+The recovery codes are used as an alternative to the 2FA. Currently the Username is set as `hmcts-platform-operations`
+
+### Generate a user token for the Github account
+
+- Open a browser in incognito mode
+- Go to [sonarcloud](https://sonarcloud.io/) and choose `Github` login option
+- Sign in and then go to Security tab
+- Provide a meaningful token name and click on Generate Token. As of writing this doc there are two generated tokens
+`Jenkins` and `pat-sonarcloud-platops-github`. The latter one is used in this
+[SonarCloud service connection](https://dev.azure.com/hmcts/Shared%20Services/_settings/adminservices?resourceId=82529b07-182d-4e66-be2e-fd4e27703cdb)
+- Take a note of generated token as it will be used later
+- Create a new secret in the Azure Key Vault `rpe-prod` with the name `pat-sonarcloud-platops-github` and the value as the generated token
+
+### Create a SonarCloud service connection in Azure DevOps
+
+Go to the Azure DevOps project where you want to create the service connection. e.g. Shared Services.
+go to Project settings > Service connections > New service connection > SonarCloud.
+
+![New Service Connection](images/ADO-SonarCloud-ServiceConnection.png)
+
+Paste the token generated in the previous step in the field `SonarCloud Token` and click on `Verify and Save`.
+
+You can also update the `SonarCloud Token` by launching the existing SonarCloud service connection in `Edit` mode.

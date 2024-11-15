@@ -25,10 +25,46 @@ GitHub have an official guide on how to do this which can be found [here](https:
 
 ## Which account are PATs created under?
 
-We have a central account that we use to create PATs that will be used by multiple pipelines within the Azure DevOps organisation.
+We have a central account `HMCTS Platform Operations` that we use to create PATs that will be used by multiple pipelines within the Azure DevOps
+organisation, applications used by SOC team, etc.
 
-The sign in details for this account can be found in the `rpe-prod` Azure Key Vault.
+The sign in details for this account can be found in the `rpe-prod` Azure Key Vault. You will need to find three secrets:
+`github-bot-owner-username`, `github-bot-owner-password`, and `github-bot-owner-recovery-codes`.
+The username is currently set as `hmcts-platform-operations`.
 
-Search for `github-bot-owner-sso` and you will find the relevant details.
+Once you get signed into GitHub with this account, go to `Settings` > `Developer settings` > `Personal access tokens`
+and view existing PAT tokens or create a new one.
 
-Once you get signed into GitHub with this account, follow the linked procedure for authorising PATs and the error should be corrected.
+To avoid using the recovery codes, you can set up MFA on your phone.
+
+For MFA, the secret key and account name have been saved in the keyvault as well. Look for `github-bot-owner-totp-secret`.
+
+You can set up the MFA code on your phone on an authenticator app of your choosing.
+
+Select the option to create the code manually in the app rather than scanning a QR code.
+
+You should then have the codes being generated on your phone that you can use to authenticate.
+
+If you only need this one time, it would be best to remove this from your phone again.
+
+## How can I perform single-sign-on to GitHub with the owner account?
+
+The github bot owner account is backed by an Entra ID account. The details for this are also in the keyvault.
+
+Just look for `sso` in the secret name. There is a username and password.
+
+For MFA, the secret key (github-bot-owner-sso-totp-secret) and account name github-bot-owner-sso-totp-account-name) have been saved in the keyvault as well.
+
+You can set up the MFA code on your phone on an authenticator app of your choosing.
+
+Select the option to create the code manually in the app rather than scanning a QR code.
+
+You should then have the codes being generated on your phone that you can use to authenticate.
+
+If you only need this one time, it would be best to remove this from your phone again.
+
+## Phone backup method
+
+There is a phone number configured on the account as a backup. This will call Tim Jacomb's phone to approve the sign in request.
+
+This should only be required if the MFA code method is not working.

@@ -41,7 +41,7 @@ spec:
   interval: 1m
   url: https://github.com/hmcts/cnp-plum-frontend
   ref:
-    branch: marty/DTSPO-16054-topologySpreadConstraints
+    branch: DTSPO-16054-topologySpreadConstraints
   ignore: |
     # exclude all
     /*
@@ -57,7 +57,7 @@ Notice that I have a branch as a reference, this is my branch containing my own 
 With the GitRepository in place its now possible to add new values to your environment file so that it now uses this new repository resource for your chart:
 
 ```text
-apps/cnp/plum-frontend/sbox.yaml 
+apps/cnp/plum-frontend/sbox.yaml
 ```
 
 ```yaml

@@ -21,7 +21,7 @@ Consumer documentation can be found on [the HMCTS way](https://hmcts.github.io/s
 1.	Search for “Function Apps” in the Azure portal
 2.	Find the Function App associated with the appropriate subscription, the name format is `acme<subscription-name>` sharedservices is replaced with sds because of length limits, (There are different ACME function apps according to the environment where the certificate is to be uploaded)
 3.	Click the URL on the Overview page, appending '/add-certificate' to the end if needed
-4.	Populate the fields with the information provided in the Jira ticket and click “Submit” (Wildcards are creted by using an asterisk as the DNS name)
+4.	Populate the fields with the information provided in the Jira ticket and click “Submit” (Wildcards are created by using an asterisk as the DNS name)
 5.	The cert will now be available in the key vault within the same resource group as the Function App
 
 ## Renew an existing certificate

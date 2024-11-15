@@ -1,152 +1,226 @@
 ---
 title: Artifactory Patching
 weight: 30
-last_reviewed_on: 2024-03-13
+last_reviewed_on: 2024-06-06
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
 
-Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment. Here's how it is used based on the provided instructions:
+Artifactory is utilized in the context of managing and updating software dependencies and configurations within a Kubernetes environment. These dependencies are cached and are utilized by teams if upstream issues arise. By bringing the cached dependencies closer to build agents, fewer teams are impacted. **Artifactory can be disabled** by following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1266/files) as a temporary bypass to unblock teams.
 
-The steps below will show you how to check the current version of Artifactory being used (7.71.5) and then to update it to a newer version (7.77.3). This process involves accessing Artifactory's website to determine the latest version available.
+There are [3 additional files](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/ptl-intsvc) within artifactory: `admin-pw.yaml`, `join-key.yaml` and `master-key.yaml`. These files are necessary for Artifactory to operate, `admin-pw.yaml` is used to login to artifactory, `join-key.yaml` and `master-key.yaml` are used internally and are needed for the startup of Artifactory.
 
-Before applying the update, a testing process is initiated. This involves downloading a repository containing configuration files for Artifactory (artifactory-sbox.yaml). This file is created and modified to reflect the desired changes, such as updating the version number.
+This documentation will guide you through checking and updating the **self-hosted version** of Artifactory being used. This process includes accessing [Artifactory's website](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) to determine the latest version available, verifying that the Artifactory Helm Release has accepted the latest changes, and ensuring the pods are healthy and that [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is accessible.
 
-Kubernetes configuration files (kustomization.yaml) are updated to include the changes made in the testing phase. This ensures that the updated configuration is applied correctly within the Kubernetes cluster.
+**Note:** This activity is disruptive and will cause artifactory to stop working as the pods are redeployed in a statefulset. To minimize disruptions to teams the following paths can be taken:
 
-Changes made to the configuration files are submitted for review through a pull request (PR) process. Once approved, the changes are merged into the main branch, allowing them to be deployed.
+- A: Complete the patch early in the morning, similar to a jenkins upgrade, to avoid disruptions.
+- B: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1266/files), **before** upgrading.
 
-If any issues arise during the update process, troubleshooting steps are provided. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
+If any issues arise during the patching process, [troubleshooting steps](#troubleshooting) are provided at the bottom of this page. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
-# Artifactory Patching Process
+## Artifactory Patching Process
 
-1. Azure CLI Login and Kubernetes Services:
+### 1. Updating CFT PTLSBOX
 
-• Access Azure CLI and search for Kubernetes Services
+  • Create a new file named `artifactory-sbox.yaml` in the [artifactory directory](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory "apps/artifactory/artifactory"), add the following and update to the latest version.
 
-• Type the following PTL in the search box:
+  ```yaml
+  apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    name: artifactory-oss
+    namespace: artifactory
+  spec:
+    chart:
+        spec:
+          chart: artifactory-oss
+          version: 107.90.9 <- update to latest version
+  ```
 
-![](Images/artifactory_pic01.png)
+  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.90.9`
 
-2. Connect to PTLSBOX:
+  • Make the changes to the bottom of `kustomization.yaml` file found in [sbox-intsvc directory](https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml "apps/artifactory/sbox-intsvc/base/kustomization.yaml").
 
-• Click on "cft-ptlsbox-00-aks"
+  ```yaml
+  ...
 
-• Navigate to Connect and open Terminal
+  patchesStrategicMerge:
+    - ../../artifactory/artifactory-sbox.yaml
+  ```
 
-• Connect using the provided commands (first three)
+  • Submit your PR and ensure it gets reviewed and merged.
 
-Note: Ensure correct cluster connection with the provided commands
+### 2. Check new version on CFT PTLSBOX
 
-3. Check Active Pods:
+  • [Connect to CFT PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
+  
+  • Run the command below and ensure the Helm Release is showing **True** and is running the latest chart version.
 
-• In the terminal, execute the following commands to display active pods:
+  ```command
+  kubectl get hr -n artifactory
+  ```
+  
+  • Run the following commands ensuring the pod is **healthy** and has applied new version. **Note:** version number found at "artifactory-oss".
 
-```command
-kubectl get pods -n artifactory 
-```
+  ```command
+  kubectl get pods -n artifactory
+  ```
 
-![](Images/artifactory_pic02.png)
+  ```command
+  kubectl describe pods -n artifactory artifactory-oss-0
+  ```
 
-This command lists running pods.
+  • For further confirmation, ensure that the grep command below returns the chart version that you have applied.
 
-```command
-kubectl describe pods -n artifactory artifactory-oss-0 
-```
+  ```command
+  kubectl describe pods -n artifactory artifactory-oss-0 | grep chart=artifactory-107.90.9
+  ```
 
-![](Images/artifactory_pic03.png)
+  • Ensure you can access [Artifacory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/treeGeneral/hmcts) website. **Note:** you will need to be connected to F5 VPN to access this link.
 
-This command provides detailed information about the desired pods, confirming the version (Image: 7.71.5)
+### 3. Update CFT PTL
 
-4. Version Checking:
+  • Remove `artifactory-sbox.yaml` file and its corresponding code from `kustomization.yaml` made in step 1.
 
-• Visit the following website to look for latest self hosted version:[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
+  • Update the version in `artifactory.yaml` to latest version eg, (7.90.9) <- ensure `10` is in front of the version.
 
-5. Pre-update Testing:
+  ```yaml
+  ...
 
-• Before updating the PTLSBOX, conduct testing to ensure no issues
-
-• Download the repository from [GitHub] (https://github.com/hmcts/cnp-flux-config)
-
-• File location: apps/artifactory/artifactory/…
-
-• Create a new file named "artifactory-sbox.yaml" with the provided code snippet
-
-```command
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: artifactory-oss
-  namespace: artifactory
-spec:
-  serviceName: "artifactory"
-  replicas: 2
-  selector:
-    matchLabels:
-      app: artifactory-oss
-  template:
-    metadata:
-      labels:
-        app: artifactory-oss
+  chart:
     spec:
-      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
-          name: artifactory-oss
-```
+      chart: artifactory-oss
+      version: 107.90.9
+  
+  ...
+  ```
+  
+  • Submit your PR and ensure it gets reviewed and merged.
+  
+  • Repeat [step 2](#2-check-new-version-on-cft-ptlsbox) for **'CFT PTL cluster'** checking the Helm release is on the new version and ensuring the pods are healthy.
 
-[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29609/files)
+## Related Links
+  
+  [cnp-flux repo](https://github.com/hmcts/cnp-flux-config)
+  
+  [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) **Note:** you will need to be connected to F5 VPN to access this link.
 
-6. Run Test:
+  [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)
 
-• Add the below code to kustomization.yaml file for the test to run:
+## Troubleshooting
 
-```command
-patchesStrategicMerge:-../../artifactory/artifactory-sbox.yaml
-```
+### How to view logs of artifactory
 
-7. Push Changes:
-
-• Raise a PR and push changes out for review and approval
-
-8. Update Version:
-
-• For the PTLSBOX, remove "artifactory-sbox.yaml" file and its corresponding code from kustomization.yaml
-
-
-• Update the version in "artifactory.yaml" to 7.77.3
+To view the logs while artifactory is booting up / running and to spot any errors, enter the following commands below. **Note:** The default logs are from the router container.
 
 ```command
-      containers:
-        - image: docker.bintray.io/jfrog/artifactory-oss:7.77.3
-          name: artifactory-oss
-          env:
+kubectl logs -n artifactory artifactory-oss-0
 ```
 
-[Example PR] (https://github.com/hmcts/cnp-flux-config/pull/29665/files)
+- **Tip:** To keep watching logs use `-f` at the end.
 
-9. Push Changes:
+• To view all containers in a pod and to get container specific logs enter the following commands.
 
-• Raise a PR and push changes out for review and approval
+```command
+kubectl get pods -n artifactory artifactory-oss-0 -o jsonpath='{.spec.containers[*].name}'
+```
 
-• If you can go to the [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/) site after the upgrade and checking the packages and repositories to ensure they are working.
+```commands
+kubectl logs -n artifactory artifactory-oss-0 -c <container-name-here>
+```
 
-10. Release Draft and Version Bump:
+- **Tip:** The main containers to view are `router` and `artifactory`, here you will see most errors likely to occur.
 
-• Publish the draft release in "chart-neuvector"
+### Missing required services
 
-• Bump the version in "flux-config" from 1.5.4 to 1.5.5
+```json
+[jfrou] [WARN] [217db729f7674ef0] [local_topology_helper.go:68] [main] [] - Missing required services: [jfmd]
+```
 
-11. Push Changes:
+• You will see this error upon startup of artifactory as all services startup, if they do not clear after 60 - 90 seconds investigate further. This often occurs when one of the containers is not healthy, usually the router service. These errors most likely point to Master / Join key issues as the router cannot establish connection with the internal DB.
 
-• Raise a PR and push changes out for review and approval
+### Database errors
 
-Troubleshooting Steps:
+```json
+[jfrt ] [ERROR] [ee4c12af0700e30b] [o.a.s.d.i.DbConnectionUtils:86] [Catalina-utility-2  ] - Cannot start the application with a database other than PostgreSQL. For more information, see JFrog documentation
+```
 
-To resolve namespace issues in ["chart-neuvector"] (https://hmcts.github.io/ops-runbooks/neuvector/updating-neuvector-policies.html). We had specific issues with neuvector which should be resolved and the details can be found in the linked page.
+• This error is unlikely to appear, if it does it means that the artifactory configuration has not successfully applied and is using other DB than the one specified. Restart artifactory and watch the startup logs of the container and ensure this error does not appear. 
 
-Related Links:
+To watch the containers enter the command below.
 
-[Artifactory Repository] (https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) - You will need to be connect to F5 VPN to access this link
+```command
+kubectl logs -n artifactory -c artifactory artifactory-oss-0
+```
 
-[Artifactory Release Information] (https://jfrog.com/help/r/jfrog-release-information/artifactory-7.77.5-self-hosted)
+### Join / Master key errors
+
+Join / Master key errors **can be a false error** and point to a separate issue. Investigate the `artifactory` container first before attempting to look at other areas of artifactory as this can be a bootstrapping error upon startup. Artifactory masks most issues with `join-key` or `master-key` so it is a good case to check artifactory container first. More info can be found in this [GitHub comment](https://github.com/jfrog/charts/issues/1917#issuecomment-2342990400) where a more in depth explanation can be found, but is not relevant to this documentation.
+
+```json
+[jfrou] Cluster join: Access Service ping failed, will retry. Error: cluster join: error from service registry on ping:
+```
+
+• Join key issues are found before master key issues arise, these are shown upon startup as the internal database boots and usually disappear after 30 seconds. If `join-key missing` is still showing investigate containers themselves if the key has been picked up by artifactory correctly.
+
+```json
+[jfmd ] [ERROR] - Failed resolving master key: failed resolving 'shared.security.masterKey' key; file does not exist: /opt/jfrog/artifactory/var/etc/security/master.key
+```
+
+• Master key is also used for the database, for internal communication purposes. If `master-key` issues are still showing ensure artifactory has these in the containers.
+
+#### Check keys in container
+
+```command
+kubectl exec -it artifactory-oss-0 -n artifactory -c router -- /bin/sh
+```
+
+• Once inside the container cd to this directory, list the files and ensure `join.key` and `master.key` are there.
+
+```command
+cd var/etc/security/
+```
+
+```command
+ls -la
+```
+
+#### How to fix
+
+After investigating artifactory containers further and if the key issues are is persisting, restart the artifactory service by deleting the `pvc`, `statefulset` and the `pod` of artifactory namespace. If the service is still not restarting successfully, then a full rebuild of the secret keys is most likely needed.
+
+#### Recreating new keys
+
+This will cover creating a new key, sops encrypt new key, rename file and update the [cnp flux repo](https://github.com/hmcts/cnp-flux-config) in a new pr with the new key. **Note:** The following example uses `master-key` replace this with `join-key` when creating that key.
+
+• Before we start we need a random string to be used by our key. Copy its output as we need it later.
+
+```command
+openssl rand -hex 32
+```
+
+```command
+kubectl create secret generic master-key -n artifactory --from-literal=master-key='<rand -hex 32 output>' --type=Opaque -o yaml --dry-run=client > file.enc.yaml
+```
+
+• **Note:** Ensure you have the correct key vault sops link, search for your cluster in [azure portal](https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults) and copy the sops key uri. The Sops key uri is found in objects -> keys -> sops-key and is under `Key Identifier`.
+
+```command
+sops --encrypt --azure-kv <sops-key-uri> --encrypted-regex "^(data|stringData)$" --in-place file.enc.yaml
+```
+
+• Rename the file so that artifactory can use the new key.
+
+```command
+mv file.enc.yaml master-key.yaml
+```
+
+• Follow the steps again for `join-key.yaml`.
+
+• Submit your PR with the new keys and ensure it gets reviewed and merged.
+
+• Restart artifactory by deleting the `pvc`, `statefulset` and the `pod` of artifactory namespace. Monitor artifactory as it boots up and ensure the errors are gone.
+
+• If the new set of keys and restart of artifactory has not started up correctly reach out to a member of your team for assistance.

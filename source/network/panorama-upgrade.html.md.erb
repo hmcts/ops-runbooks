@@ -1,21 +1,26 @@
 ---
 title: Panorama - Software Updates
 weight: 100
-last_reviewed_on: 2024-04-14
+last_reviewed_on: 2024-07-12
 review_in: 3 months
 ---
 # <%= current_page.data.title %>
 
-The current Panorama, Log Collectors and Firewall software version is curently at `11.0.2-h3`, `h` stands for Hotfix.
+The current Panorama, Log Collectors and Firewall software version is currently at `11.0.4-h2`, `h` stands for Hotfix.
 We aim to be as close as possible with Palo Alto software releases on both the Panorama management servers and the firewall servers.
+The Panorama's must always be the same or higher software version then the Palo's.
 
 ### Current Estate
-We have infrastructure in UKSouth listed below
+We have infrastructure in UKSouth listed below.
+
 - 1 `sbox` Panorama servers in Panorama mode (1 in UKSouth)
 - 2 `prod` Panorama servers in HA mode (2 in UKSouth)
 - 1 Log collector (in UKSouth)
 
 ### Update Process
+
+The Panorama's need to updated in the above order under current estate.
+
 To update the Panorama servers is straight forward and there are already documented steps to 
 follow in the [Upgrade Panorama with an Internet Connection](https://docs.paloaltonetworks.com/pan-os/11-0/pan-os-upgrade/upgrade-panorama/install-content-and-software-updates-for-panorama/install-updates-for-panorama-with-internet-connection) documentation.
 
@@ -33,36 +38,59 @@ Please follow the below steps.
 
 - Login on to the log collector vm, you need to be on the `VPN` and via the `bastions`
 - Run the follow commands in order
-  ```bash
+ 
+```bash
   show system info | match sw-version
   ```
+ 
   to get the current version
+ 
   ```bash
   request system software check
   ```
+ 
   to get available versions to install
+ 
   ```bash
   request system software download version <version-number>
   ```
+ 
   to download target version, this will output a job id
+ 
   ```bash
   show jobs id <job-id>
   ```
+ 
   to view job status
-   ```bash
+   
+  ```bash
   request system software install version <version-number>
   ```
   to install target version, this returns a job id
-   ```bash
+  
+  ```bash
   show jobs id <job-id>
   ```      
   to view job status
+  
   ```bash
   request restart system 
   ```
   to restart the system, This will disconnect you from the SSH CLI session that you are connected to
+
+  If you receive an error 'requires a content version of 8770 or greater and found 8770 or greater found 8762-8327', you need update prior to updating the software version.
+  
+  ```bash
+  request content upgrade download latest
+  ``` 
+ 
+ ```bash
+  request content upgrade install version latest
+ ``` 
+
 - Log back on to the Log Collector, give 5 to 7min for it to reboot  
   Run the `show system info` command as above to verify that the version has been updated
+  
 - Log on to the Panorama management web UI, navigate to
    `Panorama` -> `Managed Collectors` and verify that the Panorama log collector Status entries are `connected` and `In sync` and the Software Version also reflects the new version
 

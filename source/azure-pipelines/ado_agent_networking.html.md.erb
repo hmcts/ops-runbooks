@@ -7,9 +7,9 @@ weight: 30
 
 # <%= current_page.data.title %>
 
-ADO pipelines, agent pools are most likley to be containers hosted by Azure Kubernetes services for HMCTS. 
+ADO pipelines, agent pools are most likely to be containers hosted by Azure Kubernetes services for HMCTS. 
 
-Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the begining and adding VNET to the end.
+Agent Capabilities can help narrow down the vNet hosting the container. First the AZP_Name follows a manual naming convention. Try removing the HMCTS at the beginning and adding VNET to the end.
 If the agent is actually a Kubernetes container, it will also state the Kubernetes_Port, with HMCTS being 10.0.0.1:443.
 
 ![Agent_Capabilities](images/ADO-Agent-Capabilities.png )
@@ -31,7 +31,7 @@ Traffic from the agent pool to the Azure resource, flows through the Palo Alto i
 
 ![Firewall_Monitor](images/ADO-Agent-To_Azure-Resource-Traffic-Monitor.png)
 
-Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet secuirty rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
+Use the Palo Alto monitor utility to view the traffic flows.  If there is nothing, the ADO agent is not sending traffic to Azure. Review the agent pool vNet security rules, routing and DNS configuration. Palo Alto policy may DENY the traffic, requiring a rule change.
 If the traffic is coming into Azure from the agent pool, use Azure portal Network Watch to troubleshoot.
 
 ## ADO Connections to HMCTS Environments
@@ -58,7 +58,7 @@ To enable ADO agents to resolve private DNS zones, each zone needs to be linked 
 [aks-sds-deploy Repo](https://github.com/hmcts/aks-sds-deploy)
 
 Note once merged, this pipeline needs to be manually run to apply your changes. The network stage is early in the pipeline and can be selected via the "stages to run" option.
-Besure you have selected the correct **Environment** for your ADO agent network. 
+Be sure you have selected the correct **Environment** for your ADO agent network. 
 
 Traffic will also have to be enabled between the agent pool vNet and the private endpoint vNet, by linking the vNets
 

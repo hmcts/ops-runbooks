@@ -5,6 +5,8 @@ Enda
 Jacomb
 journalctl
 Qube
+ruxit
+statefulset
 toset
 totp
 TTLs

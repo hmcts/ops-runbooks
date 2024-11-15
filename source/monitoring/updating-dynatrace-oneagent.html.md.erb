@@ -1,0 +1,32 @@
+---
+title: Updating Dynatrace OneAgent on VM hosts
+last_reviewed_on: 2024-11-08
+review_in: 12 months
+weight: 40
+---
+# <%= current_page.data.title %>
+
+## Azure Portal
+
+- Log in to the [Azure Portal](https://portal.azure.com).
+- Navigate to the Virtual Machine host where you want to trigger the update.
+- Select `Extensions + applications` from the left-hand menu.
+![vm_extensions_tab](images/vm_extensions_tab.png)
+- Select the `Dynatrace` extension from the list of extensions. It may be called something else but the type should be `dynatrace.ruxit.oneAgentLinux`.
+- Click on the `Update` button to trigger the update.
+![update_vm_extension](images/update_vm_extension.png)
+- The update will usually take a few minutes to complete. Once complete, you'll get a notification in the Azure Portal and the version should have changed in the UI.
+![vm_extension_updated](images/vm_extension_updated.png)
+
+## Azure CLI
+
+- Open a terminal and log in to the Azure CLI with `az login`.
+- Run the following command to update the OneAgent extension on the VM host:
+
+```bash
+# Linux VM
+az vm extension set --subscription "mySubscription1" --resource-group "myResourceGroup1" --vm-name "myVM1" --name "Dynatrace" --publisher "dynatrace.ruxit.oneAgentLinux" --force-update
+
+# Windows VM
+az vm extension set --subscription "mySubscription1" --resource-group "myResourceGroup1" --vm-name "myVM1" --name "Dynatrace" --publisher "dynatrace.ruxit.oneAgentWindows" --force-update
+```

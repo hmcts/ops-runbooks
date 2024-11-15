@@ -24,10 +24,23 @@ Each folder contains updates published during that specific week, with the downl
 Folder name is Year Month Day. Record the latest numeric folder name for later use in this process.
 
 # Automation Repository
-All the scripts to manage the patching process are stored in  
+All the scripts to manage the patching process are stored in Gerrit.
 
-[Github Azure-Policy](https://github.com/hmcts/azure-policy)
+[automation.ansible](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible)
 
-Windows VMs - assign.aum_Windows_scan.json
-Linux VMs - assign.aum_Windows_scan.json
+Browse to automation.ansible/sp-ansible/group_vars
 
+Search for "yum_repo_patching_tag" in VS Code or use the consol command 
+```
+grep -Rns yum_repo_patching_tag 
+```
+
+From the list of environments environments displayed, look for your environment.  ie dev, prd, mdv, etc.
+
+Beware of the date displayed.  yum_repo_patching_tag: **20241027**
+
+It should be close to the date you are deploying. If it is out by years, this is the wrong file.  yum_repo_patching_tag: **20190922**
+
+Save the file and commit it with a useful name like
+
+DTSPO-22138 :  set MDV to use yum_repo_patching_tag to 20241103'

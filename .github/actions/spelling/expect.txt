@@ -1,12 +1,9 @@
 Bance
 cdef
+EDB
 Enda
 Jacomb
-jfmd
-jfrou
-jfrt
-pmd
-pvc
+journalctl
 Qube
 ruxit
 statefulset
@@ -14,3 +11,8 @@ toset
 totp
 TTLs
 utilisation
+jfmd
+jfrou
+jfrt
+pmd
+pvc

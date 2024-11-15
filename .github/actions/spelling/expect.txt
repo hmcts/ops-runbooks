@@ -11,3 +11,8 @@ toset
 totp
 TTLs
 utilisation
+jfmd
+jfrou
+jfrt
+pmd
+pvc

@@ -8,7 +8,7 @@ weight: 133
 # <%= current_page.data.title %>
 
 We need to ensure that Virtual Machines within the HMCTS subscription are kept up to date in terms of OS patching.
-The patching approach will be on a quarterly basis unless a critical patch(es) have been identified.  This document 
+The patching approach will be on a monthly basis unless a critical patch(es) have been identified.  This document 
 covers the patching process, patching instructions for each OS type and troubleshooting sections.
 
 ## Patching Process
@@ -43,6 +43,10 @@ Azure Update Manager is a SaaS solution, to manage and govern software updates f
 The native software update feature within the operating system is utilised by Azure Update Manager (AUM), to first audit the patching requirements and then apply any updates.  With scheduling and scope, controlled by AUM, with results reported back, via a single console.
 
 - [Azure Update Manager Page](AUM-intro.html)
+
+## CRIME Environment Patching
+The Linux VMs within the CRIME subsciptions are are patched using Jenkins, as decribed in the [CRIME Patching](CRIME-Patching.html) document.
+
 
 ## Manual OS Patching Instructions
 

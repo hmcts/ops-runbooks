@@ -32,10 +32,10 @@ The generic process can be found on the [Flux website](https://fluxcd.io/flux/in
 
 Make sure to clone the flux repos and enter them on your terminal by running `cd cnp-flux-config` or `cd sds-flux-config`.
 
-The specific command we need to target an environment, e.g, sandbox, is:
+The specific command we need to target an environment, it is recommended to add the '--version' flag at the end as flux will default to your local configutation. e.g, sandbox, is:
 
 ```
-flux install --export > apps/flux-system/sbox/base/gotk-components.yaml
+flux install --export > apps/flux-system/sbox/base/gotk-components.yaml --version v2.4.0
 ```
 
 This command will generate a file containing the latest versions of all the flux components.

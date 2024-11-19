@@ -43,8 +43,7 @@ An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC tea
 
 These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
 
-Its possible the level at which you wish to set these variables doesn't have a pre-exisiting vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. If you find this, create the necessary vars file.
-
+Its possible the level at which you wish to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. If you find this, create the necessary vars file.
 
 ### Other Role variables
 
@@ -87,7 +86,7 @@ The parameters are reactive and will update based on the Subscription & Limit dr
 
 Select the subscription which contains the target VMs. Then select the chosen limit scope. When the Limit selection is chosen, the corresponding Group, ResourceGroup or Host dropdowns will populate.
 
-Alternatively, choose Limit type of Custom Limit and provide a custom limit. Be careful with this and formulate your ansible limit correctly. Information on how Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
+Alternatively, choose Limit type of Custom Limit and provide a custom limit. Be careful with this and formulate your ansible limit correctly. Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
 
 Click 'Build' and the pipeline will run with the chosen Limit. Failure is possible, please review any error output thoroughly. This is likely to be caused by authentication/sudo escalation issues which will need resolving between PlatOps/the application team.
 
@@ -104,12 +103,12 @@ xdr-ansible-inventory saves JSON data locally on the master Jenkins server. It s
 
 xdr-ansible-deploy reads one of the JSON files (one per subscription for nonlive & live) based on the selection of the Subscription dropdown. The Group, ResourceGroup & Host dropdown boxes are Jenkins Active Choices Reactive Parameter type from the Active Choices Jenkins plugin. 
 
-'Reactive' refers to its capability to dynamically update based on another input selection. 'Active' refers to the capability to programatically return choices based on the output of a groovy script. All these parameters read the appropriate JSON file and applies filtering to populate itself correctly.
+'Reactive' refers to its capability to dynamically update based on another input selection. 'Active' refers to the capability to programmatically return choices based on the output of a groovy script. All these parameters read the appropriate JSON file and applies filtering to populate itself correctly.
 
 
 ### Jenkins
 
-Crime have multiple Jenkins instances, some are application specific (such as build-idam) and these live as deployments in AKS. The main PlatOps Jenkins is deployed as a VM (active & standby pairing) & seperate instances exist for non-live & live:
+Crime have multiple Jenkins instances, some are application specific (such as build-idam) and these live as deployments in AKS. The main PlatOps Jenkins is deployed as a VM (active & standby pairing) & separate instances exist for non-live & live:
 
 - build[.]mdv[.]cpp[.]nonlive
 - build[.]mdv[.]cpp[.]live
@@ -119,7 +118,7 @@ The Jenkinsfile pipeline script of xdr-ansible-deploy is set to run on the Maste
 
 ### The Role
 
-All installation code is contained within the Role. The playbook xdr-ansible-deploy executes only calls the Role. The Role code is seperated into its [own repository](https://github.com/hmcts/cpp-ansible-role-xdr-agent-install)
+All installation code is contained within the Role. The playbook xdr-ansible-deploy executes only calls the Role. The Role code is separated into its [own repository](https://github.com/hmcts/cpp-ansible-role-xdr-agent-install)
 
 The Role makes use of the same Shared Access Signature token used in the HMCTS XDR install process for HMCTS. azcopy is installed and used to retrieve the installation package & config from [cftptlintsvc](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Storage/storageAccounts/cftptlintsvc/overview) storage account under the xdr-collectors blob.
 
@@ -180,7 +179,7 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 We have created a [test environment repo](https://github.com/hmcts/cpp-ansible-test-environment/) which mimics the python & ansible setup used in Crime's automation.ansible repository. 
 
-This repository contains Ansible code which delivers os-level customisation to VMs for PlatOps such as installing the Dynatrace one-agent agent.
+This repository contains Ansible code which delivers os-level customization to VMs for PlatOps such as installing the Dynatrace one-agent agent.
 
 The README details how to setup a local machine environment for development that is compatible with the automation.ansible repo. It uses Vagrant & the Virtualbox driver to build a local VM and automate Ansible against it.
 

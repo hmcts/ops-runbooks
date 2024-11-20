@@ -125,13 +125,13 @@ The SAS token itself is stored in Vault and Ansible's Vault lookup plugin is use
 
 The Role has the ability to update tag information in-place. Simply update xdr_tags variable and re-run the xdr-ansible-deploy pipeline.
 
-### Customisation of Existing Components
+### Customization of Existing Components
 
 #### Jenkins Library ansibleDeploy.groovy
 
-Crime Jenkins uses a shared library like HMCTS. The main component from the Library is _ansibleDeployX.groovy_. This is located in the _vars_ drectory of automation.jenkins-groovy-libraries. This executes the ansible-playbook command and does pre-requisites to ensure it works.
+Crime Jenkins uses a shared library like HMCTS. The main component from the Library is _ansibleDeployX.groovy_. This is located in the _vars_ directory of automation.jenkins-groovy-libraries. This executes the ansible-playbook command and does pre-requisites to ensure it works.
 
-There are multiple versions of _ansibleDeploy_, we have created a customised version called _ansibleDeployV2xdr.groovy_ for our use. Currently this is in the xdr-ansible-deploy branch which is used by the Jenkinsfile pipeline script of xdr-ansible-deploy. This should be merged to master in the future.
+There are multiple versions of _ansibleDeploy_, we have created a customized version called _ansibleDeployV2xdr.groovy_ for our use. Currently this is in the xdr-ansible-deploy branch which is used by the Jenkinsfile pipeline script of xdr-ansible-deploy. This should be merged to master in the future.
 
 
 #### automation.ansible Azure Inventory Script
@@ -162,7 +162,7 @@ In Crime, VMs are tagged with useful info such as tier, stack, project, platform
 
 The inventory script is located in automation.ansible in _/sp-ansible/inventory/azure_rm.py_ and config params are provided by _/sp-ansible/inventory/azure_rm.ini_. The inventory script looks for an .ini file with the same name within the same directory by default.
 
-We have created a customised version of _azure_rm.py_ called _azure_rm_standalone.py_ & an associated .ini file, _azure_rm_standalone.ini_. This version has been altered to remove a dependency on a non-standard python library utilised for checking azure_compute minimum version for API compatability. In favour, standard library functionality is used. This allows the script to execute standalone outside of the ansible-playbook command without needing to mess with dependencies in the Jenkins environment.
+We have created a customized version of _azure_rm.py_ called _azure_rm_standalone.py_ & an associated .ini file, _azure_rm_standalone.ini_. This version has been altered to remove a dependency on a non-standard python library utilised for checking azure_compute minimum version for API compatability. In favour, standard library functionality is used. This allows the script to execute standalone outside of the ansible-playbook command without needing to mess with dependencies in the Jenkins environment.
 
 This standalone version of the inventory script is used by xdr-ansible-inventory to create the backend JSON data that populates xdr-ansible-deploy parameters. This exists in the xdr-ansible-deploy branch of the automation.ansible repo.
 

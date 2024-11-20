@@ -16,3 +16,8 @@ jfrou
 jfrt
 pmd
 pvc
+Chirag
+Virtualbox
+mdv
+dsl
+Jenkinsfiles

@@ -1,0 +1,245 @@
+---
+title: XDR Agent Installation - Crime (DEPRECATED)
+last_reviewed_on: 2024-11-19
+review_in: 12 months
+weight: 156
+---
+
+# <%= current_page.data.title %>
+
+
+# THIS HAS BEEN DEPRECATED IN FAVOUR OF [XDR AGENT INSTALLATION - CRIME](xdr-agent-crime.html)
+
+-------
+-------
+-------
+-------
+-------
+We have developed a method of installing the XDR agent to Crime VMs. This differs from the HMCTS install method which utilised the VM Extension capability on Azure VMs and is delivered via Terraform.
+
+For Crime, we are utilising Ansible as the delivery method and have developed an [Ansible Role](https://github.com/hmcts/cpp-ansible-role-xdr-agent-install) which will perform the installation.
+
+To trigger the Ansible, we have created two pipelines in the main Crime Jenkins instance which can be scope limited by Ansible's Limit functionality. This enables us to follow a rollout plan through environments and safely stage our delivery.
+
+When the deploy pipeline is run, this calls an Ansible playbook that includes a Role we have developed which handles the installation.
+
+This document details the procedure to do this.
+
+
+
+## Ansible Inventory/Variables
+
+Before running the pipelines, two variables need declaring in either Ansible group_vars or host_vars. These are:
+
+- cortex_env
+- xdr_tags
+
+cortex_env is a string which needs set to either 'nonprod' or 'prod'. MoJ SoC provided a separate installation package for nonprod & prod, this defines which installation package is used.
+
+xdr_tags is a comma-separated string of tags to provide to the Cortex Agent.
+
+Example:
+
+```bash
+xdr_tags: "hmcts,server,idam"
+cortex_env: "nonprod"
+```
+
+An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC team as members. Please reach out to MoJ SoC if unsure of tags to use.
+
+### Where to set these?
+
+These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
+
+Its possible the level at which you wish to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. If you find this, create the necessary vars file.
+
+### Other Role variables
+
+Other variables are defaulted within the Role and do not need setting in automation.ansible repo inventory. The only exception to this is 'sa_key'. This has been set on the 'all' group and is already usable by all hosts.
+
+
+## Deploying the XDR agents
+
+### Pipelines
+
+The pipelines in Jenkins for deployment are:
+
+- xdr-ansible-inventory
+- xdr-ansible-deploy
+
+xdr-ansible-deploy is the pipeline which does the actual installation. xdr-ansible-inventory queries Azure and brings back JSON data used to populate the parameter options for xdr-ansible-deploy.
+
+xdr-ansible-inventory is set on a schedule to run each morning and update its backend JSON data. This schedule should be enough to ensure groups and host parameter options are up-to-date with Azure. 
+
+```
+Caveat: If new VMs are deployed during the day and the rollout plan after this, the new VMs will not be included in the parameter option list. This isn't likely as new VMs are rarely deployed. If they are the inventory pipeline can be re-run ad-hoc without issue to get the latest data. Make sure this is only run when xdr-ansible-deploy is NOT running!
+```
+
+
+### Using the Pipelines
+
+Run the xdr-ansible-inventory pipeline first. There are no build parameters to this, simply click 'Build now'.
+
+<img src="images/xdrCrimeInventory.png" style="width:600px;">
+
+---
+
+Run the xdr-ansible-deploy pipeline, click 'Build with Parameters'. Only run this when xdr-ansible-inventory pipeline has completed.
+
+<img src="images/xdrCrimeDeploy.png" style="width:600px;">
+
+<img src="images/xdrCrimeDeployParams.png" style="width:600px;">
+
+The parameters are reactive and will update based on the Subscription & Limit dropdown selection.
+
+Select the subscription which contains the target VMs. Then select the chosen limit scope. When the Limit selection is chosen, the corresponding Group, ResourceGroup or Host dropdowns will populate.
+
+Alternatively, choose Limit type of Custom Limit and provide a custom limit. Be careful with this and formulate your ansible limit correctly. Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
+
+Click 'Build' and the pipeline will run with the chosen Limit. Failure is possible, please review any error output thoroughly. This is likely to be caused by authentication/sudo escalation issues which will need resolving between PlatOps/the application team.
+
+
+## How it works
+
+### Pipeline Design
+
+xdr-ansible-inventory saves JSON data locally on the master Jenkins server. It saves the files in:
+
+```
+/var/lib/jenkins/data/azure-inventory/
+```
+
+xdr-ansible-deploy reads one of the JSON files (one per subscription for nonlive & live) based on the selection of the Subscription dropdown. The Group, ResourceGroup & Host dropdown boxes are Jenkins Active Choices Reactive Parameter type from the Active Choices Jenkins plugin. 
+
+'Reactive' refers to its capability to dynamically update based on another input selection. 'Active' refers to the capability to programmatically return choices based on the output of a groovy script. All these parameters read the appropriate JSON file and applies filtering to populate itself correctly.
+
+### Jenkins
+
+Crime have multiple Jenkins instances, some are application specific (such as build-idam) and these live as deployments in AKS. The main PlatOps Jenkins is deployed as a VM (active & standby pairing) & separate instances exist for non-live & live:
+
+- build[.]mdv[.]cpp[.]nonlive
+- build[.]mdv[.]cpp[.]live
+
+The Jenkinsfile pipeline script of xdr-ansible-deploy is set to run on the Master Jenkins server and not a jenkins slave. This is by design.
+
+
+### The Role
+
+All installation code is contained within the Role. The playbook xdr-ansible-deploy executes only calls the Role. The Role code is separated into its [own repository](https://github.com/hmcts/cpp-ansible-role-xdr-agent-install)
+
+The Role makes use of the same Shared Access Signature token used in the HMCTS XDR install process for HMCTS. azcopy is installed and used to retrieve the installation package & config from [cftptlintsvc](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Storage/storageAccounts/cftptlintsvc/overview) storage account under the xdr-collectors blob.
+
+The SAS token itself is stored in Vault and Ansible's Vault lookup plugin is used to fetch this value.
+
+The Role has the ability to update tag information in-place. Simply update xdr_tags variable and re-run the xdr-ansible-deploy pipeline.
+
+### Customization of Existing Components
+
+#### Jenkins Library ansibleDeploy.groovy
+
+Crime Jenkins uses a shared library like HMCTS. The main component from the Library is _ansibleDeployX.groovy_. This is located in the _vars_ directory of automation.jenkins-groovy-libraries. This executes the ansible-playbook command and does pre-requisites to ensure it works.
+
+There are multiple versions of _ansibleDeploy_, we have created a customized version called _ansibleDeployV2xdr.groovy_ for our use. Currently this is in the xdr-ansible-deploy branch which is used by the Jenkinsfile pipeline script of xdr-ansible-deploy. This should be merged to master in the future.
+
+
+#### automation.ansible Azure Inventory Script
+
+Ansible in automation.ansible repo utilises a _inventory script_ which dynamically queries Azure and fetches existing VMs. It does this on a subscription level and groups the VMs in the following way:
+
+ - azure
+ - location
+ - resource_group
+ - security_group
+ - tag key_value
+
+The most useful groupings for us are likely to be _resource_group_ & _tag key_value_. 
+
+_tag key_value_ groups by Azure tags. Each Azure tag key & value form its own group in the syntax:
+
+```
+key_value
+
+e.g:
+[environment_dev]
+Host1
+Host2
+Host3
+```
+
+In Crime, VMs are tagged with useful info such as tier, stack, project, platform & application. The dynamic grouping from these tags, along with the resource group grouping can then be used in Ansible Limiting as the most effective way to target subsets of VMs when delivering the rollout strategy.
+
+The inventory script is located in automation.ansible in _/sp-ansible/inventory/azure_rm.py_ and config params are provided by _/sp-ansible/inventory/azure_rm.ini_. The inventory script looks for an .ini file with the same name within the same directory by default.
+
+We have created a customized version of _azure_rm.py_ called _azure_rm_standalone.py_ & an associated .ini file, _azure_rm_standalone.ini_. This version has been altered to remove a dependency on a non-standard python library utilised for checking azure_compute minimum version for API compatability. In favour, standard library functionality is used. This allows the script to execute standalone outside of the ansible-playbook command without needing to mess with dependencies in the Jenkins environment.
+
+This standalone version of the inventory script is used by xdr-ansible-inventory to create the backend JSON data that populates xdr-ansible-deploy parameters. This exists in the xdr-ansible-deploy branch of the automation.ansible repo.
+
+#### automation.jenkins-dsl-jobs & The Mother Seed!
+
+automation.jenkins-dsl-jobs contains pipeline Jenkinsfiles for Crime Jenkins pipelines. These are split across different directories in logical fashion. 
+
+Within the repo exists a file: _/mother_seed_job.groovy_
+
+The purpose of the mother seed is to build the pipelines in Jenkins. While the Jenkinsfiles exist in their directory structure, they don't do anything till they're brought into a pipeline definition. This is what the mother seed does.
+
+Currently the two xdr pipelines are defined through the UI in-place & NOT via the mother seed. Its likely these will need integrating into the mother seed in the future.
+
+
+### Verify Installation
+
+Verify installation in the Cortex XSIAM Portal. Certain PlatOps members have access (Rees, Chirag, Jordan H). This can also be confirmed by MOJ SoC Engineers in the MS Teams chat.
+
+Verification can also be made on the VM itself.
+
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+<img src="images/xdr-linux.png" style="width:600px;">
+
+To check the agent is running on the VM:
+
+```bash
+systemctl status traps_pmd.service
+```
+
+
+### Uninstall
+
+If required, uninstall the XDR agent by doing the following:
+
+Verify agent is installed
+
+```bash
+rpm -qa | grep -i cortex-agent
+```
+
+If installed, run the rpm erase command
+
+```bash
+rpm -e cortex-agent
+```
+
+If this fails to work, specify the full version (this will have been output from the first command).
+
+For example
+
+```bash
+rpm —e cortex-agent-8.5.0.125392-1.x86_64
+```
+
+This will automatically remove the VM from the [XSIAM Cortex portal](https://justiceuk.xdr.uk.paloaltonetworks.com/login)
+
+[Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
+
+
+## Developing the Role
+
+We have created a [test environment repo](https://github.com/hmcts/cpp-ansible-test-environment/) which mimics the python & ansible setup used in Crime's main PlatOps Jenkins instance. 
+
+The README details how to setup a local machine environment for development that is compatible with the Jenkins environment. It uses Vagrant & the Virtualbox driver to build a local VM and automate Ansible against it.
+
+
+## Troubleshooting
+
+Put troubleshooting info here as needed

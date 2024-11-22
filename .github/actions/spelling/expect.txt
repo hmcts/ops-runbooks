@@ -1,5 +1,6 @@
 Bance
 cdef
+EDB
 Enda
 IMZ
 Jacomb
@@ -14,6 +15,7 @@ prd
 prepatch
 PRX
 pvc
+journalctl
 Qube
 Rns
 ruxit
@@ -24,3 +26,13 @@ toset
 totp
 TTLs
 utilisation
+jfmd
+jfrou
+jfrt
+pmd
+pvc
+Chirag
+Virtualbox
+mdv
+dsl
+Jenkinsfiles

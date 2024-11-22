@@ -72,7 +72,7 @@ Packages used by Linux's YUM utility are available from the CRIME repository [YU
 
 Redhat version 7 updates are held [here](https://yum.mdv.cpp.nonlive/pulp/repos/base/el/7/os/).
 
-Each folder contains updates published during that specific week, with the download happening on Sunday. The process is controlled via a Jenkins pipeline called "Pipeline Create New Pulp Tag (automation.ansible). It creates a new folder named Year Month Day (20241103). Confirm a folder name listed, matches what has been provided as the yum_repo_patching_tag in the patching Epic, you are working on.
+Each folder contains updates published during that specific week, with the download happening on Sunday. The process is controlled via a Jenkins pipeline called Pipeline "Create New Pulp Tag (automation.ansible)" [Link](https://build.mdv.cpp.nonlive/job/strategic_platform_strategic-platform_ansible_create_datetag_pulp.groovy/). It creates a new folder named Year Month Day (20241103). Confirm a folder name listed, matches what has been provided as the yum_repo_patching_tag in the patching Epic, you are working on.
 
 **NB-** The patches in each folders are current for that calendar week and will contain a roll-up of all the prior weeks. So the weeks don't need to be applied sequentially to each VM.
 

@@ -11,7 +11,7 @@ We have developed a method of installing the XDR agent to Crime VMs. This differ
 
 For Crime, we are utilising Ansible as the delivery method and have developed an [Ansible Role](https://github.com/hmcts/cpp-ansible-role-xdr-agent-install) which will perform the installation.
 
-To trigger the Ansible, we use the pre-exisiting adhoc pipelines in the main Crime Jenkins instance which can be scope limited by Ansible's Limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. This enables us to follow a rollout plan through environments and safely stage our delivery.
+To trigger the Ansible, we use the pre-existing adhoc pipelines in the main Crime Jenkins instance which can be scope limited by Ansible's Limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. This enables us to follow a rollout plan through environments and safely stage our delivery.
 
 This document details the procedure to do this.
 
@@ -134,7 +134,7 @@ Host2
 Host3
 ```
 
-As seen in the ANSIBLE_LIMIT section above, the true limit passed to the ansible-playbook commmand is using a _tag key_value_ group. This is the _stack_ tag on VMs in Azure.
+As seen in the ANSIBLE_LIMIT section above, the true limit passed to the ansible-playbook command is using a _tag key_value_ group. This is the _stack_ tag on VMs in Azure.
 
 Crime use different tags to tag useful information about a VM to the VM in Azure. Other tags include application, tier, stack, project & platform. 
 

@@ -15,29 +15,21 @@ To trigger the Ansible, we use the pre-existing adhoc pipelines in the main Crim
 
 This document details the procedure to do this.
 
+## Declaring xdr_tags
 
+### ANSIBLE_EXTRA_VARS Parameter
 
-## Ansible Inventory/Variables
+_xdr_tags_ is the only ansible variable that needs declaring for the xdr deployment role to work. There are two ways this can be declared; via the adhoc pipeline ANSIBLE_EXTRA_VARS parameter or via the group/host vars in the automation.ansible repository under _sp-ansible/_ directory. 
 
-Before running the pipelines, a variable need declaring in either Ansible group_vars or host_vars. This is:
+The recommended method is to use the ANSIBLE_EXTRA_VARS parameter. The reasoning for this is that it is much easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. Also, moving forward we will be trying to avoid VM deployments in the future so for the time being the role will not be included in the main deploy.yml playbook in automation.ansible. This is the playbook which is run against VMs to install/configure them with things required by Crime Platops.
 
-- xdr_tags
+<img src="images/xdr-crime-deploy-extra-vars.png" style="width:600px;">
 
-xdr_tags is a comma-separated string of tags to provide to the Cortex Agent.
+-----
 
-Example:
-
-```bash
-xdr_tags: "hmcts,server,idam"
-```
+Provide ANSIBLE_EXTRA_VARS in the format above. This is a comma separated string. 
 
 An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC team as members. Please reach out to MoJ SoC if unsure of tags to use.
-
-### Where to set these?
-
-These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
-
-Its possible the level at which you wish to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. If you find this, create the necessary vars file.
 
 ### Other Role variables
 
@@ -47,6 +39,21 @@ As MoJ SoC use their 'nonprod' instance of Cortex XSIAM more like a sandbox inst
   
 The only exception to this is 'sa_key'. This has been set on the 'all' group and is already usable by all hosts.
 
+### Declaring xdr_tags through Host/Group vars - Not Recommended
+
+This is not the recommended method for declaring _xdr_tags_ however it can be done this way.
+
+Declare in either Ansible group_vars or host_vars:
+
+Example:
+
+```bash
+xdr_tags: "hmcts,server,idam"
+```
+
+These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
+
+Its possible the level to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. The vars file can be created as necessary.
 
 ## Deploying the XDR agents
 
@@ -83,6 +90,10 @@ This option must be chosen.
 #### ANSIBLE_PLAYBOOK
 
 This is the playbook to run. Set this to _xdr-agent-deploy.yml_.
+
+#### ANSIBLE_EXTRA_VARS
+
+See section above on how to set _xdr_tags_ with this parameter.
 
 #### ANSIBLE_LIMIT
 

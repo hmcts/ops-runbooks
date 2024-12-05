@@ -11,7 +11,7 @@ Artifactory is utilized in the context of managing and updating software depende
 
 There are [3 additional files](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/ptl-intsvc) within artifactory: `admin-pw.yaml`, `join-key.yaml` and `master-key.yaml`. These files are necessary for Artifactory to operate, `admin-pw.yaml` is used to login to artifactory, `join-key.yaml` and `master-key.yaml` are used internally and are needed for the startup of Artifactory.
 
-This documentation will guide you through checking and updating the **self-hosted version** of Artifactory being used. This process includes accessing [Artifactory's website](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes) to determine the latest version available, verifying that the Artifactory Helm Release has accepted the latest changes, and ensuring the pods are healthy and that [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is accessible.
+This documentation will guide you through checking and updating the **self-hosted version** of Artifactory being used. This process involves checking the upstream [Artifactory's version](https://github.com/jfrog/charts/blob/387d7a1aa890bb65fb42a7d5b2c65cae0b7dded1/stable/artifactory-oss/Chart.yaml#L23C10-L23C18) verifying that the Artifactory Helm Release has accepted the latest changes, and ensuring the pods are healthy and that [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is accessible.
 
 **Note:** This activity is disruptive and will cause artifactory to stop working as the pods are redeployed in a statefulset. To minimize disruptions to teams the following paths can be taken:
 

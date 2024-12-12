@@ -18,7 +18,8 @@ mdv
 MDVADMVPNHA
 MDVDMZJUMPL
 NONLINE
-paramatisedpmd
+paramatised
+pmd
 prd
 prepatch
 PRX

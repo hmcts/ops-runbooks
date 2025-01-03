@@ -73,4 +73,6 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 - [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview)
 - [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
 
+#### SSH to PaloAlto VMs
+This needs done from Bastion server and ssh using the private IP from the Virtual machines in Azure.  Get the credentials from Key Vault (for example hmcts-infra-hub-prod-int for production) for the firewall-username and firewall-password.
 ---

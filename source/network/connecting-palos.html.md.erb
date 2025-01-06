@@ -1,18 +1,22 @@
 ---
 title: Connecting to a Palo Alto firewall
 weight: 60
-last_reviewed_on: 2024-07-12
+last_reviewed_on: 2025-01-06
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
 
-### SSO login steps
-## UK South 
+This page provides information on how to connect to a Palo Alto firewall.
 
-You can connect to the Palo VMs via the HMCTS VPN by following the following steps: 
+## SSO login steps
+Panorama is a centralized management system that provides global visibility and control over multiple Palo Alto Networks next generation firewalls through an easy-to-use web-base interface.
 
-### Sandbox
+### Prerequisite
+- VPN connection via F5
+- Active HMCTS or Justice account
+
+### Open Panorama
 
 1. Connect to the [HMCTS VPN](https://portal.platform.hmcts.net/).
 2. Retrieve the url of the Palo VM you want to connect to via the 'Virtual machines' section below.  
@@ -36,7 +40,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 - [panorama sandbox](https://panorama-sandbox.hmcts.net)
 - [panorama production](https://panorama.hmcts.net)
 
-### Access All systems via VPN:
+### Access All systems via F5 VPN:
 
 #### Panorama
 - [panorama-sbox](https://panorama-sbox-uks-0.sandbox.platform.hmcts.net)
@@ -73,7 +77,7 @@ You can connect to the Palo VMs via the HMCTS VPN by following the following ste
 - [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview)
 - [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
 
-#### SSH to PaloAlto VMs
+### SSH to PaloAlto VMs
 
 This needs done from Bastion server and ssh using the private IP from the Virtual machines in Azure.  Get the credentials from Key Vault (for example `hmcts-infra-hub-prod-int` for production) for the `firewall-username` and `firewall-password`.
 

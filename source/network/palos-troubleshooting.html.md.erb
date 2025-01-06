@@ -106,8 +106,8 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 ### **Troubleshooting tip**
 
 1. Log unto the VPN and `ssh` into the vm in questions. Good chance that at this point the management UI is inaccessible
-2. Check that there aren't any disk partition maxed out
-   ```cmd
+2. Check that there aren't any disk partition maxed out:
+   ```
    show system disk-space
    ```
 
@@ -116,14 +116,14 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
     <img alt="Disk usage result" src="images/disk_usage_high.png" width="591" height="225">
    </details>
 
-3. Verify the aggressive clean up is enabled
-   ```cmd
+3. Verify the aggressive clean up is enabled:
+   ```
    show system state | match aggressive-cleaning
    ```
    At the moment, setting is only available via the terminal. There is a possibility that this gets lost between major version upgrades or vm restarts
-4. In above command give no output then there is need to enable it per vm. chose `y` option to remove all old file. SysLog information would have already been
-   sent to Panorama log collector, run the below command in the terminal
-   ```cmd
+4. If the above command gives no output then it needs to be enabled per vm. chose `y` option to remove all old file. SysLog information would have already been
+   sent to Panorama log collector, run the below command in the terminal:
+   ```
    debug software disk-usage aggressive-cleaning enable
    ```
 
@@ -132,8 +132,8 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
     <img alt="Disk usage result" src="images/disk_usage_enable_cleanup.png" width="514">
    </details>
 
-5. Set to threshold to `90%` or lower e.g. `85%`
-   ```cmd
+5. The lowest threshold available is `90%`. The following command will set to `90%`:
+   ```
    debug software disk-usage cleanup deep threshold 90
    ```
 

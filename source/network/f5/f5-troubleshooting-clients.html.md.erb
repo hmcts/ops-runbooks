@@ -1,8 +1,8 @@
 ---
-title: F5 Client Troubleshooting
+title: Client Troubleshooting
 last_reviewed_on: 2024-08-06
 review_in: 6 months
-weight: 15
+weight: 10
 ---
 
 # <%= current_page.data.title %>
@@ -11,7 +11,8 @@ weight: 15
 
 While it is possible to install the F5 client software on Windows computers, local administrator permissions are required to complete the process.
 Problems with DNS name resolution will be encountered by non-admin users.
-https://my.f5.com/manage/s/article/K32311645#link_01_01
+
+[Link for more info](https://my.f5.com/manage/s/article/K32311645#link_01_01)
 
 
 ## MacOS
@@ -26,7 +27,7 @@ Notice the nameserver[0] : 100.64.9.0
 
 #### DNS configuration
 
-```
+```bash
 resolver #1
   search domain[0] : alpha.vpn.justice.gov.uk
   search domain[1] : a03.wp360g.svcs.hp.com
@@ -65,7 +66,7 @@ Notice the WiFi nameserver[0] : 8.8.4.4 and then the F5   nameserver[0] : 10.11.
 
 #### DNS configuration
 
-```
+```bash
 resolver #1
   search domain[0] : database.windows.net
   search domain[1] : hmcts.net

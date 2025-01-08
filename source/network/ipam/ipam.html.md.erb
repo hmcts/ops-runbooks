@@ -2,7 +2,7 @@
 title: Using IPAM to get available address space
 last_reviewed_on: 2024-06-10
 review_in: 12 months
-weight: 160
+weight: 10
 ---
 
 # <%= current_page.data.title %>
@@ -71,17 +71,17 @@ Please replace the `cidr` value with value you have got from above API call and 
 
 Get the Token after you logged in to the [IPAM portal](https://ipam.hmcts.net/)
 
-  <img src=images/token.png width="400">
+  <img src=../images/token.png width="400">
 
 On the Postman, select POST method and enter this API  https://ipam.hmcts.net/api/tools/nextAvailableVNet
 
 And then, select Bearer Token in Authorization and paste your above copied token there.
 
-  <img src=images/token-2.png width="400">
+  <img src=../images/token-2.png width="400">
 
 In the Body section, select Raw and Json type. You can then copy the body data from the [IPAM API Docs](https://ipam.hmcts.net/api/docs#/tools/next_available_vnet_api_tools_nextAvailableVNet_post) and paste it in the body. Replace the values depending upon the size and in the environment you are looking to find nextAvailable VNet space.
 
-  <img src=images/body-ipam-api.png width="400">
+  <img src=../images/body-ipam-api.png width="400">
 
 
 If you are happy with the range you are getting, run the reservation command to reserve the address space.
@@ -97,7 +97,7 @@ If you are happy with the range you are getting, run the reservation command to 
   }
   ```
 
-  <img src=images/body-ipam-reservation.png width="400">
+  <img src=../images/body-ipam-reservation.png width="400">
 
 
 Please also reference the following GitHub repo link for more information regarding ipam:

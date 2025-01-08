@@ -18,18 +18,18 @@ If you lose your login details, a person with existing access can provide you wi
 
 3. For making the changes to the ACL: click 'Access → 'Access Control Lists' → 'User-defined ACLs' → 'acl_vpn_reform', [direct link](https://vpn.platform.hmcts.net/tmui/Control/jspmap/tmui/accessctrl/acls/properties.jsp?name=/Common/acl_vpn_reform)
 
-    <img src=images/f5_routing_1.png  width="400">
+    <img src=../../images/f5_routing_1.png  width="400">
 
 4. Make sure the range in question is NOT already added  (If the range is already there and your app still not accessible through f5, see Common Issues section below)
 
-    <img src=images/f5_routing_2.png  width="400">
+    <img src=../images/f5_routing_2.png  width="400">
 
 4. You will see a list of ACLs for all the entries. Open two tabs in your browser on the same page, open an existing one and then click 'Add' for your new one. Copy the required details from the existing one to the new one.
 Note: If using Firefox then the search function probably won't find the IP address you type in.
 
 5. You will find 2 entries; HTTP and HTTPS. Change it to add new CIDR range, such as below:
 
-    <img src=images/properties.png  width="400">
+    <img src=../images/properties.png  width="400">
 
 ## Access Policy
 
@@ -42,8 +42,8 @@ Note: If using Firefox then the search function probably won't find the IP addre
 3. Logout of your current F5 VPN session (<https://portal.platform.hmcts.net>) and log back in to validate if the routing table update has taken place for the new network address space as shown below:
 
 <p float="left">
-<img src=images/VPN_Routing_table.png  width="400" />
-<img src=images/Routing_Change.png  width="400" />
+<img src=../images/VPN_Routing_table.png  width="400" />
+<img src=../images/Routing_Change.png  width="400" />
 </p>
 
 ## Apply Access Policy
@@ -54,23 +54,23 @@ Once you have made a change to F5, you are required to Apply Access Policy.
 
 Select Apply Access Policy
 
-<img src=images/apply_access_policy.png  width="400">
+<img src=../images/apply_access_policy.png  width="400">
 
 * Review Access profile & ensure option prof_portal.platform.hmcts.net is ticked
 
 Select Apply
 
-<img src=images/apply_access_profile.png  width="400">
+<img src=../images/apply_access_profile.png  width="400">
 
 * Access profile policies are then shown, it should already be ticked for all.
 
 Select Apply
 
-<img src=images/apply_access_profile_all.png  width="400">
+<img src=../images/apply_access_profile_all.png  width="400">
 
 * Once successful apply, all access profiles should be green
 
-<img src=images/apply_access_policy_review.png  width="400">
+<img src=../images/apply_access_policy_review.png  width="400">
 
 ## Common Issues
 
@@ -80,7 +80,7 @@ If your app is not available after adding CIDR range and you know that app is ac
 
 1. Click  'Access → 'Connectivity/VPN' → 'Network Access(VPN)' → 'Network Access Lists'  and then  select `netacl_mojvpn` from the list
 
-<img src=images/f5_routing_3.png width="400">
+<img src=../images/f5_routing_3.png width="400">
 
 2. Click on Network Settings tab
 
@@ -90,7 +90,7 @@ If your app is not available after adding CIDR range and you know that app is ac
 
 5. Make sure private dns zone has been added under DNS Address Space too
 
-<img src=images/f5_routing_4.png width="400">
+<img src=../images/f5_routing_4.png width="400">
 
 ###  Other Common issue
 

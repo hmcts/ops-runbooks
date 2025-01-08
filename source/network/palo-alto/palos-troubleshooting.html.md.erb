@@ -45,14 +45,14 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
     <details>
         <summary>Commit Button</summary>
-        <img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
+        <img alt="Commit Button" src="../images/palo-commit.png" width="300" height="200">
     </details>
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit.
 
     <details>
         <summary>Validate Button</summary>
-        <img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
+        <img alt="Validate Button" src="../images/validate-button.png" width="300" height="200">
     </details>
 
 4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is.
@@ -62,7 +62,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
     <details>
         <summary>Validate Example</summary>
-        <img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
+        <img alt="Validate Example" src="../images/example-validate.png" width="300" height="200">
     </details>
 
 5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
@@ -83,7 +83,7 @@ The Palos have a built in traffic monitoring tool that could help you find the i
 
 <details>
     <summary>Filtering Example</summary>
-    <img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
+    <img alt="Traffic Filtering" src="../images/filtering.png" width="300" height="200">
 </details>
 
 For more information on types of filters you can apply check out [Basics of traffic monitor filtering](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).
@@ -97,7 +97,7 @@ root. Some other path may be presented in the error not always `/`.
 
 <details>
     <summary>Disk usage for / exceeds limit</summary>
-    <img alt="Disk usage" src="images/disk_usage_exceeds_limit.png" width="423">
+    <img alt="Disk usage" src="../images/disk_usage_exceeds_limit.png" width="423">
 </details>
 
 When this happens then there needs to be a cleaning exercise or a hard reboot as a last resort.
@@ -113,7 +113,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 
    <details>
     <summary>Disk usage for / exceeds limit</summary>
-    <img alt="Disk usage result" src="images/disk_usage_high.png" width="591" height="225">
+    <img alt="Disk usage result" src="../images/disk_usage_high.png" width="591" height="225">
    </details>
 
 3. Verify the aggressive clean up is enabled:
@@ -129,7 +129,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 
    <details>
     <summary>Enable cleanup</summary>
-    <img alt="Disk usage result" src="images/disk_usage_enable_cleanup.png" width="514">
+    <img alt="Disk usage result" src="../images/disk_usage_enable_cleanup.png" width="514">
    </details>
 
 5. The lowest threshold available is `90%`. The following command will set to `90%`:
@@ -139,7 +139,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 
    <details>
     <summary>Disk cleanup setting</summary>
-    <img alt="Disk usage result" src="images/disk_usage_reset.png" width="775">
+    <img alt="Disk usage result" src="../images/disk_usage_reset.png" width="775">
    </details>
 
    You should see info stating usage has been adjusted

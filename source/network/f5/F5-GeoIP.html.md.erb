@@ -42,7 +42,7 @@ The following steps are to be in the `*shared*` directory, which is different fr
 
 - Connect to the F5 device via SSH and run the following commands:
 
-```
+```bash
 mkdir /shared/GeoIP_backup
 
 cp -R /GeoIP/* /GeoIP_backup/
@@ -58,7 +58,7 @@ unzip <ip-geolocationfile>.zip
 
 - This step will overwrite the update GeoIP database files, repeat for each rpm file in the zip archive
 
-```
+```bash
 geoip_update_data -f </path/to/rpm>
 
 geoip_lookup -f <path/to/db/files> <IP address>
@@ -66,7 +66,7 @@ geoip_lookup -f <path/to/db/files> <IP address>
 
 - Remove the now redundant zip, rpm and md5 files from temp directory
 
-```
+```bash
 rm -i </path/to/file>
 
 ```

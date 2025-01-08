@@ -107,7 +107,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 
 1. Log unto the VPN and `ssh` into the vm in questions. Good chance that at this point the management UI is inaccessible
 2. Check that there aren't any disk partition maxed out:
-   ```
+   ```bash
    show system disk-space
    ```
 
@@ -117,7 +117,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
    </details>
 
 3. Verify the aggressive clean up is enabled:
-   ```
+   ```bash
    show system state | match aggressive-cleaning
    ```
    At the moment, setting is only available via the terminal. There is a possibility that this gets lost between major version upgrades or vm restarts
@@ -133,7 +133,7 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
    </details>
 
 5. The lowest threshold available is `90%`. The following command will set to `90%`:
-   ```
+   ```bash
    debug software disk-usage cleanup deep threshold 90
    ```
 

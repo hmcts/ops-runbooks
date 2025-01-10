@@ -17,7 +17,7 @@ In production, by default these pinned routes target 10.11.8.37 | [hmcts-hub-pro
 
 This means that in the event of palo-vm-1 being unavailable, either due to an incident, or scheduled maintenance, traffic from Cloud Gateway will not be able to reach the applications.
 
-Applications affected by this are:
+Applications affected by this are
 - DARTs
 - LibraGoB
 - SDP
@@ -34,28 +34,26 @@ This document will describe the process of failing over to the other firewall in
 ## Failover Process
 Before starting the failover process, be aware that there may be a brief period of downtime while the failover is in progress.
 
-Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover.
+Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover. These steps will assume a Production failover, with links to example PRs for the DEMO environment.
 
-These steps will assume a Production failover, with links to example PRs for the DEMO environment.
-
-1. There are three places across two repositories where the IP address needs to be updated:
+There are three places across two repositories where the IP address needs to be updated:
 - [aks-sds-deploy](https://github.com/hmcts/aks-sds-deploy)
 - [azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan)
 
-2. Update the IP address in the following files in the aks-sds-deploy repository:
+1. Update the IP address in the following files in the aks-sds-deploy repository:
 - [prod-pinned-aks-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-aks-routes.yaml#L3)
 - [prod-pinned-appgw-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-appgw-routes.yaml#L3)
 
 See example PR for DEMO enviornment: [DEMO PR](https://github.com/hmcts/aks-sds-deploy/pull/662/files)
 Note: the IPs are different for DEMO and PROD environments.
 
-3. Update the IP address in the following files in the azure-platform-virtualwan repository:
+2. Update the IP address in the following files in the azure-platform-virtualwan repository:
 - [static vnet routes](https://github.com/hmcts/azure-platform-virtualwan/blob/b48a0cc40b52accfd6884b8811d2e79503d071be/environments/prod/prod.tfvars#L153-L156)
 
 See example PR for DEMO enviornment: [DEMO PR](https://github.com/hmcts/azure-platform-virtualwan/pull/103/files)
 Note: the IPs are different for DEMO and PROD environments.
 
-4. Running the pipelines
+3. Running the pipelines
 
 There are usually two reason why you would want to failover, either due to an incident / issue with a VM, or scheduled maintenance, such as patching.
 
@@ -74,7 +72,7 @@ The required stages for this are:
 
 The [azure-platform-virtualwan pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=478&_a=summary) is usally quicker to run, and can be run by merging your PR, following approval.
 
-5. Verify the failover has been successful.
+4. Verify the failover has been successful.
 
 To verify the failover has been successful, you can check the following:
 - Your pipeline has completed successfully.

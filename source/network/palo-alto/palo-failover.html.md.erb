@@ -10,8 +10,8 @@ review_in: 4 months
 For applications accessed via Cloud Gateway, we have pinned routes in place to route traffic through
 a specific Palo Alto firewall, to ensure the return traffic is routed back through the same firewall.
 
-In production, by default these pinned routes target 10.11.8.37 | [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
-and should be updated to 10.11.8.38 which is hmcts-hub-prod-int-palo-vm-0 in the event of a failover is needed in production.
+In production, by default these pinned routes target 10.11.8.37 which is [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
+and should be updated to 10.11.8.38 which is [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview) in the event of a failover is needed in production.
 
 This means that in the event of palo-vm-1 being unavailable, either due to an incident, or scheduled maintenance, traffic from Cloud Gateway will not be able to reach the applications.
 
@@ -31,14 +31,16 @@ There are three places across two repositories where the IP address needs to be 
 - [azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan)
 
 1. Update the IP address in the following files in the aks-sds-deploy repository:
-- [prod-pinned-aks-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-aks-routes.yaml#L3)
-- [prod-pinned-appgw-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-appgw-routes.yaml#L3)
+
+-[prod-pinned-aks-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-aks-routes.yaml#L3)
+-[prod-pinned-appgw-routes](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-appgw-routes.yaml#L3)
 
 See example PR for DEMO enviornment: [DEMO PR](https://github.com/hmcts/aks-sds-deploy/pull/662/files)
 Note: the IPs are different for DEMO and PROD environments.
 
 2. Update the IP address in the following files in the azure-platform-virtualwan repository:
-- [static vnet routes](https://github.com/hmcts/azure-platform-virtualwan/blob/b48a0cc40b52accfd6884b8811d2e79503d071be/environments/prod/prod.tfvars#L153-L156)
+
+-[static vnet routes](https://github.com/hmcts/azure-platform-virtualwan/blob/b48a0cc40b52accfd6884b8811d2e79503d071be/environments/prod/prod.tfvars#L153-L156)
 
 See example PR for DEMO enviornment: [DEMO PR](https://github.com/hmcts/azure-platform-virtualwan/pull/103/files)
 Note: the IPs are different for DEMO and PROD environments.

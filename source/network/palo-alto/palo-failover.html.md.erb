@@ -4,9 +4,6 @@ weight: 10
 last_reviewed_on: 2025-01-10
 review_in: 4 months
 ---
-
-Reachable from behind cloud gateway
-
 # <%= current_page.data.title %>
 ## Overview
 
@@ -14,19 +11,12 @@ For applications accessed via Cloud Gateway, we have pinned routes in place to r
 a specific Palo Alto firewall, to ensure the return traffic is routed back through the same firewall.
 
 In production, by default these pinned routes target 10.11.8.37 | [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
+and should be updated to 10.11.8.38 which is hmcts-hub-prod-int-palo-vm-0 in the event of a failover is needed in production.
 
 This means that in the event of palo-vm-1 being unavailable, either due to an incident, or scheduled maintenance, traffic from Cloud Gateway will not be able to reach the applications.
 
-Applications affected by this are
-- DARTs
-- LibraGoB
-- SDP
-- SDP
-- Juror Digital
-- CVP
-- BAIS
-- MI
-- Interim Hosting
+Applications affected by this are:
+- DARTs, LibraGoB, SDP, SDP, Juror Digital, CVP, BAIS, MI, Interim Hosting
 
 This document will describe the process of failing over to the other firewall in the pair. 
 
@@ -34,7 +24,7 @@ This document will describe the process of failing over to the other firewall in
 ## Failover Process
 Before starting the failover process, be aware that there may be a brief period of downtime while the failover is in progress.
 
-Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover. These steps will assume a Production failover, with links to example PRs for the DEMO environment.
+Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover. 
 
 There are three places across two repositories where the IP address needs to be updated:
 - [aks-sds-deploy](https://github.com/hmcts/aks-sds-deploy)
@@ -79,6 +69,17 @@ To verify the failover has been successful, you can check the following:
 - Check the [aks-prod-appgw-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-appgw-route-table/overview) has been updated. Check the 'Next hop IP address now reflects your PR. You can ignore any routes pointing to .36 addresses'
 - Check the [aks-prod-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-route-table/overview) for the same.
 
+## FAQ
+
+### How do I find out IP's for the firewalls?
+
+You can find out which IPs belong to which Palos by checking the backend pool of the Load Balancer in the Azure Portal.
+
+For example, the production backend pool can be found [here](https://https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Network/loadBalancers/hmcts-hub-prod-int-palo-lb/backendPools)
+
+### The terraform plans are showing a lot of changes, is this normal?
+
+Yes, this is normal. The pipeline reorders resoucres and IPs within the plan which creates a messy outout. If you are in any doubt, ask #platform-operations on Slack. 
 
 
 

@@ -1,6 +1,8 @@
 Bance
 cdef
 Chirag
+CVP
+deevanapalli
 devrot
 dsl
 EDB
@@ -14,6 +16,7 @@ jfmd
 jfrou
 jfrt
 journalctl
+kalyan
 mdv
 MDVADMVPNHA
 MDVDMZJUMPL
@@ -35,3 +38,4 @@ totp
 TTLs
 utilisation
 Virtualbox
+virtualwan

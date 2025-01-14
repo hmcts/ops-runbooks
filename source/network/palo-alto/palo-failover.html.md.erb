@@ -42,14 +42,14 @@ There are three places across two repositories where the IP address needs to be 
 * Pinned aks routes in [prod-pinned-aks-routes.yaml](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-aks-routes.yaml#L3)
 * Pinned app gateway routes [prod-pinned-appgw-routes.yaml](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-appgw-routes.yaml#L3)
 
-See example [PR for DEMO enviornment](https://github.com/hmcts/aks-sds-deploy/pull/662/files)
+See example [PR for DEMO environment](https://github.com/hmcts/aks-sds-deploy/pull/662/files)
 **Note:** the IPs are different for DEMO and PROD environments.
 
 ### 2. Update the IP address in the following files in the azure-platform-virtualwan repository:
 
 * static vnet routes in [prod.tfvars](https://github.com/hmcts/azure-platform-virtualwan/blob/b48a0cc40b52accfd6884b8811d2e79503d071be/environments/prod/prod.tfvars#L153-L156)
 
-See example [PR for DEMO enviornment](https://github.com/hmcts/azure-platform-virtualwan/pull/103/files)
+See example [PR for DEMO environment](https://github.com/hmcts/azure-platform-virtualwan/pull/103/files)
 **Note:** the IPs are different for DEMO and PROD environments.
 
 ### 3. Running the pipelines
@@ -71,7 +71,7 @@ The required stages for this are:
 * '{Environment}: Genesis'
 * '{Environment}: Network'
 
-**Finally, your PR should still be merged** this is to keep the codebase in sync with the enviornment as well as to prevent a future pipeline run from overwriting your changes.
+**Finally, your PR should still be merged** this is to keep the codebase in sync with the environment as well as to prevent a future pipeline run from overwriting your changes.
 
 The [azure-platform-virtualwan pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=478&_a=summary) is usually quicker to run, and can be run by merging your PR, following approval.
 

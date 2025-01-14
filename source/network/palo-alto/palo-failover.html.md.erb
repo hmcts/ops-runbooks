@@ -16,6 +16,7 @@ and should be updated to 10.11.8.38 which is [hmcts-hub-prod-int-palo-vm-0](http
 This means that in the event of palo-vm-1 being unavailable, either due to an incident, or scheduled maintenance, traffic from Cloud Gateway will not be able to reach the applications.
 
 Applications affected by this are:
+
 * DARTs
 * LibraGoB
 * SDP
@@ -34,6 +35,7 @@ Before starting the failover process, be aware that there may be a brief period 
 Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover. 
 
 There are three places across two repositories where the IP address needs to be updated:
+
 * [aks-sds-deploy](https://github.com/hmcts/aks-sds-deploy)
 * [azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan)
 
@@ -54,7 +56,8 @@ See example [PR for DEMO environment](https://github.com/hmcts/azure-platform-vi
 
 ### 3. Running the pipelines
 
-There are usually two reason why you would want to failover, either; 
+There are usually two reason why you would want to failover, either;
+
 * due to an incident / issue with a VM
 * scheduled maintenance, such as patching.
 
@@ -66,6 +69,7 @@ If you run from your branch, and select only the required pipeline stages, it ca
 Ensure you still raise a PR, wait for checks to complete successfully, and then run the pipeline from your branch.
 
 The required stages for this are:
+
 * 'Precheck'
 * 'Checking Clusters for sbox'
 * '{Environment}: Genesis'
@@ -78,6 +82,7 @@ The [azure-platform-virtualwan pipeline](https://dev.azure.com/hmcts/PlatformOpe
 ### 4. Verify the failover has been successful.
 
 To verify the failover has been successful, you can check the following:
+
 * Your pipeline has completed successfully.
 * Check the [aks-prod-appgw-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-appgw-route-table/overview) has been updated. Check the 'Next hop IP address now reflects your PR. You can ignore any routes pointing to .36 addresses'
 * Check the [aks-prod-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-route-table/overview) for the same.

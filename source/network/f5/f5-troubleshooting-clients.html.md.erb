@@ -1,11 +1,35 @@
 ---
 title: Client Troubleshooting
-last_reviewed_on: 2024-08-06
+last_reviewed_on: 2025-01-15
 review_in: 6 months
 weight: 10
 ---
 
 # <%= current_page.data.title %>
+
+## F5 Portal Connection Issues
+The F5 portal uses your justice.gov.uk or hmcts.net user account to authenticate. If you are having issues connecting to the F5 portal, you may need to reset your password via the Office 365 portal.
+
+[o365 Login](https://login.microsoftonline.com/)
+
+This site has much better user feedback about logon problems and enables you to make any changes to your account.
+
+### Organisation Account
+Multiple organisations are available to users and swapping them can help resolve issues. Such as the F5 reporting that
+
+```
+"Failed the antivirus check, please ensure your system antivirus is enabled, updated and that you have run a full scan within the last 7 days..."
+
+or 
+
+"Access has been blocked by Conditional Access policies. The access policy does not allow token issuance..."
+```
+
+While the F5 VPN client is failing, the problem may be the Organisation account being used. 
+
+Log into [o365 Login](https://login.microsoftonline.com/) and select the alternative account.
+
+<img src=../images/f5_AccountOrganisation.png width="400">
 
 ## Windows 
 
@@ -17,6 +41,22 @@ Problems with DNS name resolution will be encountered by non-admin users.
 
 ## MacOS
 
+### Start Inspection Fails
+If the F5 VPN client fails to start inspection, the following error message will be displayed:
+
+<img src=../images/f5_EndpointInspectorFails.png width="400">
+
+This error is caused by the F5 VPN client not being able to start the inspection process. The inspection process is required to ensure that the client is compliant with the security policies of the VPN. 
+
+Your local routers IPv6 configuration may be causing the issue. To resolve the issue, you will need to ignore the IPv6 on your local router.
+Open the operating system System Settings, WiFi and select Details of your connection.
+
+Select TCP/IP from the menu and scroll down to the Configure IPv6 section. Change the setting to Link-local only.
+
+Click Ok and try to connect the F5 VPN again.
+
+
+### DNS Configuration
 Users have reported problems when using the F5 VPN if another VPN is also active. Such as MoJs Global Protect VPN. Turning off the unrequired VPN, will resolve the issue.
 By opening a terminal on the mac and using the command 'scutil --dns' the local DNS configuration can be seen.
 

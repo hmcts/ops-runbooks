@@ -1,6 +1,6 @@
 ---
 title: Client Troubleshooting
-last_reviewed_on: 2024-08-06
+last_reviewed_on: 2025-01-15
 review_in: 6 months
 weight: 10
 ---
@@ -17,6 +17,22 @@ Problems with DNS name resolution will be encountered by non-admin users.
 
 ## MacOS
 
+### Start Inspection Fails
+If the F5 VPN client fails to start inspection, the following error message will be displayed:
+
+<img src=../images/f5_EndpointInspectorFails.png width="400">
+
+This error is caused by the F5 VPN client not being able to start the inspection process. The inspection process is required to ensure that the client is compliant with the security policies of the VPN. 
+
+Your local routers IPv6 configuration may be causing the issue. To resolve the issue, you will need to ignore the IPv6 on your local router.
+Open the operating system System Settings, WiFi and select Details of your connection.
+
+Select TCP/IP from the menu and scroll down to the Configure IPv6 section. Change the setting to Link-local only.
+
+Click Ok and try to connect the F5 VPN again.
+
+
+### DNS Configuration
 Users have reported problems when using the F5 VPN if another VPN is also active. Such as MoJs Global Protect VPN. Turning off the unrequired VPN, will resolve the issue.
 By opening a terminal on the mac and using the command 'scutil --dns' the local DNS configuration can be seen.
 

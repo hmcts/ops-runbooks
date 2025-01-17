@@ -171,13 +171,13 @@ Terraform already has the automation script which would make config changes on t
 
 ### Post Deployment Steps
 
-**1.** Post merging PR above and having the automation script run, add the recovery admin password on crowd and make your account Aamin account
+**1.** Post merging PR above and having the automation script run, add the recovery admin password on crowd and make your account Admin account
 
 **2.** Added password here  - vi /opt/crowd/apache-tomcat/bin/setenv.sh  --> append  ``` -Datlassian.recovery.password=<any password> ```
 
 **3.** Login to crowd using recovery_admin username and above password and add yourself Administrator groups.
 
-Your account then should sync with Jira and Confluence and you can then make any Administrative changes.
+Your account then should sync with Jira and Confluence and you can then able to make any Administrative changes.
 
 **4.** Change the Base URLs on all the apps to staging.tools.hmcts.net
 

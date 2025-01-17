@@ -15,7 +15,7 @@ This documentation provides a detailed outline of the procedure, offering guidan
 
 ## Prerequisites
 
-The atlassian production environment is deployed on the [MOJ DCD Atlassian LVE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/overview) subscription and the staging environment is deployed on the [MOJ DCD Atlassian NLE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/overview) subscription. so make sure you have access to these subscriptions as contruibutor.
+The atlassian production environment is deployed on the [MOJ DCD Atlassian LVE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/overview) subscription and the staging environment is deployed on the [MOJ DCD Atlassian NLE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/overview) subscription. so make sure you have access to these subscriptions as contributor.
 
 
 ## Existing Production Setup
@@ -52,7 +52,7 @@ Please note that there are other important resources like Application Gateways, 
 
 ## Approach for Staging deployment
 
-We decided to use the same setup as production for the staging environment. We have first of all used backup copies of the above VMs to deploy the VMs on staging. We have also used the same database server for the staging environment.
+We decided to use the same setup as production for the staging environment. We have first of all used backup copies of the above VMs to deploy the VMs on staging. We restored a backup of the production database to a new staging single server.
 
 In order to restore VMs from the Backup and give them new names, we have used the following script:
 
@@ -184,7 +184,7 @@ Your account then should sync with Jira and Confluence and you can then make any
 **5.** Change colours of the environment to differentiate between Live and Staging
 
 
-## Toublshooting
+## Troubleshooting
 
 **1.** If you are unable to access the VMs, please make sure you are connected to F5 VPN and using the correct private key and the private key is in the correct format.
 

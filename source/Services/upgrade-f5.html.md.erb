@@ -1,0 +1,36 @@
+---
+title: Upgrade F5
+last_reviewed_on: 2025-01-07
+review_in: 6 months
+weight: 51
+---
+
+# <%= current_page.data.title %>
+## Introduction
+We have a live instance of F5 (mgmt-vpn-2-vm) which before now was our only instance. Now we have a passive instance which remains turned off until we need to use it to test some changes or an upgrade, called mgmt-vpn.
+> It is now part of the patching rota to keep mgmt-vpn up to date with our live instance, this document is written with this fact in mind, and different precautions must be taken and downtime considered in a CR if upgrading the live instance of F5.
+
+
+We backup our live f5 regularly to a remote storage account and file share created, with a cron job now setup to automate backup of config and copy to the remote storage account (mgmtvpn2mgmtsa.file.core.windows.net/f5backup). 
+
+It is not so trivial to port this config into a nonlive instance of F5, because it brings all config over, including user accounts, hostname, IP configuration etc. There are some options to do all this via REST API, but we instead chose to update whatever is needed manually on the nonlive instance to reflect testing a change we plant to make to the live instance.
+
+## Upgrading F5
+We manage F5 upgrades currently via ISO file uploads and swaps. A pre-requisite for this step is that you have an account with F5 support. This is trivial to set up, head to https://account.f5.com/myf5 and sign up with your email. You will need to raise a case to have your user added to HMCTS-JUSTICE support account, you will need to provide the account name, ID, and address, all of this is available in cftptl-intsvc key vault.
+
+Once you have access to the ISO files on the download page, download the one which matches the current version on our live instance.
+See this by logging into the F5, System > Software Management > Image List. You will see the one marked as "Active" is the version you are looking for, and is the file you need to download.
+
+<img src="images/f5-image-list.png" style="width:600px;">
+
+
+Before beginning the upload, you should check disk capacity on the VM, and if needed clear up some space. Otherwise, the image import may fail.
+
+
+The rest is nicely outlined in [this kt article](https://techdocs.f5.com/kb/en-us/products/big-ip_ltm/manuals/product/bigip-ve-setup-linux-kvm-13-1-0/5.html).
+
+When you come to rebooting the non-live F5, it will take a while and shut down the device. This is of no concern as the device is a nonlive instance.
+
+## Compatibility
+If the APM clients software is different compared to our live instance, you can follow https://my.f5.com/manage/s/article/K23159056 to upgrade those too.
+There is a [compatibility matrix](https://techdocs.f5.com/kb/en-us/products/big-ip_apm/manuals/product/desktop-clientcompatmatrix.html) to help you figure out which APM Edge client versions are supported by various other dependencies.

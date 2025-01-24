@@ -183,6 +183,43 @@ Your account then should sync with Jira and Confluence and you can then able to 
 
 **5.** Change colours of the environment to differentiate between Live and Staging
 
+### Creating Manual Backups
+
+When we are cutting over to the new production environment, we need to take manual backups of the VMs.  We have used the following script to take the manual backups:
+
+```bash   
+VaultName="BK-PRD-ATL-INT-01"
+ResourceGroup="RG-PRD-ATL-INT-01"
+Subscription="79898897-729c-41a0-a5ca-53c764839d95"
+
+RetainUntil=$(date -v+3d '+%d-%m-%Y')
+
+az account set --subscription $Subscription
+
+# List of VM names
+VMNames=(
+  "PRDATL01ACNF02.cp.cjs.hmcts.net"
+  "PRDATL01ACNF04.cp.cjs.hmcts.net"
+  "PRDATL01ACRD01.cp.cjs.hmcts.net"
+  "PRDATL01AJRA01.cp.cjs.hmcts.net"
+  "PRDATL01AJRA02.cp.cjs.hmcts.net"
+  "PRDATL01AJRA03.cp.cjs.hmcts.net"
+  "PRDATL01DGST01.cp.cjs.hmcts.net"
+  "PRDATL01DGST02.cp.cjs.hmcts.net"
+  "PRDATL01DGST03.cp.cjs.hmcts.net"
+)
+
+# Loop through each VM name and execute the backup command
+for VMName in "${VMNames[@]}"; do
+  ContainerName=$(az backup container list --resource-group $ResourceGroup --vault-name $VaultName --backup-management-type AzureIaasVM --query "[?properties.friendlyName=='$VMName'].{Name:name}" -o tsv)
+  az backup protection backup-now --container-name $ContainerName --item-name $VMName --resource-group $ResourceGroup --retain-until $RetainUntil --vault-name $VaultName --backup-management-type AzureIaasVM
+done
+
+```
+
+Once the VMs are backed up, we can then able to use the latest backup to restore the VMs to the new production environment.
+
+<img src=images/AtlassianVMBackupRestore.png  width="600">
 
 ## Troubleshooting
 

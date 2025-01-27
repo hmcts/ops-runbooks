@@ -235,6 +235,6 @@ e.g  `jira_shared` should be mounted here `/var/atlassian/application-data/jira/
 
 Please use `mount -a` command to mount them correctly.
 
-There was problem where the share was not mounted correctly after auto shutdown, we have got cronjob on the staging VMs to run the mounting script everyday at 8am.
+There was problem where the share was not mounted correctly after auto shutdown, we have got cronjob on the staging VMs to run the mounting every hour, the script checks if the Share is mounted or not and if not, it will attempt to mount it.
 
 

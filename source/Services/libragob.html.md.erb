@@ -1,0 +1,81 @@
+---
+title: LibraGoB
+last_reviewed_on: 2025-01-28
+review_in: 6 months
+weight: 130
+---
+
+# <%= current_page.data.title %>
+
+## Introduction
+Libra Green on Black (GoB) or Libra-GoB is the legacy system used in magistrates court for compliance and enforcement. 
+It is passed details of financial impositions from the court, and then 'manages' the collection of those fines - takings payments, setting terms and sending bailiffs etc.
+
+The application itself runs in containers hosted by Azure Kubernetes, SDS clusters, in the MET namespace. With CGI creating the images, which are manually pushed by them, to the HMCTS container repository.
+
+Known as MET within the sds-flux-config apps folder
+
+## Repositories
+* Frontend
+[sds-flux-config / MET](https://github.com/hmcts/sds-flux-config/tree/master/apps/met)
+
+* Backend
+[Libragob-Shared-Infrastructure](https://github.com/hmcts/libragob-shared-infrastructure)
+
+
+
+### Pipelines
+GitHub Actions apply HELM CHART changes to the MET containers in the TEST environments, when a GitHub Pull Request in sds-flux-config is created.  When these PRs are approved, the PROD environment receives the new helm charts.
+
+
+Libragob-Shared-Infrastructure uses SDS's Jenkins and the HMCTS / libragob-shared-infrastructure pipeline to manage infrastructure
+[Jenkins Pipeline](https://sds-build.hmcts.net/blue/organizations/jenkins/HMCTS%2Flibragob-shared-infrastructure)
+
+
+# MET Containers
+
+The [themis-fe.yaml](https://github.com/hmcts/sds-flux-config/blob/master/apps/met/themis-fe/themis-fe.yaml) file describes the MET application and is combined with either prod.yaml or test.yaml to create the specific environments containers.
+
+The environment variables within the files are the responsibility of CGI and they toggle "TEMP_VAR" to either 0 or 1, to restart the containers in environments.
+
+Log output from the application can be viewed by either watching the live logs via K9s or kubectl logs
+
+### Example log file
+```
+kubectl logs -n namespace container > any_name.txt
+
+kubectl logs -n met met-themis-fe-nodejs-86ccbcdc94-mdnrg > any_name.txt
+```
+
+By saving the logs to a text file, you can use an editor to search the log for key events
+
+Starting
+
+* Starting DacSbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-68c8dfd96-x72vz
+* Starting ThemisGatewaySbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-68c8dfd96-x72vz
+* Starting service [Tomcat]
+* Starting Servlet engine: [Apache Tomcat/9.0.70]
+
+
+Exception
+* Caused by: java.sql.SQLException: Cannot create JDBC driver of class 'org.postgresql.Driver' for connect URL 'jdbc:postgresql://libragobrestore-'
+
+
+## MET Testing
+If the MET containers are operational and you are connected via thw F5 VPN tunnel, these URLs will respond with a page of XML
+"This XML file does not appear to have any style information associated with it. The document tree is shown below."
+
+* PROD -  https://cloudgobgateway.platform.hmcts.net/services/themisgatewayapi?wsdl
+* TEST -  https://cloudgobgateway.test.platform.hmcts.net/services/themisgatewayapi?wsdl
+
+The URL resolves to an application gateway (aks00-(env$)-agw) which has the health probe "gob-gateway" to test the response from /services/themisgatewayapi?wsdl for a HTTP response status code match between 200-399.  The probe connects a 2nd gateway and ultimately the MET containers.
+Any problems with the back end network, containers or themis-fe-nodejs application and the 502 Bad Gateway error will be returned.
+
+### Example Of Failed Application
+<img src=images/Libragob-down.png  width="800">
+
+
+## Key Vault Secrets
+Important configuration details are held within each environments key vault. Problems with database connection strings, user names or passwords, maybe reported in the log files. As shown in the example above. However, it is possible the container will become stuck in a reboot loop, when the readiness or liveness tests fail.
+
+In January 2025, a wrong value for dac-datasource-username was provided but was not reported in the log file as an issue. It was only by testing the individual secrets called by the apps/met/themis-fe/test.yaml file, that the problem was discovered.  

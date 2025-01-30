@@ -44,15 +44,15 @@ Log output from the application can be viewed by either watching the live logs v
 ```
 kubectl logs -n namespace container > any_name.txt
 
-kubectl logs -n met met-themis-fe-nodejs-86ccbcdc94-mdnrg > any_name.txt
+kubectl logs -n met met-themis-fe-nodejs-X > any_name.txt
 ```
 
 By saving the logs to a text file, you can use an editor to search the log for key events
 
 Starting
 
-* Starting DacSbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-68c8dfd96-x72vz
-* Starting ThemisGatewaySbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-68c8dfd96-x72vz
+* Starting DacSbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-X
+* Starting ThemisGatewaySbApplication v1.0.0 using Java 17-ea on met-themis-fe-nodejs-X
 * Starting service [Tomcat]
 * Starting Servlet engine: [Apache Tomcat/9.0.70]
 
@@ -65,8 +65,8 @@ Exception
 If the MET containers are operational and you are connected via thw F5 VPN tunnel, these URLs will respond with a page of XML
 "This XML file does not appear to have any style information associated with it. The document tree is shown below."
 
-* PROD -  https://cloudgobgateway.platform.hmcts.net/services/themisgatewayapi?wsdl
-* TEST -  https://cloudgobgateway.test.platform.hmcts.net/services/themisgatewayapi?wsdl
+* PROD -  [https://cloudgobgateway.platform.hmcts.net/services/themisgatewayapi?wsdl](https://cloudgobgateway.platform.hmcts.net/services/themisgatewayapi?wsdl)
+* TEST -  [https://cloudgobgateway.test.platform.hmcts.net/services/themisgatewayapi?wsdl](https://cloudgobgateway.test.platform.hmcts.net/services/themisgatewayapi?wsdl)
 
 The URL resolves to an application gateway (aks00-(env$)-agw) which has the health probe "gob-gateway" to test the response from /services/themisgatewayapi?wsdl for a HTTP response status code match between 200-399.  The probe connects a 2nd gateway and ultimately the MET containers.
 Any problems with the back end network, containers or themis-fe-nodejs application and the 502 Bad Gateway error will be returned.

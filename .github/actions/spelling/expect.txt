@@ -1,17 +1,21 @@
 ACNF
 ACRD
+agw
 AJRA
 atl
 atlassian
 atlassiannonprod
 atlasssian
 Bance
+ccbcdc
 cdef
 Chirag
 CVP
+Dac
 Datlassian
 deevanapalli
 devrot
+dfd
 dpdb
 dsl
 EDB
@@ -28,6 +32,9 @@ jfrt
 jira
 journalctl
 kalyan
+libragob
+libragobrestore
+mdnrg
 mdv
 MDVADMVPNHA
 MDVDMZJUMPL
@@ -49,6 +56,8 @@ ruxit
 SBZ
 statefulset
 STE
+themisgatewayapi
+thw
 toset
 totp
 TTLs
@@ -56,3 +65,4 @@ utilisation
 Virtualbox
 virtualwan
 VNETs
+wsdl

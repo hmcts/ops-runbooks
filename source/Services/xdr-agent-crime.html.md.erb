@@ -55,6 +55,28 @@ These need setting in the automation.ansible repository. The vars live at /sp-an
 
 Its possible the level to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. The vars file can be created as necessary.
 
+## Vertifying xdr_tags
+
+There are two ways to verify that the tags are set correctly:
+
+- Cortex XSIAM Portal
+- Manaully check on the VM 
+
+To verify tags on the VM:
+
+Go to the VM.
+Use the Run Command feature and select PowerShellScript.
+Run the following command:
+
+```bash
+/opt/traps/bin/cytool endpoint_tags list
+```
+
+You should get an output like this:
+
+<img src="images/xdr-crime-vertify-tags.png" style="width:600px;">
+
+
 ## Deploying the XDR agents
 
 ### Pipelines

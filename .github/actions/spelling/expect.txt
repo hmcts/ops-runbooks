@@ -7,7 +7,6 @@ atlassian
 atlassiannonprod
 atlasssian
 Bance
-ccbcdc
 cdef
 Chirag
 CVP
@@ -15,7 +14,6 @@ Dac
 Datlassian
 deevanapalli
 devrot
-dfd
 dpdb
 dsl
 EDB
@@ -32,9 +30,9 @@ jfrt
 jira
 journalctl
 kalyan
+keyfile
 libragob
 libragobrestore
-mdnrg
 mdv
 MDVADMVPNHA
 MDVDMZJUMPL
@@ -56,8 +54,10 @@ ruxit
 SBZ
 statefulset
 STE
+Tenables
 themisgatewayapi
 thw
+tns
 toset
 totp
 TTLs

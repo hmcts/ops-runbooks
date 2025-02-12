@@ -212,7 +212,7 @@ To convert the .pfx file to a .crt and .key file use the following commands:
 ```bash
 # Extract the private key, you will be prompted to enter a password.
 openssl pkcs12 -in your-certificate-and-key-combined.pfx -nocerts -out keyfile.key
-# Unencrypt the key, you will be prompted to enter a password, this is the password you entered in the previous step.
+# Decrypt the key, you will be prompted to enter a password, this is the password you entered in the previous step.
 openssl rsa -in keyfile.key -out SecurityCenter.key
 # Extract the certificate
 openssl pkcs12 -in your-certificate-and-key-combined.pfx -clcerts -nokeys -out SecurityCenter.crt

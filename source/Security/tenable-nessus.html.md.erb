@@ -196,3 +196,40 @@ Last connection attempt: 1655998378
 * https://docs.tenable.com/nessus/Content/NessusCLIAgent.htm#Nessuscli-Commands
 
 * https://docs.tenable.com/nessus/Content/RemoveNessusAgentLinux.htm 
+
+## Security Center SSL
+
+Tenables Security Center is hosted on a VM in Azure using a marketplace image published by Tenable. The VM is configured out of the box with a self signed certificate. This is not ideal and should use either a Lets Encrypt or Gandi certificate.
+
+Tenable Security Center also sits behind App Proxy. If Security Center is not presenting a valid certificate App Proxy will fail to validate the cert and the user will not be able to access Security Center.
+
+### Updating the SSL Certificate
+
+Generate a new certificate using Lets Encrypt or Gandi. Security Center needs the certificate in a .crt and .key format. If you are retrieving the cert from an Azure KeyVault it will most likely be a single .pfx file which contains both the cert and the key.
+
+To convert the .pfx file to a .crt and .key file use the following commands:
+
+```bash
+# Extract the private key, you will be prompted to enter a password.
+openssl pkcs12 -in your-certificate-and-key-combined.pfx -nocerts -out keyfile.key
+# Unencrypt the key, you will be prompted to enter a password, this is the password you entered in the previous step.
+openssl rsa -in keyfile.key -out SecurityCenter.key
+# Extract the certificate
+openssl pkcs12 -in your-certificate-and-key-combined.pfx -clcerts -nokeys -out SecurityCenter.crt
+```
+
+Once you have the .crt and .key files you can upload them to the Security Center VM. The files should be placed in the `/opt/sc/support/conf` directory.
+Both the .crt and .key files should be owned by the `tns` user and group and have 0640 permissions.
+
+```bash
+chown tns:tns /opt/sc/support/conf/SecurityCenter.crt
+chown tns:tns /opt/sc/support/conf/SecurityCenter.key
+chmod 640 /opt/sc/support/conf/SecurityCenter.crt
+chmod 640 /opt/sc/support/conf/SecurityCenter.key
+```
+
+Restart the Security Center service to apply the new certificate.
+
+```bash
+systemctl restart SecurityCenter
+```

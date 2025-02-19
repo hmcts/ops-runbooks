@@ -1,0 +1,37 @@
+---
+title: Updating Panorama SSL Certs
+weight: 10
+last_reviewed_on: 2025-02-19
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+## Prerequisites
+
+To renew the Panorama SSL Certificate follow the [existing process to either generate a Gandi.net or Let's Encrypt certificate.](../../Certificates/index.html)
+
+This guide with assume the certificate is in a PKCS12 format (.pfx file which contains both the private key and certificate) and is password protected. If you downloaded the certificate from Azure KeyVault it will not has a password. The steps below will allow to you add a password.
+
+1. Convert the PFX file to a PEM file
+```bash
+   openssl pkcs12 -in original-file.pfx -out temp.pem -nodes
+```
+2. Convert the PEM file back to a PFX file, specifying the password when prompted
+```bash
+   openssl pkcs12 -export -out cert-with-password.pfx -in temp.pem
+```
+
+## Updating the Panorama SSL Certificate
+
+1. Navigate to Panorama, if the certificate has already expired you won't be able to access via App Proxy. Instead you will need to connect [via the VPN](connecting-palos.html#via-vpn).
+2. Login using your HMCTS or Justice credentials. (Panorama local admin credentials will also work.)
+3. Navigate to `Panorama` > `Certificate Management` > `Certificates`.
+4. Click on the `Import` button.
+5. Provide a name, upload your `.pfx` file and select `Encrypted Private Key and Certificate (PKCS12)` as the File Format.
+6. Enter the password for the `.pfx` file.
+7. Click `OK` to import the certificate.
+8. Navigate to `Panorama` > `Certificate Management` > `SSL/TLS Service Profile`.
+9. Edit the profile, update the certificate drop down to the new certificate.
+10. Click `OK` to save the changes.
+11. Commit the changes to Panorama.

@@ -42,7 +42,6 @@ jfrt
 jira
 journalctl
 kalyan
-laborious
 lharrigangre
 libragob
 libragobrestore
@@ -69,7 +68,6 @@ SBZ
 sourced
 spn
 statefulset
-STE
 ste
 TBC
 themisgatewayapi

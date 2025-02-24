@@ -82,6 +82,16 @@ The images pulled and then pushed to ACR can be found [here](https://github.com/
 
 The file is used by this [pipeline](https://github.com/hmcts/cpp-aks-ops/blob/main/push_to_acr.yml) to pull the images from the remote `registry/repo:tag` combination and pushed to ACR (always the nonlive and a flag exists to push to live as well). Note that in the file, multiple tags can be pulled from the remote registry allowing for upgrade testing.
 
+```yaml
+- registry: quay.io
+  repo: alfresco/alfresco-content-repository
+  promote_live: yes
+  username: "<USERNAME>"
+  password_path: "secret/mgmt/<PASSWORD>"
+  tags:
+    - "7.2.0"
+```
+
 This pipeline is used only for images not built or maintained by CPP and in some cases the images are pulled from a private registry where credentials are required.
 If you are adding a new tag then this shouldnt matter but if you are adding a new image from a new registry please be mindful of this.
 

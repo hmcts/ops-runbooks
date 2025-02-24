@@ -205,7 +205,7 @@ e.g. the `{{ stack }}` value in the template will be replaced with the value inp
 
     -e stack=${{ parameters.environment }}${{ parameters.stack }}
 
-- A **chart-versions** environment file is sourced as a default for the pipeline which sets a number of variables and values.
+- A **chart-versions** environment file is sourced by default in the pipeline, setting a number of variables and values."
 - A **chart-versions** environment file is sourced if it exists for the environment chosen in the **environment** input which will override the values set in the default **chart-versions.env** file
 
 At this point the script has setup a number of variables and configs ready for the actual deployment.

@@ -96,6 +96,8 @@ The Jar file referenced in that Dockerfile is not built from the master branch, 
 
 A new [sdk4_6](https://codereview.mdv.cpp.nonlive/plugins/gitiles/dr-alfresco-store/+/sdk4_6) was created to facilitate the upgrade to Alfresco 7.4.2 and is in testing. This branch also contains a [full guide](https://codereview.mdv.cpp.nonlive/plugins/gitiles/dr-alfresco-store/+/sdk4_6/README.md) on local development and image build for this service and should be referenced for this purpose (note you must complete the Crime onboarding to access the Gerrit server).
 
+All artifacts for the Alfresco service that are created get stored in Artifactory and the current Jar file can be found [here](https://libraries-internal.mdv.cpp.nonlive/artifactory/webapp/#/artifacts/browse/tree/General/alfresco-deployment/alfresco-jars).
+
 ## Deployment
 
 Deployment of the new Helm chart and image can be carried out using the guidance in [alfresco deployment](alfresco-deployment.html).
@@ -111,7 +113,6 @@ These deployments can be carried out via the [CPP-AKS-DEPLOY](https://dev.azure.
 Example inputs of a successful deployment to an STE stack containing Alfresco:
 
 <img src="images/aks-deploy.png" style="height:450px;">
-
 
 Please note the guide is not completely up to date and contains old links:
 

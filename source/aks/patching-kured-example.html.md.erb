@@ -21,9 +21,7 @@ Similarly, create a PR in sds-flux-config to patch kured in SDS.  Please note th
 After above raised PR approved and merged, describe the kured pod on different clusters and check the labels has updated kured chart version.
 e.g.
 
-```
+```bash
 kubectl describe pod <POD NAME> -n kured | grep "helm.sh/chart"
 
 ```
-
-

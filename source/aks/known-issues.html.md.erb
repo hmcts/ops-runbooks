@@ -1,6 +1,6 @@
 ---
 title: AKS Known Issues
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 weight: 20
 ---
@@ -21,7 +21,7 @@ az resource update --ids <aks-resource-id>
 
 ## One or more nodes has failed to upgrade
 
-You can track the progress of the upgrade by running 
+You can track the progress of the upgrade by running
 
 ```bash
 kubectl get nodes
@@ -37,18 +37,18 @@ You may encounter a quota limit during an AKS upgrade due to the provisioning of
 
 ## DaemonSet Failed Scheduling
 
-For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.  
+For a DaemonSet application (e.g. CSI driver, Oneagent or Kured), when applying an update or patch which requires a restart, a pod on a specific node may fail scheduling and blocks the rolling update from proceeding with restarting other pods.
 
-An error similar to the below may be seen in the cluster events log:  
+An error similar to the below may be seen in the cluster events log:
 
 ![oneagent_scheduling_error](Images/oneagent_scheduling_error.png)
 
 - This happens when there is a capacity issue on specific cluster nodes
 - DaemonSet rolling update is blocked with the pod stuck in `Pending` state
 - Deleting the pod does not fix issue as pod restarts and goes into same `Pending` state
-  
+
 - Run `kubectl get pod <pod name> -o yaml | grep nodeName` to identify the node where pod scheduling has failed
 - Run `kubectl get pods -A | grep <node name>` to list all pods running on node
-- Identify and delete one or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node  
+- Identify and delete one or more non-DaemonSet pods to restart on a different node and free up a capacity on the current node
 - If deleted pods are stuck in `Terminating` state, use `kubectl delete pod <pod name> --grace-period 0 --force` to forcefully delete pod
 - Confirm DaemonSet pod now starts successfully

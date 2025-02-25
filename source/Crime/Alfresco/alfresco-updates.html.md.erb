@@ -114,9 +114,28 @@ Deployment of the new Helm chart and image can be carried out using the guidance
 
 This should be deployed only to an STE stack that has been assigned for the upgrade and is not currently in used by anyone else.
 
+### Checking Alfresco
+
+You can check Alfresco has deployed an updated version by accessing the service, this is only possible via Port-Forwarding as there is no external frontend for the service.
+To port-forward to Alfresco you can run a `kubectl` command against the Alfresco Content Services Repository pod e.g.
+
+    kubectl port-forward pods/alfresco-content-services-alfresco-cs-repository-b8db88b48x7mzn 8080:8080 -n ns-ste-alfapp-89
+
+format:
+
+    kubectl port-forward pods/<pod name> <pod port>:<local port> -n <namespace>
+
+Once started you can then navigate to your web browser and access the service on `http://localhost:8080` which should show you an Alfresco landing page.
+
+Selecting `admin console` on this page will prompt for credentials which by default are `admin:admin`. This will then load a page like this which contains versions, modules installed and settings:
+
+<img src="images/alfresco-admin.png" style="height:350px;">
+
 ### Testing
 
 Testing of the deployment requires additional components, namely the other services that CPP contains that make use of Alfresco.
+
+#### Additional services
 
 These deployments can be carried out via the [CPP-AKS-DEPLOY](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333&_a=summary) pipeline and the following [guide](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=SRECCP&title=Spinning+up+new+AKS+Based+STE).
 
@@ -131,4 +150,11 @@ Please note the guide is not completely up to date and contains old links:
 - 2- Run AKS alfresco job to create for new STE stack created above using below jenkins job with below parameters
     This section references an old pipeline, the new pipeline is CPP-Alfresco-Deploy linked in the [alfresco deployment](alfresco-deployment.html) document.
 
-TBC
+#### Priming
+
+Once deployed, the services/stack need to be primed with data to make the testing useful.
+
+This yaml [pipeline](https://github.com/hmcts/cpp-aks-ops/blob/main/aks_priming_deploy.yaml) is used for priming.
+This ADO [pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=207) is built from that file.
+
+Please read through this [guide](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1753712844#SpinningupnewAKSBasedSTE-3-PrimingorSITreferencedata) for more information on Priming.

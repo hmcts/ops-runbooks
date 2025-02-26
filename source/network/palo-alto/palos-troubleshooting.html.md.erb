@@ -1,6 +1,6 @@
 ---
-title: Palo Alto Troubleshooting
-weight: 20
+title: Troubleshooting
+weight: 10
 last_reviewed_on: 2024-07-12
 review_in: 6 months
 ---
@@ -45,14 +45,14 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
     <details>
         <summary>Commit Button</summary>
-        <img alt="Commit Button" src="images/palo-commit.png" width="300" height="200">
+        <img alt="Commit Button" src="../images/palo-commit.png" width="300" height="200">
     </details>
 
 3. A dialog box will pop up giving you the option to validate the most recent configuration, click on validate commit.
 
     <details>
         <summary>Validate Button</summary>
-        <img alt="Validate Button" src="images/validate-button.png" width="300" height="200">
+        <img alt="Validate Button" src="../images/validate-button.png" width="300" height="200">
     </details>
 
 4. This will run for a few seconds, once it's complete you'll be presented with a status page giving you a clearer idea of what the problem is.
@@ -62,7 +62,7 @@ module.hub-infra.module.firewall.null_resource.ansible-runs (remote-exec): }
 
     <details>
         <summary>Validate Example</summary>
-        <img alt="Validate Example" src="images/example-validate.png" width="300" height="200">
+        <img alt="Validate Example" src="../images/example-validate.png" width="300" height="200">
     </details>
 
 5. Make your changes in the rdo-terraform-hub-dmz repository and run the [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=226&_a=summary) again.
@@ -83,7 +83,7 @@ The Palos have a built in traffic monitoring tool that could help you find the i
 
 <details>
     <summary>Filtering Example</summary>
-    <img alt="Traffic Filtering" src="images/filtering.png" width="300" height="200">
+    <img alt="Traffic Filtering" src="../images/filtering.png" width="300" height="200">
 </details>
 
 For more information on types of filters you can apply check out [Basics of traffic monitor filtering](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClSlCAK).
@@ -97,7 +97,7 @@ root. Some other path may be presented in the error not always `/`.
 
 <details>
     <summary>Disk usage for / exceeds limit</summary>
-    <img alt="Disk usage" src="images/disk_usage_exceeds_limit.png" width="423">
+    <img alt="Disk usage" src="../images/disk_usage_exceeds_limit.png" width="423">
 </details>
 
 When this happens then there needs to be a cleaning exercise or a hard reboot as a last resort.
@@ -106,40 +106,40 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 ### **Troubleshooting tip**
 
 1. Log unto the VPN and `ssh` into the vm in questions. Good chance that at this point the management UI is inaccessible
-2. Check that there aren't any disk partition maxed out
-   ```cmd
+2. Check that there aren't any disk partition maxed out:
+   ```bash
    show system disk-space
    ```
 
    <details>
     <summary>Disk usage for / exceeds limit</summary>
-    <img alt="Disk usage result" src="images/disk_usage_high.png" width="591" height="225">
+    <img alt="Disk usage result" src="../images/disk_usage_high.png" width="591" height="225">
    </details>
 
-3. Verify the aggressive clean up is enabled
-   ```cmd
+3. Verify the aggressive clean up is enabled:
+   ```bash
    show system state | match aggressive-cleaning
    ```
    At the moment, setting is only available via the terminal. There is a possibility that this gets lost between major version upgrades or vm restarts
-4. In above command give no output then there is need to enable it per vm. chose `y` option to remove all old file. SysLog information would have already been
-   sent to Panorama log collector, run the below command in the terminal
-   ```cmd
+4. If the above command gives no output then it needs to be enabled per vm. chose `y` option to remove all old file. SysLog information would have already been
+   sent to Panorama log collector, run the below command in the terminal:
+   ```
    debug software disk-usage aggressive-cleaning enable
    ```
 
    <details>
     <summary>Enable cleanup</summary>
-    <img alt="Disk usage result" src="images/disk_usage_enable_cleanup.png" width="514">
+    <img alt="Disk usage result" src="../images/disk_usage_enable_cleanup.png" width="514">
    </details>
 
-5. Set to threshold to `90%` or lower e.g. `85%`
-   ```cmd
+5. Set to threshold to `90%` or lower e.g. `85%`. The following command will set to `90%`:
+   ```bash
    debug software disk-usage cleanup deep threshold 90
    ```
 
    <details>
     <summary>Disk cleanup setting</summary>
-    <img alt="Disk usage result" src="images/disk_usage_reset.png" width="775">
+    <img alt="Disk usage result" src="../images/disk_usage_reset.png" width="775">
    </details>
 
    You should see info stating usage has been adjusted
@@ -149,4 +149,58 @@ When this happens then there needs to be a cleaning exercise or a hard reboot as
 Link with further details
 
 - [High Disk Space Usage on / root partition and How To Clear](https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClaJCAS)
+
 - [AnalysisMan](https://www.analysisman.com/2020/08/pan-diskspace.html)
+
+## Support Tickets with Palo Alto
+
+### **Pre-req**
+You need to have a Palo Alto Customer Support Portal (SCP) account already setup, if not then you can create one in the [CSP](https://support.paloaltonetworks.com/Support/Index/).
+An already existing user will need to assign you to the account, reach out to the team on the #platform-operations Slack channel to get this done.
+
+You will also need Google Authenticator or similar 2FA app to login to the CSP.
+
+### **Creating a new ticket**
+Follow the steps `Support` -> `Get Help` then select what type of ticket you want to create and provide the necessary information.
+
+You can also add attachments to the ticket after creating it, so if you have a tech support file you can attach it here or any other relevant information requested.
+
+<details>
+    <summary>Step one</summary>
+    <img alt="Step one" src="../images/tac-step-1.png">
+</details>
+
+<details>
+    <summary>Step two</summary>
+    <img alt="Step two" src="../images/tac-step-2.png">
+</details>
+
+<details>
+    <summary>Step three</summary>
+    <img alt="Step three" src="../images/tac-step-3.png">
+</details>
+
+### **Things to Note**
+- There is a good chance they will ask for the tech support file, so make sure you have that ready
+  See the generating a tech support file section in the [Palo Alto Software Upgrade](./palos-upgrade.html) [Prerequisite](./palos-upgrade.html#prerequisite) guide
+- You will need to factor timezone differences when arranging a call with them, make sure you are specific about your timezone
+- They may ask for details like serial number, software version, model etc. Make sure you have that information to hand. See [Prerequisite](./palos-upgrade.html#prerequisite) for how to get that information
+- You can only see your case  history, to be notified or participate in an open case you need to be added to the case by the person who opened it by adding you to the Subscribers list
+- You can replay via the email you get in your inbox and that will get added to the case history
+- Sometimes you are raising a case for the entire infrastructure, when prompted for a serial number you can only provide one,
+  pick any one so you can progress with the ticket creation, then provide more context in the ticket itself
+
+### **Support escalation and contacts**
+
+[contact support details](https://www.paloaltonetworks.co.uk/company/contact-support)
+
+
+Escalation contacts within the MoJ account:
+
+Service Delivery Leader - Charles Kingston (ckingston@paloaltonetworks.com)
+
+Major Account Manager - Lauren Verby (lverby@paloaltonetworks.com & 07833247488) & David Woods (dawoods@paloaltonetworks.com)
+
+Technical Solutions Consultant - Lee Harrigan-Green (lharrigangre@paloaltonetworks.com)
+
+Focused Service Engineer - Maria Vasileiadi

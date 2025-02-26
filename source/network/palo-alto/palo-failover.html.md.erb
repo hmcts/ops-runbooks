@@ -1,0 +1,100 @@
+---
+title: Palo Alto Failover
+weight: 10
+last_reviewed_on: 2025-01-10
+review_in: 4 months
+---
+# <%= current_page.data.title %>
+## Overview
+
+For applications accessed via Cloud Gateway, we have pinned routes in place to route traffic through
+a specific Palo Alto firewall, to ensure the return traffic is routed back through the same firewall.
+
+In production, by default these pinned routes target 10.11.8.37 which is [hmcts-hub-prod-int-palo-vm-1](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-1/overview)
+and should be updated to 10.11.8.38 which is [hmcts-hub-prod-int-palo-vm-0](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Compute/virtualMachines/hmcts-hub-prod-int-palo-vm-0/overview) in the event of a failover is needed in production.
+
+This means that in the event of palo-vm-1 being unavailable, either due to an incident, or scheduled maintenance, traffic from Cloud Gateway will not be able to reach the applications.
+
+Applications affected by this are:
+
+* DARTs
+* LibraGoB
+* SDP
+* Juror Digital
+* CVP
+* BAIS
+* MI
+* Interim Hosting
+
+This document will describe the process of failing over to the other firewall in the pair. 
+
+
+## Failover Process
+Before starting the failover process, be aware that there may be a brief period of downtime while the failover is in progress.
+
+Where possible, James Drew (James.Drew2@justice.gov.uk) and Kalyan Deevanapalli (kalyan.deevanapalli@hmcts.net) should be contacted in advance of the failover. 
+
+There are three places across two repositories where the IP address needs to be updated:
+
+* [aks-sds-deploy](https://github.com/hmcts/aks-sds-deploy)
+* [azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan)
+
+### 1. Update the IP address in the following files in the aks-sds-deploy repository:
+
+* Pinned aks routes in [prod-pinned-aks-routes.yaml](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-aks-routes.yaml#L3)
+* Pinned app gateway routes [prod-pinned-appgw-routes.yaml](https://github.com/hmcts/aks-sds-deploy/blob/master/environments/01-network/prod-pinned-appgw-routes.yaml#L3)
+
+See example [PR for DEMO environment](https://github.com/hmcts/aks-sds-deploy/pull/662/files)
+**Note:** the IPs are different for DEMO and PROD environments.
+
+### 2. Update the IP address in the following files in the azure-platform-virtualwan repository:
+
+* static vnet routes in [prod.tfvars](https://github.com/hmcts/azure-platform-virtualwan/blob/b48a0cc40b52accfd6884b8811d2e79503d071be/environments/prod/prod.tfvars#L153-L156)
+
+See example [PR for DEMO environment](https://github.com/hmcts/azure-platform-virtualwan/pull/103/files)
+**Note:** the IPs are different for DEMO and PROD environments.
+
+### 3. Running the pipelines
+
+There are usually two reason why you would want to failover, either;
+
+* due to an incident / issue with a VM
+* scheduled maintenance, such as patching.
+
+If the failover is required to be done urgently, during an incident for example, it is recommended to run the 
+[aks-sds-deploy pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482&_a=summary) from 
+your branch, as merging the PR and allowing all stages to run on the pipeline can take over 45 minutes to complete. 
+If you run from your branch, and select only the required pipeline stages, it can be completed in around 10 minutes.
+
+Ensure you still raise a PR, wait for checks to complete successfully, and then run the pipeline from your branch.
+
+The required stages for this are:
+
+* 'Precheck'
+* 'Checking Clusters for sbox'
+* '{Environment}: Genesis'
+* '{Environment}: Network'
+
+**Finally, your PR should still be merged** this is to keep the codebase in sync with the environment as well as to prevent a future pipeline run from overwriting your changes.
+
+The [azure-platform-virtualwan pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=478&_a=summary) is usually quicker to run, and can be run by merging your PR, following approval.
+
+### 4. Verify the failover has been successful.
+
+To verify the failover has been successful, you can check the following:
+
+* Your pipeline has completed successfully.
+* Check the [aks-prod-appgw-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-appgw-route-table/overview) has been updated. Check the 'Next hop IP address now reflects your PR. You can ignore any routes pointing to .36 addresses'
+* Check the [aks-prod-route-table](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/ss-prod-network-rg/providers/Microsoft.Network/routeTables/aks-prod-route-table/overview) for the same.
+
+## FAQ
+
+#### How do I find out IP's for the firewalls?
+
+You can find out which IPs belong to which Palos by checking the backend pool of the Load Balancer in the Azure Portal.
+
+For example, the production backend pool can be found [here](https://https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Network/loadBalancers/hmcts-hub-prod-int-palo-lb/backendPools)
+
+#### The terraform plans are showing a lot of unexpected changes, is this normal?
+
+Yes, this is normal, expect a lot of changes. The pipeline reorders resources and IPs within the plan which creates a busy output that can be hard to interpret. If you are in any doubt, ask #platform-operations on Slack.

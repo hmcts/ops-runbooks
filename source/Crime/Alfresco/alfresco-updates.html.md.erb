@@ -119,7 +119,7 @@ This should be deployed only to an STE stack that has been assigned for the upgr
 You can check Alfresco has deployed an updated version by accessing the service, this is only possible via Port-Forwarding as there is no external frontend for the service.
 To port-forward to Alfresco you can run a `kubectl` command against the Alfresco Content Services Repository pod e.g.
 
-    kubectl port-forward pods/alfresco-content-services-alfresco-cs-repository-b8db88b48x7mzn 8080:8080 -n ns-ste-alfapp-89
+    kubectl port-forward pods/alfresco-content-services-alfresco-cs-repository 8080:8080 -n ns-ste-alfapp-89
 
 format:
 

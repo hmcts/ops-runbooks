@@ -11,30 +11,53 @@ Guide to resolving common problems with the Operations Guide
 
 ## RuntimeError
 
+**Issue:** RuntimeError often occurs when images and binary files are not properly organised
+
 ![Operations Tabs](images/RuntimeError.png)
 
-Images and bins must be in sub folders
+**Solution:**
+- Ensure all images are stored in an images subfolder
+- Place all binary files in appropriate subfolders (e.g., bins, assets)
 
 ## Webpage Rendering Errors
 
+**Issue:** Incorrect file extension can lead to webpage rendering errors
+
 ![Operations Tabs](images/WebpageError.png)
 
-The file name is missing html from its extension.
+**Solution:** 
+
+- The file name is missing html from its extension
+- Use the correct file extension, example: `pagename.html.md.erb``
+- Common mistake: `pagename.md.erb`` (missing 'html')
 
 ```text
-pagename.md.erb
+Incorrect: pagename.md.erb
 vs
-pagename.html.md.erb
+correct: pagename.html.md.erb
 ```
 
-## Escape a special character  
+## Escape a special character
 
-Add a backslash \ before the character
+**Issue:** Special characters can cause unexpected behavior in Markdown rendering
+
+**Solution:**
+
+- Add a backslash \ before the special character to escape it
+
+```bash
+Escaped underscore: \_
+Escaped backtick: \`
+```
 
 ## Grouped Index Headings
 
+**Issue:** Multiple headings are shown in the index but only a single page is displayed when selected
+
 ![Operations Tabs](images/GroupedHeadings.png)
 
-Multiple headings are shown in the index but only a single page is displayed when selected.
-Normally this is caused by a special character being included in a section of code.
-Escape the character using the backslash
+**Solution:**
+
+- Escape special characters in code sections using backslashes
+- Review your Markdown syntax for any unintended formatting
+

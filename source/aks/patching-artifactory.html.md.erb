@@ -1,7 +1,7 @@
 ---
 title: Artifactory Patching
 weight: 30
-last_reviewed_on: 2024-06-06
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 ---
 
@@ -55,13 +55,13 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 ### 2. Check new version on CFT PTLSBOX
 
   • [Connect to CFT PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
-  
+
   • Run the command below and ensure the Helm Release is showing **True** and is running the latest chart version.
 
   ```command
   kubectl get hr -n artifactory
   ```
-  
+
   • Run the following commands ensuring the pod is **healthy** and has applied new version. **Note:** version number found at "artifactory-oss".
 
   ```command
@@ -93,18 +93,18 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
     spec:
       chart: artifactory-oss
       version: 107.90.9
-  
+
   ...
   ```
-  
+
   • Submit your PR and ensure it gets reviewed and merged.
-  
+
   • Repeat [step 2](#2-check-new-version-on-cft-ptlsbox) for **'CFT PTL cluster'** checking the Helm release is on the new version and ensuring the pods are healthy.
 
 ## Related Links
-  
+
   [cnp-flux repo](https://github.com/hmcts/cnp-flux-config)
-  
+
   [Artifactory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) **Note:** you will need to be connected to F5 VPN to access this link.
 
   [Artifactory Release Information](https://jfrog.com/help/r/jfrog-release-information/artifactory-release-notes)
@@ -147,7 +147,7 @@ kubectl logs -n artifactory artifactory-oss-0 -c <container-name-here>
 [jfrt ] [ERROR] [ee4c12af0700e30b] [o.a.s.d.i.DbConnectionUtils:86] [Catalina-utility-2  ] - Cannot start the application with a database other than PostgreSQL. For more information, see JFrog documentation
 ```
 
-• This error is unlikely to appear, if it does it means that the artifactory configuration has not successfully applied and is using other DB than the one specified. Restart artifactory and watch the startup logs of the container and ensure this error does not appear. 
+• This error is unlikely to appear, if it does it means that the artifactory configuration has not successfully applied and is using other DB than the one specified. Restart artifactory and watch the startup logs of the container and ensure this error does not appear.
 
 To watch the containers enter the command below.
 

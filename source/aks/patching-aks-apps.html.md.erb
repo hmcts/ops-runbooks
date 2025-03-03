@@ -1,7 +1,7 @@
 ---
 title: Patching AKS Apps Overview
 weight: 30
-last_reviewed_on: 2024-02-19
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 ---
 
@@ -16,7 +16,8 @@ This run book documents some tasks that we have to perform when patching apps on
 
 Patching is shared across the Platform Operations team, review the patching rota to view which app is due and who it is assigned to.
 
-[Patching Rota](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/Shared%20Documents/General/Patching%20Calendar%202024%20v1.xlsx?d=w72761ec6e128433f8b676893edd8be59&csf=1&web=1&e=2Ewqzn)
+- [Patching Rota Spreadsheet](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/Shared%20Documents/General/Patching%20Calendar%202024%20v1.xlsx?d=w72761ec6e128433f8b676893edd8be59&csf=1&web=1&e=2Ewqzn)
+- [Patching Rota GitHub](https://github.com/hmcts/bau-patching-rota/blob/main/rota.md)
 
 ## Patching order by Environment
 
@@ -36,7 +37,7 @@ SDS is a good place to start, as any issues will have a smaller impact due to th
 - AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)
 
 ### Production
-- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
+- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks)
 - Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks)
 
 ## Research the App version
@@ -81,7 +82,7 @@ You can start checking the flux config to make sure it hasn’t got any error an
 
 When a change is pushed to the flux repo, the flux controller pods on the cluster sync with GitHub.
 
-This triggers a reconciliation of the kustomizations in the flux-system namespace. 
+This triggers a reconciliation of the kustomizations in the flux-system namespace.
 
 You can see this by running:
 
@@ -130,7 +131,7 @@ You can also check if any UIs are reachable.
 
 If the application has a UI, open it in a browser. If it's working then the upgrade worked.
 
-Some applications, like traefik, don't have a UI exposed but there are other ways to check. 
+Some applications, like traefik, don't have a UI exposed but there are other ways to check.
 
 Have a look at the example on [Traefik](patching-traefik.html) for details.
 
@@ -169,9 +170,9 @@ AAD Pod Identity has been deprecated hence there is not going to be further patc
 ## Application specific examples
 
 - [Artifactory](patching-artifactory.html)
-- [dns-node-cache](patching-flux-example.html)
 - [Dynatrace Operator](patching-dynatrace.html)
 - [Flux](patching-flux-example.html)
+- [DNS Node Cache](patching-dns-node-cache.html)
 - [KEDA](patching-keda-example.html)
 - [kured](patching-kured-example.html)
 - [pact-broker](patching-pact-broker-example.html)

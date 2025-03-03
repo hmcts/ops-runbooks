@@ -1,13 +1,15 @@
 ---
 title: kured Patching Example
 weight: 30
-last_reviewed_on: 2024-02-21
+last_reviewed_on: 2025-02-21
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
 
 This document covers a high level patching example for the kured app patching.
+
+<%= warning_text('Kured is no longer deployed across CFT and SDS and this page is for historical reference only!') %>
 
 ## Patching
 
@@ -21,9 +23,7 @@ Similarly, create a PR in sds-flux-config to patch kured in SDS.  Please note th
 After above raised PR approved and merged, describe the kured pod on different clusters and check the labels has updated kured chart version.
 e.g.
 
-```
+```bash
 kubectl describe pod <POD NAME> -n kured | grep "helm.sh/chart"
 
 ```
-
-

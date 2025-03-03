@@ -47,7 +47,6 @@ libragob
 libragobrestore
 mdv
 MDVADMVPNHA
-MPDJUMPL
 NONLINE
 NSGs
 paloaltonetworks
@@ -69,7 +68,7 @@ sourced
 spn
 statefulset
 ste
-TBC
+STECCM
 themisgatewayapi
 thw
 toset

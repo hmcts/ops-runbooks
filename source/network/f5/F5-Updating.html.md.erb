@@ -1,0 +1,94 @@
+---
+title: Update F5 BIG-IP System
+last_reviewed_on: 2024-12-12
+review_in: 6 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+## IP Geolocation Database
+
+Used to control access to the VPN based on the physical location of the user connection. The database is updated monthly and doesn't interrupt service.
+
+[F5 Updating Guide PDF](https://www.f5.com/pdf/deployment-guides/bigip-update-upgrade-guide.pdf)
+[Overview of system upgrades](https://my.f5.com/manage/s/article/K84554955)
+
+## Prerequisites
+
+1. GUI access to the F5 device with admin permissions. (Beware the Azure NSG rules)
+2. Access to [my.f5.com](https://my.f5.com) and "HM Courts & Tribunals Service" account to download the latest updates.
+
+## Process
+
+1. Power on the test F5. Azure VM mgmt-vpn
+2. Confirm current versions of BIG-IP OS, apmclients and EPsec
+3. Download the latest updates from MyF5
+4. Upload the updates to the F5 device
+5. Install the updates
+6. Reboot the F5 device
+7. Confirm the updates have been applied
+8. Test the VPN connection
+9. Accept the F5 client software updates on test laptop
+10. Confirm the VPN connection is working
+11. Download the HMCTS specific F5 client software from the F5 device
+12. Power off the test F5
+13. Forward the F5 client software to the HMCTS Package team for deployment
+14. Create change request for the production system update, requires 2 reboots and will interrupt service
+15. Update the production system
+16. Confirm the updates have been applied
+17. Test the VPN connection
+
+
+
+## Instructions
+Please note that the following steps will require the F5 to reboot, which will interrupt service. However the pre-update steps can be performed during working hours as they do not interrupt service and take significant time to complete. 
+
+
+### Pre-Update
+1. Confirm your F5 VPN is not active before proceeding
+2. Log into the F5 Web Admin portal using a web browser and note the current version BIG-IP
+3. Confirm your admin user account has access to the F5 device via SSH and if any IP access restrictions are in place
+4. Log into the [MyF5](https://my.f5.com) portal and download the latest GeoIP database
+- Goto Resources > Downloads
+- Set `GROUP` as `BIG-IP`
+- Set Product Line and Product Version as per your F5 device
+- Set `GEOLOCATIONUPDATES_Edge`
+- Download the latest GeoIP database zip file and md5 file
+
+### Update GeoIP database
+The following steps are to be in the `*shared*` directory, which is different from the `*/usr/share*` directory, which contains the default GeoIP database files.
+
+1. Use a SFTP client to upload the GeoIP database zip file to the F5 device
+2. Place the GeoIP database zip and md5 files in the */shared/tmp* directory
+
+- Connect to the F5 device via SSH and run the following commands:
+
+```bash
+mkdir /shared/GeoIP_backup
+
+cp -R /GeoIP/* /GeoIP_backup/
+
+cd /shared/tmp
+
+md5sum -c <ip-geolocationfile>.zip.md5
+
+unzip <ip-geolocationfile>.zip
+
+```
+
+
+- This step will overwrite the update GeoIP database files, repeat for each rpm file in the zip archive
+
+```bash
+geoip_update_data -f </path/to/rpm>
+
+geoip_lookup -f <path/to/db/files> <IP address>
+```
+
+- Remove the now redundant zip, rpm and md5 files from temp directory
+
+```bash
+rm -i </path/to/file>
+
+```

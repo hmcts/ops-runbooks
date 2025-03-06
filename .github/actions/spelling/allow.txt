@@ -599,7 +599,7 @@ TProgress
 traefik
 Traefik
 TResult
-triage
+triaged
 TRO
 tsv
 ttfunk

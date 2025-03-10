@@ -31,7 +31,7 @@ We need to tell Flux to use the new Neuvector chart that we has the regsitry whi
 
 On the ptl cluster, in the `flux-system` namespace, you will need to create a secret that contains the credentials that Flux will use to pull images from the registry. The simplest way is to navigate to the new container registry and create a new repository token based on a scope map with the appropriate permissions.
 
-![Example token](../../images/acr_token.png)
+![Example token](images/acr_token.png)
 
 Once you have a repository token, run the following command on the cluster to create the secret:
 

@@ -37,6 +37,7 @@ Ansible
 ansible
 apastuhov
 apim
+apmclients
 AppAttach
 appattach
 appinsights
@@ -184,6 +185,7 @@ elkadmin
 Entra
 entra
 envsubst
+epsec
 erb
 erubis
 ethon

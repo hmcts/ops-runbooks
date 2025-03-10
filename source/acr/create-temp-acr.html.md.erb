@@ -12,12 +12,18 @@ In this section, we will step through the process of creating a temporary contai
 ## Create the new container registry
 
 Depending on the situation, this can be done a number of ways. Preferably via IaC such as Terraform, but can also be done using ClickOps in the Azure Portal or by using this Azure CLI command:
-`az acr create -n myregistry -g MyResourceGroup --sku Standard`
+
+```bash
+az acr create -n myregistry -g MyResourceGroup --sku Standard
+```
 
 ## Copy images to the new container registry
 
 If replacing an existing ACR, you may need to copy over any images that are currently in use in the old registry. This can be done via the Azure CLI with:
-`az acr import -n myregistry --source sourceregistry.azurecr.io/sourcerepository:sourcetag`
+
+```bash
+az acr import -n myregistry --source sourceregistry.azurecr.io/sourcerepository:sourcetag
+```
 
 ## Update Neuvector to allow new container registry
 
@@ -36,11 +42,11 @@ On the ptl cluster, in the `flux-system` namespace, you will need to create a se
 Once you have a repository token, run the following command on the cluster to create the secret:
 
 ```bash
-	kubectl create secret docker-registry <secret-name> \
-		--namespace flux-system \
-		--docker-server=<registry-name>.azurecr.io \
-		--docker-username=<token-name> \
-		--docker-password=<token-password>
+kubectl create secret docker-registry <secret-name> \
+	--namespace flux-system \
+	--docker-server=<registry-name>.azurecr.io \
+	--docker-username=<token-name> \
+	--docker-password=<token-password>
 ```
 
 ## Set up Flux image automation for new container registry
@@ -54,14 +60,14 @@ At this stage, you can begin configuring the flux config for specific apps to us
 You can check to see if it has updated correctly by running:
 
 ```bash
-	kubectl get imagepolicy.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
-	kubectl get imagerepository.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
+kubectl get imagepolicy.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
+kubectl get imagerepository.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
 ```
 
 You should also try deleting the helm release and checking the pods spin back up with an image from the new container registry. You can check by running:
 
 ```bash
-	kubectl describe pod <pod_name> | grep 'Image:'
+kubectl describe pod <pod_name> | grep 'Image:'
 ```
 
 Once you're happy, you can point production to the new container registry as well and re-enable image automation.

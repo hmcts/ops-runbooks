@@ -1,6 +1,6 @@
 ---
 title: Camunda How To Guides
-last_reviewed_on: 2024-07-25
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 50
 ---
@@ -35,7 +35,7 @@ If the worst happens and you cannot solve the issue yourself then we have access
 This [URL](https://jira.camunda.com/servicedesk/customer/portal/1/user/login) leads to the Camunda Jira service desk.
 The credentials for this can be found in the `camunda-prod` Key Vault under the secrets **__Camunda_Service_Desk_[user/password]__**
 
-Logging in you will find 3 different options, the most likely option to use is `Help Request`. 
+Logging in you will find 3 different options, the most likely option to use is `Help Request`.
 
 Selecting this will open a request form to enter all the information you think will help Camunda to triage the ticket quicker.
 
@@ -52,7 +52,7 @@ There are 2 ways to search the Camunda database, one via Camunda UI itself and t
 ### Camunda UI
 This method of searching the DB is a workaround, it provides search facilities but its primary purpose is to make **changes** so please be careful.
 
-Searching the Camunda DB via the UI provides less freedom, you can use batch operations of specific types to search through the returned results of that operation e.g. the operation `delete all finished process instances` will only ever return finish process instances, not running instances or any decisions. 
+Searching the Camunda DB via the UI provides less freedom, you can use batch operations of specific types to search through the returned results of that operation e.g. the operation `delete all finished process instances` will only ever return finish process instances, not running instances or any decisions.
 
 If what you need falls into one of the existing batch operations then it is best to use the UI to carry out the query however you must **NOT** complete the operation if you are simply doing a search!
 

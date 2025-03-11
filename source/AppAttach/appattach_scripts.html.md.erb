@@ -1,6 +1,6 @@
 ---
 title: Modified AppAttach Scripts
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 30
 ---
@@ -14,7 +14,7 @@ These scripts rely on a JSON config file to mount, register and provision packag
 ## Stage
 
 ```powershell
-<#	
+<#
 	.NOTES
 	===========================================================================
 	 Created on:   	19/08/2020 20:31
@@ -29,7 +29,7 @@ These scripts rely on a JSON config file to mount, register and provision packag
 		This script reads the Json Configuration file, mounts the VHD with no Drive letter and as read only.
 		A new MSIX Junction is created with the package name
 		Package Manager is run for staging the package (Windows.Management.Deployment.PackageManager)
-		
+
 		Point to note, ensure the VHD and json are in the same location as the script for this to work correctly.
 
 
@@ -54,7 +54,7 @@ foreach ($package in $configFile)
 	$parentFolder = "\" + $package.parentFolder + "\";
 	$volumeGuid = $package.volumeGuid;
 	$msixJunction = $package.msixJunction;
-	
+
 	try
 	{
 		Mount-Diskimage -ImagePath $vhdSrc -NoDriveLetter -Access ReadOnly;
@@ -64,35 +64,35 @@ foreach ($package in $configFile)
 	{
 		Write-Host ("Mounting of " + $vhdSrc + " has failed!") -BackgroundColor Red;
 	}
-	
+
 	$msixDest = "\\?\Volume{" + $volumeGuid + "}\";
-	
+
 	if (!(Test-Path $msixJunction))
 	{
 		New-Item $msixJunction -ItemType Directory;
 	}
-	
+
 	$msixJunction = Join-Path $msixJunction $packageName;
 	if (Test-Path $msixJunction)
 	{
 		throw "The path $msixJunction already exists!";
 	}
-	
+
 	cmd.exe /c mklink /j $msixJunction $msixDest
-	
+
 	$lec = $LASTEXITCODE;
 	if (0 -ne $lec)
 	{
 		throw "mklink returned exit code $lec";
 	}
-	
+
 	[Windows.Management.Deployment.PackageManager, Windows.Management.Deployment, ContentType = WindowsRuntime] | Out-Null;
-	
+
 	Add-Type -AssemblyName System.Runtime.WindowsRuntime;
-	
+
 	$asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.ToString() -eq 'System.Threading.Tasks.Task`1[TResult] AsTask[TResult,TProgress](Windows.Foundation.IAsyncOperationWithProgress`2[TResult,TProgress])' })[0];
 	$asTaskAsyncOperation = $asTask.MakeGenericMethod([Windows.Management.Deployment.DeploymentResult], [Windows.Management.Deployment.DeploymentProgress]);
-	
+
 	$packageManager = [Windows.Management.Deployment.PackageManager]::new();
 	$path = $msixJunction + $parentFolder + $packageName;
 	$path = ([System.Uri]$path).AbsoluteUri;
@@ -106,7 +106,7 @@ foreach ($package in $configFile)
 ## Register
 
 ```powershell
-<#	
+<#
 	.NOTES
 	===========================================================================
 	 Created on:   	19/08/2020 20:31
@@ -119,8 +119,8 @@ foreach ($package in $configFile)
 		MSIX App Attach Register Script
 
 		This script reads the Json Configuration file, and
-		Registers the Application for the user. 
-		
+		Registers the Application for the user.
+
 		Point to note, ensure the VHD and json are in the same location as the script for this to work correctly.
 
 
@@ -149,7 +149,7 @@ foreach ($package in $configFile)
 ## Deregister
 
 ```powershell
-<#	
+<#
 .NOTES
 ===========================================================================
  Created on:   	19/08/2020 20:31
@@ -162,8 +162,8 @@ foreach ($package in $configFile)
 	MSIX App Attach Deregister Script
 
 	This script reads the Json Configuration file, and
-	Deregisters the Application for the user. 
-	
+	Deregisters the Application for the user.
+
 	Point to note, ensure the VHD and json are in the same location as the script for this to work correctly.
 
 
@@ -193,7 +193,7 @@ Remove-AppxPackage -PreserveRoamableApplicationData $packageName
 ## Destage
 
 ```powershell
-<#	
+<#
 	.NOTES
 	===========================================================================
 	 Created on:   	19/08/2020 20:31
@@ -206,8 +206,8 @@ Remove-AppxPackage -PreserveRoamableApplicationData $packageName
 		MSIX App Attach Destage Script
 
 		This script reads the Json Configuration file, and
-		Destage's the Application and MSIX Junction from the host. 
-		
+		Destage's the Application and MSIX Junction from the host.
+
 		Point to note, ensure the VHD and json are in the same location as the script for this to work correctly.
 
 
@@ -230,10 +230,10 @@ foreach ($package in $configFile)
 	$vhdSrc = Join-Path $PSScriptRoot $package.vhdFileName;
 	$packageName = $package.packageName;
 	$msixJunction = Join-Path $package.msixJunction $packageName;
-	
+
 	Remove-AppxPackage -AllUsers -Package $packageName;
 	Dismount-DiskImage -ImagePath $vhdSrc;
-	
+
 	if (Test-Path $msixJunction)
 	{
 		Remove-Item $msixJunction -Force -Recurse;

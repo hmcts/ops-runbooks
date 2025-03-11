@@ -73,11 +73,11 @@ TargetVNetName="atlassian-int-nonprod-vnet"
 
 # az backup container list --resource-group $SourceResourceGroup --vault-name $VaultName --backup-management-type AzureIaasVM --query '[].{Name:name, ItemName:properties.friendlyName}' -o table
 
-ContainerName=$(az backup container list --resource-group $SourceResourceGroup --vault-name $VaultName --backup-management-type AzureIaasVM --query "[?properties.friendlyName=='$ItemName'].{Name:name}" -o tsv)
+ContainerName=$(az backup container list --resource-group $SourceResourceGroup --vault-name $VaultName --backup-management-type AzureIaasVM --query "[?properties.friendlyName=='$ItemName'].{Name:name}" -o tsv | head -n 1)
 
 # az backup recoverypoint list --vault-name $VaultName --resource-group $SourceResourceGroup --container-name $ContainerName --item-name $ItemName --query '[].{Name:properties.recoveryPointTime, ID:name}' -o table
 
-RecoverypointName=$(az backup recoverypoint list --vault-name $VaultName --resource-group $SourceResourceGroup --container-name $ContainerName --item-name $ItemName --query '[0].name' -o tsv)
+RecoverypointName=$(az backup recoverypoint list --vault-name $VaultName --resource-group $SourceResourceGroup --container-name $ContainerName --item-name $ItemName --query '[0].name' -o tsv | head -n 1)
 
 echo $RecoverypointName
 

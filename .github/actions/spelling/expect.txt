@@ -10,6 +10,7 @@ atlassian
 atlassiannonprod
 atlasssian
 Bance
+BODYCONTENT
 CAHOSTVERIFY
 cdef
 cdes
@@ -51,6 +52,7 @@ manan
 mdv
 MDVADMVPNHA
 myregistry
+neuberger
 NONLINE
 NSGs
 paloaltonetworks
@@ -93,12 +95,3 @@ Virtualbox
 virtualwan
 VNETs
 wsdl
-chris
-eyetan
-lucyyoung
-manan
-priya
-seanduff
-TBC
-tomknight
-neuberger

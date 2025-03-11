@@ -181,7 +181,27 @@ Your account then should sync with Jira and Confluence and you can then able to 
 
 **4.** Change the Base URLs on all the apps to staging.tools.hmcts.net
 
-**5.** Change colours of the environment to differentiate between Live and Staging
+**5.** Update affected macros to use the new base URL following step 4.
+
+You can run the required query via Azure Data Studio by connecting to the F5 VPN and using the credentials stored in the [atlassian-nonprod-kv keyvault](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/resourceGroups/atlassian-nonprod-rg/providers/Microsoft.KeyVault/vaults/atlasssian-nonprod-kv/overview)
+
+Username: NONPROD-POSTGRES-FLEX-SERVER-USER
+Password: NONPROD-POSTGRES-FLEX-SERVER-PASS
+
+Ensure the correct database is selected before running the the query - 'confluence-db-nonprod'
+
+```sql
+UPDATE BODYCONTENT
+SET body = replace(body,'<ac:parameter ac:name="url">https://tools.hmcts.net','<ac:parameter ac:name="url">https://staging.tools.hmcts.net')
+WHERE body LIKE '%<ac:parameter ac:name="url">https://tools.hmcts.net%';
+```
+
+This query will take a few minutes to complete.
+
+This solution was determined from Atlassian support via [Jira Gadgets fail to load in Confluence with a "Error rendering macro 'gadget'" error](https://confluence.atlassian.com/confkb/jira-gadgets-fail-to-load-in-confluence-with-a-error-rendering-macro-gadget-error-1188421715.html)
+
+
+**6.** Change colours of the environment to differentiate between Live and Staging
 
 ### Creating Manual Backups
 

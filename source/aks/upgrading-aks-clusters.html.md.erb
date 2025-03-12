@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-04-25
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 30
 ---
@@ -20,8 +20,8 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 - Demo             - (cft-demo-00-aks, cft-demo-01-aks/ ss-demo-00-aks, ss-demo-01-aks)
 - Perftest         - (cft-perftest-00-aks, cft-perftest-01-aks/ ss-test-00-aks, ss-test-01-aks)
 - AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)
-- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
-- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
+- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks)
+- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks)
 
 ## Planning
 
@@ -62,7 +62,7 @@ For more information, refer to the [Azure Kubernetes Service (AKS) supported Kub
 
 Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for announcements rather than notification).
 
-Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters. 
+Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters.
 
 ## Pods and HRs Health Checks
 
@@ -78,16 +78,16 @@ Before upgrading any of the clusters run the following query on the cluster you 
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status && kubectl get pdb -A > pdb_status && kubectl get hr --all-namespaces | awk '/(Unknown|False)/' > hr_failed_status
 ```
 
-Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
+Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files.
 
-- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. 
+- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status.
 
 ```command
 kubectl get pods --all-namespaces
 kubectl get hr --all-namespaces
 ```
 
-- Check if these pods have pod disruption budgets 
+- Check if these pods have pod disruption budgets
 
 ```command
 echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json | jq -r '.items[] | select(.status.disruptionsAllowed==0) | {namespace: .metadata.namespace,disruptionsAllowed: .status.disruptionsAllowed,name: .metadata.name} | [.namespace, .disruptionsAllowed, .name] | @tsv' | sed 's/\t\t/ | /g'
@@ -101,7 +101,7 @@ echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json
   - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/30547/files)
 
 
-- For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release). 
+- For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).
 
 - To list all failed helm releases
 
@@ -116,14 +116,14 @@ helm history <chart name> -n <namespace>
 - To roll back helm chart to a prior version or specific version
 
 ```command
-helm rollback <chart name> -n <namespace> 
+helm rollback <chart name> -n <namespace>
 helm rollback <chart name> <version number> -n <namespace>
 ```
 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
 
 ```command
-helm rollback <chart name> -n <namespace> 
+helm rollback <chart name> -n <namespace>
 helm rollback <chart name>  <version number> -n <namespace>
 ```
 
@@ -148,7 +148,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
             3. Remove 01 Cluster IP
             4. Put back 01 Cluster IP after successful upgrade
 
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
+- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer:
 
   [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
 
@@ -158,7 +158,7 @@ We upgrade PTL/PTLSbox and Preview/Dev/ITHC (only because we have one ITHC clust
 ### Ptlsbox, Ptl, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
-Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
+Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.
 
 We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place upgrade on the current live cluster. This means we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the [Rebuilding AKS Clusters guide](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#environment-specific).
 
@@ -172,7 +172,7 @@ Before you upgrade a cluster in the AAT environment, please check which is the a
 
 ### perftest
 
-If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand. 
+If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand.
 
 ### Production
 

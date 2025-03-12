@@ -1,6 +1,6 @@
 ---
 title: Camunda Setup
-last_reviewed_on: 2024-07-25
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 45
 ---
@@ -31,7 +31,7 @@ Camunda API and UI are both deployed centrally to AKS (CFT). What is unique abou
 
 The image is built via [Jenkins](https://build.hmcts.net/job/HMCTS_a_to_c/job/camunda-bpm/) and stored in Azure Container Registry in the [hmctsprivate](https://portal.azure.com/#view/Microsoft_Azure_ContainerRegistries/RepositoryBlade/id/%2Fsubscriptions%2F8999dec3-0104-4a27-94ee-6588559729d1%2FresourceGroups%2Frpe-acr-prod-rg%2Fproviders%2FMicrosoft.ContainerRegistry%2Fregistries%2Fhmctsprivate/repository/camunda%2Fbpm) repository so you cannot access this without the relevant permissions in Azure.
 
-The image contains all elements related to Camunda BPM and by having a single image it allows teams and local development to take place in a simple docker setup. 
+The image contains all elements related to Camunda BPM and by having a single image it allows teams and local development to take place in a simple docker setup.
 In AKS, specifically Flux, we split out the API and UI functionality by supplying environment variables which enable or disable certain features.
 Within Flux the deployments will be found under `apps/camunda/` and they are split into UI and API.
 

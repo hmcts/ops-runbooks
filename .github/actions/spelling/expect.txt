@@ -30,7 +30,7 @@ dpdb
 dsl
 EDB
 Enda
-eyetan
+Eyetan
 geolocationfile
 GEOLOCATIONUPDATES
 gluster
@@ -48,7 +48,7 @@ lharrigangre
 libragob
 libragobrestore
 lucyyoung
-manan
+Manan
 mdv
 MDVADMVPNHA
 myregistry

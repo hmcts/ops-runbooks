@@ -17,6 +17,7 @@ cdes
 Chirag
 chris
 ckingston
+cloudgateway
 containerised
 customisations
 CVP
@@ -31,6 +32,7 @@ dsl
 EDB
 Enda
 eyetan
+Eyetan
 geolocationfile
 GEOLOCATIONUPDATES
 gluster
@@ -49,6 +51,7 @@ libragob
 libragobrestore
 lucyyoung
 manan
+Manan
 mdv
 MDVADMVPNHA
 myregistry

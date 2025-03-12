@@ -95,6 +95,6 @@ Virtualbox
 virtualwan
 VNETs
 wsdl
-eyetan
-manan
+Eyetan
+Manan
 cloudgateway

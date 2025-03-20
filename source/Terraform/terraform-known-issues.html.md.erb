@@ -11,9 +11,9 @@ weight: 210
 
 ### Issue Description
 
-When moving from the `azapi` resource to the new Federated Identity Credentials resource (https://github.com/hmcts/aks-module-kubernetes/blob/master/service-operator.tf), I encountered an issue with the creation of multiple Federated Identities at the same time.
+When moving from the azapi resource to the new Federated Identity Credentials resource (https://github.com/hmcts/aks-module-kubernetes/blob/master/service-operator.tf), I encountered an issue with the creation of multiple Federated Identities at the same time.
 
-When creating or deleting Federated Identity Credentials (FIs) for multiple clusters concurrently, the following error occurs:
+When creating or deleting Federated Identity Credentials for multiple clusters concurrently, the following error occurs:
 
 > Too many Federated Identity Credentials are written concurrently for the managed identity. Concurrent Federated Identity Credentials writes under the same managed identity are not supported.
 

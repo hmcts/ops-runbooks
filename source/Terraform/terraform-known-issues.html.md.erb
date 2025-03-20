@@ -15,13 +15,13 @@ When moving from the azapi resource to the new Federated Identity Credentials re
 
 When creating or deleting Federated Identity Credentials for multiple clusters concurrently, the following error occurs:
 
-> Too many Federated Identity Credentials are written concurrently for the managed identity. Concurrent Federated Identity Credentials writes under the same managed identity are not supported.
+"Too many Federated Identity Credentials are written concurrently for the managed identity. Concurrent Federated Identity Credentials writes under the same managed identity are not supported"
 
 See the example below:
 
 ![FI-credentials-issues](images/concurrent-federated-issues.png)
 
-This error typically occurs during the creation of multiple Federated Identities at the same time, rather than during deletion. The process should delete the `azapi` resource first and then create the new resource.
+This error typically occurs during the creation of multiple Federated Identities at the same time, rather than during deletion. The process should delete the azapi resource first and then create the new resource.
 
 ### Resolution
 

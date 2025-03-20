@@ -11,7 +11,7 @@ weight: 210
 
 ### Issue Description
 
-When moving from the azapi resource to the new Federated Identity Credentials resource (https://github.com/hmcts/aks-module-kubernetes/blob/master/service-operator.tf), I encountered an issue with the creation of multiple Federated Identities at the same time.
+When moving to the new Federated Identity Credentials resource (https://github.com/hmcts/aks-module-kubernetes/blob/master/service-operator.tf), I encountered an issue with the creation of multiple Federated Identities at the same time.
 
 When creating or deleting Federated Identity Credentials for multiple clusters concurrently, the following error occurs:
 
@@ -21,7 +21,7 @@ See the example below:
 
 ![FI-credentials-issues](images/concurrent-federated-issues.png)
 
-This error typically occurs during the creation of multiple Federated Identities at the same time, rather than during deletion. The process should delete the azapi resource first and then create the new resource.
+This error typically occurs during the creation of multiple Federated Identities at the same time, rather than during deletion. The process should delete the old resource first and then create the new resource.
 
 ### Resolution
 

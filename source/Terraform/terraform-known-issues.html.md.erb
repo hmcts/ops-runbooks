@@ -1,0 +1,36 @@
+---
+title: Terraform Known Issues
+last_reviewed_on: 2025-03-20
+review_in: 12 months
+weight: 210
+---
+
+# <%= current_page.data.title %>
+
+## Concurrent Federated Identity Credentials Issue
+
+### Issue Description
+
+When moving from the `azapi` resource to the new Federated Identity Credentials resource (https://github.com/hmcts/aks-module-kubernetes/blob/master/service-operator.tf), I encountered an issue with the creation of multiple Federated Identities at the same time.
+
+When creating or deleting Federated Identity Credentials (FIs) for multiple clusters concurrently, the following error occurs:
+
+> Too many Federated Identity Credentials are written concurrently for the managed identity. Concurrent Federated Identity Credentials writes under the same managed identity are not supported.
+
+See the example below:
+
+![FI-credentials-issues](images/concurrent-federated-issues.png)
+
+This error typically occurs during the creation of multiple Federated Identities at the same time, rather than during deletion. The process should delete the `azapi` resource first and then create the new resource.
+
+### Resolution
+
+To fix this issue, re-run the `terraform apply` command. The process should complete successfully on the second attempt. I also checked, and there are currently no other issues raised on the Azurerm Terraform provider.
+
+This is a known issue that was recently fixed in the following update:  
+
+[HashiCorp Terraform Provider Azurerm Pull Request #20003](https://github.com/hashicorp/terraform-provider-azurerm/pull/20003)
+
+### Workaround
+
+**Manual Selection**: Manually selecting a single cluster for creation does not result in this error.

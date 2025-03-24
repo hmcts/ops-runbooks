@@ -280,6 +280,8 @@ If we need to rollback we can use the cloned index from step 8 that was done bef
 
 This will save us a lot of time and risk, where we dont have to a full re-index.
 
+Please ensure that the original index exists and is empty prior to doing the rollback steps (i.e. if you started doing a reindex and then needed to rollback part-way through, you would need to delete the index and have the service import their definition file again to recreate an empty one to clone into)
+
 1) Restore the backed up index:
 
 ```

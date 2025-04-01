@@ -1,0 +1,32 @@
+---
+title: Github Accounts
+last_reviewed_on: 2025-03-18
+review_in: 6 months
+weight: 55
+---
+
+# <%= current_page.data.title %>
+
+## User Accounts
+
+Personal GitHub accounts can be joined to the HMCTS organisation. This allows users to access the HMCTS repositories and contribute to the codebase.
+
+### Joining the HMCTS organisation
+
+Users will need to be a member of the Azure Entra ID group `DTS GitHub Access` to be able to join the HMCTS organisation.
+
+## Changing GitHub account
+
+Sometime users may need to change their personal GitHub account but this will fail, as they will still be connected to the Justice or HMCTS user account.
+
+A GitHub admin will need to open the GitHub HMCTS organisation and remove the old user account from the organisation by searching for the using in the People tab.
+
+The admin will then need to invite the user to the HMCTS organisation using their Justice/HMCTS email address.
+
+This email will allow the user to join the HMCTS organisation with their new GitHub account.
+
+### User Error Message
+
+<img src="images/GitHubJoin.png" style="width:600px;">
+
+If the user gets this message when trying to join the HMCTS organisation, you will need to remove the Azure Entra ID group `DTS GitHub Access` from the user.  Wait 15 minutes and then add it back.

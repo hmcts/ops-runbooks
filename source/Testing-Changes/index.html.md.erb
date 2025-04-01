@@ -1,6 +1,6 @@
 ---
 title: Testing Changes
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-04-01
 review_in: 12 months
 weight: 200
 ---
@@ -12,8 +12,6 @@ This will ensure that the changes have no impact on upstream users as testing is
 
 ## Guides
 
-- [Create a draft release](drafting-a-release.html)
-
-- [Use Helm Template to test chart library changes](test-chart-library-changes.html)
-
-- [Use GitRepository in Flux to test charts from a branch](temporary-flux-gitrepository.html)
+<% current_page.children.each do |page| %>
+- [<%= page.data.title %>](<%= page.url %>)
+<% end %>

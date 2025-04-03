@@ -1,0 +1,32 @@
+---
+title: Panorama Disaster Recovery
+last_reviewed_on: 2024-01-26
+review_in: 12 months
+weight: 75
+---
+
+# <%= current_page.data.title %>
+
+This guide outlines disaster recovery procedures for Panorama, including backup and restore processes.
+
+## Backup Procedures
+
+The Panorama's infrastructure and most of the configuration are stored as code in the `hub-panorama-terraform` repository. To 
+ensure that full configuration is backed up, there is 
+[hub-panorama-config-backup](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1099) pipeline 
+that runs weekly. That pipeline stores Panorama's configuration in `configuration-backup` container of a storage 
+account in the Panorama's resource group.
+
+### Configuration Backup
+
+Weekly backup of Panorama running configuration is performed automatically.
+
+## Recovery Procedures
+
+After restoreing the infrastructure and the Panorama instance itself, the full configuration can be restored from the backup.
+
+### Restoring Configuration
+
+1. Access the `configuration-backup` container in the storage account from Panorama's resource group.
+2. Download the latest backup file.
+3. Restore the configuration using the Panorama web interface or CLI.

@@ -1,0 +1,52 @@
+---
+title: Panorama Disaster Recovery
+last_reviewed_on: 2024-01-26
+review_in: 12 months
+weight: 75
+---
+
+# <%= current_page.data.title %>
+
+This guide outlines disaster recovery procedures for Panorama, including backup and restore processes.
+
+## Backup Procedures
+
+The Panorama's infrastructure and most of the configuration are stored as code in the `hub-panorama-terraform` repository. To 
+ensure that full configuration is backed up, there is 
+[hub-panorama-config-backup](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1099) pipeline 
+that runs weekly. 
+
+That pipeline stores Panorama's configuration in the `configuration-backup` container of the `panoramasboxukssa` 
+(Sandbox) or `panoramaprodukssa` (Production) storage account.
+
+This storage account is located in the same resource group 
+as Panorama instance - `panorama-sbox-uks-rg` (Sandbox) or `panorama-prod-uks-rg` (Production).
+
+### Configuration Backup
+
+The weekly backup of Panorama running configuration is performed automatically. Data retention for the backups is set to 30 days.
+
+## Recovery Procedures
+
+After restoring the infrastructure and the Panorama instance itself, the full configuration can be restored from the backup.
+
+### Restoring Configuration
+
+Access the `configuration-backup` container in the `panorama<ENV>ukssa` storage account located in the `panorama-<ENV>-uks-rg`
+resource group.
+
+
+Download the latest backup file.
+
+Use the [Connecting to a Palo Alto firewall](connecting-palos.html) guide to connect to the Panorama web interface.
+
+    Do not use the Single Sign-On login method, instead use the administrator username and password.
+    
+To obtain the administrator username and password access the `panorama-<ENV>-uks-kv` Key Vault and read the 
+`panorama-admin-username` and `panorama-admin-password` secrets.
+
+After you logged in, navigate to `Panorama > Setup > Operations`.
+
+Click on `Import named Panorama configuration snapshot`.
+
+Follow the [Revert Panorama Configuration Changes](https://docs.paloaltonetworks.com/panorama/10-2/panorama-admin/administer-panorama/manage-panorama-and-firewall-configuration-backups/revert-panorama-configuration-changes) guide.

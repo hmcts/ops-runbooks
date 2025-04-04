@@ -32,10 +32,21 @@ After restoring the infrastructure and the Panorama instance itself, the full co
 
 ### Restoring Configuration
 
-1. Access the `configuration-backup` container in the `panorama<ENV>ukssa` storage account located in the `panorama-<ENV>-uks-rg`
+Access the `configuration-backup` container in the `panorama<ENV>ukssa` storage account located in the `panorama-<ENV>-uks-rg`
 resource group.
-2. Download the latest backup file.
-3. Go to the Panorama web interface and log in as admin user.
-4. Navigate to `Panorama > Setup > Operations`.
-5. Click on `Import named Panorama configuration snapshot`.
-6. Follow the [Revert Panorama Configuration Changes](https://docs.paloaltonetworks.com/panorama/10-2/panorama-admin/administer-panorama/manage-panorama-and-firewall-configuration-backups/revert-panorama-configuration-changes) guide.
+
+
+Download the latest backup file.
+
+Use the [Connecting to a Palo Alto firewall](connecting-palos.html) guide to connect to the Panorama web interface.
+
+    Do not use the Single Sign-On login method, instead use the administrator username and password.
+    
+To obtain the administrator username and password access the `panorama-<ENV>-uks-kv` Key Vault and read the 
+`panorama-admin-username` and `panorama-admin-password` secrets.
+
+After you logged in, navigate to `Panorama > Setup > Operations`.
+
+Click on `Import named Panorama configuration snapshot`.
+
+Follow the [Revert Panorama Configuration Changes](https://docs.paloaltonetworks.com/panorama/10-2/panorama-admin/administer-panorama/manage-panorama-and-firewall-configuration-backups/revert-panorama-configuration-changes) guide.

@@ -684,6 +684,6 @@ customised
 screenshots
 BODYCONTENT
 panoramasboxukssa
-PanoramasBoxUKSSA
+panoramaprodukssa
 ukssa
 UKSSA

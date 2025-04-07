@@ -683,6 +683,3 @@ Customisation
 customised
 screenshots
 BODYCONTENT
-uks
-panoramaprodukssa
-ukssa

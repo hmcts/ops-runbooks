@@ -9,7 +9,7 @@ weight: 20
 
 ## Determine if the DB is in a Limbo State
 
-1. **Check the Authentication Tab**:
+1. Check the Authentication Tab
    - Navigate to the Authentication tab for the DB you are trying to connect to.
    - Verify if either of the following groups is listed as **Microsoft Entra Administrators**:
      - `PlatOps PostgreSQL Admin`
@@ -18,7 +18,7 @@ weight: 20
 
    ![entra-admin](images/entra-admins.png)
 
-2. **Locate the JIT Group**:
+2. Locate the JIT Group
    - Search for the JIT group in the [entitlement-package](https://github.com/hmcts/azure-access-packages/blob/master/entitlement-packages.yml)
    - Look for the group under the `resource_roles` key.
 
@@ -26,10 +26,9 @@ weight: 20
 
 ## Gain Admin Access
 
-1. **Assign Group Administrator Role**:
+1. Assign Group Administrator Role
    - Go to PIM (Privileged Identity Management) in the Azure Portal.
    - Assign yourself the group you requested above
 
-
-2. **Request the Access Package**:
+2. Request the Access Package
    - Request the access package via [access](https://github.com/hmcts/azure-access-packages/blob/master/entitlement-packages.yml) and ensure your org is set to CJS Common Platform

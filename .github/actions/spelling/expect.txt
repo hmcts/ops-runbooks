@@ -96,7 +96,3 @@ virtualwan
 VNETs
 wsdl
 cloudgateway
-panoramaprodukssa
-panoramasboxukssa
-uks
-ukssa

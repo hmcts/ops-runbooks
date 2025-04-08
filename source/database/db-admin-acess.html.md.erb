@@ -1,0 +1,24 @@
+---
+title: Gaining Admin Access to PostgreSQL Flex DBs in Limbo State
+last_reviewed_on: 2025-04-07
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## Determine if the DB is in a Limbo State
+
+Check the Authentication tab for the database you are trying to connect to. If neither the `PlatOps PostgreSQL Admin` nor the `PlatOps PostgreSQL Admin SC` group is listed as **Microsoft Entra Administrators**, then the database is in a limbo state
+
+![Entra Admin](images/entra-admin.png)
+
+Next, locate the **JIT group** by searching for it in the [entitlement-package](https://github.com/hmcts/azure-access-packages/blob/master/entitlement-packages.yml). Look for the group under the resource_roles key.
+
+![Resource Roles](images/resource-roles.png)
+
+## Gain Admin Access
+
+1. Go to **Privileged Identity Management** in the Azure Portal and assign yourself the **Group Administrator** role.
+2. Add yourself to the requestor_groups you identified earlier.
+3. Request the access package via [MyAccess](https://github.com/hmcts/azure-access-packages/blob/master/entitlement-packages.yml) and ensure your organization is set to **CJS Common Platform**.

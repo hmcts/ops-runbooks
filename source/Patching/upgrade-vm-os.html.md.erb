@@ -9,33 +9,41 @@ review_in: 12 months
 This guide is here to show you how to upgrade the ubuntu version by hopping onto the virtual machine and using commands via the Terminal
 
 **Update Ubuntu using terminal:**
+
 To make the update easier you should sync the package index files from their sources via Internet
 List all available upgrades:
+
 ```
 apt list -a –upgradable
 ```
 
 Install newest versions of all installed packages on Ubuntu:
+
 ```
 sudo apt update && sudo apt upgrade -y
 ```
 
 Then reboot the system:
+
 ```
 sudo reboot
 ```
 
 Check the current version of ubuntu:
+
 ```
 lsb_release -a
 ```
 
-Port 1022, Ubuntu will automatically open another ssh port on 1022 to give provide a secure channel in case of server error. This command Opens the channel:
+Port 1022, Ubuntu will automatically open another ssh port on 1022 to give provide a secure channel in case of server error.
+This command Opens the channel:
+
 ```
 sudo ufw allow 1022/tcp
 ```
 
 **Upgrade to ubuntu 22.04 (from 20.04)**
+
 ```
 sudo do-release-upgrade
 ```
@@ -53,7 +61,7 @@ Type ENTER
 ![Final_Confirmation](images/FinalConfirmation.png)
 
 Type Y
-You will then get a pop asking to Restart Services during packager upgrades without asking: Choose ‘Yes’
+You will then get a pop asking to Restart Services during package upgrades without asking: Choose ‘Yes’
 
 ![Restart_Services](images/RestartServices.png)
 
@@ -63,6 +71,7 @@ Next a Configuration pop up will appear stating you have made changes to the con
 
 Type y to remove obsolete software packages and then type Y to restart the system.
 To confirm the upgrade, use the command: 
+
 ```
 lsb_release -a 
 ```
@@ -72,14 +81,15 @@ Which should produce a similar output as below
 ![2204_Ubuntu](images/2204Ubuntu.png)
 
 The upgrade only works one version at a time.
+
 This section should be repeated until the VM OS is the desired version aka run this twice to get from 20.04 to 24.04
+
 The final output should look like the screenshot below:
 
 ![2404_Ubuntu](images/2404Ubuntu.png)
 
 Resources
-https://www.elastic.co/guide/en/elasticsearch/reference/7.17/targz.html
-https://www.cyberciti.biz/faq/upgrade-update-ubuntu-using-terminal/
-https://documentation.ubuntu.com/server/how-to/software/upgrade-your-release/index.html
-https://krystal.io/blog/post/upgrading-ubuntu-20-04-to-22-04-lts-using-the-command-line
 
+- [Upgrade Ubuntu using terminal](https://www.cyberciti.biz/faq/upgrade-update-ubuntu-using-terminal/)
+- [Ubuntu documentation](https://documentation.ubuntu.com/server/how-to/software/upgrade-your-release/index.html)
+- [Upgrade Ubuntu from 20.04 to 22.04](https://krystal.io/blog/post/upgrading-ubuntu-20-04-to-22-04-lts-using-the-command-line)

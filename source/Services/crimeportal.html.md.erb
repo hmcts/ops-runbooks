@@ -1,6 +1,6 @@
 ---
 title: Crime Portal
-last_reviewed_on: 2024-05-30
+last_reviewed_on: 2025-03-30
 review_in: 6 months
 weight: 35
 ---
@@ -25,8 +25,7 @@ Azure Update Manager is used to apply updates to the VMs and automatically reboo
 
 Crime Portal is a highly stateful legacy application which has been moved to the cloud. It was not part of the project to rewrite the Java Wildfly based services. Therefore application and LDAP services have been deployed within a docker container running within the respective VMs. These have been doubled into pairs to provide HA and increased throughput.  With the application gateway probing for container health, ensuring session persistence and load balancing.
 
-LDAP services required by Crime Portal could not be migrated to Azure provided platforms, so the existing solution was kept. 
-
+LDAP services required by Crime Portal could not be migrated to Azure provided platforms, so the existing solution was kept.
 
 ## Overview
 
@@ -38,7 +37,6 @@ LDAP services required by Crime Portal could not be migrated to Azure provided p
 GitHub Repo: [https://github.com/hmcts/crime-portal-infra](https://github.com/hmcts/crime-portal-infra)
 
 ADO Pipeline: PlatformOperations, hmcts.crime-portal-infra
-
 
 ### Access to VMs
 Add users to the correct group
@@ -56,6 +54,7 @@ Provides session persistence
 Load balancing, Ports 80 and 443
 
 TLS termination for integration with Libra in Interim Hosting
+
 * crimeportal-libra-gw-staging-internal-hmcts-net
 * crimeportal-libra-gw-prod-internal-hmcts-net
 

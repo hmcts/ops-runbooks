@@ -687,3 +687,5 @@ panoramaprodukssa
 panoramasboxukssa
 uks
 ukssa
+lsb
+ufw

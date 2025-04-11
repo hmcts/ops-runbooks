@@ -108,7 +108,7 @@ type: Opaque
 Now you must re-encrypt it using SOPS:
 
 ```
-sops --decrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
+sops --encrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
 ```
 
 Once encrypted the values should no longer be visible and start with `ENC[AES256]`.

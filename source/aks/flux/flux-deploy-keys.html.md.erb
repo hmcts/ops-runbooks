@@ -27,6 +27,8 @@ You then go to your repo settings and find `Deploy keys`. Click `Add deploy key`
 
 Give the deploy key a sensible name and save.
 
+<%= warning_text('Each environment should have a unique key! Do not share keys between environments!') %>
+
 This SSH key can now be used to authenticate to this GitHub repo. By default, it has read-only access. 
 
 You should only require read/write access when flux needs to write back to GitHub. This would only be required on our PTL cluster as it has the image automation controller configured on it.
@@ -116,3 +118,19 @@ Once encrypted the values should no longer be visible and start with `ENC[AES256
 <%= warning_text('Make sure you have encrypted all secrets before pushing to GitHub!') %>
 
 Now you can push your changes to your branch.
+
+You should remove all keys from your local machine once you've added a new key to GitHub, code and key vault.
+
+## Revoking a deploy key
+
+If a key needs to be revoked so it can no longer be used. Go to the settings of your repo and then go to `Deploy keys`, find the key you need to revoke and click `Delete`.
+
+The key should no longer be able to be used.
+
+You can check the fingerprint of a key you have locally by running:
+
+```
+sh-keygen -l -E sha256 -f /path/to/public/key
+```
+
+Compare this to the one shown on the `Deploy keys` page to match a local version to the version stored in GitHub.

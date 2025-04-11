@@ -11,7 +11,6 @@ atlassiannonprod
 atlasssian
 Bance
 botkube
-botkube
 cabcdefg
 CAHOSTVERIFY
 cdef
@@ -61,7 +60,6 @@ pvc
 Qube
 recoverypoint
 regitries
-replicasets
 replicasets
 Resouce
 Rns

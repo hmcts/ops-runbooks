@@ -1,0 +1,59 @@
+---
+title: Botkube
+last_reviewed_on: 2025-04-10
+review_in: 12 months
+weight: 30
+---
+# <%= current_page.data.title %>
+
+This page details the deployment of Botkube in HMCTS, where it comes from, how its used and integration with Slack.
+
+## Deployment
+
+Botkube is deployed via [Flux](https://github.com/hmcts/cnp-flux-config/tree/master/apps/monitoring/botkube) using the upstream Helm Chart from [Botkube](https://github.com/kubeshop/botkube/tree/main/helm/botkube).
+
+The Flux configuration covers all environments that we deploy Botkube to:
+
+- CFT Sandbox
+- CFT AAT
+- CFT Production
+
+### Values
+
+We have override values in Flux that customise the default deployment of Botkube to our own use case including command aliases, rbac, slack channel setup and tokens (encrypted via [SOPS](https://github.com/hmcts/cnp-flux-config/blob/master/docs/secrets-sops-encryption.md)).
+
+_**Note**: We do not pin the version of Botkube Helm chart so its possible for changes upstream to be automatically added to our deployment. This can cause unexpected changes to values, templates and/or dependencies._
+
+### RBAC
+
+The values we have are overrides for the upstream Helm Chart and include RBAC to control what users can do from Slack.
+
+The RBAC configuration is designed as a specific allow rule because Kubernetes RBAC is additive so we start with no permissions and then allow what we want.
+
+```yaml
+    rbac:
+      groups:
+        botkube-plugins-default:
+          create: true
+          rules:
+            - apiGroups: ["*"]
+              resources: ["namespaces", "pods", "services", "daemonsets", "deployments", "ingresses", "replicasets", "jobs", "configmaps", "helmreleases"]
+              verbs: ["get", "watch", "list"]
+```
+
+In our case we allow the shown resources and commands and only those i.e. users cannot access pod logs, secrets or any other resource types not listed above.
+
+Without this configuration Botkubes Helm Chart provides completely open access to all resources in the cluster.
+
+## Slack integration
+
+Deployment via Flux includes multiple encrypted secrets that contain Slack tokens for OAuth and App integration.
+The creation of the Slack Apps was carried out manually and followed the official [guidance](https://docs.botkube.io/installation/slack/) from Botkube.
+
+When integrated with Slack the App can be added to channels (namely the _**aks-monitoring-x**_ channels) and called to send commands to Botkube which are then run against the cluster that it is installed in:
+
+<img src="Images/botkube-slack.png" alt="botkube-slack" width="700"/>
+
+In this screenshot you can see the use of Botkube to send commands to the Sbox-00 cluster and also the use of the alias `kgp` which translates to `kubectl get pods` via the Botkube [configuration](https://github.com/hmcts/cnp-flux-config/blob/master/apps/monitoring/botkube/botkube.yaml#L32).
+
+You can find all Botkube Slack apps by searching the currently installed apps in the `HMCTS Reform` Slack workspace [management section](https://app.slack.com/apps-manage/T1L0WSW9F/integrations/installed).

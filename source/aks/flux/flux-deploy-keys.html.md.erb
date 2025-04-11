@@ -65,3 +65,54 @@ The deploy keys are also saved in code so that we can update them after bootstra
 You can find them under the flux-system namespace, in each environment folder under the base folder. For example:
 
 `/apps/flux-system/sbox/base` in [sds-flux-config](https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/base/git-credentials.enc.yaml)
+
+If you need to update these, you must first decrypt them using SOPS.
+
+<%= warning_text('You are about to decrypt a secret! Make sure you do not push an unencrypted version of a secret to GitHub!') %>
+
+```
+sops --decrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
+```
+
+You can find the key vault name and version id in the encrypted version of the file.
+
+Now you have the decrypted version, you need to add the new values.
+
+You will notice the values are base64 encoded. You need to get the private key you created and encode it in base64.
+
+You can do this by using the cat command: `cat /path/to/private/key | base64`.
+
+Take the value returned and place it in the `identity` value.
+
+Do the same for the public key but save it as the `identity.pub` value.
+
+The known_hosts value is public and does not usually change. you can find the latest one on GitHub's [website](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints.)
+
+Pick the version that matches your SSH key algorithm.
+
+Your file should now look something like this:
+
+```
+apiVersion: v1
+data:
+    identity: <base64 encoded string>
+    identity.pub: <base64 encoded string>
+    known_hosts: <base64 encoded string>
+kind: Secret
+metadata:
+    name: git-credentials
+    namespace: flux-system
+type: Opaque
+```
+
+Now you must re-encrypt it using SOPS:
+
+```
+sops --decrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
+```
+
+Once encrypted the values should no longer be visible and start with `ENC[AES256]`.
+
+<%= warning_text('Make sure you have encrypted all secrets before pushing to GitHub!') %>
+
+Now you can push your changes to your branch.

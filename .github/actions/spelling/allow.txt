@@ -689,3 +689,5 @@ uks
 ukssa
 lsb
 ufw
+Zubair
+resolvconf

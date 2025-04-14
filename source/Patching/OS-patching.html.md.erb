@@ -1,0 +1,304 @@
+---
+title: OS Patch Management
+last_reviewed_on: 2024-04-26
+review_in: 12 months
+
+weight: 133
+---
+# <%= current_page.data.title %>
+
+We need to ensure that Virtual Machines within the HMCTS subscription are kept up to date in terms of OS patching.
+The patching approach will be on a monthly basis unless a critical patch(es) have been identified.  This document
+covers the patching process, patching instructions for each OS type and troubleshooting sections.
+
+## Patching Process
+PlatOps resources confirmed to participate in patching, including out of hours.
+
+A quarterly patching schedule needs to be created, reviewed, and approved (by PlatOps and the customer).  The
+non-live environments for a service needs to be scheduled and successfully patched first prior to production.
+
+Production services will require a change request and scheduled out of hours, for the agreed change window.  Changes
+should be raised in advance to allow changes to be approved and resources/teams scheduled (i.e. applications and DBs to
+be shut down prior to patching and started after and tested.)
+
+[Patching Calendar](https://justiceuk.sharepoint.com/:x:/r/sites/DTSPlatformOperations/_layouts/15/Doc.aspx?sourcedoc=%7B97F4A896-AAB7-4CCD-A4D9-B4D158B8071D%7D&file=Patching%20Calendar%20v2.xlsx&action=default&mobileredirect=true)
+consists of rota, server lists and services scheduled for patching per month.
+
+**High-level patching process**:
+A lower environment will be patched prior to Production (example: Non-Live Environment (NLE) → Production).
+Ensure production changes are approved and at the implement status and window and resources have been approved and provided.
+Prior to patching (i.e. the day before) log into each server and do health checks to make sure no space issues and repos are setup correctly to pull down patches and scheduled backups are successful, etc.
+Ensure a valid backup is available prior to each environment/virtual machine being patched.  For NLE check backups were successful from the last scheduled daily backup.  For Production run a backup and proceed when completed.
+Check Patching Calendar Server Lists tab to verify the services to be patched and their servers and the patching notes tab to confirm if version upgrade is required as well as patching.
+Prior to any patching, Platform Operations will contact the Development team; they will be required to stop relevant services/shutdown databases etc.
+This initial process should be documented if not already.
+To include a restart schedule (example: restart app01 → db01 → app02 → db02 ) - this is to be provided by the Application team.
+Once restarts have been completed, development team to start & test applications.
+Once the above is successful, the next environment will be patched with similar steps.
+
+
+## Azure Update Manager
+Azure Update Manager is a SaaS solution, to manage and govern software updates for Windows and Linux machines. As part of its deep integration with the Azure Portal, all Azure infrastructure in place and any VM’s created using Azure marketplace images, already include the necessary software. Removing all barriers to implementation.
+
+The native software update feature within the operating system is utilised by Azure Update Manager (AUM), to first audit the patching requirements and then apply any updates.  With scheduling and scope, controlled by AUM, with results reported back, via a single console.
+
+- [Azure Update Manager Page](AUM-intro.html)
+
+## CRIME Environment Patching
+The Linux VMs within the CRIME subsciptions are patched using Jenkins, as decribed in the [CRIME Patching](CRIME-Patching.html) document.
+
+
+## Manual OS Patching Instructions
+
+See instructions below on how to generate list and apply patching for each OS – RHEL, Ubuntu and Windows:
+
+### RHEL
+**1.**	Based on a standard RHEL 7.7 VM, yum-plugin-security is installed by default
+
+```
+[root@tamops-rhel ~]# yum install yum-plugin-security
+Loaded plugins: langpacks, product-id, search-disabled-repos
+Package yum-3.4.3-163.el7.noarch already installed and latest version
+Nothing to do
+```
+
+**2.** Check for Security Critical Updates (Check for Critical Updates only)
+
+```
+[root@tamops-rhel ~]# yum --security --sec-severity=Critical check-update
+--> maven30-maven-profile-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+--> python27-python-jinja2-2.6-15.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+--> maven30-maven-model-2.2.1-47.7.el7.noarch from rhui-rhel-server-rhui-rhscl-7-rpms excluded (updateinfo)
+No packages needed for security; 14 packages available
+```
+
+**3.** List any available Updates
+
+```
+[root@tamops-rhel ~]# yum updateinfo list
+Loaded plugins: langpacks, product-id, search-disabled-repos
+RHSA-2021:2523 Important/Sec. bpftool-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. bpftool-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2405 Important/Sec. dhclient-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2405 Important/Sec. dhcp-common-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2405 Important/Sec. dhcp-libs-12:4.2.5-77.el7_7.1.x86_64
+RHSA-2021:2175 Important/Sec. glib2-2.56.1-6.el7_7.x86_64
+RHSA-2021:2998 Moderate/Sec.  glibc-2.17-292.el7_7.2.x86_64
+RHSA-2021:2998 Moderate/Sec.  glibc-common-2.17-292.el7_7.2.x86_64
+RHSA-2021:2523 Important/Sec. kernel-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2523 Important/Sec. kernel-tools-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-tools-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2523 Important/Sec. kernel-tools-libs-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. kernel-tools-libs-3.10.0-1062.52.2.el7.x86_64
+RHSA-2021:2304 Important/Sec. microcode_ctl-2:2.1-53.16.el7_7.x86_64
+RHSA-2021:3029 Important/Sec. microcode_ctl-2:2.1-53.18.el7_7.x86_64
+RHSA-2021:2523 Important/Sec. python-perf-3.10.0-1062.51.1.el7.x86_64
+RHSA-2021:2728 Important/Sec. python-perf-3.10.0-1062.52.2.el7.x86_64
+RHBA-2021:2951 bugfix         redhat-release-server-7.7-12.el7.x86_64
+RHBA-2021:3402 bugfix         redhat-release-server-7.7-13.el7.x86
+```
+
+**4.** Run yum update to update RHEL
+
+```
+[root@tamops-rhel ~]# yum update
+```
+
+5. Verify release version
+
+```
+cat /etc/os-release
+cat /etc/redhat-release
+```
+
+6. Reboot server
+
+```
+reboot
+```
+
+### Ubuntu
+**1.**	Upgrade
+
+```
+root@tamops-ubuntu:~# apt-get update
+Hit:1 http://azure.archive.ubuntu.com/ubuntu bionic InRelease
+Get:2 http://azure.archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]
+Get:3 http://azure.archive.ubuntu.com/ubuntu bionic-backports InRelease [74.6 kB]
+Get:4 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu bionic/universe amd64 Packages [8570 kB]
+Get:6 http://azure.archive.ubuntu.com/ubuntu bionic/universe Translation-en [4941 kB]
+```
+
+**2.** Review Security Updates against CVE Dashboard
+
+```
+root@tamops-ubuntu:~# apt-get upgrade -s | grep -i security
+19 standard security updates
+Inst login [1:4.5-1ubuntu2] (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Conf login (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst python-samba [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst samba-common-bin [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst samba-common [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [all]) []
+Inst samba-libs [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst libwbclient0 [2:4.7.6+dfsg~ubuntu-0ubuntu2.27] (2:4.7.6+dfsg~ubuntu-0ubuntu2.28 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst passwd [1:4.5-1ubuntu2] (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Conf passwd (1:4.5-1ubuntu2.2 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64])
+Inst vim [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-tiny [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-runtime [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [all]) []
+Inst xxd [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu:18.04/bionic-updates, Ubuntu:18.04/bionic-security [amd64]) []
+Inst vim-common [2:8.0.1453-1ubuntu1.7] (2:8.0.1453-1ubuntu1.8 Ubuntu
+```
+
+**3.** Lists any available Updates
+
+```
+root@tamops-ubuntu:~# apt list --upgradable
+Listing... Done
+libpolkit-agent-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libpolkit-backend-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libpolkit-gobject-1-0/bionic-updates,bionic-security 0.105-20ubuntu0.18.04.6 amd64 [upgradable from: 0.105-20ubuntu0.18.04.5]
+libwbclient0/bionic-updates,bionic-security 2:4.7.6+dfsg~ubuntu-0ubuntu2.28 amd64 [upgradable from: 2:4.7.6+dfsg~ubuntu-0ubuntu2.27]
+linux-azure/bionic-updates,bionic-security 5.4.0.1068.47 amd64 [upgradable from: 5.4.0.1067.46]
+linux-cloud-tools-azure/bionic-updates,bionic-security 5.4.0.1068.47
+```
+
+**4.** Update Ubuntu
+
+```
+root@tamops-ubuntu:~# apt-get upgrade -y
+```
+
+5. Reboot server
+
+```
+reboot
+```
+
+### Windows
+
+```
+PS C:\Users\tamops> ((New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher()).Search('IsInstalled=0 and IsHidden=0').updates | Select-Object -Property Title,IsDownloaded,RebootRequired | ft -AutoSize
+
+Title                                                                                                               IsDownloaded RebootRequired
+-----                                                                                                               ------------ --------------
+2021-01 Update for Windows Server 2019 for x64-based Systems (KB4589208)                                                   False          False
+2022-01 Cumulative Update Preview for .NET Framework 3.5, 4.7.2 and 4.8 for Windows Server 2019 for x64 (KB5009823)        False          False
+```
+
+
+## Patching Troubleshooting
+This section includes updates of any issues encountered during patching and how to resolve.
+
+### RHEL 6.10 not showing any patches available
+RHEL 6.10 is the latest version for RHEL 6 and is End of Life and not supported - therefore there will be no available patches if previously patched to latest version.
+
+### Patching and upgrading RHEL 7 to latest version and not showing any patches available
+If trying to patch and upgrade RHEL 7 to the latest version (i.e. 7.7 to 7.9) and if no patches are showing as available then the repos will need checked and updated:
+
+```
+[root@NSDT-DB-VM01 ~]# yum updateinfo list
+Loaded plugins: langpacks, product-id, search-disabled-repos, subscription-manager
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+updateinfo list done
+```
+
+If patching to the latest version remove the releasever file:
+
+```
+rm /etc/yum/vars/releasever
+```
+
+If patching to a specific higher version then update this file to the required version.
+
+Disable non-EUS repositories:
+
+```
+yum repolist enabled
+
+yum-config-manager --disable rhui-microsoft-azure-rhel7-eus
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-supplementary-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-optional-rpms
+yum-config-manager --disable rhui-rhel-7-server-rhui-eus-rpms
+```
+
+Get the latest Azure RHEL 7 repository config file:
+
+```
+wget https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel7.config
+```
+
+Add the latest Azure RHEL 7 repositories:
+
+```
+yum --config=rhui-microsoft-azure-rhel7.config install rhui-azure-rhel7
+```
+
+Remove the disabled repos to reduce space usage:
+
+```
+cd /var/cache/yum/x86_64/7.7
+du -sh *
+rm -rf rhui-microsoft-azure-rhel7-eus
+rm -rf rhui-rhel-7-server-rhui-eus-optional-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-rpms
+rm -rf rhui-rhel-7-server-rhui-eus-supplementary-rpms
+```
+
+Clean up the repos and confirm patches are now available and can upgrade to latest version:
+
+```
+yum clean all
+yum repolist enabled
+yum updateinfo list
+```
+
+### Errors
+
+```
+Transaction check error:
+  file /etc/cron.daily/rhui-update-client from install of rhui-azure-rhel7-2.2-606.noarch conflicts with file from package rhui-azure-rhel7-eus-2.2-491.noarch
+Error Summary
+-------------
+```
+
+The file might have a different title, but the fix is the same. To resolve the above delete the offending file with:
+
+```command
+yum remove rhui-azure-rhel7-eus-2.2-491.noarch
+```
+
+```
+Transaction check error:
+  installing package clamav-data-0.103.9-1.el7.noarch needs 17MB on the /var filesystem
+Error Summary
+-------------
+Disk Requirements:
+  At least 17MB more space needed on the /var filesystem.
+```
+
+To clean up some disk space try the following:
+
+```command
+cd /var/opt/microsoft/omsconfig
+cat /dev/null > omsconfigdetailed.log
+cat /dev/null > omsconfig.log
+```
+
+### High CPU or memory
+
+To see which processes are using the most CPU/Memory run
+
+```command
+top
+ps -ef |grep aide
+```
+which will return a list of the aide processes. If CPU/ Memory usage is very high try terminating some of the aide processes by taking the PID Numbers from the list and running the below
+
+```command
+kill -9 1211 2376
+```
+
+where the numbers are the PIDs, replace as required.

@@ -41,6 +41,7 @@ jfrt
 jira
 journalctl
 kalyan
+keyfile
 libragob
 libragobrestore
 Manan
@@ -72,10 +73,13 @@ sourcerepository
 sourcetag
 spn
 statefulset
+STE
+Tenables
 ste
 STECCM
 themisgatewayapi
 thw
+tns
 toset
 totp
 TTLs

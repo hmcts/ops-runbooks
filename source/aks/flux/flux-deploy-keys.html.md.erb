@@ -1,0 +1,136 @@
+---
+title: Flux Deploy Keys
+last_reviewed_on: 2025-03-11
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+When setting up Flux on a kubernetes cluster, it must be "bootstrapped". This is the process whereby the flux controller pods are deployed to the cluster and they are configured to sync with a git repository.
+
+In order to perform bootstrapping, you need to authenticate to your git repo.
+
+There are several ways to do this but the way we do it is using deploy keys.
+
+Deploy keys are SSH keys that grant access to a single repository in GitHub.
+
+You can find out more details about deploy keys in GitHub [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys).
+
+Because deploy keys aren't tied to any user and don't expire, they are a convenient and secure method of allowing flux to sync with our git config and deploy the applications are developers need.
+
+## Creating deploy keys
+
+Deploy keys are created by generating an SSH key locally like you would for your own account.
+
+You then go to your repo settings and find `Deploy keys`. Click `Add deploy key` and paste in the contents of the SSH public key you've created.
+
+Give the deploy key a sensible name and save.
+
+<%= warning_text('Each environment should have a unique key! Do not share keys between environments!') %>
+
+This SSH key can now be used to authenticate to this GitHub repo. By default, it has read-only access. 
+
+You should only require read/write access when flux needs to write back to GitHub. This would only be required on our PTL cluster as it has the image automation controller configured on it.
+
+See [flux image automation](flux-image-automation.html) for more information.
+
+## Saving deploy keys in Key Vault
+
+We have scripts in our aks-cft-deploy and aks-sds-deploy repos that read the private and public SSH keys from a keyvault and use them to create a secret on our AKS clusters.
+
+This secret is what allows the flux controllers on the cluster to sync with GitHub.
+
+You can see the commands in the script [here](https://github.com/hmcts/aks-sds-deploy/blob/fbf76b87b08ddae45bc99b1399e61cea7fdeae13/bootstrap/create-sshkeys.sh#L17-L18).
+
+The script looks for a private key stored in a secret called `flux-ssh-git-key-private` and a public key stored in a secret called `flux-ssh-git-key-private`.
+
+If you have created a new deploy key, make sure you update the relevant keyvault with the private and public SSH keys.
+
+To make sure the keys are stored in the correct format, you should use the Azure CLI as the portal can sometimes mess up how the key looks.
+
+Use these commands: 
+
+```
+az keyvault secret set -f <path to private key> --vault-name <key vault name> --name flux-ssh-git-key-private
+az keyvault secret set -f <path to public key> --vault-name <key vault name> --name flux-ssh-git-key-public
+```
+
+The keyvault should be named based on the subscription ID e.g. `cabcdefg12345678kv`.
+
+## Saving the keys in code - encrypted
+
+#### This only applies to SDS currently
+
+The deploy keys are also saved in code so that we can update them after bootstrapping, should they need to be changed.
+
+You can find them under the flux-system namespace, in each environment folder under the base folder. For example:
+
+`/apps/flux-system/sbox/base` in [sds-flux-config](https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/base/git-credentials.enc.yaml)
+
+If you need to update these, you must first decrypt them using SOPS.
+
+<%= warning_text('You are about to decrypt a secret! Make sure you do not push an unencrypted version of a secret to GitHub!') %>
+
+```
+sops --decrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
+```
+
+You can find the key vault name and version id in the encrypted version of the file.
+
+Now you have the decrypted version, you need to add the new values.
+
+You will notice the values are base64 encoded. You need to get the private key you created and encode it in base64.
+
+You can do this by using the cat command: `cat /path/to/private/key | base64`.
+
+Take the value returned and place it in the `identity` value.
+
+Do the same for the public key but save it as the `identity.pub` value.
+
+The known_hosts value is public and does not usually change. you can find the latest one on GitHub's [website](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)
+
+Pick the version that matches your SSH key algorithm.
+
+Your file should now look something like this:
+
+```
+apiVersion: v1
+data:
+    identity: <base64 encoded string>
+    identity.pub: <base64 encoded string>
+    known_hosts: <base64 encoded string>
+kind: Secret
+metadata:
+    name: git-credentials
+    namespace: flux-system
+type: Opaque
+```
+
+Now you must re-encrypt it using SOPS:
+
+```
+sops --encrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/git-credentials.enc.yaml
+```
+
+Once encrypted the values should no longer be visible and start with `ENC[AES256]`.
+
+<%= warning_text('Make sure you have encrypted all secrets before pushing to GitHub!') %>
+
+Now you can push your changes to your branch.
+
+You should remove all keys from your local machine once you've added a new key to GitHub, code and key vault.
+
+## Revoking a deploy key
+
+If a key needs to be revoked so it can no longer be used. Go to the settings of your repo and then go to `Deploy keys`, find the key you need to revoke and click `Delete`.
+
+The key should no longer be able to be used.
+
+You can check the fingerprint of a key you have locally by running:
+
+```
+sh-keygen -l -E sha256 -f /path/to/public/key
+```
+
+Compare this to the one shown on the `Deploy keys` page to match a local version to the version stored in GitHub.

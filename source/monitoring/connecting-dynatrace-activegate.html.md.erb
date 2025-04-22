@@ -6,9 +6,13 @@ weight: 40
 ---
 # <%= current_page.data.title %>
 
+## CNP
 ## Pre-Requisites
 
 - Connected to the [VPN](https://portal.platform.hmcts.net)
+
+## Dynatrace Activegate Code
+[dynatrace-activegate](https://github.com/hmcts/dynatrace-activegate)
 
 ## Connecting to Dynatrace VMs (ActiveGate)
 
@@ -48,3 +52,43 @@ SSH to the appropriate bastion and run `az login`.
 Use the `az ssh --ip` command followed by the IP address of the VM to connect to it using your own account.
 
 If you are getting `permission denied`, try upgrading the instance in the portal.
+
+## CPP
+## Pre-Requisites
+
+- Connect to MDV/MPD Jumpbox:
+  - mdvdmzjumpl01 (nonlive)
+  - MPDDMZJUMPL01 (live)
+
+Assuming your CPP access is all setup and you are on the correct VPN, this is done by simply `ssh mdvdmzjumpl01.cpp.nonlive`, then using your google auth MFA code.
+
+## Dynatrace Activegate Code
+[cpp-terraform-dynatrace-activegate](https://github.com/hmcts/cpp-terraform-dynatrace-activegate/tree/main)
+
+## Connecting to Dynatrace VMs (ActiveGate)
+Connection is usually performed via SSH, the key for this can be found in KV-MDV-CCM-01, as `ado--cpp-module-terraform-azurerm-vmss--mdv--vmss-ssh-private-key`.
+Once connected to the bastion and having set up the SSH key there, connect to an activegate instance with `ssh -i .ssh/dt-ssh-key.pem azureadmin@<instance-private-ip>`.
+
+- Dynatrace ActiveGate VMs exist as instances of different Virtual Machine Scale Sets:
+  - [MDV](https://portal.azure.com/#@hmctsnonlive.onmicrosoft.com/resource/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MNL-ACGATE-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-mnl-dynatrace-activegate-01/overview)
+
+
+## Troubleshooting
+
+In both CNP and CPP ActiveGates are now built on Azure VMSS, with automated terraform that utilises [custom-data](https://learn.microsoft.com/en-us/azure/virtual-machines/custom-data).
+It uses a simple script provided by Dynatrace to install an [Environment Activegate](https://docs.dynatrace.com/docs/ingest-from/dynatrace-activegate/installation/linux/linux-install-an-environment-activegate), the PaaS token is only used to authenticate the agent trying to fetch the install script. The rest of the configuration which passes a Network Zone and ActiveGate groups is the more important part of making sure this ends up in the right place.
+
+If an ActiveGate is not installing, it's best to debug by looking into the cloud-init service on the Virtual Machine:
+  
+  - Check cloud-init is running: `cloud-init status`
+  - Check logs: `/var/log/cloud-init.log` or `/var/log/cloud-init-output.log`.
+  - In case of CPP, we are using a CIS hardened image which originally was blocking custom-data installation. [Some rules](https://github.com/hmcts/cpp-packer-pipeline/pull/107) had to be disabled in the Ubuntu Image to make this possible. There could be chance that these were re-added to the image.
+  - Manually test. Run the install script manually on the machine, it's possible that a stricter future networking change could stop installation.
+
+
+
+## Additional Info
+We have oneagents installed in many different places, but ActiveGate discovery is done automatically based on what's available in the SaaS endpoint. To see which ActiveGates a given oneagent can "see", connect to the instance with a oneagent installed, and run `./oneagentctl --get-server`. This is located by default on linux in `/opt/dynatrace/oneagent/agent/tools/oneagentctl`. You will see a list of ActiveGates that a OneAgent can "see", this is all auto-discovered by Dynatrace and the oneagent will loadbalance between what's available in it's network zone, or fall back to any others later.
+
+If you are testing building new ActiveGates in isolation, it is important to uninstall the ActiveGate software before you delete the VMSS instances, otherwise they will show as unreachable in the SaaS endpoint for 10 days, see [Uninstall ActiveGate](https://docs.dynatrace.com/docs/ingest-from/dynatrace-activegate/operation/uninstall-activegate).
+General advice from Dynatrace when migrating to use New ActiveGates, is to either build them in a new network zone, and update all oneagents to point to the new zone... Or, preferably, build the new ActiveGates, and ensure that all currently monitored hosts on the old ActiveGate are showing the new one when running the above command, then switching off the old ones.

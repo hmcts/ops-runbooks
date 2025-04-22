@@ -54,7 +54,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          architecture: 'x64'
+          ruby-version: '3.3.4'
           bundler-cache: true
       - name: Build
         run: bundle exec middleman build

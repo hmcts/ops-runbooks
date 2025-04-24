@@ -1,3 +1,4 @@
+acmehmctssoc
 ACNF
 ACRD
 Afresco
@@ -10,7 +11,6 @@ atlassian
 atlassiannonprod
 atlasssian
 Bance
-botkube
 cabcdefg
 CAHOSTVERIFY
 cdef
@@ -41,6 +41,7 @@ jfrt
 jira
 journalctl
 kalyan
+keyfile
 libragob
 libragobrestore
 Manan
@@ -60,7 +61,6 @@ pvc
 Qube
 recoverypoint
 regitries
-replicasets
 Resouce
 Rns
 ruxit
@@ -74,8 +74,10 @@ spn
 statefulset
 ste
 STECCM
+Tenables
 themisgatewayapi
 thw
+tns
 toset
 totp
 TTLs
@@ -84,3 +86,4 @@ Virtualbox
 virtualwan
 VNETs
 wsdl
+XXXX

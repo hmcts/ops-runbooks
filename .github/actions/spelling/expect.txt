@@ -15,7 +15,6 @@ cabcdefg
 CAHOSTVERIFY
 cdef
 cdes
-ceritifcates
 Chirag
 containerised
 customisations
@@ -28,15 +27,12 @@ dockerfiles
 dsl
 EDB
 Enda
-enviornment
 Eyetan
 geolocationfile
 GEOLOCATIONUPDATES
 Glust
 gluster
 IMZ
-indepth
-Infrastrastructure
 Jacomb
 Jenkinsfiles
 jfmd
@@ -46,7 +42,6 @@ jira
 journalctl
 kalyan
 keyfile
-lastest
 libragob
 libragobrestore
 Manan
@@ -80,10 +75,8 @@ statefulset
 ste
 STECCM
 Tenables
-thebackup
 themisgatewayapi
 thw
-tne
 tns
 toset
 totp

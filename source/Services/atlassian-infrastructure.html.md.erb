@@ -82,16 +82,16 @@ For example Jira node 1 in staging and production will both the same hostname as
 
 The environments have been built to use Lets Encrypt SSL certificates via the [acmebot](https://acmedtssdsprod.azurewebsites.net/dashboard)
 
-This means that the certificates renew  regularly (every 3 months) so automated has been created to automatically renew these certs within the environment.
+This means that the certificates renew  regularly (every 3 months) so automation has been created to automatically renew these certs within the environment.
 
-The bash function responsoible for this is [check_and_replace_cert function](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/components/general/scripts/functions.sh#L118-L209)
+The bash function responsible for this is [check_and_replace_cert function](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/components/general/scripts/functions.sh#L118-L209)
 
 * Query if the latest cert from the KeyVault has a newer expiry date than the cert already on the servers.
 * If it does, it will update the certificate on the servers
-* if the current time is within an agreed window (before 8am), the services will be restated automatically to pick up the new cert.
+* if the current time is within an agreed window (before 8am), the services will be restarted automatically to pick up the new cert.
 * If the latest cert has the same expiry date as the current cert, no action will be taken.
 
-The [Atlassian pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1022) runs every Monday morning at 7am, this is to poll for a any certificate updates.
+The [Atlassian pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1022) runs every Monday morning at 7am, this is to poll for any certificate updates.
 
 
 ## FAQ

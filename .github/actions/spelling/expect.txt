@@ -6,7 +6,7 @@ agw
 AJRA
 alfapp
 alfweb
-atl
+ATL
 atlassian
 atlassiannonprod
 atlasssian
@@ -24,13 +24,13 @@ Datlassian
 deevanapalli
 devrot
 dockerfiles
-dpdb
 dsl
 EDB
 Enda
 Eyetan
 geolocationfile
 GEOLOCATIONUPDATES
+Glust
 gluster
 IMZ
 Jacomb

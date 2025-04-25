@@ -1,5 +1,5 @@
 ---
-title: Atlassian Infrastrastructure
+title: Atlassian Infrastructure
 last_reviewed_on: 2025-04-25
 review_in: 12 months
 weight: 15
@@ -10,7 +10,7 @@ Atlassian Apps - Jira, Confluence and Crowd
 
 New infrastructure was deployed for all Atlassian apps as part of work to migrate from single server to flexible server. The [repository](https://github.com/hmcts/atlassian-infrastructure) has all the IaC as well as automation scripts.
 
-Enviornments built
+environments built
 * Production - this replaced "PRD"
 * Staging - this replaced "PRP"
 
@@ -53,7 +53,7 @@ Please note that there are other important resources like Application Gateways, 
 
 ## PlatOps responsibility
 
-The internal tooling team have access to the servers and databases in both production and staging, as well as indepth knowledge of how the Atlassian apps work. This means that self-service is normally possible.
+The internal tooling team have access to the servers and databases in both production and staging, as well as in-depth knowledge of how the Atlassian apps work. This means that self-service is normally possible.
 
 What cant the internal team do? 
 
@@ -74,19 +74,19 @@ The team does not have access to Azure, or the automation scripts. This means th
 ssh -i <privatekeyfilename> atlassian-admin@<VM-IP>
 ```
 
-###NOTE: as the VM's are restores of a previous production enviornment, the local hostname will be different from the Azure display name. Verify you are on the right host by its local IP address!
+###NOTE: as the VM's are restores of a previous production environment, the local hostname will be different from the Azure display name. Verify you are on the right host by its local IP address!
 
 For example Jira node 1 in staging and production will both the same hostname as "PRDATL01AJRA01.cp.cjs.hmcts.net"
 
 ## Auto SSL renewal process
 
-The enviornments have been built to use Lets Encrypt SSL certificates via the [acmebot](https://acmedtssdsprod.azurewebsites.net/dashboard)
+The environments have been built to use Lets Encrypt SSL certificates via the [acmebot](https://acmedtssdsprod.azurewebsites.net/dashboard)
 
-This means that the ceritifcates renew  regularly (every 3 months) so automated has been created to automatically renew these certs within the environment.
+This means that the certificates renew  regularly (every 3 months) so automated has been created to automatically renew these certs within the environment.
 
 The bash function responsoible for this is [check_and_replace_cert function](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/components/general/scripts/functions.sh#L118-L209)
 
-* Query if the lastest cert from the KeyVault has a newer expiry date than tne cert already on the servers.
+* Query if the latest cert from the KeyVault has a newer expiry date than the cert already on the servers.
 * If it does, it will update the certificate on the servers
 * if the current time is within an agreed window (before 8am), the services will be restated automatically to pick up the new cert.
 * If the latest cert has the same expiry date as the current cert, no action will be taken.

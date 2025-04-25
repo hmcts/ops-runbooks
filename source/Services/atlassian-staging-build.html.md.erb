@@ -7,14 +7,14 @@ weight: 15
 
 # <%= current_page.data.title %>
 
-This document covers the process that was undertaken to build out the new staging enviornment for the Atlassian apps (Jira, Confluence and Crowd).
+This document covers the process that was undertaken to build out the new staging environment for the Atlassian apps (Jira, Confluence and Crowd).
 
-For more general documentation on the new Atlassian setups, see [Atlassian Infrastrastructure](atlassian-infrastructure.html)
+For more general documentation on the new Atlassian setups, see [Atlassian Infrastructure](atlassian-infrastructure.html)
 
 
 ## How was staging built?
 
-Staging was built to be a clone of production, including data, the previous "PRP" enviornment was found to be unreliable for testing and required more accurate data.
+Staging was built to be a clone of production, including data, the previous "PRP" environment was found to be unreliable for testing and required more accurate data.
 
 The atlassian production environment is deployed on the [MOJ DCD Atlassian LVE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/overview) subscription and the staging environment is deployed on the [MOJ DCD Atlassian NLE](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/overview) subscription. so make sure you have access to these subscriptions as contributor.
 
@@ -65,7 +65,7 @@ az backup restore restore-disks \
     --storage-account-resource-group $TargetResouceGroup
 ```
 
-Above script will trigger the restore of the VM from the backup and will create a new VM in the staging environment.  You can able to see progress of the restore in thebackup vault.
+Above script will trigger the restore of the VM from the backup and will create a new VM in the staging environment.  You can able to see progress of the restore in the backup vault.
 
 Please note that each backup is separate job so its fine to run restore for multiple VMs at the same time.
 

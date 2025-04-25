@@ -8,7 +8,7 @@ weight: 15
 # <%= current_page.data.title %>
 Atlassian Apps - Jira, Confluence and Crowd
 
-New infrastructure was deployed for all Atlassian apps as part of work to migrate from single server to flexible server. The [repository](https://github.com/hmcts/atlassian-infrastructure) has all the IaC as well as automation scripts.
+New infrastructure was deployed for all Atlassian apps as part of work to migrate from single server to flexible server. The [atlassian-infrastructure](https://github.com/hmcts/atlassian-infrastructure) has all the IaC as well as automation scripts.
 
 environments built
 * Production - this replaced "PRD"
@@ -21,7 +21,7 @@ Please take a look at this [documentation](https://tools.hmcts.net/confluence/pa
 
 There are total 9 VMs in the production environment, 3 VMs for Jira, 2 VMs for Confluence, 1 VM for Crowd and 3 VMs for GlusterFS.
 
-All resources are store in either [atlassian-prod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/atlassian-prod-rg/overview) or [atlassian-nonprod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/resourceGroups/atlassian-nonprod-rg/overview)
+All resources are stored in either [atlassian-prod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/atlassian-prod-rg/overview) or [atlassian-nonprod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/resourceGroups/atlassian-nonprod-rg/overview)
 
 ```bash
 Prod
@@ -62,11 +62,11 @@ The team does not have access to Azure, or the automation scripts. This means th
 ## Accessing the VMs
 1. Connect to the F5 VPN - available at https://portal.platform.hmcts.net/
 
-2. Download the private key "test-private-key" from the key vault [atlasssian-nonprod-kv](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://atlasssian-prod-kv.vault.azure.net/secrets/test-private-key), and save it to a file.  
+2. Download the private key "test-private-key" from the key vault [atlassian-nonprod-kv](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://atlasssian-prod-kv.vault.azure.net/secrets/test-private-key), and save it to a file.  
 
 3. Set the correct permissions on the file and 
 ```bash
-# run chmod 600 <privatekeyfilename>
+run chmod 600 <privatekeyfilename>
 ```
 
 4. SSH to the desired VM.
@@ -94,7 +94,7 @@ The bash function responsoible for this is [check_and_replace_cert function](htt
 The [Atlassian pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1022) runs every Monday morning at 7am, this is to poll for a any certificate updates.
 
 
-# FAQ
+## FAQ
 ## How are services restarted?
 You can restart the services when logged into the servers with
 

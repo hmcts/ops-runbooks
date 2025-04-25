@@ -1,0 +1,133 @@
+---
+title: Atlassian Infrastrastructure
+last_reviewed_on: 2025-04-25
+review_in: 12 months
+weight: 15
+---
+
+# <%= current_page.data.title %>
+Atlassian Apps - Jira, Confluence and Crowd
+
+New infrastructure was deployed for all Atlassian apps as part of work to migrate from single server to flexible server. The [repository](https://github.com/hmcts/atlassian-infrastructure) has all the IaC as well as automation scripts.
+
+Enviornments built
+* Production - this replaced "PRD"
+* Staging - this replaced "PRP"
+
+
+## Virtual Machines
+
+Please take a look at this [documentation](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=DTSPO&title=ODP+0002+-+Atlassian+Interim+Hosting+Deployment+Approach) on confluence which has detailed list of VMs and existing setup and the diagram.
+
+There are total 9 VMs in the production environment, 3 VMs for Jira, 2 VMs for Confluence, 1 VM for Crowd and 3 VMs for GlusterFS.
+
+All resources are store in either [atlassian-prod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/atlassian-prod-rg/overview) or [atlassian-nonprod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/resourceGroups/atlassian-nonprod-rg/overview)
+
+```bash
+Prod
+
+#### Jira VMs
+* atlassian-prod-jira-01
+* atlassian-prod-jira-02
+* atlassian-prod-jira-03
+
+#### Confluence VMs
+* atlassian-prod-confluence-02
+* atlassian-prod-confluence-04
+
+#### Crowd VM - this is used to handle the authentication.
+* atlassian-prod-crowd-01
+
+#### GlusterFS VMs - GlustFS is used to store file attachments.
+* atlassian-prod-gluster-01
+* atlassian-prod-gluster-02
+* atlassian-prod-gluster-03
+
+#### Postgres Flexible Server
+atlassian-prod-flex-server
+
+staging / non prod VM's following the same naming convention but with "nonprod" instead of "prod"
+```
+
+Please note that there are other important resources like Application Gateways, Load Balancer, NSGs, VNETs, SendGrid etc. which are not mentioned here.
+
+## PlatOps responsibility
+
+The internal tooling team have access to the servers and databases in both production and staging, as well as indepth knowledge of how the Atlassian apps work. This means that self-service is normally possible.
+
+What cant the internal team do? 
+
+The team does not have access to Azure, or the automation scripts. This means that PlatOps will need to provide assistance in these spaces. This includes any network related issues or features.
+
+## Accessing the VMs
+1. Connect to the F5 VPN - available at https://portal.platform.hmcts.net/
+
+2. Download the private key "test-private-key" from the key vault [atlasssian-nonprod-kv](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://atlasssian-prod-kv.vault.azure.net/secrets/test-private-key), and save it to a file.  
+
+3. Set the correct permissions on the file and 
+```bash
+# run chmod 600 <privatekeyfilename>
+```
+
+4. SSH to the desired VM.
+```bach
+ssh -i <privatekeyfilename> atlassian-admin@<VM-IP>
+```
+
+###NOTE: as the VM's are restores of a previous production enviornment, the local hostname will be different from the Azure display name. Verify you are on the right host by its local IP address!
+
+For example Jira node 1 in staging and production will both the same hostname as "PRDATL01AJRA01.cp.cjs.hmcts.net"
+
+## Auto SSL renewal process
+
+The enviornments have been built to use Lets Encrypt SSL certificates via the [acmebot](https://acmedtssdsprod.azurewebsites.net/dashboard)
+
+This means that the ceritifcates renew  regularly (every 3 months) so automated has been created to automatically renew these certs within the environment.
+
+The bash function responsoible for this is [check_and_replace_cert function](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/components/general/scripts/functions.sh#L118-L209)
+
+* Query if the lastest cert from the KeyVault has a newer expiry date than tne cert already on the servers.
+* If it does, it will update the certificate on the servers
+* if the current time is within an agreed window (before 8am), the services will be restated automatically to pick up the new cert.
+* If the latest cert has the same expiry date as the current cert, no action will be taken.
+
+The [Atlassian pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1022) runs every Monday morning at 7am, this is to poll for a any certificate updates.
+
+
+# FAQ
+## How are services restarted?
+You can restart the services when logged into the servers with
+
+```bash
+systemctl restart jira
+```
+replace "Jira" with the service you want to restart, such as "Crowd" or "Confluence" 
+
+You can also set the automation to restart the services by adjusting this [environment var](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/environments/prod/prod.tfvars#L4) 
+
+## What do the automation scripts do?
+On each VM, there is a terraform remote-exec to trigger bash scripts which complete various bits of a setup on the VMs. These scripts complete the following:
+* Configure staging with a different base URL - staging.tools.hmcts.net
+* Grants permissions to app users, such as the jira user.
+* Updates the local hosts file
+* Runs SSL renewal checks
+* Points the app the correct database
+* Sets the content of a robots.txt file
+* optionally restarts the app service
+
+## How was the staging env built?
+
+See [Atlassian Staging Build](atlassian-staging-build.html)
+
+
+## Troubleshooting
+
+**1.** If you are unable to access the VMs, please make sure you are connected to F5 VPN and using the correct private key and the private key is in the correct format.
+
+**2.** For some reason, if you see errors on the application, please make sure GlusterFS shares are mounted correctly on the VMs.
+e.g  `jira_shared` should be mounted here `/var/atlassian/application-data/jira/shared`
+
+Please use `mount -a` command to mount them correctly.
+
+There was problem where the share was not mounted correctly after auto shutdown, we have got cronjob on the staging VMs to run the mounting every hour, the script checks if the Share is mounted or not and if not, it will attempt to mount it.
+

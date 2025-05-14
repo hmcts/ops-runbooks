@@ -82,7 +82,14 @@ Set this to _nessus-agent-deploy.yml_ to run the playbook.
 Set this to nessus_env='nlv' for non-live or nessus_env='lv' for live. This will set the nessus server to connect to based on the tags on the VM.
 
 ```
- 'ANSIBLE_LIMIT'     : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
+ 'ANSIBLE_LIMIT' : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
+```
+The ANSIBLE_LIMIT provided in the box is combined with the stack that is chosen for JENKINS_ANSIBLE_ENVIRONMENT to form the true limit string that is fed to the ansible-playbook command.
+
+An example of this where a single host is given as the limit: 
+
+```
+DEVROT01AAPSV01.cpp.nonlive:&stack_devrot01:stack_devrot01
 ```
 
 <img src="images/nessus-agent-ansible-limit.png" style="width:600px;">
@@ -104,6 +111,7 @@ Why the stack is repeated twice is unknown however there is probably an underlyi
 The end result of the limit is the intersection of VMs given to ANSIBLE_LIMIT parameter and the stack that is chosen. So VMs that are targeted are those that are in both of the groups for example.
 
 This underlying formulation of the true limit restricts the scope of VMs which can be targeted. This makes it much safer to run given the ANSIBLE_LIMIT parameter can be left empty or given the * character which acts as a wildcard for all. Without this the scope it would be possible to target all VMs in the Strategic subscription (Strategic non-live for .non-live Jenkins, Strategic live for .live Jenkins).
+
 
 #### All Other Parameters
 
@@ -132,6 +140,8 @@ Host1
 Host2
 Host3
 ```--------
+
+Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
 
 ### Verify Nessus Installation
 

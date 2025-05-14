@@ -164,3 +164,45 @@ ls /opt/nessus_agent/sbin/nessuscli
 ```
 
 <img src="images/nessus-agent-active-status.png" style="width:600px;">
+
+### Uninstall
+
+If an uninstall is required for the nessus agent then follow the below command after logging on to the VM in question.
+
+Stop agent 
+
+```bash
+systemctl stop nessusagent.service
+```
+
+Check system agent status 
+
+```bash
+systemctl status nessusagent.service
+```
+
+Disable agent
+
+```bash
+systemctl disable nessusagent.service
+```
+
+
+Verify agent is installed
+
+```bash
+rpm -qa | grep -i nessus
+```
+
+
+If installed, run the rpm erase command
+
+```bash
+rpm -e NessusAgent
+```
+
+Remove folders
+
+```bash
+sudo rm -rf /opt/nessus_agent
+```

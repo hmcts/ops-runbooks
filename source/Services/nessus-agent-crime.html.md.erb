@@ -27,6 +27,8 @@ Undeer the sp-ansible/roles/nessus-agent-deploy folder we have a further four fo
 4a)sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml - cleanup of the installer after the agent has been installed.
 4b)sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml - install the nessus agent and link to the nessus server.
 
+The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL willl point to a different versions of the agent for RHEL or Ubuntu within Artifactory, in the MDV (non-live) or MPD (live) and Jenkins will then be able to access the installer during th pipeline run.
+
 
 The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
 

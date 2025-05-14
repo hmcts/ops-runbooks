@@ -87,9 +87,48 @@ Set this to nessus_env='nlv' for non-live or nessus_env='lv' for live. This will
 
 <img src="images/nessus-agent-ansible-limit.png" style="width:600px;">
 
-A pipeline may fail when teh additional parameter are appended during the run and you may need to re-run the pipeline removing the additional parameters and be left with just the 'ANSIBLE_LIMIT' : "${params.ANSIBLE_LIMIT}" as per the example below.
+A pipeline may fail when the additional parameter are appended during the run and you may need to re-run the pipeline removing the additional parameters and be left with just the 'ANSIBLE_LIMIT' : "${params.ANSIBLE_LIMIT}" as per the example below.
 
 <img src="images/nessus-agent-ansible-limit-amended.png" style="width:600px;">
 
 The ANSIBLE_LIMIT provided in the box is combined with the stack that is chosen for JENKINS_ANSIBLE_ENVIRONMENT to form the true limit string that is fed to the ansible-playbook command.
 
+An example of this where a single host is given as the limit: 
+
+```
+DEVROT01AAPSV01.cpp.nonlive:&stack_devrot01:stack_devrot01
+```
+
+Why the stack is repeated twice is unknown however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
+
+The end result of the limit is the intersection of VMs given to ANSIBLE_LIMIT parameter and the stack that is chosen. So VMs that are targeted are those that are in both of the groups for example.
+
+This underlying formulation of the true limit restricts the scope of VMs which can be targeted. This makes it much safer to run given the ANSIBLE_LIMIT parameter can be left empty or given the * character which acts as a wildcard for all. Without this the scope it would be possible to target all VMs in the Strategic subscription (Strategic non-live for .non-live Jenkins, Strategic live for .live Jenkins).
+
+#### All Other Parameters
+
+All other parameters should be left blank.
+
+### Azure Inventory Script & Determining ANSIBLE_LIMIT Param
+
+Ansible in automation.ansible repo utilises a _inventory script_ which dynamically queries Azure and fetches existing VMs including the vm tags to register the correct scanner and target the correct VM's.
+
+It does this on a subscription level and groups the VMs in the following way:
+
+ - azure
+ - location
+ - resource_group
+ - security_group
+ - tag key_value
+
+_tag key_value_ groups by Azure tags. Each Azure tag key & value form its own group in the syntax:
+
+```
+key_value
+
+e.g:
+[environment_dev]
+Host1
+Host2
+Host3
+```--------

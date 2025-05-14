@@ -11,4 +11,20 @@ We have developed a method of installing the XDR agent to Crime VM's and will re
 
 We're utilising Ansible as the delivery method and have developed an Ansible Role(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
 
-The pre-existing adhoc pipelines wil be used to trigger the Ansible, we use in the main Crime Jenkins instance which can be scope limited by Ansible’s Limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. This enables us to follow a rollout plan through environments and safely stage our delivery.
+The pre-existing adhoc (automation.ansible) pipelines wil be used to trigger the Ansible playbook (nessus-agent-deploy.yml),in the main Crime Jenkins instance, which can provide limited  scope via Ansible’s limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
+This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation.
+
+The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
+
+
+<img src="images/nessus-crime-deploy-extra-vars.png" style="width:600px;">
+
+The above example is for non-live (nle) and live (lv) will be the parameter to identify which server to connect the VM agent to the correct scanner server, based on the env tags on the Crime VM's.
+
+Non-live
+<img src="images/nessus-crime-nlv-tag.png" style="width:600px;">
+
+
+Live 
+
+<img src="images/nessus-crime-lv-tag.png" style="width:600px;">

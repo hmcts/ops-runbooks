@@ -6,10 +6,11 @@ agw
 AJRA
 alfapp
 alfweb
-ATL
 atlassian
 atlassiannonprod
 atlasssian
+bacpac
+bak
 Bance
 cabcdefg
 CAHOSTVERIFY
@@ -47,6 +48,7 @@ libragobrestore
 Manan
 mdv
 MDVADMVPNHA
+Moj
 myregistry
 NONLINE
 NSGs
@@ -71,6 +73,8 @@ sourceregistry
 sourcerepository
 sourcetag
 spn
+sqldb
+sqlpackage
 statefulset
 ste
 STECCM

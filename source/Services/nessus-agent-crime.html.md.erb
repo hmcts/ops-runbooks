@@ -7,28 +7,35 @@ weight: 157
 
 # <%= current_page.data.title %>
 
-We have developed a method of installing the XDR agent to Crime VM's and will replicate this method for nessus agent installs too.
+We have developed a method of installing the XDR agent to Crime VM's and will replicate this method for nessus agent installs too. 
+
+The pre-existing infrastructure has been deemed un-useable and new infrastructure will be created;
+
+1) Tenable SC (Management UI) - The central management hub that provides the web interface.
+
+2) Scanners  Network-based components that conduct remote vulnerability checks and report results to the Tenable SC.
+
+3) Agents -  installed directly on endpoints that perform local scans
 
 We're utilising Ansible as the delivery method and have developed an Ansible Role(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
 
 The pre-existing adhoc (automation.ansible) pipelines wil be used to trigger the Ansible playbook (nessus-agent-deploy.yml),in the main Crime Jenkins instance, which can provide limited  scope via Ansible’s limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
-This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation.
+This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation and set up will follow the boostrap script in the terraform-module-vm-bootstrap repo(https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
 
 Folder Set up in Automation Ansible
 
 We have the playbook called nessus-agent-deploy.yml, which is located within the sp-ansible folder. This is the playbook that will be called from the pipeline and declare the role to be used to run tasks on a host.
 
-Undeer the sp-ansible/roles/nessus-agent-deploy folder we have a further four folders 
+Under the sp-ansible/roles/nessus-agent-deploy folder we have a further four folders 
 
 1) sp-ansible/roles/nessus-agent-deploy/defaults -  provides all the parameters the playbook needs to run similar to a Vars file in Terraform ie the installation URL etc.
-2) sp-ansible/roles/nessus-agent-deploy/handlers - only runs when notified by other tasks, in thi case after the agent is newly linked to the server to restart the agent.
-3) sp-ansible/roles/nessus-agent-deploy/meta - declares the minimum Ansible version required to run the playbook, and the dependencies for the role similiar to init file in Terraform.
+2) sp-ansible/roles/nessus-agent-deploy/handlers - only runs when notified by other tasks, in this case after the agent is newly linked to the server to restart the agent.
+3) sp-ansible/roles/nessus-agent-deploy/meta - declares the minimum Ansible version required to run the playbook, and the dependencies for the role similar to init file in Terraform.
 4) sp-ansible/roles/nessus-agent-deploy/tasks/main.yml - tasks are to be run by the role ie install and clean up installer.
 4a)sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml - cleanup of the installer after the agent has been installed.
 4b)sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml - install the nessus agent and link to the nessus server.
 
-The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL willl point to a different versions of the agent for RHEL or Ubuntu within Artifactory, in the MDV (non-live) or MPD (live) and Jenkins will then be able to access the installer during th pipeline run.
-
+The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL will point to a different versions of the agent for RHEL or Ubuntu within Artifactory, in the MDV (non-live) or MPD (live) and Jenkins will then be able to access the installer during th pipeline run.
 
 The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
 
@@ -46,3 +53,43 @@ Non-live
 Live 
 
 <img src="images/nessus-crime-lv-tag.png" style="width:600px;">
+
+
+### Using the Pipelines
+
+Pick the pipeline for the applicable environment. These are paramatised:
+
+<img src="images/nessus-pipeline-parameters.png" style="width:600px;">
+
+--------
+
+#### AUTOMATION_ANSIBLE_VERSION
+
+A branch called dev/tenable-nessus-install-dtspo-25466 in the automation.ansible gerrit repo has been created to deploy the nessus-agent-deploy.yml playbook link(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) and should not be merged into master.
+
+#### JENKINS_ANSIBLE_ENVIRONMENT
+
+This is named strangely. This sets the _stack_ to target. All _stacks_ for the environment will be available in the dropdown. 
+
+This option must be chosen. 
+
+#### ANSIBLE_PLAYBOOK
+
+Set this to _nessus-agent-deploy.yml_ to run the playbook.
+
+#### ANSIBLE_EXTRA_VARS
+
+Set this to nessus_env='nlv' for non-live or nessus_env='lv' for live. This will set the nessus server to connect to based on the tags on the VM.
+
+```
+ 'ANSIBLE_LIMIT'     : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
+```
+
+<img src="images/nessus-agent-ansible-limit.png" style="width:600px;">
+
+A pipeline may fail when teh additional parameter are appended during the run and you may need to re-run the pipeline removing the additional parameters and be left with just the 'ANSIBLE_LIMIT' : "${params.ANSIBLE_LIMIT}" as per the example below.
+
+<img src="images/nessus-agent-ansible-limit-amended.png" style="width:600px;">
+
+The ANSIBLE_LIMIT provided in the box is combined with the stack that is chosen for JENKINS_ANSIBLE_ENVIRONMENT to form the true limit string that is fed to the ansible-playbook command.
+

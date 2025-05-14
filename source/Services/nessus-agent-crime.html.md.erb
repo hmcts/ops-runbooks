@@ -132,3 +132,35 @@ Host1
 Host2
 Host3
 ```--------
+
+### Verify Nessus Installation
+
+Verify installation of the Nessus agent by ssh on to the vm using the fqdn.
+
+```bash
+
+Verification on the VM itself.
+
+```bash
+rpm -qa | grep -i nessus
+```
+
+Ensure the nessus agent is running on the VM
+
+```bash
+systemctl status nessusagent
+```
+
+To check the nessus agent version running on the VM
+
+```bash
+/opt/nessus_agent/sbin/nessuscli --version
+```
+
+Checks whether the CLI tool (nessuscli) for managing the agent exists
+
+```bash
+ls /opt/nessus_agent/sbin/nessuscli
+```
+
+<img src="images/nessus-agent-active-status.png" style="width:600px;">

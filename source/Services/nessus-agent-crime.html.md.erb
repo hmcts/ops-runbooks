@@ -14,6 +14,20 @@ We're utilising Ansible as the delivery method and have developed an Ansible Rol
 The pre-existing adhoc (automation.ansible) pipelines wil be used to trigger the Ansible playbook (nessus-agent-deploy.yml),in the main Crime Jenkins instance, which can provide limited  scope via Ansible’s limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
 This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation.
 
+Folder Set up in Automation Ansible
+
+We have the playbook called nessus-agent-deploy.yml, which is located within the sp-ansible folder. This is the playbook that will be called from the pipeline and declare the role to be used to run tasks on a host.
+
+Undeer the sp-ansible/roles/nessus-agent-deploy folder we have a further four folders 
+
+1) sp-ansible/roles/nessus-agent-deploy/defaults -  provides all the parameters the playbook needs to run similar to a Vars file in Terraform ie the installation URL etc.
+2) sp-ansible/roles/nessus-agent-deploy/handlers - only runs when notified by other tasks, in thi case after the agent is newly linked to the server to restart the agent.
+3) sp-ansible/roles/nessus-agent-deploy/meta - declares the minimum Ansible version required to run the playbook, and the dependencies for the role similiar to init file in Terraform.
+4) sp-ansible/roles/nessus-agent-deploy/tasks/main.yml - tasks are to be run by the role ie install and clean up installer.
+4a)sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml - cleanup of the installer after the agent has been installed.
+4b)sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml - install the nessus agent and link to the nessus server.
+
+
 The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
 
 

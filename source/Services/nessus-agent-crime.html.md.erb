@@ -1,0 +1,14 @@
+---
+title: Nessus Agent Installation - Crime
+last_reviewed_on: 2025-05-14
+review_in: 12 months
+weight: 157
+---
+
+# <%= current_page.data.title %>
+
+We have developed a method of installing the XDR agent to Crime VM's and will replicate this method for nessus agent installs too.
+
+We're utilising Ansible as the delivery method and have developed an Ansible Role(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
+
+The pre-existing adhoc pipelines wil be used to trigger the Ansible, we use in the main Crime Jenkins instance which can be scope limited by Ansible’s Limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. This enables us to follow a rollout plan through environments and safely stage our delivery.

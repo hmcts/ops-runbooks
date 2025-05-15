@@ -73,31 +73,7 @@ Pick the pipeline for the applicable environment. These are paramatised:
 
 <img src="images/xdr-crime-deploy-params-2.png" style="width:600px;">
 
---------
 
-#### AUTOMATION_ANSIBLE_VERSION
-
-This is the branch of automation.ansible to use. The xdr-agent-deploy playbook is currently only in the xdr-agent-deploy branch with a view of merging to master in the future.
-
-For now set this as _xdr-agent-deploy_.
-
-#### JENKINS_ANSIBLE_ENVIRONMENT
-
-This is named strangely. This sets the _stack_ to target. All _stacks_ for the environment will be available in the dropdown. 
-
-This option must be chosen. 
-
-#### ANSIBLE_PLAYBOOK
-
-This is the playbook to run. Set this to _xdr-agent-deploy.yml_.
-
-#### ANSIBLE_EXTRA_VARS
-
-See section above on how to set _xdr_tags_ with this parameter.
-
-#### ANSIBLE_LIMIT
-
-This is the ansible limit field. In the backend of Jenkins this is how the limit is formed:
 
 <img src="images/xdr-crime-deploy-limiting.png" style="width:600px;">
 
@@ -143,7 +119,31 @@ e.g:
 Host1
 Host2
 Host3
-```
+```--------
+
+#### AUTOMATION_ANSIBLE_VERSION
+
+This is the branch of automation.ansible to use. The xdr-agent-deploy playbook is currently only in the xdr-agent-deploy branch with a view of merging to master in the future.
+
+For now set this as _xdr-agent-deploy_.
+
+#### JENKINS_ANSIBLE_ENVIRONMENT
+
+This is named strangely. This sets the _stack_ to target. All _stacks_ for the environment will be available in the dropdown. 
+
+This option must be chosen. 
+
+#### ANSIBLE_PLAYBOOK
+
+This is the playbook to run. Set this to _xdr-agent-deploy.yml_.
+
+#### ANSIBLE_EXTRA_VARS
+
+See section above on how to set _xdr_tags_ with this parameter.
+
+#### ANSIBLE_LIMIT
+
+This is the ansible limit field. In the backend of Jenkins this is how the limit is formed:
 
 As seen in the ANSIBLE_LIMIT section above, the true limit passed to the ansible-playbook command is using a _tag key_value_ group. This is the _stack_ tag on VMs in Azure.
 

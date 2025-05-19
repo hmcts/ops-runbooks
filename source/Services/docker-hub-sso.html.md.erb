@@ -23,7 +23,7 @@ This should line up with our daily checks for service principal secrets which st
 
 When that notification comes through to the daily checks, you can run the pipeline to renew the secret.
 
-The secret should be stored in a keyvault where you can retrieve it to enter it into the docker settings page.
+The secret is stored in a [keyvault](https://github.com/hmcts/docker-hub-sso/blob/c8ae3e285628104afbc224dedebcc9840b43bdc6/components/azure-ad/main.tf#L74-L83) where you can retrieve it to enter it into the docker settings page.
 
 ### Updating the client secret in docker
 

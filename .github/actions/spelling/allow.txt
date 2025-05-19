@@ -725,3 +725,5 @@ ufw
 Zubair
 ATL
 resolvconf
+nlv
+nessusagent

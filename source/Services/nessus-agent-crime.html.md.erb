@@ -10,9 +10,9 @@ weight: 157
 
 ### Set up 
 
-We have developed a method of installing the XDR agent on the Crime VM's and will replicate this method for the nessus agent installs too. 
+We have developed a method of installing the XDR agent on the Crime VMs and will replicate this method for the Nessus agent installs to. 
 
-The pre-existing infrastructure has been deemed un-useable and new infrastructure will be created;
+The pre-existing infrastructure has been deemed un-useable and new infrastructure will be created.
 
 <b>1) Tenable SC (Management UI)</b> - The central management hub that provides the web interface.
 
@@ -22,16 +22,16 @@ The pre-existing infrastructure has been deemed un-useable and new infrastructur
 
 We are utilising Ansible as the delivery method and have developed an Ansible Role [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
 
-The pre-existing adhoc <b>(automation.ansible)</b> pipelines wil be used to trigger the Ansible playbook <b>(nessus-agent-deploy.yml)</b> in the main Crime Jenkins instance and will provide limited scope via Ansible’s limit functionality. 
+The pre-existing adhoc <b>(automation.ansible)</b> pipelines will be used to trigger the Ansible playbook <b>(nessus-agent-deploy.yml)</b> in the main Crime Jenkins instance and will provide limited scope via Ansible’s limit functionality. 
 
 These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
-This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation, the set up will follow the boostrap script in the terraform-module-vm-bootstrap [repo](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
+This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation, the set up will follow the bootstrap script in the terraform-module-vm-bootstrap [repo](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
 
 ### Folder set up in Automation Ansible
 
 We have the playbook called <b>nessus-agent-deploy.yml</b>, which is located within the sp-ansible folder on the branch <b>dev/tenable-nessus-install-dtspo-25466</b>. This is the playbook that will be called from the pipeline and declare the role to be used to run tasks on a host.
 
-Under the sp-ansible/roles/nessus-agent-deploy folder we have a further four folders 
+Under the <b>sp-ansible/roles/nessus-agent-deploy</b> folder we have a further four folders;
 
 <b>1) sp-ansible/roles/nessus-agent-deploy/defaults</b> - provides all the parameters the playbook needs to run similar to a Vars file in Terraform ie the installation URL, install directory location etc.
 
@@ -43,9 +43,9 @@ Under the sp-ansible/roles/nessus-agent-deploy folder we have a further four fol
 
 <b>4a) sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml</b> - cleanup of the installer after the agent has been installed.
 
-<b>4b) sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml</b> - install the nessus agent and link to the scanner.
+<b>4b) sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml</b> - install the Nessus agent and link to the scanner.
 
-The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL will point to a different versions of the agent for RHEL or Ubuntu within Artifactory, in the <b>MDV (non-live)</b> or <b>MPD (live)</b> and Jenkins will then be able to access the installer during th pipeline run.
+The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL will point to a different version of the agent for RHEL or Ubuntu within Artifactory, in the <b>MDV (nlv)</b> or <b>MPD (nl)</b> and Jenkins will then be able to access the installer during the pipeline run.
 
 The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
 
@@ -53,8 +53,8 @@ The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easie
 <img src="images/nessus-crime-deploy-extra-vars.png" style="width:600px;">
 
 
-The above example is for <b>non-live</b> (nle) and <b>live</b> (lv) will be the parameter to identify which scanner server to connect the VM agent too, based on the env tags on the Crime VM's.
-Further information about the set for CNP is on the following [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-254660), the new Crime set is to mirror the CNP set up.
+The above parameter example is for <b>non-live</b> (nle) and there will also be <b>live</b> (lv), to select which scanner to connect the VM agent to, based on the env tags on the Crime VMs.
+Further information about the set up for CNP is on the following [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-254660), the new Crime set is to mirror the CNP set up.
 
 <b>Non-live</b>
 <img src="images/nessus-crime-nlv-tag.png" style="width:600px;">
@@ -68,15 +68,11 @@ Further information about the set for CNP is on the following [link](https://cod
 
 ### Using the Pipelines
 
-Pick the pipeline for the applicable environment. These are paramatised:
+Pick the pipeline for the applicable environment. These are parameterised:
 
 <img src="images/nessus-pipeline-parameters.png" style="width:600px;">
 
---------
-
-### Pipelines
-
-The pipelines in Jenkins for deployment are the current pre-existing adhoc pipelines and there is an adhoc pipeline per crime environment. These can be found by searching _adhoc_ in Jenkins either in live(https://build.mpd.cp.cjs.hmcts.net/) or non-live(https://build.mdv.cpp.nonlive/) Jenkins..:
+The pipelines in Jenkins for deployment are the current pre-existing adhoc pipelines and there is an adhoc pipeline per crime environment. These can be found by searching _adhoc_ in Jenkins either in [live](https://build.mpd.cp.cjs.hmcts.net/) or [non-live](https://build.mdv.cpp.nonlive/) Jenkins.
 
 <img src="images/xdr-crime-deploy-adhoc-pipelines.png" style="width:600px;">
 
@@ -97,7 +93,7 @@ Set this to _nessus-agent-deploy.yml_ to run the playbook.
 
 #### ANSIBLE_EXTRA_VARS
 
-Set this to nessus_env='nlv' for non-live or nessus_env='lv' for live. This will set the nessus server to connect to based on the tags on the VM.
+Set this to <b>nessus_env='nlv' for non-live</b> or <b>nessus_env='lv'</b> for live. This will set the Nessus scanner to connect to based on the tags on the VM.
 
 ```
  'ANSIBLE_LIMIT' : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
@@ -124,7 +120,7 @@ An example of this where a single host is given as the limit:
 DEVROT01AAPSV01.cpp.nonlive:&stack_devrot01:stack_devrot01
 ```
 
-Why the stack is repeated twice is unknown however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
+Why the stack is repeated twice is unknown, however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
 
 The end result of the limit is the intersection of VMs given to ANSIBLE_LIMIT parameter and the stack that is chosen. So VMs that are targeted are those that are in both of the groups for example.
 
@@ -137,7 +133,7 @@ All other parameters should be left blank.
 
 ### Azure Inventory Script & Determining ANSIBLE_LIMIT Param
 
-Ansible in automation.ansible repo utilises a _inventory script_ which dynamically queries Azure and fetches existing VMs including the vm tags to register the correct scanner and target the correct VM's.
+Ansible in automation.ansible repo utilises a _inventory script_ which dynamically queries Azure and fetches existing VMs including the vm tags to register the correct scanner and target the correct VMs.
 
 It does this on a subscription level and groups the VMs in the following way:
 
@@ -179,7 +175,7 @@ Ensure the nessus agent is running on the VM
 systemctl status nessusagent
 ```
 
-To check the nessus agent version running on the VM
+To check the Nessus agent version running on the VM
 
 ```bash
 /opt/nessus_agent/sbin/nessuscli --version
@@ -195,7 +191,7 @@ ls /opt/nessus_agent/sbin/nessuscli
 
 ### Uninstall
 
-If an uninstall is required for the nessus agent then follow the below command after logging on to the VM in question.
+If an uninstall is required for the Nessus agent then follow the below command after logging on to the VM in question.
 
 Stop agent 
 
@@ -215,13 +211,11 @@ Disable agent
 systemctl disable nessusagent.service
 ```
 
-
 Verify agent is installed
 
 ```bash
 rpm -qa | grep -i nessus
 ```
-
 
 If installed, run the rpm erase command
 

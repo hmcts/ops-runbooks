@@ -63,6 +63,21 @@ Pick the pipeline for the applicable environment. These are paramatised:
 
 --------
 
+
+### Pipelines
+
+The pipelines in Jenkins for deployment are the current pre-existing adhoc pipelines and there is an adhoc pipeline per crime environment. These can be found by searching _adhoc_ in Jenkins either in live(https://build.mpd.cp.cjs.hmcts.net/) or non-live(https://build.mdv.cpp.nonlive/) Jenkins..:
+
+<img src="images/xdr-crime-deploy-adhoc-pipelines.png" style="width:600px;">
+
+### Using the Pipelines
+
+Pick the pipeline for the applicable environment. These are paramatised:
+
+<img src="images/xdr-crime-deploy-params-1.png" style="width:600px;">
+
+
+
 #### AUTOMATION_ANSIBLE_VERSION
 
 A branch called dev/tenable-nessus-install-dtspo-25466 in the automation.ansible gerrit repo has been created to deploy the nessus-agent-deploy.yml playbook link(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) and should not be merged into master.

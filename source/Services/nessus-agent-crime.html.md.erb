@@ -47,7 +47,7 @@ Under the <b>sp-ansible/roles/nessus-agent-deploy</b> folder we have a further f
 
 The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL will point to a different version of the agent for RHEL or Ubuntu within Artifactory, in the <b>MDV (nlv)</b> or <b>MPD (nl)</b> and Jenkins will then be able to access the installer during the pipeline run.
 
-The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. 
+The recommended method is to use the <b>ANSIBLE_EXTRA_VARS</b> parameter, as it's easier to provide via the pipeline parameter compared to updating the automation.ansible group/host Vars. 
 
 
 <img src="images/nessus-crime-deploy-extra-vars.png" style="width:600px;">
@@ -80,6 +80,7 @@ The pipelines in Jenkins for deployment are the current pre-existing adhoc pipel
 #### AUTOMATION_ANSIBLE_VERSION
 
 A branch called dev/tenable-nessus-install-dtspo-25466 in the automation.ansible gerrit repo has been created to deploy the nessus-agent-deploy.yml playbook link(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) and should not be merged into master.
+
 
 #### JENKINS_ANSIBLE_ENVIRONMENT
 
@@ -188,6 +189,7 @@ ls /opt/nessus_agent/sbin/nessuscli
 ```
 
 <img src="images/nessus-agent-active-status.png" style="width:600px;">
+
 
 ### Uninstall
 

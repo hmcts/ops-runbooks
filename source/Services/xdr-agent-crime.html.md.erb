@@ -103,6 +103,8 @@ See section above on how to set _xdr_tags_ with this parameter.
 
 This is the ansible limit field. In the backend of Jenkins this is how the limit is formed:
 
+<img src="images/xdr-crime-deploy-limiting.png" style="width:600px;">
+
 ```
 'ANSIBLE_LIMIT'     : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
 ```

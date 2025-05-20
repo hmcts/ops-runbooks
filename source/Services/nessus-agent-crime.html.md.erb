@@ -7,33 +7,41 @@ weight: 157
 
 # <%= current_page.data.title %>
 
-We have developed a method of installing the XDR agent to Crime VM's and will replicate this method for nessus agent installs too. 
+
+### 
+Set up 
+We have developed a method of installing the XDR agent on the Crime VM's and will replicate this method for the nessus agent installs too. 
 
 The pre-existing infrastructure has been deemed un-useable and new infrastructure will be created;
 
-1) Tenable SC (Management UI) - The central management hub that provides the web interface.
+<b>1) Tenable SC (Management UI)</b> - The central management hub that provides the web interface.
 
-2) Scanners  Network-based components that conduct remote vulnerability checks and report results to the Tenable SC.
+<b>2) Scanners</b>  - Network-based components that conduct remote vulnerability checks and report results to the Tenable SC.
 
-3) Agents -  installed directly on endpoints that perform local scans
+<b>3) Agents</b>  - installed directly on the endpoints that perform local scans.
 
-We're utilising Ansible as the delivery method and have developed an Ansible Role(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
+We are utilising Ansible as the delivery method and have developed an Ansible Role [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
 
-The pre-existing adhoc (automation.ansible) pipelines wil be used to trigger the Ansible playbook (nessus-agent-deploy.yml),in the main Crime Jenkins instance, which can provide limited  scope via Ansible’s limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
-This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation and set up will follow the boostrap script in the terraform-module-vm-bootstrap repo(https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
+The pre-existing adhoc (automation.ansible) pipelines wil be used to trigger the Ansible playbook (nessus-agent-deploy.yml)in the main Crime Jenkins instance and will provide limited scope via Ansible’s limit functionality. These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
+This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation, the set up will follow the boostrap script in the terraform-module-vm-bootstrap [repo](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
 
-Folder Set up in Automation Ansible
+### Folder set up in Automation Ansible
 
 We have the playbook called nessus-agent-deploy.yml, which is located within the sp-ansible folder. This is the playbook that will be called from the pipeline and declare the role to be used to run tasks on a host.
 
 Under the sp-ansible/roles/nessus-agent-deploy folder we have a further four folders 
 
-1) sp-ansible/roles/nessus-agent-deploy/defaults -  provides all the parameters the playbook needs to run similar to a Vars file in Terraform ie the installation URL etc.
-2) sp-ansible/roles/nessus-agent-deploy/handlers - only runs when notified by other tasks, in this case after the agent is newly linked to the server to restart the agent.
-3) sp-ansible/roles/nessus-agent-deploy/meta - declares the minimum Ansible version required to run the playbook, and the dependencies for the role similar to init file in Terraform.
-4) sp-ansible/roles/nessus-agent-deploy/tasks/main.yml - tasks are to be run by the role ie install and clean up installer.
-4a)sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml - cleanup of the installer after the agent has been installed.
-4b)sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml - install the nessus agent and link to the nessus server.
+<b>1)</b>  sp-ansible/roles/nessus-agent-deploy/defaults - provides all the parameters the playbook needs to run similar to a Vars file in Terraform ie the installation URL, install directory etc.
+
+<b>2)</b>  sp-ansible/roles/nessus-agent-deploy/handlers - only runs when notified by other tasks, in this case after the agent is newly linked to the Scanner to restart the agent.
+
+<b>3)</b>  sp-ansible/roles/nessus-agent-deploy/meta - declares the minimum Ansible version required to run the playbook and the dependencies for the role, similar to init file in Terraform.
+
+ <b>4)</b>  sp-ansible/roles/nessus-agent-deploy/tasks/main.yml - tasks are to be run by the role ie install and clean up installer.
+
+<b>4a)</b>  sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml - cleanup of the installer after the agent has been installed.
+
+<b>4b)</b>  sp-ansible/roles/nessus-agent-deploy/tasks/install-nessus.yml - install the nessus agent and link to the scanner.
 
 The installation of the agent package is declared in the defaults/main.yml file, which is the default location for Ansible to look for variables. The installation URL will point to a different versions of the agent for RHEL or Ubuntu within Artifactory, in the MDV (non-live) or MPD (live) and Jenkins will then be able to access the installer during th pipeline run.
 
@@ -44,7 +52,7 @@ The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easie
 
 
 The above example is for non-live (nle) and live (lv) will be the parameter to identify which scanner server to connect the VM agent too, based on the env tags on the Crime VM's.
-Further information about the set for CNP is on the following link(https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-254660), the new Crime set is to mirror the CNP set up.
+Further information about the set for CNP is on the following [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-254660), the new Crime set is to mirror the CNP set up.
 
 Non-live
 <img src="images/nessus-crime-nlv-tag.png" style="width:600px;">

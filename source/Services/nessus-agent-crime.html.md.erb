@@ -1,6 +1,6 @@
 ---
 title: Nessus Agent Installation - Crime
-last_reviewed_on: 2025-05-14
+last_reviewed_on: 2025-05-20
 review_in: 12 months
 weight: 157
 ---
@@ -12,7 +12,7 @@ weight: 157
 
 We have developed a method of installing the XDR agent on the Crime VMs and will replicate this method for the Nessus agent installs to. 
 
-The pre-existing infrastructure has been deemed un-useable and new infrastructure will be created.
+The pre-existing infrastructure has been deemed unusable and new infrastructure will be provisioned.
 
 <b>1) Tenable SC (Management UI)</b> - The central management hub that provides the web interface.
 
@@ -20,16 +20,16 @@ The pre-existing infrastructure has been deemed un-useable and new infrastructur
 
 <b>3) Agents</b>  - installed directly on the endpoints that perform local scans.
 
-We are utilising Ansible as the delivery method and have developed an Ansible Role [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which will perform the installation.
+We are utilising Ansible as the delivery method and have developed an Ansible Role [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-25466) which performs the installation.
 
 The pre-existing adhoc <b>(automation.ansible)</b> pipelines will be used to trigger the Ansible playbook <b>(nessus-agent-deploy.yml)</b> in the main Crime Jenkins instance and will provide limited scope via Ansible’s limit functionality. 
 
 These are also limited in scope with an adhoc pipeline for each environment and a stack selection parameter. 
-This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation, the set up will follow the bootstrap script in the terraform-module-vm-bootstrap [repo](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
+This enables us to follow a rollout plan through environments and safely stage our delivery with segmentation, the setup will follow the bootstrap script in the terraform-module-vm-bootstrap [repo](https://github.com/hmcts/terraform-module-vm-bootstrap/blob/cbcb528c996241b382ff513c4a019b1c5883d875/scripts/bootstrap_vm.sh).
 
 ### Folder set up in Automation Ansible
 
-We have the playbook called <b>nessus-agent-deploy.yml</b>, which is located within the sp-ansible folder on the branch <b>dev/tenable-nessus-install-dtspo-25466</b>. This is the playbook that will be called from the pipeline and declare the role to be used to run tasks on a host.
+We have the playbook called <b>nessus-agent-deploy.yml</b>, which is located within the sp-ansible folder on the branch <b>dev/tenable-nessus-install-dtspo-25466</b>. This is the playbook that will be called from the pipeline and specifies the role used to run tasks on the target host.
 
 Under the <b>sp-ansible/roles/nessus-agent-deploy</b> folder we have a further four folders;
 
@@ -39,7 +39,7 @@ Under the <b>sp-ansible/roles/nessus-agent-deploy</b> folder we have a further f
 
 <b>3) sp-ansible/roles/nessus-agent-deploy/meta</b> - declares the minimum Ansible version required to run the playbook and the dependencies for the role, similar to init file in Terraform.
 
-<b>4) sp-ansible/roles/nessus-agent-deploy/tasks/main.yml</b> - tasks are to be run by the role ie install and clean up installer.
+<b>4) sp-ansible/roles/nessus-agent-deploy/tasks/main.yml</b> - tasks are to be run by the role ie install and clean up the installer.
 
 <b>4a) sp-ansible/roles/nessus-agent-deploy/tasks/cleanup-nessus.yml</b> - cleanup of the installer after the agent has been installed.
 
@@ -53,7 +53,7 @@ The recommended method is to use the ANSIBLE_EXTRA_VARS parameter, as it's easie
 <img src="images/nessus-crime-deploy-extra-vars.png" style="width:600px;">
 
 
-The above parameter example is for <b>non-live</b> (nle) and there will also be <b>live</b> (lv), to select which scanner to connect the VM agent to, based on the env tags on the Crime VMs.
+The above parameter example is for <b>non-live</b> (nlv) and there will also be <b>live</b> (lv), to select which scanner (nlv or lv) to connect the VM agent to, based on the environmentj tags on the Crime VMs.
 Further information about the set up for CNP is on the following [link](https://codereview.mdv.cpp.nonlive/admin/repos/automation.ansible,branches/q/filter:dev%252Ftenable-nessus-install-dtspo-254660), the new Crime set is to mirror the CNP set up.
 
 <b>Non-live</b>
@@ -68,11 +68,11 @@ Further information about the set up for CNP is on the following [link](https://
 
 ### Using the Pipelines
 
-Pick the pipeline for the applicable environment. These are parameterised:
+Pick the pipeline for the applicable environment via parameters.
 
 <img src="images/nessus-pipeline-parameters.png" style="width:600px;">
 
-The pipelines in Jenkins for deployment are the current pre-existing adhoc pipelines and there is an adhoc pipeline per crime environment. These can be found by searching _adhoc_ in Jenkins either in [live](https://build.mpd.cp.cjs.hmcts.net/) or [non-live](https://build.mdv.cpp.nonlive/) Jenkins.
+The pipelines in Jenkins for deployment are the current pre-existing adhoc pipelines and there is an adhoc pipeline per Crime environment. These can be found by searching _adhoc_ in Jenkins either in [live](https://build.mpd.cp.cjs.hmcts.net/) or [non-live](https://build.mdv.cpp.nonlive/) Jenkins.
 
 <img src="images/xdr-crime-deploy-adhoc-pipelines.png" style="width:600px;">
 
@@ -120,7 +120,7 @@ An example of this where a single host is given as the limit:
 DEVROT01AAPSV01.cpp.nonlive:&stack_devrot01:stack_devrot01
 ```
 
-Why the stack is repeated twice is unknown, however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
+The reason for the stack being repeated twice is unclear, however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
 
 The end result of the limit is the intersection of VMs given to ANSIBLE_LIMIT parameter and the stack that is chosen. So VMs that are targeted are those that are in both of the groups for example.
 

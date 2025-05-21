@@ -312,6 +312,7 @@ jfr
 jfrog
 JIRA
 jmc
+JML
 JOBLOG
 jpa
 jps
@@ -372,6 +373,8 @@ mgmt
 microservices
 microsoft
 microtask
+misconfiguring
+misrouted
 mklink
 Mohammed
 MOJ

@@ -62,7 +62,7 @@ Below is an example of the type of error thrown:
 
 To troubleshoot the issue, you'll first need to pull the chart locally.
 
-To get the chart to your local machine, run `helm regsitry login` and sign in with credentials that have the acrPull permissions. In this case, we used the same creds that were being used in [cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/blob/2ed6d10c04c5a285fc32cfea08f331f9cb06a64d/data.tf#L17-L24).
+To get the chart to your local machine, run `helm registry login` and sign in with credentials that have the acrPull permissions. In this case, we used the same creds that were being used in [cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/blob/2ed6d10c04c5a285fc32cfea08f331f9cb06a64d/data.tf#L17-L24).
 
 ```Bash
 helm registry login ${ACR_NAME} \

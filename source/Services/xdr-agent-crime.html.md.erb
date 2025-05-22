@@ -73,6 +73,10 @@ Pick the pipeline for the applicable environment. These are paramatised:
 
 <img src="images/xdr-crime-deploy-params-2.png" style="width:600px;">
 
+
+
+<img src="images/xdr-crime-deploy-limiting.png" style="width:600px;">
+
 --------
 
 #### AUTOMATION_ANSIBLE_VERSION
@@ -102,7 +106,7 @@ This is the ansible limit field. In the backend of Jenkins this is how the limit
 <img src="images/xdr-crime-deploy-limiting.png" style="width:600px;">
 
 ```
- 'ANSIBLE_LIMIT'     : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
+'ANSIBLE_LIMIT'     : "${params.ANSIBLE_LIMIT ? params.ANSIBLE_LIMIT + ':&stack_'+ params.JENKINS_ANSIBLE_ENVIRONMENT : 'stack_' + params.JENKINS_ANSIBLE_ENVIRONMENT}"
 ```
 
 The ANSIBLE_LIMIT provided in the box is combined with the stack that is chosen for JENKINS_ANSIBLE_ENVIRONMENT to form the true limit string that is fed to the ansible-playbook command.

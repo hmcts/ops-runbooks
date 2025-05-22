@@ -129,6 +129,7 @@ crds
 CRDs
 crictl
 crimeportal
+crmpdrepo
 crt
 CRT
 CSRs

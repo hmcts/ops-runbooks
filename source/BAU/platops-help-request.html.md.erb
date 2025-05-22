@@ -1,0 +1,79 @@
+---
+title: Slack PlatOps Help Request
+last_reviewed_on: 2025-05-21
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+This provides details on how to raise PlatOps BAU tickets.  The recommended way is to do this using Slack and not directly on Jira.
+
+## How to raise a PlatOps BAU Ticket
+
+To raise a PlatOps BAU ticket use the Slack PlatOps Help Request feature.  You can do this in slack by going to any message and type /PlatOps Help Request and select that presented option.
+
+Select the workspace and Run Shortcut.  Then go to the PlatOps help section at the bottom of slack under Apps.  Select Crime / CPP or All other requests for non-Crime / CNP.  From there follow the prompts and it will finally created a ticket, which can be accessed from Jira and Slack - platops-help-crime (Crime / CPP) or platops-help (non-Crime / CNP). 
+
+It is recommended to assign, update and resolve the ticket via Slack and not Jira.  Updates made to Jira directly do not update via Slack and there is no resolution details if closed directly via Jira.
+
+
+## Resolve a PlatOps BAU Ticket
+
+Please use Slack when resolving tickets. 
+
+When resolving there is a drop down category section to choose from asking what was the issue and there is a text section to provide further details on how it was resolved, which helps for future troubleshooting.
+
+Below is a list of the category section and further explanation details:
+
+- Missing / Inadequate Docs
+The developer couldn’t find or understand how to do something using existing docs.
+Examples: unclear steps for release, outdated runbooks, confusing platform onboarding docs.
+
+- Self-Service Gap
+The task couldn’t be completed independently using the platform’s self-service tools.
+Examples: manual intervention required for releases or cert renewal that should be automatable.
+
+- Tooling / Automation Deficiency
+The platform lacks automation or tooling to handle a common task efficiently.
+Examples: no script or service to help renew certs; no tooling for safe SQL query execution.
+
+- Platform Feature Missing / Misaligned
+The platform doesn’t offer a capability the user expected, or it’s not fit for purpose.
+Examples: Jenkins doesn’t support parallel execution as needed, AKS cluster config not flexible.
+
+- Poor Signposting / Discoverability
+The developer didn’t know where to find the right docs, tools, or processes.
+Examples: useful info is buried in Confluence; Slack is the only way to get help.
+
+- User Education / Misuse
+The issue stemmed from user misunderstanding or misuse of the platform despite available support.
+Examples: users triggering SQL queries incorrectly, or misconfiguring Jenkins despite good docs.
+
+- Policy / Process Ambiguity
+Lack of clarity around governance, approvals, or procedural steps.
+Examples: unclear who approves production access or how to request temporary privileges.
+
+- Incident / One-Off Platform Failure
+This was a true breakage or flake, not something easily prevented by docs or tooling.
+Examples: Jenkins outage, cert renewal job failure due to platform bug.
+
+- External Failure (GitHub / Azure / Sonarcloud etc)
+External issues in relation to vendor issues.
+Examples: GitHub unavailable and Azure service outage.
+
+- Triage Error / Wrong Queue
+Ticket was misrouted or incorrectly raised to platform team.
+Examples: issue belonged to app team or external vendor, not platform.
+
+- Network Failure
+Errors in relation to anything network related, including F5 VPN, OpenVPN, Firewalls and various other networking related issues.
+
+
+These are also used for Crime with the addition of the following:
+
+- Joiner / Mover / Leaver (JML)
+Access requests for new users, change of roles and users leaving.
+
+- Release Support
+Tickets that involve any type of release involvement.

@@ -108,3 +108,28 @@ Whereas, an Express Route Gateway will look like this:
 ```
 
 Virtual Network Gateways are not required for an Express Route circuit with a virtual WAN configuration.
+
+## How can I tell where routes are advertised from in the effective routes?
+
+If you look at the effective routes, you will notice that there is an associated Autonomous System Number (ASN).
+
+For example, you will see the following information in the table (this route is made up for the example):
+
+
+|IP Range|Next Hop Type|Next Hop|Origin|ASN|
+| ---- | --- | --- | --- | ---|
+|10.20.30.40/20|ExpressRouteGateway|name-of-express-route-gateway|name-of-express-route-gateway|12076-205098-65021-12076|
+
+The ASNs listed here tell you something about where the routes are being advertised from.
+
+`205908` is Cloud Gateway.
+
+`65021` is a reserved ASN used only for BGP.
+
+`12076` is Azure.
+
+Cloud Gateway (205098) are advertising this made up route to Azure (12076) via BGP (65021).
+
+`12076` shows up twice because this is part of a virtual WAN configuration so the Express Route Gateway is advertising the routes to the virtual hub.
+
+Because the Express Route Gateway lives in Azure, its ASN shows as the Azure ASN.

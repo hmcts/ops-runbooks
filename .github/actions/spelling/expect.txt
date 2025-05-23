@@ -6,6 +6,7 @@ agw
 AJRA
 alfapp
 alfweb
+ASNs
 atlassian
 atlassiannonprod
 atlasssian
@@ -21,6 +22,7 @@ containerised
 customisations
 CVP
 Dac
+datacentre
 Datlassian
 deevanapalli
 devrot

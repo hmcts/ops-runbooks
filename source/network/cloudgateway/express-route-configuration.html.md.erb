@@ -1,0 +1,135 @@
+---
+title: Cloud Gateway Express Route
+weight: 10
+last_reviewed_on: 2025-05-23
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+We have a couple of express route circuits from our Azure tenant to Cloud Gateway.
+
+These are used to connect some of our Azure resources to services running within MoJ.
+
+The express route circuits form part of virtual hubs inside virtual WANs within Azure.
+
+You can learn more about virtual WANs from the [Microsoft docs](https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about).
+
+## How do we create virtual WANs and express routes?
+
+We have a GitHub repo called [hmcts/azure-platform-virtualwan](https://github.com/hmcts/azure-platform-virtualwan).
+
+This repo contains the code to deploy:
+
+- virtual WAN
+- virtual hubs
+- express route circuit
+- express route connection
+- express route gateway
+- routing advertisements
+
+We have two virtual WANs, one in [nonprod](https://portal.azure.com/#resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-virtualwan-nonprod/providers/Microsoft.Network/virtualWans/hmcts-virtualwan-nonprod) and one in [prod](https://portal.azure.com/#resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/CloudGateway-ExpressRoute/providers/Microsoft.Network/virtualWans/HMCTS-VirtualWAN).
+
+Within each virtual WAN, there are one or more virtual hubs.
+
+Each virtual hub will have an express route circuit associated with it. 
+
+Each express route circuit has its own express route gateway.
+
+The express route gateway is a device in Microsoft's datacentre that advertises our routes to the destination, in this case Cloud Gateway's firewall. 
+
+It will also learn routes advertised to it from the firewall.
+
+The advertisement of the routes is done using the Border Gateway Protocol (BGP).
+
+This ensures services in our Azure tenant can route traffic to services hosted within MoJ and vice versa.
+
+You can find the routes by going to the virtual hub > Routing > Effective routes.
+
+<img src="../images/effective-routes.png" style="height:500px;">
+
+The overall picture of the network configuration looks like this (example is nonprod but prod is the same):
+
+<img src="../images/express-route.png" style="height:500px;">
+
+It's possible to have multiple express route circuits within the same virtual hub.
+
+This is the case for prod where there are two express route circuits associated with the virtual hub.
+
+Each circuit is separate from each other and has its own express route gateway but the routes are learned and advertised at the virtual hub level.
+
+## Important distinctions
+
+Microsoft's documentation on Express Route can be somewhat confusing.
+
+If you search for information on this topic you will, most likely, be told that you need to create a Virtual Network Gateway and set its type to `ExpressRoute`.
+
+Whilst this is accurate for setting up Express Route more generally, it is not relevant to using Express Route within a Virtual WAN configuration.
+
+If you ever need to set up an Express Route connection to share a single VNet to a third party datacentre or on-premises environment, a virtual network gateway would be required.
+
+However, since our setup is a virtual WAN, we do not need a virtual network gateway.
+
+Instead we use an Express Route Gateway.
+
+You can see the difference by looking at the resource addresses in Azure.
+
+A virtual network gateway of type ExpressRoute, will look like this:
+
+```
+{
+    "name": "MyVnetGateway",
+    "type": "Microsoft.Network/virtualNetworkGateways",
+    "location": "uksouth",
+    "properties": {
+        "gatewayType": "ExpressRoute"
+    }
+}
+```
+
+Whereas, an Express Route Gateway will look like this:
+
+```
+{
+    "name": "MyExpressRouteGateway",
+    "type": "Microsoft.Network/expressRouteGateways",
+    "location": "uksouth",
+    "properties": {
+        "virtualHub": {
+            "id": "/subscriptions/<SUBSCRIPTION ID>/resourceGroups/<RESOURCE GROUP>/providers/Microsoft.Network/virtualHubs/<VIRTUAL HUB>"
+        },
+        "expressRouteConnections": [
+            {
+                "name": "<CONNECTION NAME>",
+                "type": "Microsoft.Network/expressRouteGateways/expressRouteConnections",
+            }
+        ]
+    }
+}
+```
+
+Virtual Network Gateways are not required for an Express Route circuit with a virtual WAN configuration.
+
+## How can I tell where routes are advertised from in the effective routes?
+
+If you look at the effective routes, you will notice that there is an associated Autonomous System Number (ASN).
+
+For example, you will see the following information in the table (this route is made up for the example):
+
+
+|IP Range|Next Hop Type|Next Hop|Origin|ASN|
+| ---- | --- | --- | --- | ---|
+|10.20.30.40/20|ExpressRouteGateway|name-of-express-route-gateway|name-of-express-route-gateway|12076-205098-65021-12076|
+
+The ASNs listed here tell you something about where the routes are being advertised from.
+
+`205908` is Cloud Gateway.
+
+`65021` is a reserved ASN used only for BGP.
+
+`12076` is Azure.
+
+Cloud Gateway (205098) are advertising this made up route to Azure (12076) via BGP (65021).
+
+`12076` shows up twice because this is part of a virtual WAN configuration so the Express Route Gateway is advertising the routes to the virtual hub.
+
+Because the Express Route Gateway lives in Azure, its ASN shows as the Azure ASN.

@@ -27,53 +27,66 @@ When resolving there is a drop down category section to choose from asking what 
 Below is a list of the category section and further explanation details:
 
 - Missing / Inadequate Docs
+
 The developer couldn’t find or understand how to do something using existing docs.
 Examples: unclear steps for release, outdated runbooks, confusing platform onboarding docs.
 
 - Self-Service Gap
+
 The task couldn’t be completed independently using the platform’s self-service tools.
 Examples: manual intervention required for releases or cert renewal that should be automatable.
 
 - Tooling / Automation Deficiency
+
 The platform lacks automation or tooling to handle a common task efficiently.
 Examples: no script or service to help renew certs; no tooling for safe SQL query execution.
 
 - Platform Feature Missing / Misaligned
+
 The platform doesn’t offer a capability the user expected, or it’s not fit for purpose.
 Examples: Jenkins doesn’t support parallel execution as needed, AKS cluster config not flexible.
 
 - Poor Signposting / Discoverability
+
 The developer didn’t know where to find the right docs, tools, or processes.
 Examples: useful info is buried in Confluence; Slack is the only way to get help.
 
 - User Education / Misuse
+
 The issue stemmed from user misunderstanding or misuse of the platform despite available support.
 Examples: users triggering SQL queries incorrectly, or misconfiguring Jenkins despite good docs.
 
 - Policy / Process Ambiguity
+
 Lack of clarity around governance, approvals, or procedural steps.
 Examples: unclear who approves production access or how to request temporary privileges.
 
 - Incident / One-Off Platform Failure
+
 This was a true breakage or flake, not something easily prevented by docs or tooling.
 Examples: Jenkins outage, cert renewal job failure due to platform bug.
 
 - External Failure (GitHub / Azure / Sonarcloud etc)
+
 External issues in relation to vendor issues.
 Examples: GitHub unavailable and Azure service outage.
 
 - Triage Error / Wrong Queue
+
 Ticket was misrouted or incorrectly raised to platform team.
 Examples: issue belonged to app team or external vendor, not platform.
 
 - Network Failure
+
 Errors in relation to anything network related, including F5 VPN, OpenVPN, Firewalls and various other networking related issues.
 
 
 These are also used for Crime with the addition of the following:
 
 - Joiner / Mover / Leaver (JML)
+
 Access requests for new users, change of roles and users leaving.
 
 - Release Support
+
 Tickets that involve any type of release involvement.

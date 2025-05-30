@@ -502,7 +502,9 @@ Protips
 PSDT
 PSUPS
 ptl
+PTL
 ptlsbox
+PTLsbox
 pwpush
 QAs
 racc

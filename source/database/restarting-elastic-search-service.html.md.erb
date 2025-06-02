@@ -1,0 +1,47 @@
+---
+title: How to restart the Elastic Search service
+last_reviewed_on: 2024-11-04
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+There may be cases where the Elastic Search systemd service needs to be restarted on the VM. This guide provides instructions on how to restart this service.
+
+1) Request JIT access for non-prod or prod Bastion server depending on environment that is failing (https://myaccess.microsoft.com/)
+
+2) Connect to F5 VPN and log in to the appropriate Bastion server e.g. `bastion-nonprod.platform.hmcts.net`
+
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+ssh bastion-nonprod.platform.hmcts.net
+```
+
+3) SSH into the Elastic Search node (there are 4 VMs per environment named `ccd-data-0` to `ccd-data-3`)
+
+``` 
+ssh -i <logstash ssh key> elkadmin@<private ip address of VM>
+```	
+
+**Note:** Generally it is best to check all 4 servers to ensure the service is running on each.
+
+4) Check the status of the Elastic Search service
+
+```
+systemctl status elasticsearch
+```
+
+5) If the service is not running, start the service (requires sudo permissions)
+
+```
+sudo systemctl restart elasticsearch
+```
+
+6) After a few seconds the command should return without any output. Check the status of the service again to ensure it is running
+
+```
+systemctl status elasticsearch
+```
+
+If the service fails to restart, you can investigate the logs to identify the issue. The logs can usually be found in the `/var/log/elasticsearch` directory.

@@ -1,6 +1,6 @@
 ---
 title: ADO Pipeline Agents PAT Usage
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 40
 ---
@@ -12,10 +12,10 @@ We use PATs to allow azure-devops self-hosted agents to spin up through KEDA bas
 We use a bot account to sign in to Azure Devops and generate new PATs.
 You can sign in with `rpe-azure-devops-email` and `rpe-azure-devops-password` found in the `rpe-prod` Key Vault in Azure.
 
-Once signed in, click on user settings > Personal acccess tokens as below:
+Once signed in, click on user settings > Personal access tokens as below:
 ![Agent_Token_Generation](images/ADO-Agent-PAT-setting.png)
 
-You will be able to see currrent active tokens, and expired/revoked tokens too once in this page.
+You will be able to see current active tokens, and expired/revoked tokens too once in this page.
 To generate a new PAT, click the `+ New Token` button.
 The docs are split between KEDA and Daily checks below as the access level varies a bit and this avoids assigning more permissions than needed to a given token.
 

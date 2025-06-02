@@ -1,6 +1,6 @@
 ---
-title: Data Boarding 
-last_reviewed_on: 2024-02-19
+title: Data Boarding
+last_reviewed_on: 2024-09-20
 review_in: 6 months
 weight: 40
 ---
@@ -10,19 +10,19 @@ weight: 40
 ### Prerequisites
 
 * Be onboarded to the [HMCTS Github Organisation](https://hmcts.github.io/cloud-native-platform/onboarding/person/index.html)
-* Get a member of your team to add you to [devops-azure-ad](https://github.com/hmcts/devops-azure-ad) or raise a [platops-help](https://moj.enterprise.slack.com/archives/C8SR5CAMU) ticket.
+* Get a member of your team to add you to [azure-access](https://github.com/hmcts/azure-access) or raise a [platops-help](https://moj.enterprise.slack.com/archives/C8SR5CAMU) ticket.
 
 [GitHub Overview, Repositories and Pull Requests](github.html)
 
 ### Overview
 
-A total of four storage accounts have been deployed, an internal and an external account in both the NonProd and Prod environments. The external account is directly accessible from RDWeb and is enabled for SFTP. The internal account is mounted as anetwork drive to the Jumpbox for that environment.
+A total of four storage accounts have been deployed, an internal and an external account in both the NonProd and Prod environments. The external account is directly accessible from RDWeb and is enabled for SFTP. The internal account is mounted as a network drive to the Jumpbox for that environment.
 
-These accounts allow the transfer of data in and out of the HMCTS Azure environments withan audit trail. 
+These accounts allow the transfer of data in and out of the HMCTS Azure environments with an audit trail.
 
 ### Copying Data from RDWeb to the external storage accounts
 
-Both the production and non-production external storage accounts can be SFTPd to fromRDWEB. The connection strings are below:
+Both the production and non-production external storage accounts can be accessed via SFTP from RDWEB. The connection strings are below:
 
 * Nonprod: boardingextnonprodstor.blob.core.windows.net
 * Prod: boardingextprodstor.blob.core.windows.net

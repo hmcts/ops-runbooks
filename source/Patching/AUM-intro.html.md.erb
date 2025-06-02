@@ -1,52 +1,66 @@
 ---
 title: Azure Update Manager - Operations Guide
 weight: 255
-last_reviewed_on: 2024-04-26
+last_reviewed_on: 2025-04-01
 review_in: 12 months
 ---
 # <%= current_page.data.title %>
+
+**Contents**
+
+- [Intro](#intro)
+- [Scripting AUM](#scripting-aum)
+- [Enabling VM OS Scans](#enabling-vm-os-scans)
+- [Updating OS](#updating-os)
+- [Ad Hoc Jobs](#ad-hoc-jobs)
+- [Individual VM Updates](#individual-vm-updates)
+- [Ad Hoc Jobs For Multiple VMs](#ad-hoc-jobs-for-multiple-vms)
+
+## Intro
 
 Azure Update Manager is a unified service, tightly integrated into the Azure Portal, simplifying the patching of Windows and Linux operating systems.
 
 **BEWARE**
 *Azure Update Manager (AUM) is a different service to the similarly named service, Update Management in Azure Automation. This can create confusion when searching for help within the Azure documentation.*
 
-### Azure Update Manager documentation
-[Link to MS docs](https://learn.microsoft.com/en-us/azure/update-manager/)
+- **Azure Update Manager [documentation](https://learn.microsoft.com/en-us/azure/update-manager/)**
 
-### Support matrix for Azure Update Manager
+- **Support matrix for Azure Update Manager**
+  - Only supported configurations will receive patches [Supported Operating Systems](https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems).
 
-Only supported configurations will recieve patches [Supported Operating Systems](https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems).
+## Scripting AUM
 
-
-# Scripting AUM
 HMCTS adopted AUM in February 2024 and many VMs are already protected. Additional VMs should be added to the repositories described below.
 
 ## Enabling VM OS Scans
+
 Azure policy has been used to set VM **Update Settings**, enabling periodic assessment for all VMs within the management group.
 
 [Github Azure-Policy](https://github.com/hmcts/azure-policy)
 
-Windows VMs - assign.aum_Windows_scan.json
-Linux VMs - assign.aum_Windows_scan.json
+- Windows VMs - assign.aum_Windows_scan.json
+- Linux VMs - assign.aum_Windows_scan.json
 
 ## Updating OS
+
 Azure maintenance configurations are used to select VMs for updating, assigning the types of updates, scheduling and managing reboots.
 
 [Github Azure-Update-Manager-Maintenance-Configurations](https://github.com/hmcts/Azure-Update-Manager-Maintenance-Configurations)
 
 See the detailed Readme file on the repository for further details.  Be aware that terraform limits each maintenance configuration to a single subscription ID.
 
-# Ad Hoc Jobs 
-These processes can be used to trigger scans and deploy updates on demand.  A single VM can be managed from its Azure portal webpage by browsing for the VM and select the Update from the left hand menu.  Multiple VMs can be managed from the Azure update manager web page. 
+## Ad Hoc Jobs
+
+These processes can be used to trigger scans and deploy updates on demand.  A single VM can be managed from its Azure portal webpage by browsing for the VM and select the Update from the left hand menu.  Multiple VMs can be managed from the Azure update manager web page.
 
 [Azure Update Manager Portal](https://portal.azure.com/#view/Microsoft_Azure_Automation/UpdateCenterMenuBlade/~/overview)
 
-[AUM Multiple VMs Instructions](AUM-Multi-VM.html)
+[Ad Hoc Jobs For Multiple VMs](#ad-hoc-jobs-for-multiple-vms)
 
 ## Individual VM Updates
 
 ### Step 1 - Enable AUM
+
 Using the Azure portal, browse to the VM to be protected. Select Operations / **Updates** from the tool bar, then **Update Settings**
 
 ![Update_Settings](images/AUM_Update_Settings1.png)
@@ -55,40 +69,66 @@ For HMCTS maintenance configurations, set the *Periodic assessment* as **Enable*
 
 ![Configuration_Settings](images/AUM_VM_UpdateSettings1.png)
 
-Various problems described in the troubleshooting section are the result, of not setting these values correctly.
+Various problems described in the troubleshooting section are the result of not setting these values correctly.
 
 ### Step 2 - Audit OS
-AUM will ask the OS to begin an audit of missing updates using its own tool, either Windows Update or APT/YUM. Please note this process can be slow, as it needs to trigger the OS tool, wait for the results, collect the results and then process them with the AUM.  Waiting patiently is recommended and triggering more than 3 scans in a 24 hour period can result in even longer waits.  
 
+AUM will ask the OS to begin an audit of missing updates using its own tool, either Windows Update or APT/YUM. Please note this process can be slow, as it needs to trigger the OS tool, wait for the results, collect the results and then process them with the AUM.  Waiting patiently is recommended and triggering more than 3 scans in a 24 hour period can result in even longer waits.
 
 Using the Azure portal, browse to the VM to be protected. Select **Updates** then **Check for Updates**.  Can take 5 minutes for Linux machines and 20 - 40 minutes for Windows VMs.
 
-
 The results will be shown on the VMs *Updates** page as Recommended Updates. If nothing is shown as required, there is nothing to update and the process is complete.
 
-
 ### Step 3 - Updating VM/s
-Once a scan has successfully completed, AUM will present a list of missing updates which can be applied to the VMs operating system.
 
+Once a scan has successfully completed, AUM will present a list of missing updates which can be applied to the VMs operating system.
 
 Select **One-time update** from the VMs Updates screen, to open the **Install one-time updates** wizard. Select the Machine Name to be updated and click Next.
 
 A preview of the updates to be installed will be displayed.  This can be modified using the **Update selection** options. Once the correct updates are displayed, click Next.
 
-
 **Caution**
 The default reboot option is "Reboot if required" which can sometimes automatically reboot the VM to complete the patching process. Be sure to select the "Never reboot" option, if you dont want the VM to reboot.  Click Next
 
-
-Review the choices which have been selected and click Install to start the update job.  To abort the wizard, click the X in the top right hand corner, ending the process. 
-
+Review the choices which have been selected and click Install to start the update job.  To abort the wizard, click the X in the top right hand corner, ending the process.
 
 The patching process will begin.
 
-
 ### Step 4 - Rebooting VM
+
 If you need to manually reboot the VM, select **Overview** from the left hand menu.  Then click on the Restart button, which will gracefully restart the operating system.
 
-
 ### Step 5 - Progress and History
+
 From the VMs **Updates** page, select the **History** button.  Each jobs status will be displayed including active tasks.  However this information can lag many minutes behind.  Waiting patiently is recommended...
+
+## Ad Hoc Jobs For Multiple VMs
+
+To manage multiple VMs, browse to the Azure Update Manager, Machines page
+
+![AUM-Machines](images/AUM_Machines.png)
+
+1. Filter by Name
+  - Filter by name (1 on diagram) enables searching for VMs by using either the specific name or just part of the name, such as proxy.  In the diagram, 'proxy' would return change the view, to show just the 3 machines app-proxy-0, app-proxy-1 and app-proxy-3.  Using 'sbox' would return 'all' 21 from 545 VMs, with sbox, within any part of their name.
+
+2. Check for Updates
+  - By first selecting the target VMs using the check box (9 on diagram), a scan for missing updates can be triggered by clicking **Check for Updates**.  (2 on diagram).
+
+3. One-time update
+  - After selecting the target VMs, click **One-time update** (3 on diagram) to open the wizard. Select all the VMs to be updated and click Next.
+  A preview of the updates to be installed will be displayed.  This can be modified using the **Update selection** options. Once the correct updates are displayed, click Next.
+
+4. Edit Update Setting
+  - Azure policy should force the VMs update settings but sometimes they need to be changed. Select the target VMs and the click **Settings** (4 on diagram).
+
+5. Export to CSV
+  - Azure Update manager holds data about the VMs which can be exported to a CSV file and processed by 3rd party applications like Excel. Use **Export to CSV** (5 on diagram).
+
+6. Filters
+  - With over 500 VMs, the machines view can contain a lot of noise. The diagram shows app-proxy-1, which is deallocated. By click on Status within the view filers (6 on diagram), only running VMs could be shown. These filters are very powerful and time spent exploring them, with be rewarded.
+
+7. Fast Filters
+  - The view of shown VMs can be quickly changed using these filters. Just click on **Pending reboot** (7 on diagram), to see only these 32 VMs.
+
+8. Column Order
+  - By default, the view of VMs is sorted by the VMs name.  This can be changed by selecting any column header (8 on diagram).

@@ -1,0 +1,75 @@
+---
+title: Creating a temporary Azure Container Registry
+last_reviewed_on: 2025-03-10
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+In this section, we will step through the process of creating a temporary container registry in Azure and configuring image automation via Flux. This was recently required during an incident where one of our container regitries became unusable due to an error by Microsoft Support.
+
+## Create the new container registry
+
+Depending on the situation, this can be done a number of ways. Preferably via IaC such as Terraform, but can also be done using ClickOps in the Azure Portal or by using this Azure CLI command:
+
+```bash
+az acr create -n myregistry -g MyResourceGroup --sku Premium
+```
+
+## Copy images to the new container registry
+
+If replacing an existing ACR, you may need to copy over any images that are currently in use in the old registry. This can be done via the Azure CLI with:
+
+```bash
+az acr import -n myregistry --source sourceregistry.azurecr.io/sourcerepository:sourcetag
+```
+
+## Update Neuvector to allow new container registry
+
+You will need to add the newly created container registry to an allow list in Neuvector. This can be done by updating the admission-control.yaml in the chart-neuvector repository. [Example PR](https://github.com/hmcts/chart-neuvector/pull/93/files)
+
+## Update flux config to use new Neuvector chart
+
+We need to tell Flux to use the new Neuvector chart that has the regsitry whitelisted. [Example PR](https://github.com/hmcts/cnp-flux-config/pull/36408/files)
+
+## Create kubernetes secret with registry credentials
+
+On the ptl cluster, in the `flux-system` namespace, you will need to create a secret that contains the credentials that Flux will use to pull images from the registry. The simplest way is to navigate to the new container registry and create a new repository token based on a scope map with the appropriate permissions.
+
+![Example token](images/acr_token.png)
+
+Once you have a repository token, run the following command on the cluster to create the secret:
+
+```bash
+kubectl create secret docker-registry <secret-name> \
+	--namespace flux-system \
+	--docker-server=<registry-name>.azurecr.io \
+	--docker-username=<token-name> \
+	--docker-password=<token-password>
+```
+
+## Set up Flux image automation for new container registry
+
+Next, you will need to configure the image automation in Flux for the new registry. It can be done by raising a PR similar to what was done [here](https://github.com/hmcts/cnp-flux-config/pull/36425/files).
+
+## Update Flux config for apps to use new registry
+
+At this stage, you can begin configuring the flux config for specific apps to use the new container registry. To ensure all is working as expected, you can disable image automation in production, swap to the new registry and test in a lower environment. You can see an example of this [here](https://github.com/hmcts/cnp-flux-config/pull/36451/files)
+
+You can check to see if it has updated correctly by running:
+
+```bash
+kubectl get imagepolicy.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
+kubectl get imagerepository.image.toolkit.fluxcd.io -n flux-system | grep <app_name>
+```
+
+You should also try deleting the helm release and checking the pods spin back up with an image from the new container registry. You can check by running:
+
+```bash
+kubectl describe pod <pod_name> | grep 'Image:'
+```
+
+Once you're happy, you can point production to the new container registry as well and re-enable image automation.
+
+**NOTE: Depending on the app, there may be other places that will need to be pointed to the new container registry e.g. pipelines, dockerfiles etc**

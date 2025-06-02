@@ -1,11 +1,11 @@
 ---
-title: Troubleshooting Azure Update Manager
+title: Azure Update Manager Troubleshooting
 weight: 259
 last_reviewed_on: 2024-06-19
 review_in: 6 months
 ---
 # <%= current_page.data.title %>
-When troubleshhoting patching issues, remember that Azure Update Manager only orchestrates the process by triggering the operating systems own patching features. 
+When troubleshooting patching issues, remember that Azure Update Manager only orchestrates the process by triggering the operating systems own patching features.
 If these services are faulty, AUM will be unable to resolve the issue and only has limited ability to report issues, via the Azure Portal.
 
 **Troubleshooting OS Patching Problems**
@@ -16,13 +16,13 @@ a). Try turning it off and on again...
 
 2. Run One-time update for just the problem VM
 
-3. If problem VM is selected via Dynamic scope, change to Resourses and vice versa, in the Maintenance Configuration
+3. If problem VM is selected via Dynamic scope, change to Resources and vice versa, in the Maintenance Configuration
 
 ### Be Patient
-It has been noted in testing that status updates and progress are not frequently refreshed.  Allow time 15 minutes for processes to complete. The operating system update features need to report thier status to AUM.
+It has been noted in testing that status updates and progress are not frequently refreshed.  Allow time 15 minutes for processes to complete. The operating system update features need to report their status to AUM.
 The recommended updates screen does not refresh multiple times within an hour and over night might be required, for all activities to be reported correctly.
 
-Error - "The following packages have been kept back" Error while updating your system 
+Error - "The following packages have been kept back" Error while updating your system
 Ubuntu (Canonical) phases updates, which require time for package changes to propagate. Waiting overnight, resolved this issue.
 
 
@@ -37,17 +37,17 @@ HMCTS legacy Ubuntu VMs do not patch due to the waagent.conf file, not having th
 
 [Linux Agent Configuration](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/update-linux-agent?tabs=ubuntu)
 
-### Azure Maintenance Configuration Errors 
-When creating or updating the Maintenance Configuration, the portal may flash and display "The renderComponetIntoRoot component encountered an error while loading"
+### Azure Maintenance Configuration Errors
+When creating or updating the Maintenance Configuration, the portal may flash and display "The renderComponentIntoRoot component encountered an error while loading"
 
 ![Maintenance_Configuration_Error1](images/AUM_Maintenance_Configuration_Error1.png)
 
 You may also see this error
 ![Maintenance_Configuration_Error2](images/AUM_Schedule_Error1.png)
 
-This is because the VM Update Setting have not been configured correctly. 
+This is because the VM Update Setting have not been configured correctly.
 ![Configuration_Settings](images/AUM_VM_UpdateSettings1.png)
 
 ### Linux Error
 ![Linux Error](images/AUM_Agent_Error1.png)
-Rebooting the VM and rescanning for missing patches, resolved this issue.
+Rebooting the VM and rescan for missing patches, resolved this issue.

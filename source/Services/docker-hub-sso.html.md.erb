@@ -1,0 +1,45 @@
+---
+title: Docker Hub SSO Overview
+last_reviewed_on: 2025-05-16
+review_in: 6 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+We have a Docker Business Account.
+
+This account is setup with an organisation called HMCTS.
+
+The account has been configured to enable single sign on to Docker accounts with Entra ID.
+
+The service principal and secret are created by a GitHub repo and pipeline called [docker-hub-sso](https://github.com/hmcts/docker-hub-sso).
+
+The pipeline will run automatically when a change is merged.
+
+The secret has been configured to be rotated by the pipeline every 335 days which means that when there is less than 30 days until the secret expires, running the pipeline will renew it.
+
+This should line up with our daily checks for service principal secrets which start notifying us about secrets that will expire in the next 30 days.
+
+When that notification comes through to the daily checks, you can run the pipeline to renew the secret.
+
+The secret is stored in a [keyvault](https://github.com/hmcts/docker-hub-sso/blob/c8ae3e285628104afbc224dedebcc9840b43bdc6/components/azure-ad/main.tf#L74-L83) where you can retrieve it to enter it into the docker settings page.
+
+### Updating the client secret in docker
+
+Login to the [docker hub](https://hub.docker.com) as an administrator.
+
+Go to the settings page for the organisation and then go to `Security`.
+
+Edit the single sign on connection and click `Next` until you reach the page where you can enter the secret.
+
+<img src="images/docker-hub-sso-1.png" style="width:600px;">
+
+Enter the secret value and click `Next` and eventually `Save`.
+
+<img src="images/docker-hub-sso-2.png" style="width:600px;">
+
+### Who has admin access?
+
+- Enda Kelly
+- Felix Eyetan

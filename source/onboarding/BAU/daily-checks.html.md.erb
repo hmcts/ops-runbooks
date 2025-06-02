@@ -1,0 +1,73 @@
+---
+title: '#dtspo-daily-checks'
+last_reviewed_on: 2025-03-05
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+A set of routine inspections designed to ensure the smooth operation and reliability of the HMCTS platform. These checks cover various aspects of the system, from resource management to pipeline health, and are crucial for maintaining optimal performance and preventing issues.
+
+### Orphaned Resource Status
+- **How they work:** Orphaned resources are unused resources in your Azure environment. These can include unattached disks, unused network interfaces, and empty resource groups.
+- **Where they are run from:** These checks are typically run from Azure Resource Graph queries or Azure Monitor.
+- **What they are checking:** They identify resources that are no longer in use but still incur costs or could cause misconfigurations.
+- **Importance:** Medium, as they help in cost-saving and preventing potential misconfigurations.
+- **Fixing issues:** Delete the identified orphaned resources after verifying they are not needed.
+
+### Jenkins Status
+- **How they work:** Jenkins status checks monitor the health and performance of Jenkins jobs and pipelines.
+- **Where they are run from:** These checks are run from the Jenkins dashboard.
+- **What they are checking:** They check the status of builds (e.g., success, failure, in progress) and the health of the Jenkins server.
+- **Importance:** High, as they ensure continuous integration and delivery processes are functioning correctly.
+- **Fixing issues:** Investigate failed builds, check logs for errors, and rerun or fix the pipeline as needed.
+
+### Service Principal Checks – HMCTS
+- **How they work:** Service principal checks ensure that service principals used for authentication in Azure DevOps are valid and not expired.
+- **Where they are run from:** These checks are run from Azure AD and Azure DevOps.
+- **What they are checking:** They verify the validity and expiration of service principal credentials.
+- **Importance:** High, as expired credentials can cause authentication failures and downtime.
+- **Fixing issues:** Renew or rotate the service principal credentials before they expire.
+
+### Documentation Review
+- **How they work:** Documentation review checks ensure that all project documentation is accurate, complete, and up to date.
+- **Where they are run from:** These checks are typically manual reviews conducted by team members.
+- **What they are checking:** They check for accuracy, completeness, compliance, and readability of documentation.
+- **Importance:** Medium, as accurate documentation is crucial for project success and compliance.
+- **Fixing issues:** Update the documentation to correct errors, fill in missing information, and ensure compliance.
+
+### Jira Status
+- **How they work:** Jira status checks monitor the status of issues and tasks in Jira.
+- **Where they are run from:** These checks are run from the Jira dashboard.
+- **What they are checking:** They check the status of issues (e.g., open, in progress, resolved) and overall project progress.
+- **Importance:** Medium, as they help track project progress and identify bottlenecks.
+- **Fixing issues:** Update issue statuses, assign tasks, and resolve any blockers.
+
+### Auto Shutdown Status
+- **How they work:** Auto shutdown status checks ensure that virtual machines and other resources are automatically shut down when not in use.
+- **Where they are run from:** There are scripts which are scheduled to run via GitHub Actions in this repo: https://github.com/hmcts/auto-shutdown
+- **What they are checking:** They verify that auto shutdown policies are correctly configured and applied.
+- **Importance:** Medium, as they help in cost-saving and resource management.
+- **Fixing issues:** Configure or update auto shutdown policies to ensure they are correctly applied.
+
+### Azure DevOps Scheduled Pipelines Checks
+- **How they work:** These checks ensure that scheduled pipelines in Azure DevOps are running as expected.
+- **Where they are run from:** These checks are run from the Azure DevOps pipeline dashboard.
+- **What they are checking:** They verify that pipelines are triggered at the scheduled times and complete successfully.
+- **Importance:** High, as they ensure automated builds and deployments are executed on schedule.
+- **Fixing issues:** Investigate and resolve any pipeline failures, check logs, and ensure triggers are correctly configured.
+
+### AKS Cluster Status Checks
+- **How they work:** AKS cluster status checks monitor the health and performance of Azure Kubernetes Service (AKS) clusters.
+- **Where they are run from:** These checks are run from Azure Monitor and Azure Kubernetes Service dashboards.
+- **What they are checking:** They check the health of nodes, pods, and overall cluster performance.
+- **Importance:** High, as they ensure the reliability and performance of Kubernetes workloads.
+- **Fixing issues:** Investigate and resolve any issues with nodes or pods, check logs, and ensure the cluster is properly configured.
+
+### SSL Certificates Checks
+- **How they work:** SSL certificate checks ensure that the SSL certificates used on our web servers are correctly installed, valid, and trusted.
+- **Where they are run from:** These checks are run from Azure DevOps, utilizing Azure Key Vault to manage and monitor the certificates.
+- **What they are checking:** They verify the validity of the SSL certificate, check for correct installation, ensure the certificate is trusted by browsers, and monitor the expiration date.
+- **Importance:** High, as expired or improperly installed SSL certificates can lead to security vulnerabilities and trust issues with users.
+- **Fixing issues:** Renew the SSL certificate before it expires, ensure the correct intermediate certificates are installed, and verify that the certificate matches the hostname.

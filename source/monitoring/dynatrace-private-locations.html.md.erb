@@ -41,3 +41,68 @@ This was needed when we removed our old private activegates and the new ones had
 Once the new activegates had been added, rather than waiting another 15 mins for the particular monitor to run again, we clicked `On-demand execution` and were able to quickly confirm the synthetic monitor was working again.
 
 <img src=images/on-demand-execution.png  width="600">
+
+## Fix DNS resolution issues
+
+If the private VMs cannot resolve the hostnames of the apps being monitored, you may need to add the vnet as a link to the DNS zone.
+
+To do this, raise a pull request in the [azure-private-dns](https://github.com/hmcts/azure-private-dns) repo to add the dynatrace vnet as a link.
+
+Here is an [example pr](https://github.com/hmcts/azure-private-dns/pull/800).
+
+## Fix timeout issues
+
+If the DNS is resolving but you're getting a timeout error when running an on-demand execution, the issue could be firewall related.
+
+Connect to the appropriate [Palo Alto](../network/palo-alto/connecting-palos.html) and check the Palo Alto [monitor](../network/palo-alto/palos-troubleshooting.html).
+
+If the traffic is showing as denied, then you will need to ensure the traffic is allowed by ensuring the two networks are in the correct zone and there is a rule to allow the traffic.
+
+This is managed in the [hub-panorama-terraform](https://github.com/hmcts/hub-panorama-terraform) repo.
+
+If the traffic is allowed but it's still not working, then it may be that there is no route back from the application to dynatrace.
+
+In this case, you need to add a route to the appropriate route table for the application gateway.
+
+Here is an [example PR](https://github.com/hmcts/aks-cft-deploy/pull/640/files) showing how to do this.
+
+## Dynatrace Private Activegates have stopped working
+
+You may receive a PlatOps Help request from one of the Dynatrace team saying the private activegates have stopped working.
+
+This is usually due to an outdated version of Chromium. Whoever raises the request will usually state this is the case.
+
+If this is what's happened, you can upgrade Chromium and install the latest activegate version manually.
+
+Follow [this guide](./connecting-dynatrace-activegate.html) to get connected to the activegates.
+
+Then do the following:
+
+1. Remove chromium `sudo snap remove chromium`
+
+2. Uninstall the activegate `sudo /opt/dynatrace/gateway/uninstall.sh`
+
+3. Reinstall chromium `sudo snap install chromium`
+
+4. Download the latest activegate installer script 
+
+    ```
+    wget -O Dynatrace-ActiveGate-Linux-x86-azure.cft-<LATEST_VERSION>.sh "https://ebe20728.live.dynatrace.com/api/v1/deployment/installer/gateway/unix/latest?arch=x86&networkZone=azure.cft" --header="Authorization: Api-Token <API_TOKEN>"
+    ```
+
+5. Reinstall the activegate 
+
+    ```
+    Dynatrace-ActiveGate-Linux-x86-azure.cft-<LATEST_VERSION>.sh --enable-synthetic --set-property=synthetic=private_location_id=SYNTHETIC_LOCATION-C0E9EDB41E72A6F7 --set-network-zone=azure.cft
+    ```
+
+You can get the API token and the latest version number from the Dynatrace team, i.e. whoever raised the ticket.
+
+If you get an error about lack of space, you can try clearing down the journal file:
+
+```
+du -h /var/log -d 1
+sudo journalctl --vacuum-time=10d
+```
+
+This will remove any logs older than 10 days.

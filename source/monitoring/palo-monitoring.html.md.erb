@@ -1,0 +1,88 @@
+---
+title: Dynatrace & Palo Alto Alerting 
+weight: 100
+last_reviewed_on: 2024-09-12
+review_in: 3 months
+---
+# <%= current_page.data.title %>
+
+The Palo Firewalls required enhanced monitoring and alerting to help manage issues pro-actively for the Platform Operations Team.
+
+Palo Alto virtual machines generate logs both system and network that is stored in Panorama/Splunk.
+
+
+### Request Dynatrace Access
+If you require access to the Dynatrace dashboard, you will need to raise a servicenow ticket [link](https://mojcppprod.service-now.com/hmcts_it?id=sc_cat_item&sys_id=e8e40cb01b74b014987d1fc3b24bcba4contact)
+- provide your email address (justice)
+- dashboard (non-prod)
+- reason for access (manage / access alerts)
+- team you're in (platops)
+
+Then contact Jonathan Forster on the dyntrace-help-admins slack channel - [link](https://moj.enterprise.slack.com/archives/C03E1092B0S) and provide your ticket number, he will then advise access is provided via slack.
+
+Use your email address to login, no password is required andthe palo dashboard can be accessed [here](https://yrk32651.live.dynatrace.com/index.jsp?state=D3s8xiGfmKmXBw8vbEikmFeg_oC0ccrpqcLrMRaBb9M&code=547f0790-c8a5-4b2d-bb6f-eded5e6cb8d4#dashboard;id=ab163c60-07f5-7e82-40d5-35cd6a8be991;gf=all;gtf=-2h).
+
+### Dynatrace Alerts
+We have the below configured in IAC infrastructure in hub-panorama-terraform repo[link](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/modules/dynatrace-alerts).
+
+These events are triggered when threshold is surpassed 3 times out of 5 in the space of a 1 minute window ie CPU limit is above 90, for non-prod & prod.
+
+- [Load Balancer Availbility](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-availability.tf) - threshold for an alert is below 100% availability.
+- [Load Balancer Health Probe](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/lb-health-probe.tf) - threshold for an alert is below 100% availability. 
+- [Palo Alto VM Memory Utilisation](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/memory-utilisation.tf) - threshold for an alert is above 26 mb memory utilisation.
+- [Palo Alto VM CPU - Azure Metrics](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-azure.tf) - threshold for an alert is above 80 based CPU from Azure Metrics.
+- [Palo Alto VM CPU MGMT - SNMP Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu-mgmt.tf) - threshold for an alert is above 80 for Palo Alto management CPU alert on SNMP data.
+- [Palo Alto VM CPU- SNMP Traps Data](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/metrics-cpu.tf) - threshold for an alert is above 80 Palo Alto metric alert bases on SNMP traps data.
+- [Session Count ICMP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-icmp.tf) - threshold for an alert is above 7k session count.
+- [Session Count TCP](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/modules/dynatrace-alerts/session-count-tcp.tf) - threshold for an alert is above 26k session count.
+
+### Slack Alerts
+When a threshold has been violated it will posted on the below slack channels to viewed with the information about the alert.
+
+Please note you'll need to be invited to the channel for access from a member of the Red Squad [link](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=DTSPO&title=Delivery+Squads).
+
+- paloalto-dynatrace-alerts [link](https://moj.enterprise.slack.com/archives/C06ADKG1LAG).
+
+<img src=images/palo-alto-dynatrace-alerts.png width=600>
+
+- paloalto-system-alerts [link](https://moj.enterprise.slack.com/archives/C073RKWSQ0N).
+
+<img src=images/palo-alto-system-alerts.png width=600>
+
+### Manual Alert Testing
+The above metrics were tested manually on Dynatrace dashboard non-prod (click on the top right head icon to see which dashboard you're on) prior to being committed to IAC.
+
+<img src=images/dynatrace-non-prod.png width="600">
+
+You'll find the Terraform resource for new metric events [link](https://registry.terraform.io/providers/dynatrace-oss/dynatrace/latest/docs/resources/metric_events).
+
+
+
+Test metrics can be found on the left side panel, Manage -> settings -> Anomaly detection -> Metric events, within the filter type 'palo" to see prior examples.
+
+<img src=images/anomaly-detection.png width="600">
+
+Please ensure that you only amend those that are not enabled (not green) e.g 1PaloAlert-snmp, to test future metrics, example of load balancing [link](https://docs.dynatrace.com/docs/setup-and-configuration/setup-on-cloud-platforms/microsoft-azure-services/azure-integrations/azure-cloud-services-metrics/monitor-azure-load-balancers-builtin). 
+
+You will know the alert has been triggered as it will show up as a problem in the top right corner of the dashboard in a red box containing a exclamation mark.
+
+<img src=images/dynatrace-problem.png width="600">
+
+You need to set the threshold above or below the expected, i.e. CPU below 10% to trigger a problem, through using metric events outlines [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events).  
+You'll set your required parameters based on the current metrics under Infrastructure Observability->Azure and find the resource under the subscription hmcts-hub-nonprod-intsvc, review a resource e.g. virtual machine, to find suitable metric event point to trigger an alert.
+
+Dyntrace provide documentation on metric key events based on incoming raw measurements of a single metric [link](https://docs.dynatrace.com/docs/platform/davis-ai/anomaly-detection/metric-events/metric-key-events) and this will provide the fields required in the terraform block of code once tested.
+
+
+### Slack Integration
+
+The following documents provide the steps to set up integration with slack.
+
+- Set up a slack channel [link](https://slack.com/intl/en-gb/help/articles/201402297-Create-a-channel).
+- Http log intergartion [link](https://live.paloaltonetworks.com/t5/log-forwarding-articles/pan-os-8-0-http-log-integration-with-slack/ta-p/172093) is set up on sbox, non-prod and prod palo alto vm's.
+- Integrating Slack and Palo Alto Network Firewalls [link](https://www.sunmanagement.net/wp-content/uploads/2021/03/Lab12-FieldNotes-Slack-integration-with-Palo-Alto-Networks-v2.pdf), this document provides the steps to get notifications in slack for system alerts from the palo alto firewalls. 
+- Web Hooks for slack [link](https://api.slack.com/messaging/webhooks) step to send messages to slack.
+
+These will notify of any palo alto system issues that are of critical and or high severity. The alert set up can be found on the Panorama under Device -> log settings.
+
+You can view these alerts under the monitor -> system and filter the criteria with (severity eq high) or (severity eq critical) query on the Panorama and here's a [link](https://hmcts.github.io/ops-runbooks/network/connecting-palos.html#access-panorama-via-app-proxy-no-need-for-vpn) on how to access Panorama's.

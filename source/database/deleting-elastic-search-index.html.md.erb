@@ -1,6 +1,6 @@
 ---
 title: How to delete Elastic Search Index
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-03-19
 review_in: 12 months
 weight: 20
 ---
@@ -59,7 +59,7 @@ Connect to Elastic Search node:
 ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 ```
 
-5) Appliction team may shutter the service
+5) Application team may shutter the service
 
 6) List all indices prior to deletion
 
@@ -89,7 +89,39 @@ For example civil:
 SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 ```
 
-8) Delete the Index
+8) Clone the index (backup incase of rollback)
+
+```
+curl -X PUT "localhost:9200/civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": true
+   }
+ }
+'
+```
+
+```
+curl -X POST "localhost:9200/civil_cases-000001/_clone/cloned-civil_cases-000001?pretty"
+```
+
+Verify the numbers match:
+
+```
+curl --silent localhost:9200/_cat/indices | grep civil_cases-000001 
+```
+
+```
+curl -X PUT "localhost:9200/civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": false
+   }
+ }
+'
+```
+
+9) Delete the Index
 
 For example civil:
 
@@ -97,13 +129,13 @@ For example civil:
 curl -XDELETE localhost:9200/civil_cases-000001;
 ```
 
-9) Application team will Merge CCD Definition File and creating new index.
+10) Application team will Merge CCD Definition File and creating new index.
 
 This step is mandatory even when no changes have been made to the definition file.
 
 This is because we need the new definition file to recreate the index so the following steps can populate it.
 
-10) Re-trigger the indexing of old cases
+11) Re-trigger the indexing of old cases
 
 If AAT is included in the same change then do this first before proceeding to production.
 
@@ -155,7 +187,7 @@ UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civi
 
 Keep increasing the offset until completed.
  
-11) Check the progress of the indexing and overall counts to confirm completion - using another session
+12) Check the progress of the indexing and overall counts to confirm completion - using another session
 
 For example civil:
 
@@ -172,7 +204,7 @@ or
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
 ```
 
-The overall indexing count should be approximatley the same as the overall DB count to confirm when completed:
+The overall indexing count should be approximately the same as the overall DB count to confirm when completed:
 
 ```
 SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
@@ -181,7 +213,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
 If the progress is taking too long check to see if the logstash pods are running on the CCD namespace for CFT AKS cluster and has not crashed with OOM and restarted.
 Check the pod status and logs.
 
-The limits applied above should prevent this from happening so not too many cases are beingn ingested at once.
+The limits applied above should prevent this from happening so not too many cases are being ingested at once.
 
 For example - ccd-logstash-logstash-0. This is an example where the logstash pod crashed due to OOM:
 
@@ -227,10 +259,74 @@ Check logs for pod:
 kubectl logs <logstash pod name> -n ccd
 ```
 
-12) Remove the temp table
+13) Remove the temp table
 
 ```
 DROP TABLE IF EXISTS civil_tmp_<date>;
 ```
 
-13) Application team may unshutter the service.
+14) Remove the cloned index:
+
+```
+curl -XDELETE localhost:9200/cloned-civil_cases-000001;
+```
+
+15) Application team may unshutter the service.
+
+
+### Rollback
+
+If we need to rollback we can use the cloned index from step 8 that was done before deleting the index.  
+
+This will save us a lot of time and risk, where we dont have to a full re-index.
+
+Please ensure that the original index exists and is empty prior to doing the rollback steps (i.e. if you started doing a reindex and then needed to rollback part-way through, you would need to delete the index and have the service import their definition file again to recreate an empty one to clone into)
+
+1) Restore the backed up index:
+
+```
+curl -X PUT "localhost:9200/cloned-civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": true
+   }
+ }
+'
+```
+
+```
+curl -X POST "localhost:9200/cloned-civil_cases-000001/_clone/civil_cases-000001?pretty"
+```
+
+Verify the numbers match:
+
+```
+curl --silent localhost:9200/_cat/indices | grep civil_cases-000001 
+```
+
+2) Set the index alias
+
+
+```
+curl -X POST "localhost:9200/_aliases?pretty" -H 'Content-Type: application/json' -d' { "actions": [ { "add": { "index": "civil_cases-000001", "alias": "civil_cases" } } ] } '
+```
+
+Search to verify:
+
+```
+curl -X GET "localhost:9200/_alias/civil_cases?pretty"
+```
+
+3) Check if any cases need reindexing:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+```
+
+4) Service teams to do a search to verify if it has the correct number of cases.
+
+5) Remove the cloned index:
+
+```
+curl -XDELETE localhost:9200/cloned-civil_cases-000001;
+```

@@ -41,7 +41,7 @@ In the example linked above, we were updating the namespaces that were allowed t
 
 To get neuvector to pick up this change, we had to delete the `admission_control.backup` and `crd.backup` files from the file share.
 
-After deleting the helm release and letting it redploy, the new admission control policy was picked up and we could deploy artifactory again.
+After deleting the helm release and letting it redeploy, the new admission control policy was picked up and we could deploy artifactory again.
 
 The storage accounts these file shares live in can be found in the Azure Portal by searching for `neuvector`. There is a storage account for each environment neuvector is deployed to.
 

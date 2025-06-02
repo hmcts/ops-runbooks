@@ -1,7 +1,7 @@
 ---
 title: Dynatrace Patching Example
 weight: 30
-last_reviewed_on: 2024-02-15
+last_reviewed_on: 2024-09-20
 review_in: 6 months
 ---
 
@@ -10,7 +10,7 @@ review_in: 6 months
 ### Context
 We use the [dynatrace-operator helm chart](https://docs.dynatrace.com/docs/shortlink/release-notes#dynatrace-operator) to deploy our instances of Dynatrace. This supports the rollout and lifecycle management of both Activegate and Oneagent in Kubernetes.
 
-Before patching, you need to [check the latest available version](https://github.com/Dynatrace/dynatrace-operator/releases/). Make sure to read through the [release notes](https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator) between the currrent version and latest, to see if there are any breaking changes, or pre-reqs before an upgrade.
+Before patching, you need to [check the latest available version](https://github.com/Dynatrace/dynatrace-operator/releases/). Make sure to read through the [release notes](https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator) between the current version and latest, to see if there are any breaking changes, or pre-reqs before an upgrade.
 
 For example, when upgrading from 0.12 -> 0.15, there is a note in [0.13 about containerd version required](https://docs.dynatrace.com/docs/whats-new/release-notes/dynatrace-operator/dto-fix-0-13-0). To check this, you can run:
 
@@ -41,7 +41,7 @@ You can see the hash from flux-config here to see if your commit has been picked
 Below, you can see below my revision is yet to be applied, wait for it to be applied before you start checking more closely on the deployment.
 ![](Images/kustomizations.png)
 
-Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running: 
+Once the revision is applied, flux will try to upgrade the HR to pick up the latest version, you can see this by running:
 
 ```bash
 kubectl get hr -n dynatrace
@@ -70,7 +70,7 @@ helm ls -a -n dynatrace
 ```
 
 ### Troubleshooting
-After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dyntrace has fixed this but when the HR would would try to deploy it would still complain about existing reosurces. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
+After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dyntrace has fixed this but when the HR would would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
 
 ```bash
 kubectl delete crds dynakubes.dynatrace.com edgeconnects.dynatrace.com
@@ -84,10 +84,10 @@ You can see attempted revisions/upgrades using helm history:
 ```bash
 helm history dynatrace-operator -n dynatrace
 ```
-In the example, you can see that a timeout occured upgrading from 0.12 to 0.15:
+In the example, you can see that a timeout occurred upgrading from 0.12 to 0.15:
 ![](Images/helm_history.png)
 
-To try this again, you can run the below command to retry the revision which attempted to deploy the ugpraded version, in this case revision 11.
+To try this again, you can run the below command to retry the revision which attempted to deploy the upgraded version, in this case revision 11.
 
 
 ```bash

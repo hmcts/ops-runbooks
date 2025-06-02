@@ -1,6 +1,6 @@
 ---
 title: AKS Scripts
-last_reviewed_on: 2024-02-01
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 weight: 10
 ---
@@ -8,14 +8,24 @@ weight: 10
 # <%= current_page.data.title %>
 
 ## Check Minimum Chart Versions
-This script was created to compare chart versions being used in the cluster with a minimum chart requirement. This will be a useful tool for checking all teams have updated before rebuilding a cluster with a necessary change added to a given chart version.
+
+This script was created to compare chart versions being used in the cluster with a minimum chart requirement.
+
+This will be a useful tool for checking all teams have updated before rebuilding a cluster with a necessary change added to a given chart version.
 
 ### Pre-requisites
 
 - [`jq`](https://stedolan.github.io/jq/download/).
 - [`azure-cli`](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-- [Connect to one of the AKS clusters](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters) before running the script.
+- [Connection to one of the AKS clusters](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
 
 ### Running the script
 
-Make sure to run `az login`, to run the script, clone this repository and switch into the `aks` directory, run `./bin/checkMinimumChartVersions.sh`. The script runs against your current kubectl context, and generates output based on applications running in the cluster.
+Make sure to run `az login`.
+
+To run the script
+
+- Clone this ([Ops Runbook](https://github.com/hmcts/ops-runbooks/blob/893fdcc51ef0ae2045e8e9488c6a54b753560c86/source/aks/bin/checkMinimumChartVersions.sh)) repository and navigate into the `aks/bin` directory
+- From here you can run: `./checkMinimumChartVersions.sh` locally to start the script.
+    - The script runs against your current kubectl context so you must have AKS cluster access!
+    - It will generate output based on applications running in the cluster.

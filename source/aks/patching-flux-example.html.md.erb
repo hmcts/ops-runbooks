@@ -1,7 +1,7 @@
 ---
 title: Flux Patching Example
 weight: 30
-last_reviewed_on: 2024-02-19
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 ---
 
@@ -32,10 +32,10 @@ The generic process can be found on the [Flux website](https://fluxcd.io/flux/in
 
 Make sure to clone the flux repos and enter them on your terminal by running `cd cnp-flux-config` or `cd sds-flux-config`.
 
-The specific command we need to target an environment, e.g, sandbox, is:
+The specific command we need to target an environment, it is recommended to add the `--version` flag at the end as flux will default to your local configuration. e.g, sandbox, is:
 
 ```
-flux install --export > apps/flux-system/sbox/base/gotk-components.yaml
+flux install --export > apps/flux-system/sbox/base/gotk-components.yaml --version v2.4.0
 ```
 
 This command will generate a file containing the latest versions of all the flux components.
@@ -117,7 +117,3 @@ Below is a step by step on how to upgrade flux when there are API changes includ
 4. Test again using commands above.
 5. Upgrade API versions e.g. [HelmRelease](https://github.com/hmcts/sds-flux-config/pull/4133) and [ImageRepository](https://github.com/hmcts/sds-flux-config/pull/4134)
 6. Test all is still working after the upgrade. **NOTE:** You can also apply the API changes only to Plum/Toffee initially to test, before applying to other apps.
-
-
-
-

@@ -1,12 +1,11 @@
 ---
 title: Rebuilding AKS Clusters
-last_reviewed_on: 2024-04-22
+last_reviewed_on: 2025-02-26
 review_in: 12 months
 weight: 35
 ---
 
 # <%= current_page.data.title %>
-
 
 ## Re-building a cluster
 
@@ -18,7 +17,7 @@ To re-build the cluster you need to run the pipeline in a given environment, and
 - [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
 - [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 
-Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu. 
+Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.
 
 Click on **Run** to start the pipeline.
 
@@ -26,11 +25,11 @@ Click on **Run** to start the pipeline.
 
 ### Before deployment of a cluster
 
-- Merge PR to remove a cluster from AGW
+- Merge PR to remove a cluster from Application Gateway
 
 #### After deployment of a cluster
 
-- Add the cluster back into AGW once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
+- Add the cluster back into Application Gateway once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
 
 ## Environment Specific
 
@@ -39,64 +38,78 @@ Click on **Run** to start the pipeline.
 - Change Jenkins to use the other cluster that is not going to be rebuilt
   - [SDS example](https://github.com/hmcts/sds-flux-config/pull/2637)
   - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/7138)
-- If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
+
+If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
+
+You will find the same Environment variables for the PRs shown above in this configuration page:
+
+<img src="Images/jenkins-manual-config.png" alt="jenkins-manual-config" width="200"/>
 
 #### After deployment of a cluster
 
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .
-  - After merging above PR, if Jenkins is not updated [Check Here](https://build.platform.hmcts.net/configure), you MUST manually change Jenkins config to use the other cluster.
-- Swap external DNS active cluster, e.g. [cnp-flux-config#19889](https://github.com/hmcts/cnp-flux-config/pull/19889) 
-- Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service) . [example PR](https://github.com/hmcts/rpe-pdf-service/pull/318)
-  - Check this PR in Jenkins has successfully ran through stage [AKS deploy - preview](https://build.platform.hmcts.net/job/HMCTS_Platform/job/rpe-pdf-service/view/change-requests/job/PR-318/)
-- Send across the comms on #cloud-native-announce channel regarding the swap over to the new preview cluster, see below example annoucenment:-
+  - After merging above PR, **IF** Jenkins is not updated, [check Here](https://build.platform.hmcts.net/configure), you **MUST** manually change Jenkins config to use the other cluster.
+- If it is a preview environment, swap external DNS active cluster, example [PR](https://github.com/hmcts/cnp-flux-config/pull/19889)
+- If it is an AAT Environment, you will need to update the Private DNS record to point to the new cluster
+  - There are 2 locations for this change:
+      - The first is `environments/staging/service-core-compute-aat-internal.yml`, example [PR](https://github.com/hmcts/azure-private-dns/pull/833/).
+      - The second is `environments/staging/aat-platform-hmcts-net.yml`, example [PR](https://github.com/hmcts/azure-private-dns/pull/916/files).
+  - The private DNS entries should be set to the kubernetes internal loadbalancer IP (Traefik).
+  - See [common upgrade](https://hmcts.github.io/ops-runbooks/aks/upgrading-aks-clusters.html#pods-and-hrs-health-checks) steps for how to retrieve the IP address"
+- Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service).
+  - Example [PR](https://github.com/hmcts/rpe-pdf-service/pull/318). Check the PR in Jenkins has successfully run through the stage [AKS deploy - preview](https://build.hmcts.net/blue/organizations/jenkins/HMCTS_j_to_z%2Frpe-pdf-service/detail/PR-843/18/pipeline/217)
+- Send out comms on `#cloud-native-announce` Slack channel regarding the swap over to the new preview cluster, see below example announcement:-
 
-Hi all, Preview cluster has been swapped cft-preview-00-aks.
-Login using:
+  ```text
+  Hi all, Preview cluster has been swapped cft-preview-00-aks.
+  You can log in using:
 
-```command
-az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
-```
+  az aks get-credentials --resource-group cft-preview-00-rg --name cft-preview-00-aks --subscription DCD-CFTAPPS-DEV --overwrite
+  ```
 
-* Delete all ingress on the old cluster to ensure external-dns deletes its existing records:
+- Delete all ingress on the old cluster to ensure external-dns deletes its existing records:
 
-```command
-kubectl delete ingress --all-namespaces -l '!helm.toolkit.fluxcd.io/name,app.kubernetes.io/managed-by=Helm'
-```
+  ```bash
+  kubectl delete ingress --all-namespaces -l '!helm.toolkit.fluxcd.io/name,app.kubernetes.io/managed-by=Helm'
+  ```
 
-* Delete any orphan A records that external-dns might have missed:
+- Delete any orphan A records that external-dns might have missed:
+  - _Replace X.X.X.X with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup_
 
-_Replace X.X.X.X with the loadbalancer IP (kubernetes-internal) of the cluster you want to cleanup_
+##### Private DNS
 
-Private DNS
-
-```command
+```bash
 az network private-dns record-set a list --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name service.core-compute-preview.internal -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+
 az network private-dns record-set a list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?aRecords[0].ipv4Address=='X.X.X.X'].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set a delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
 ```
 
-Deletes any txt records pointing to inactive:
+##### Delete any TXT records pointing to inactive
 
 ```bash
 # Private DNS
 az network private-dns record-set txt list --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network private-dns record-set txt delete --zone-name preview.platform.hmcts.net -g core-infra-intsvc-rg --subscription DTS-CFTPTL-INTSVC --yes --name {}
+
 # Public DNS
 az network dns record-set txt list --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --query "[?contains(txtRecords[0].value[0], 'inactive')].[name]" -o tsv | xargs -I {} -n 1 -P 8 az network dns record-set txt delete --zone-name preview.platform.hmcts.net -g reformmgmtrg --subscription Reform-CFT-Mgmt --yes --name {}
 ```
 
-Once swap over is fully complete then delete the old cluster:
+Once the swap over is fully complete then you can delete the old cluster
 
-* Comment out the inactive preview cluster. [Example PR](https://github.com/hmcts/aks-cft-deploy/pull/485). Once PR has been approved and merged run [this pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+- Comment out the inactive preview cluster.
+  - Example [PR](https://github.com/hmcts/aks-cft-deploy/pull/485).
+- Once the PR has been approved and merged run this [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
 
 ### Perftest
 
-### Before deployment of a cluster
+#### Before deployment of a cluster
 
-- Confirm that the environment is not being used with Nickin Sitaram before starting. 
+- Confirm that the environment is not being used with Nickin Sitaram before starting.
 - Use slack channel pertest-cluster for communication.
-- Scale the number of active nodes, increase by 5 nodes if removing a custer. 
+- Scale the number of active nodes, increase by 5 nodes if removing a cluster.
   Reason for this CCD and IDAM will auto-scale the number of running pods when a cluster is taken out of service for a upgrade.
 
-### After deployment of a cluster
+#### After deployment of a cluster
 
 - Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
 
@@ -105,8 +118,8 @@ Once swap over is fully complete then delete the old cluster:
 ### Neuvector
 
 1. `admission webhook "neuvector-validating-admission-webhook.neuvector.svc" denied the request:`, these alerts can be seen on `aks-neuvector-<env>` slack channels
-   - This happens when neuvector is broken. 
-   - Check events and status of neuvector helm release. 
+   - This happens when neuvector is broken.
+   - Check events and status of neuvector helm release.
    - Delete Neuvector Helm release to see if it comes back fine.
 2. Neuvector fails to install.
    - Check if all enforcers come up in time, they could fail to come if nodes are full.
@@ -121,14 +134,18 @@ For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not 
 
 Dynatrace Helm Chart [requires](https://github.com/Dynatrace/helm-charts/blob/3c6ac8e9d9d62c1925e79f3fbd93e6be9af1bbea/dynatrace-oneagent-operator/chart/default/app-readme.md#additional-instructions) CRDs to be applied before installing the chart. The CRDs currently need to be manually applied as they are not part of the existing Flux config.
 
-Run the below command on the cluster. An empty result confirms CRDs are not installed. 
+Run the below command on the cluster. An empty result confirms CRDs are not installed.
 
 `kubectl get crds | grep oneagent`
 
 To fix, run the below command to apply CRDs to the cluster:
 
-`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml`  
+```bash
+kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagents.yaml
+```
 
-`kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml `
+```bash
+kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releases/latest/download/dynatrace.com_oneagentapms.yaml
+```
 
-**Note**: A Flux config to apply the CRDs was previously tested ([PR14321](https://github.com/hmcts/cnp-flux-config/pull/14312)) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7
+<%= warning_text('A Flux config to apply the CRDs was previously [tested](https://github.com/hmcts/cnp-flux-config/pull/14312) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7') %>

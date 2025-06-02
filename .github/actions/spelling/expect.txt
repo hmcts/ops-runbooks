@@ -52,6 +52,7 @@ mdv
 MDVADMVPNHA
 Moj
 myregistry
+nodelocaldns
 NONLINE
 NSGs
 paramatised

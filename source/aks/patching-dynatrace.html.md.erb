@@ -72,8 +72,16 @@ helm ls -a -n dynatrace
 ### Troubleshooting
 After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dyntrace has fixed this but when the HR would would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
 
+If the helm release fails to install, you can check the kustomize pods logs and grep for dynatrace, you might mind for example that it cannot find the webhook. The following commands have been used to work around this.
+
+First delete the CRDs, use Helm to install the HR pointing to the image on our repository to pull values and then reconcile Flux.
+
 ```bash
 kubectl delete crds dynakubes.dynatrace.com edgeconnects.dynatrace.com
+
+helm upgrade dynatrace-operator dynatrace/dynatrace-operator --install --version 1.5.1 --set imageRef.repository=hmctspublic.azurecr.io/imported/dynatrace/dynatrace-operator
+
+flux reconcile kustomization dynatrace -n flux-system
 ```
 
 If the upgrade is failing, you will see an error when the pods are starting up, or in the events of the namespace. You should revert your upgrade PR and look into those logs to see what other changes may be needed.

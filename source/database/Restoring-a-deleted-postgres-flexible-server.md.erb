@@ -9,8 +9,8 @@ weight: 30
 
 You can find detailed instructions on restoring a dropped Postgres flexible server instance [here](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-restore-dropped-server).
 
-1. Open the resource group that contained the dropped server. In the activity log, you should see the activity of the dropps server. This will contain info you will need like sourceServerResourceId and DelegatedSubnetResourceId.
-2. Open the microsoft page on [restoring a dropped server](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-restore-dropped-server).
+1. Open the resource group that contained the dropped server. In the activity log, you should see the activity of the resource being deleted. This contains the info you will need like sourceServerResourceId and DelegatedSubnetResourceId.
+2. Open the microsoft guide on [restoring a dropped server](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-restore-dropped-server).
 3. Click the green try it button under creates a new server
 
 ![flexibleserver](images/postgressql-flexibleserver-create.png)
@@ -37,6 +37,6 @@ You can find detailed instructions on restoring a dropped Postgres flexible serv
     }
   }
     ```
-Note: You may need to select 10 minutes BEFORE the deletion as pointInTimeUTC
+Note: You may need to select 10 minutes BEFORE the deletion point as pointInTimeUTC
 
 7. After hitting run you should see a 201 response. It is worth noting the servers can take several minutes to appear in the resource group, in some cases even after the activity log shows a failed job.

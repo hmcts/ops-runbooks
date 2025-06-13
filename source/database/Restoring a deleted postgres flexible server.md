@@ -11,11 +11,17 @@ You can find detailed instructions on restoring a dropped Postgres flexible serv
 
 ## Grabbing the JSON
 
-1. Open the resource group that contained the dropped server and grab the JSON from the activity log.
-2. Open the microsoft page on restoring a dropped server.
+1. Open the resource group that contained the dropped server. In the activity log, you should see the activity of the dropps server. This will contain info you'll need like sourceServerResourceId and DelegatedSubnetResourceId.
+2. Open the microsoft page on [restoring a dropped server](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-restore-dropped-server).
 3. Click the green 'try it' button under 'creates a new server'
+
+![Example token](images/postgressql-flexibleserver-create.png)
+
 4. Sign into your account and select the tenant
 5. Enter the resourceGroupName, serverName, and select the subscriptionId (all this info will be in the json you grabbed earlier.).
+
+![Example token](images/postgres-restapi.png)
+
 6. Under  body, you will need to include a payload similar to:
 
     ``` {

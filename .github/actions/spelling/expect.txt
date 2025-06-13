@@ -24,13 +24,18 @@ CVP
 Dac
 datacentre
 Datlassian
+DBfor
 deevanapalli
 devrot
 dockerfiles
+dropps
 dsl
 EDB
 Enda
 Eyetan
+ffff
+ffffffff
+ffffffffffff
 geolocationfile
 GEOLOCATIONUPDATES
 Glust
@@ -60,6 +65,7 @@ pmd
 prd
 PRDATL
 prepatch
+privatednszonename
 privatekeyfilename
 PRX
 pvc
@@ -88,6 +94,7 @@ tns
 toset
 totp
 TTLs
+Txx
 utilisation
 Virtualbox
 virtualwan

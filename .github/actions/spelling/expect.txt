@@ -28,7 +28,6 @@ DBfor
 deevanapalli
 devrot
 dockerfiles
-dropps
 dsl
 EDB
 Enda

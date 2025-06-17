@@ -1,0 +1,74 @@
+---
+title: Flux Github App Authentication
+last_reviewed_on: 2025-06-17
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+In version 2.5.0 of Flux, an option to [authenticate using GitHub App](https://fluxcd.io/blog/2025/04/flux-operator-github-app-bootstrap/#github-app-docs) was introduced and this is what we migrated to
+from SSH deploy keys.
+
+The advantage of using GitHub App over SSH Deploy keys is that SSH keys require manual rotation when they expire.  
+
+Meanwhile GitHub App authentication secret does not expire and offers more options when it comes to permissions - GitHub App can have various levels of access to all or selected repositories rather then just one.
+
+## Creating the GitHub App
+
+Should you need to create GitHub App to be used for Flux - GitHub authentication, you will need to sign in to GitHub using the central [`HMCTS Platform Operations account`](http://localhost:4567/azure-pipelines/github-sso.html#which-account-are-pats-created-under).
+
+Once signed in go to `Settings` and make sure you have switched the context to HMCTS Organisation rather than `hmcts-platform-operations` personal account.
+
+1. Click on `Developer Settings` on the bottom left and select `GitHub Apps` then `New GitHub App`.
+2. Add appropriate name and description, you can follow existing naming convention:
+  - SDS-Flux-Controller-`Environment` e.g. SDS-Flux-Controller-Sbox
+  - CFT-Flux-Controller-`Environment` e.g. CFT-Flux-Controller-Ptl
+3. Set homepage to `https://github.com/hmcts`.
+4. Uncheck `Expire user authorization tokens`.
+5. Uncheck `Active` under the `Webhook` section.
+6. In `Permissions` section, if there is no Flux Image Automation Controller running on the environment that you are creating the app for (that is, there is no need to make writes) set following:
+  - Administration: Read-only
+  - Contents: Read-only
+  - Metadata: Read-only (this is mandatory and will be pre-set)
+7. For environments where Flux will need to make writes set `Contents` to `Read and Write`.
+8. Set `Only on this account` under `Where can this GitHub App be installed?` section.
+
+## Installing the GitHub App
+
+Once you have created the App you will need to install it within the [HMCTS Organisation](https://github.com/hmcts).
+
+1. Still signed in as a `HMCTS Platform Operations account` and with the `HMCTS context selected` go to `Developer Settings` then `GitHub Apps`
+2. Find your app and click on it
+3. Under `General` tab scroll down and click `Generate a private key`, your browser should download a `.pem` file and you should see a new Private key entry with SHA signature under `Private keys` section
+
+> ⚠️ **Note:** If you accidentally created the GitHub App in the wrong namespace you can always transfer it to the HMCTS Organisation, this option is available in the `Advanced` tab.  
+Keep in mind that if you already installed the app in the wrong namespace then the app will be uninstalled and you will need to install it again in HMCTS Organisation.  
+This means that the `App Installation ID` will change, while the `App ID` and the `Private Key` will remain the same.
+
+## GitHub App credentials
+
+Flux GitRepository needs following secrets for the image and automation controllers to successfully authenticate with GitHub:
+
+- githubAppID
+- githubAppInstallationID
+- githubAppPrivateKey
+
+You can read more [about this here](https://fluxcd.io/flux/components/source/gitrepositories/#github).
+
+## Storing credentials in the Azure Key Vault
+
+Identify the key vault that your environment is using to [create the GitHub App secret during Flux Bootstrapping](https://github.com/hmcts/aks-sds-deploy/blob/master/bootstrap/create-github-app-secret.sh#L7).  
+At the moment this is statically defined within AKS-CFT-Deploy and dynamically within AKS-SDS-Deploy, in each case you should be able to find the correct value in either pipeline config or output.
+
+Once you have obtained all the GitHub App secrets stored them as secrets in the Key Vault:
+
+- githubAppID under `flux-github-app-id`
+- githubAppInstallationID under `flux-github-app-id`
+- githubAppPrivateKey under `flux-github-app-id`
+
+You can follow these instructions 
+
+
+
+

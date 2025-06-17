@@ -1,0 +1,159 @@
+---
+title: Flux Key Vault Credentials
+last_reviewed_on: 2025-06-17
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+We have scripts in our [AKS-CFT-Deploy](https://github.com/hmcts/aks-cft-deploy/) and [AKS-SDS-Deploy](https://github.com/hmcts/aks-sds-deploy/) repositories that read the GitHub App credentials (in the past this used to be SSH keys) from a Key Vault and use them to create a secret on our AKS clusters.
+
+This secret is what allows the flux controllers on the cluster to sync with GitHub.
+
+You can see the commands in the script [here](https://github.com/hmcts/aks-sds-deploy/blob/master/bootstrap/create-github-app-secret.sh).
+
+The script looks for a three credentials stored in secrets called `flux-github-app-id`, `flux-github-app-installation-id` and `flux-github-app-priv-key`.
+
+If you have created a new GitHub App or its credentials have changed, make sure you update the secrets in the relevant keyvault.
+
+To make sure that the private key is stored in the correct format, you should use the Azure CLI as the portal can sometimes mess up how the key looks.
+
+Use this commands: 
+
+```
+az keyvault secret set -f <path to private key> --vault-name <key vault name> --name flux-github-app-priv-key
+```
+
+For plain text credentials you can use following commands:
+
+```
+az keyvault secret set --value <GITHUB_APP_ID> --vault-name <KEY_VAULT_NAME> --name flux-github-app-id
+az keyvault secret set --value <GITHUB_APP_INSTALLATION_ID> --vault-name <KEY_VAULT_NAME> --name flux-github-app-installation-id
+```
+
+For SDS, the keyvault should be named based on the subscription ID e.g. `cabcdefg12345678kv`, for SDS these are defined in the ADO config.
+
+## Saving the credentials in code - encrypted
+
+<%= warning_text('This only applies to SDS currently') %>
+
+The GitHub App credentials are also saved in code so that we can update them after bootstrapping, should they need to be changed.
+
+You can find them under the flux-system namespace, in each environment folder under the base folder. For example:
+
+`/apps/flux-system/sbox/base` in [sds-flux-config](https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/base/github-app-credentials.enc.yaml)
+
+If you need to update these, you must first decrypt them using SOPS.
+
+<%= warning_text('You are about to decrypt a secret! Make sure you do not push an unencrypted version of a secret to GitHub!!') %>
+
+```
+sops --decrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/github-app-credentials.enc.yaml
+```
+
+You can find the key vault name and version id in the encrypted version of the file.
+
+Now you have the decrypted version, you need to add the new values.
+
+You will notice the values are base64 encoded. You need to get the new value and encode it in base64.
+
+You can do this by using the cat command:
+
+```
+cat /path/to/github-app-private-key | base64
+```
+
+For simple values like `githubAppID` and `githubAppInstallationID` you can use echo: 
+
+```
+echo <GITHUB_APP_ID> | base64
+```
+
+Now take the updated value and place it under the appropriate key.
+
+- githubAppID
+- githubAppInstallationID
+- githubAppPrivateKey
+
+Your file should now look something like this:
+
+```
+apiVersion: v1
+data:
+    githubAppID: <base64 encoded string>
+    githubAppInstallationID: <base64 encoded string>
+    githubAppPrivateKey: <base64 encoded string>
+kind: Secret
+metadata:
+    name: github-app-credentials
+    namespace: flux-system
+type: Opaque
+```
+
+Now you must re-encrypt it using SOPS:
+
+```
+sops --encrypt --azure-kv https://<key-vault-name>.vault.azure.net/keys/sops-key/<version id> --encrypted-regex "^(data|stringData)$" --in-place apps/flux-system/sbox/base/github-app-credentials.enc.yaml
+```
+
+Once encrypted the values should no longer be visible and start with `ENC[AES256_GCM]`.
+
+<%= warning_text('Make sure you have encrypted all secrets before pushing to GitHub!') %>
+
+Now you can push your changes to your branch.
+
+You should remove all keys and credentials from your local machine once you've added them to GitHub, code and key vault.
+
+## SSH deploy key specific instructions
+
+For SSH deploy keys, the same instructions can be followed but simply replace the Key Vault secret names with SSH equivalents:
+
+- `flux-ssh-git-key-private`
+- `flux-ssh-git-key-public`
+
+Encrypted SSH secrets are currently stored in `/flux-system/env/base/git-credentials.enc.yaml` for each environment, for example: [sbox/base/git-credentials.enc.yaml](https://github.com/hmcts/sds-flux-config/blob/master/apps/flux-system/sbox/base/git-credentials.enc.yaml)
+
+- Private key is stored under `identity` value
+- Public key is stored under `identity.pub` value
+- The `known_hosts` value is public and does not usually change. you can find the latest one on GitHub's [website](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)
+
+The SSH secret file before re-encryption should look like this:
+
+```
+apiVersion: v1
+data:
+    identity: <base64 encoded string>
+    identity.pub: <base64 encoded string>
+    known_hosts: <base64 encoded string>
+kind: Secret
+metadata:
+    name: git-credentials
+    namespace: flux-system
+type: Opaque
+```
+
+
+## Revoking GitHub App
+
+To revoke access when using GitHub App authentication you can simply generate new `Private Key` then delete the old one.
+
+To revoke old tokens and force immediate re-authentication into the app you can press `Revoke all user tokens` from the `GitHub App` > `General` settings page.
+
+You can also delete the app entirely if needed.
+
+## Revoking a deploy key
+
+In case where SSH key is still being used for Flux authentication and it needs to be revoked so it can no longer be use, it will need to be deleted from the relevant repository.
+
+Go to the settings of your repo and then go to `Deploy keys`, find the key you need to revoke and click `Delete`.
+
+The key should no longer be able to be used.
+
+You can check the fingerprint of a key you have locally by running:
+
+```
+sh-keygen -l -E sha256 -f /path/to/public/key
+```
+
+Compare this to the one shown on the `Deploy keys` page to match a local version to the version stored in GitHub.

@@ -41,6 +41,10 @@ Once you have created the App you will need to install it within the [HMCTS Orga
 1. Still signed in as a `HMCTS Platform Operations account` and with the `HMCTS context selected` go to `Developer Settings` then `GitHub Apps`
 2. Find your app and click on it
 3. Under `General` tab scroll down and click `Generate a private key`, your browser should download a `.pem` file and you should see a new Private key entry with SHA signature under `Private keys` section
+4. Click on `Install App` on the left then click `Install`
+5. You will be asked where you want to install the app
+ - Select all repositories if the App has `Read-only` access on `Contents`
+ - Select corresponding flux-config repository if the app has `Read and Write` access on contents and will be used by Flux Image Automation Controller to update versions
 
 > ⚠️ **Note:** If you accidentally created the GitHub App in the wrong namespace you can always transfer it to the HMCTS Organisation, this option is available in the `Advanced` tab.  
 Keep in mind that if you already installed the app in the wrong namespace then the app will be uninstalled and you will need to install it again in HMCTS Organisation.  
@@ -54,20 +58,68 @@ Flux GitRepository needs following secrets for the image and automation controll
 - githubAppInstallationID
 - githubAppPrivateKey
 
-You can read more [about this here](https://fluxcd.io/flux/components/source/gitrepositories/#github).
+App ID can be obtained from it's settings page: `Developer settings` > `GitHub Apps` > `Your App` > `App ID`
+
+Installation ID can be obtained from installation url: `Third party Access` > `GitHub Apps` > `Your App` > `Configure` > Copy the ID at the end of the url `https://github.com/organizations/hmcts/settings/installations/this-will-be-the-id`
+
+Private key was downloaded when you generated it earlier.
+
+You can read [more about these credentials here](https://fluxcd.io/flux/components/source/gitrepositories/#github).
 
 ## Storing credentials in the Azure Key Vault
 
 Identify the key vault that your environment is using to [create the GitHub App secret during Flux Bootstrapping](https://github.com/hmcts/aks-sds-deploy/blob/master/bootstrap/create-github-app-secret.sh#L7).  
 At the moment this is statically defined within AKS-CFT-Deploy and dynamically within AKS-SDS-Deploy, in each case you should be able to find the correct value in either pipeline config or output.
 
-Once you have obtained all the GitHub App secrets stored them as secrets in the Key Vault:
+Once you have obtained all the GitHub App secrets, store them as secrets in the Key Vault:
 
 - githubAppID under `flux-github-app-id`
 - githubAppInstallationID under `flux-github-app-id`
 - githubAppPrivateKey under `flux-github-app-id`
 
-You can follow these instructions 
+[Follow these instructions](./flux-key-vault-creds.html) if you need a guide on how to store them.
+
+## Image Automation Controller
+
+<%= warning_text('Image Automation controller needs unhindered write permissions on the flux-config repository in order to push commits with new versions.') %>
+
+- Make sure that the GitHub App you created has `Read and Write` on `Contents`
+- Ensure that the App is installed in the HMCTS organisation space (or other relevant space where the repository is located instead of a user account).
+- Standard branch protection rules on the repository will block the controller from pushing the commits.
+
+If both `Require a pull request before merging` and `Require status checks to pass before merging` are enabled
+then you will need to migrate the repo from branch protection rule to `Rulesets`.
+This is because there is no way to add an exclusion for the App for both of these restrictions.
+
+### Pull request bypass
+
+To allow flux to bypass rull request requirement (only works if status checks are NOT enabled):
+
+- Go to your flux-config repo and click `Settings` > `Branches` > `Branch protection rules`
+- Click `Allow specified actors to bypass required pull requests`
+- Search for the name of your GitHub App and add it
+
+### Migrating to ruleset
+
+To migrate from `Branch protection rule` to `Ruleset`:
+
+1. Go to your flux-config repo and click `Settings` > `Branches` > `Rules` > `Rulesets`
+2. Click `New ruleset` > `New branch ruleset`
+3. Add appropriate name such as "Master branch"
+4. Under `Bypass list` click `Add bypass` then search for your app and add it
+5. Make sure that the bypass is set to `Always allow` and not `For pull requests only`
+6. Under `Target branches` click `Add target` > `Include by pattern` > Enter "master"
+7. In `Branch rules` section copy the rules that already exist in the branch protection rule you are migrating
+8. Finally change the `Enforcement status` to `Active`. Alternatively if you would like to test what the ruleset, you can set enforcement to `Evaluation` then observe what would happen under `Insights`
+
+Typically the branch rules are:
+
+ - Enable `Require a pull request before merging`
+ - Set `required approvals` set to 1
+ - Enable `Require review from Code Owners`
+ - Enable `Require status checks to pass`
+ - Add the same status checks that were set in branch protection rule
+ - Enable `Block force pushes`
 
 
 

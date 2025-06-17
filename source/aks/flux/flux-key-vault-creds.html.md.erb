@@ -19,26 +19,26 @@ If you have created a new GitHub App or its credentials have changed, make sure 
 
 To make sure that the private key is stored in the correct format, you should use the Azure CLI as the portal can sometimes mess up how the key looks.
 
-Use this commands: 
+Use this command: 
 
 ```
 az keyvault secret set -f <path to private key> --vault-name <key vault name> --name flux-github-app-priv-key
 ```
 
-For plain text credentials you can use following commands:
+For simple credentials you can use following commands:
 
 ```
 az keyvault secret set --value <GITHUB_APP_ID> --vault-name <KEY_VAULT_NAME> --name flux-github-app-id
 az keyvault secret set --value <GITHUB_APP_INSTALLATION_ID> --vault-name <KEY_VAULT_NAME> --name flux-github-app-installation-id
 ```
 
-For SDS, the keyvault should be named based on the subscription ID e.g. `cabcdefg12345678kv`, for SDS these are defined in the ADO config.
+For SDS, the keyvault should be named based on the subscription ID e.g. `cabcdefg12345678kv`, for CFT these are defined in the ADO config.
 
 ## Saving the credentials in code - encrypted
 
-<%= warning_text('This only applies to SDS currently') %>
+<%= warning_text('This currently only applies to SDS') %>
 
-The GitHub App credentials are also saved in code so that we can update them after bootstrapping, should they need to be changed.
+GitHub App credentials are also saved in code so that we can update them after bootstrapping, should they need to be changed.
 
 You can find them under the flux-system namespace, in each environment folder under the base folder. For example:
 
@@ -138,13 +138,13 @@ type: Opaque
 
 To revoke access when using GitHub App authentication you can simply generate new `Private Key` then delete the old one.
 
-To revoke old tokens and force immediate re-authentication into the app you can press `Revoke all user tokens` from the `GitHub App` > `General` settings page.
+To revoke old tokens and force immediate re-authentication into the app you can click `Revoke all user tokens` from the `GitHub App` > `General` settings page.
 
 You can also delete the app entirely if needed.
 
 ## Revoking a deploy key
 
-In case where SSH key is still being used for Flux authentication and it needs to be revoked so it can no longer be use, it will need to be deleted from the relevant repository.
+In case where SSH key is still being used for Flux authentication and it needs to be revoked so it can no longer be used, it will need to be deleted from the relevant repository.
 
 Go to the settings of your repo and then go to `Deploy keys`, find the key you need to revoke and click `Delete`.
 

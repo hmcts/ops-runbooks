@@ -41,6 +41,12 @@ Select TCP/IP from the menu and scroll down to the Configure IPv6 section. Chang
 Click Ok and try to connect the F5 VPN again.
 
 
+### Start VPN Fails
+When the VPN button is press, the pop up window will become stuck at Initializing.
+
+1). The browser session may have become stale. Log out of the F5 portal, close the browser and try again.
+2). The WAN Miniport (IP) or Virtual Adapter has been corrupted and/or tampered with. Resolve the issue by uninstaling the F5 VPN client software and reinstalling it.
+
 ### DNS Configuration
 Users have reported problems when using the F5 VPN if another VPN is also active. Such as MoJs Global Protect VPN. Turning off the unrequired VPN, will resolve the issue.
 By opening a terminal on the mac and using the command 'scutil --dns' the local DNS configuration can be seen.

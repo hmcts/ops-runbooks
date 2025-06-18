@@ -1,0 +1,40 @@
+---
+title: Connecting to Azure Cache for Redis
+last_reviewed_on: 2025-06-18
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+Quick guide on how to connect to Azure Cache for Redis using the redis-cli command line tool:
+
+Within Azure Cache for Redis Azure portal service - seach for the required service (for example adoption-web-session-storage-prod).
+
+select private endpoint > enable public network access
+
+Firewall > find my ip address and add it.
+
+Disable VPN and open local terminal session.
+
+Get details from the azure portal such as properties and access keys, etc.
+
+Test connection from your local terminal session:
+
+```cmd
+telnet <service>.redis.cache.windows.net 6380
+
+For example:
+telnet adoption-web-session-storage-prod.redis.cache.windows.net 6380
+```
+
+Run the following command from your local terminal session to access the Redis CLI:
+
+```cmd
+redis-cli --tls -u 'rediss://%%access key@<service>.redis.cache.windows.net:6380'
+
+For example:
+redis-cli --tls -u 'rediss://%%access key@adoption-web-session-storage-prod.redis.cache.windows.net:6380'
+```
+
+When finished disable the public network access.

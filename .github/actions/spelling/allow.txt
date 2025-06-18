@@ -296,6 +296,7 @@ irqbalance
 Islam
 ithc
 itnext
+ITSM
 jattach
 javascripts
 javatester
@@ -517,6 +518,7 @@ recordsets
 redcarpet
 redhat
 RedHat
+rediss
 refactorings
 referenceid
 reformmgmtrg

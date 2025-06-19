@@ -32,3 +32,27 @@ GRANT ${single_server_user} TO ${flexible_server_user};
 
 **Note:** If the single server user is in the format `am@am-org-role-mapping-service-postgres-db-v11-aat` use `am`.
 
+### Unable to login with DTS JIT xx DB Reader SC
+
+After migrating the data from Single Server to Flexible Server, the team may find that they are unable to sign into the new Flexible Server database using the JIT role. In this case, it's likely that the user did not get created during the migration.
+
+Teams can raise a PR to trigger the script that will create the role and assign appropriate permissions. Here are some useful links:
+
+* [Example Pull Request](https://github.com/hmcts/am-org-role-mapping-service/pull/1877/files)
+* [Script](https://github.com/hmcts/terraform-module-postgresql-flexible/blob/master/set-postgres-permissions.bash)
+
+If after the pipeline runs, teams are still unable to log in with the JIT role, they can view the output from their tf apply stage which should give them some idea of what went wrong. An example of this, would be if the team has set an incorrect value for `product` in their infrastructure code. This value is used to determine the name of the JIT role to be created, so if this is wrong it won't be able to create the role.
+
+* Example Error - `ERROR:  Could not validate AAD user DTS JIT Access rd-judicial-ref-api DB Reader SC because its name is not found in the tenant.`
+* [Example Fix](https://github.com/hmcts/rd-judicial-api/pull/798/files)
+
+### DTS JIT xx DB Reader SC does not have correct permissions
+
+Once able to login with the JIT role, teams should confirm they have appropriate permissions by running a simple select query. If they get a permission denied error, you can run the following commands to grant permissions:
+
+```sql 
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO "DTS JIT Access rd DB Reader SC";
+GRANT USAGE ON SCHEMA public TO "DTS JIT Access rd DB Reader SC";
+```
+
+**NOTE:** The above commands will need to be run against any additional schemas that are in use.

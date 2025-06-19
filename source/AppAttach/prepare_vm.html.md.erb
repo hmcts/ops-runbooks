@@ -1,6 +1,6 @@
 ---
 title: Configuring App Attach
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 20
 ---
@@ -47,7 +47,7 @@ The following powershell will download everything from the connected file share,
 New-Item -Path "C:\AppAttach" -ItemType Directory
 Set-Location "C:\AppAttach"
 
-# Copy contents of file shre to local directory
+# Copy contents of file share to local directory
 # powershell scripts will need to be local in order to be ran
 # MSIX packages will need to be local in order to be mounted
 Get-ChildItem -Path "Z:\" -Recurse | Copy-Item -Destination "C:\AppAttach"
@@ -106,7 +106,7 @@ Dismount-DiskImage -ImagePath C:\Path\To\Your\DiskImage.vhdx
 
 ### MsixJunction
 
-Leave "msixJunction" as-is. This is the temporary directory we will be junctioning all our packages to.
+Leave "msixJunction" as-is. This is the temporary directory we will be junction all our packages to.
 
 ### VhdFilename
 
@@ -170,7 +170,7 @@ Destaging should be done at shutdown, again by a system account someone with adm
 
 Registering should be performed by the user account we want to have access to the application. There is a built-in trigger for connecting to a remote session that we can use to register the package just before they log on.
 
-Similarly, deregistering should be performed by the same user account. There is a corresponding built-in trigger for disconnecting from a remote session that we can use to de-register the package when they disconnect. It's important to note that this will not deregister the application if the user selects 'Sign out' instead of 'Disconnect' from the start menu. However, seeing as signing out terminates any processes the user is running, we do not anticipate this being a problem.
+Similarly, de-registering should be performed by the same user account. There is a corresponding built-in trigger for disconnecting from a remote session that we can use to de-register the package when they disconnect. It's important to note that this will not deregister the application if the user selects 'Sign out' instead of 'Disconnect' from the start menu. However, seeing as signing out terminates any processes the user is running, we do not anticipate this being a problem.
 
 ### Win32 API
 
@@ -237,7 +237,7 @@ $appAttachFolder.RegisterTaskDefinition("Destage 7-Zip Package", $shutdownTask, 
 Here, we'll go over adding the register and de-register steps for a specific user in the Task Scheduler.
 
 1) Create a New Task
- 
+
 Open Task Scheduler and click 'Create Task' in the right-hand panel.
 
 Fill out a suitable name and description.
@@ -280,13 +280,13 @@ When you've added all the actions you want, click 'OK'.
 
 4) Create the Deregister Task
 
-The deregister task will be largely identical to the register task, only you'll want to set the trigger to 'On disconnect from ser session' and specify the 'AppattachDeregister' script in the action arguments.
+The deregister task will be largely identical to the register task, only you'll want to set the trigger to 'On disconnect from set session' and specify the 'AppattachDeregister' script in the action arguments.
 
 ![](images/Task3.png)
 
 ## Verify
 
-Run the stage task in the task scheduler manually. If all goes well, you should see 'The last operation mpleted successfully. (0x0)' under the 'Last Run Result' column.
+Run the stage task in the task scheduler manually. If all goes well, you should see 'The last operation completed successfully. (0x0)' under the 'Last Run Result' column.
 
 Check the `C:\Temp\AppAttach` directory to see if your package junction is present. If it is, this means the staging was successful.
 

@@ -1,0 +1,148 @@
+---
+title: Client Troubleshooting
+last_reviewed_on: 2025-01-15
+review_in: 6 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+[F5 Administrator Guide](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1843333108)
+
+## Windows 
+
+While it is possible to install the F5 client software on Windows computers, local administrator permissions are required to complete the process.
+Problems with DNS name resolution will be encountered by non-admin users.
+
+[Link for more info](https://my.f5.com/manage/s/article/K32311645#link_01_01)
+
+
+## MacOS
+
+Check for an update of the VPN client software. If the VPN client software is not up to date, the VPN client may not work correctly.
+When connecting to the F5 portal, the VPN client software will check for updates. If an update is available, the software will prompt you to install the update.
+
+If you dont have local admin access but own an MoJ MacBook Pro, you will need to access the package from the MoJ D&T Self Service portal.  Search for F5 VPN and install. Please note this will say update, if you have already installed from here. 
+
+<img src=../images/f5_agent_installer.png width="400">
+
+### Start Inspection Fails
+If the F5 VPN client fails to start inspection, the following error message will be displayed:
+
+<img src=../images/f5_EndpointInspectorFails.png width="400">
+
+This error is caused by the F5 VPN client not being able to start the inspection process. The inspection process is required to ensure that the client is compliant with the security policies of the VPN. 
+
+Your local routers IPv6 configuration may be causing the issue. To resolve the issue, you will need to ignore the IPv6 on your local router.
+Open the operating system System Settings, WiFi and select Details of your connection.
+
+Select TCP/IP from the menu and scroll down to the Configure IPv6 section. Change the setting to Link-local only.
+
+Click Ok and try to connect the F5 VPN again.
+
+
+### Start VPN Fails
+When the VPN button is press, the pop up window will become stuck at Initializing.
+
+1). The browser session may have become stale. Log out of the F5 portal, close the browser and try again.
+2). The WAN Miniport (IP) or Virtual Adapter has been corrupted and/or tampered with. Resolve the issue by uninstalling the F5 VPN client software and reinstalling it.
+
+### DNS Configuration
+Users have reported problems when using the F5 VPN if another VPN is also active. Such as MoJs Global Protect VPN. Turning off the unrequired VPN, will resolve the issue.
+By opening a terminal on the mac and using the command 'scutil --dns' the local DNS configuration can be seen.
+
+
+
+### Example of just Global Protect and F5 VPN
+Notice the nameserver[0] : 100.64.9.0
+
+#### DNS configuration
+
+```bash
+resolver #1
+  search domain[0] : alpha.vpn.justice.gov.uk
+  search domain[1] : a03.wp360g.svcs.hp.com
+  search domain[2] : database.windows.net
+  search domain[3] : hmcts.net
+  search domain[4] : internal
+  search domain[5] : platform.hmcts.net
+  search domain[6] : postgres.database.azure.com
+  search domain[7] : private.postgres.database.azure.com
+  search domain[8] : privatelink.blob.core.windows.net
+  search domain[9] : privatelink.database.windows.net
+  search domain[10] : privatelink.dev.azuresynapse.net
+  search domain[11] : privatelink.dfs.core.windows.net
+  search domain[12] : privatelink.postgres.database.azure.com
+  search domain[13] : privatelink.redis.cache.windows.net
+  search domain[14] : privatelink.servicebus.windows.net
+  search domain[15] : privatelink.sql.azuresynapse.net
+  search domain[16] : privatelink.vaultcore.azure.net
+  search domain[17] : reform
+  search domain[18] : reform.hmcts.net
+  nameserver[0] : 100.64.9.0
+  service_identifier : 2
+  flags    : Supplemental, Request A records
+  reach    : 0x00000002 (Reachable)
+  order    : 103000
+
+resolver #2
+  nameserver[0] : 100.64.9.0
+  flags    : Request A records
+  reach    : 0x00000002 (Reachable)
+  order    : 50000
+```
+
+### Example of just F5 VPN
+Notice the WiFi nameserver[0] : 8.8.4.4 and then the F5   nameserver[0] : 10.11.75.4, nameserver[1] : 168.63.129.16
+
+#### DNS configuration
+
+```bash
+resolver #1
+  search domain[0] : database.windows.net
+  search domain[1] : hmcts.net
+  search domain[2] : internal
+  search domain[3] : platform.hmcts.net
+  search domain[4] : postgres.database.azure.com
+  search domain[5] : private.postgres.database.azure.com
+  search domain[6] : privatelink.blob.core.windows.net
+  search domain[7] : privatelink.database.windows.net
+  search domain[8] : privatelink.dev.azuresynapse.net
+  search domain[9] : privatelink.dfs.core.windows.net
+  search domain[10] : privatelink.postgres.database.azure.com
+  search domain[11] : privatelink.redis.cache.windows.net
+  search domain[12] : privatelink.servicebus.windows.net
+  search domain[13] : privatelink.sql.azuresynapse.net
+  search domain[14] : privatelink.vaultcore.azure.net
+  search domain[15] : reform
+  search domain[16] : reform.hmcts.net
+  search domain[17] : fritz.box
+  nameserver[0] : 8.8.4.4
+  flags    : Request A records
+  reach    : 0x00000002 (Reachable)
+
+resolver #2
+  domain   : private.postgres.database.azure.com
+  nameserver[0] : 10.11.75.4
+  nameserver[1] : 168.63.129.16
+  flags    : Supplemental, Request A records
+  reach    : 0x00000002 (Reachable)
+  order    : 101805
+```
+
+## DNS Resolvers
+
+Split tunnel is used by the HMCTS F5 VPN, with IPv4 Primary (10.11.75.4) and Secondary (168.63.129.19) name servers, assigned as part of the netacl_mojvpn configuration.
+
+To view F5 the DNS nameserver configuration.
+
+F5 Admin Portal >> Access  ››  Connectivity / VPN : Network Access (VPN) : Network Access Lists  ››  netacl_mojvpn
+
+If the DNS nameserver passed from the F5 to the client is not valid, the client OS, will be unable to resolve the IP addresses of Azure services.
+
+
+### Azure DNS private resolver
+https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview
+
+10.11.75.4 is the Azure DNS private resolver 'private-dns-resolver-uksouth-prod-int'.  Before Azure private DNS zones or DNS zones are visible to clients, the zones vNET must be linked to mgmt-vpn-2-vnet in Azure portal.
+

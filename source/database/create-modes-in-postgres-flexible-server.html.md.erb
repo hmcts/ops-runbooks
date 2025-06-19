@@ -1,0 +1,46 @@
+---
+title: Create modes in postgres flexible server
+last_reviewed_on: 2024-07-17
+review_in: 12 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+When you create a postgres flexible server you can set a value for `createMode`.
+
+This can be set to any of the following values:
+
+- Create
+- Default
+- GeoRestore
+- PointInTimeRestore
+- Replica
+- ReviveDropped
+- Update
+
+When creating a server via the portal through ClickOps, you won't get the option to set this. It will be set to `Default`.
+
+You can set the value when using a custom template or terraform.
+
+In terraform, the attribute is called `create_mode`.
+
+By default, our [postgres terraform module](https://github.com/hmcts/terraform-module-postgresql-flexible) has `create_mode` set to `Default`.
+
+When you have an existing server and you need to upgrade the postgres version, e.g. from 15 to 16, you should change the `create_mode` value to `Upgrade`.
+
+However, when you are creating a server, you must set the value of `create_mode` to anything except `Update`.
+
+If you set the value to `Update` you will receive the following error:
+
+```
+performing Create: unexpected status 404 (404 Not Found) with error: ResourceNotFound
+```
+
+This is because when the `createMode` is set to `Update`, Azure expects the server to already exist.
+
+This is documented in the [AzureRM provider docs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_flexible_server#create_mode).
+
+If you're receiving this error in terraform, change the value for `create_mode` back to `Default`.
+
+[Here](https://github.com/hmcts/draft-store/pull/1524/files) is an example PR showing this.

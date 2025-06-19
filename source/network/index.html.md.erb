@@ -7,47 +7,71 @@ weight: 70
 
 # <%= current_page.data.title %>
 
+Area for all networking related documentation within HMCTS & Crime Azure.
+
 ## Data Centres
 
-- Azure Prod
-- Azure Nonprod
-- Azure Sbox
+### Environments
+
+### Cloud (Azure)
+- Production
+- Non-Production
+- Sandbox
+
+### On-Premises
 - Farnborough (10.23.X.Y)
 - Corsham (10.25.X.Y)
 
+## MoJ Devices
+[EUC Advice for (NonAdmin)Macbook Developers](https://tools.hmcts.net/confluence/display/DATS/EUC+Advice+for+%28NonAdmin%29Macbook+Developers)
+
+
 ## DNS
+
+We host a number of Public & Private DNS zones in Azure.
 
 - [Public DNS](https://github.com/hmcts/azure-public-dns#readme)
 - [Private DNS](https://github.com/hmcts/azure-private-dns#readme)
 - [Private DNS Resolvers](https://github.com/hmcts/rdo-terraform-hub-dmz/blob/master/hub_core/20-dns-resolver.tf)
 
 ## F5
+[F5 Index Page](f5/index.html)
 
-- [Admin Portal](F5AdminPortal.html)
-- [User Accounts](accounts.html)
-- [Setup access to internal apps](VPN-routing-config.html)
-- [GitHub Repository](https://github.com/hmcts/azure-vpn-f5) (not live yet, automation is in progress)
+
+## CRIME VPN
+
+### Admin / Access
+- [Tunnelblick VPN](https://tools.hmcts.net/confluence/display/HSS/Onboarding+Guide+AMS-EMS#OnboardingGuideAMSEMS-8.SetupVPN)
 
 ## My Cloud Gateway
-MoJ WAN Connections and firewall
 
+### Admin / Access
 - [Admin Portal](https://my.cloudgateway.co.uk/login)
+
+### Guides
 - [Information](https://my.cloudgateway.co.uk/)
-- [Using MyCloudGateway](MyCloudGateway_ops.html)
+- [Using MyCloudGateway](cloudgateway/MyCloudGateway_ops.html)
 
-## Netbox Guides
+## IPAM
 
-- [Using Netbox](netbox.html)
+### Guides
+- [Using IPAM](ipam/ipam.html)
 
-## Palo Alto firewalls Guides
+## Palo Alto & Panorama
+[Palo Alto Index Page](palo-alto/index.html)
 
-- [Connecting to a Palo Alto firewall](connecting-palos.html)
-- [Troubleshooting issues](palos-troubleshooting.html)
-- [Upgrading Palo Alto firewall Software](palos-upgrade.html)
+### Guides
+- [Connecting to a Palo Alto firewall](palo-alto/connecting-palos.html)
+- [Upgrading Palo Alto firewall Software](palo-alto/palos-upgrade.html)
+- [Palo Alto firewall Failover](palo-alto/palo-failover.html)
+- [Upgrading Panorama](palo-alto/panorama-upgrade.html)
 
-## Panorama Guides
-
-- [Upgrading Panorama](panorama-upgrade.html)
+### Troubleshooting
+- [Troubleshooting issues](palo-alto/palos-troubleshooting.html)
+    - [Problem - Not able to connect to ansible host](palo-alto/palos-troubleshooting.html#problem-not-able-to-connect-to-ansible-host)
+    - [Problem - Ansible has failed to apply the palo configuration](palo-alto/palos-troubleshooting.html#problem-ansible-has-failed-to-apply-the-palo-configuration)
+    - [Problem - debugging connectivity issues](palo-alto/palos-troubleshooting.html#problem-debugging-connectivity-issues)
+- [Disk Space Full Issues](palo-alto/palos-troubleshooting.html#disk-space-full-messages)
 
 ## Useful links
 

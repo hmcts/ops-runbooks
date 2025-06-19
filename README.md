@@ -25,7 +25,7 @@ Click the below button to get started:
 
 ### Local installation
 
-Install Ruby with Rubygems, perferably with a [Ruby version manager][rvm],
+Install Ruby with Rubygems, preferably with a [Ruby version manager][rvm],
 and the [Bundler gem][bundler].
 
 In the application folder type the following to install the required gems:
@@ -120,7 +120,7 @@ build the static HTML files.
 
 Type the following to build the HTML:
 
-```
+```bash
 bundle exec middleman build
 ```
 
@@ -130,9 +130,31 @@ the HTML and asset files ready to be published.
 [rvm]: https://www.ruby-lang.org/en/documentation/installation/#managers
 [bundler]: http://bundler.io/
 
+## Testing external URLs
+
+If you want to check that all external URLs are still valid you can run the following command:
+
+```bash
+bundle exec rake check_urls
+```
+
+You will need a GitHub token for this to work correctly as the code requires this for private repositories.
+To make this easy you can use the GH CLI tool: `brew install gh`
+
+To login in you should run `gh auth login` which will prompt you on how you want to authenticate.
+
+Using `https` and `browser` will allow you to use your current logged in session on GitHub.
+
+Once authenticated you can now create tokens as required with `gh auth token`.
+
+For the script this should be set as an environment variable: `export GH_TOKEN=$(gh auth token)`.
+
+With this complete you can now run the bundle command to check urls in the repo.
+
 ## Publishing
 
 Run:
+
 ```
 bundle exec rake publish
 ```

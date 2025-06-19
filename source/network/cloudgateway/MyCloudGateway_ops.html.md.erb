@@ -1,0 +1,38 @@
+---
+title: Operations Guide
+weight: 10
+last_reviewed_on: 2024-05-16
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+Cloud Gateway service provides wide area networking between MoJ office, data centres and public cloud providers. 
+
+## Portal
+Once you have a login and have registered your mobile phone, connect to the portal via [https://my.cloudgateway.co.uk/login](https://my.cloudgateway.co.uk/login) and enter the OTP code you have just been sent.
+
+
+## Firewall Rules
+Select the Protect tab to see the existing firewall rule. New rules and modifications are managed via service requests.
+
+[https://my.cloudgateway.co.uk/protect](https://my.cloudgateway.co.uk/protect)
+
+## Routing 
+My Cloud Gateway manage all routes, any routes created in Azure Virtual WAN, will have to be imported by My Cloud Gateway, via a service request.
+
+## NAT
+Network address transition is used to minimise IP routing complexity from Azure.  VIP address on MyCloudGateway enable Azure to reach MoJ offices, without knowing the full routing table.
+
+## Monitoring
+The Inspect tab can be used to gain access to the live traffic logs.  Important to use filters, such as source or destination IP, as the logs are very busy.
+Export logs to CSV, is more reliable than the live logs feature. Plus the file can be emailed to 3rd parties, enabling team work, on problem solving.
+
+[https://my.cloudgateway.co.uk/inspect/traffic-logs](https://my.cloudgateway.co.uk/dashboard/analytics/traffic-logs)
+
+## Service Requests
+When something has stopped working, an incident needs to be logged. To add or modify My Cloud Gateway, log a service request.
+
+Service requests are chargable, so consider creating a single large request, if you need multiple tasks completing.
+
+[https://my.cloudgateway.co.uk/support/service-requests](https://my.cloudgateway.co.uk/dashboard/support/tickets)
+

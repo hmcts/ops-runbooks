@@ -1,0 +1,39 @@
+---
+title: Gaps2 Database Restore Pipeline
+last_reviewed_on: 2025-05-14
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+## 📌 Overview  
+CFT users have been directly connecting to the GAPS2 SQL 2008 database to generate Crystal Reports. However, due to recent Moj security updates, new cipher restrictions have been enforced on end-user devices. These updated security requirements are not supported by the legacy GAPS2 infrastructure _(Windows Server 2003 running SQL Server 2008 SP3)_, meaning users can no longer access reports directly. 
+
+This pipeline provides a workaround, enabling users to continue running reports against a version of the GAPS2 database, hosted in HMCTS Azure on the Small Systems Azure SQL server (`ss01-sqlsrv-stg` / `ss01-sqlsrv-prod`).  
+
+This pipeline automates database restoration and Bacpac conversion for `.bak` files uploaded to Azure Storage (`SA`). It transforms a `.bak` file into a `.bacpac` and imports it into the Gaps2 DB (`ss-gaps2-sqldb`) on a small systems SQL instance.  
+
+## 📂 File Upload Location  
+Users upload `.bak` files to Storage Account (`SA`) via SFTP at:  `<Year>/<Month>/ss-gaps2-sqldb-<date>.bak` 
+
+Example: `2025/05/ss-gaps2-sqldb-09.bak`
+
+## 🔗 More About the Pipeline  
+Details on pipeline execution, triggers, and configurations, visit the repository:  
+🔗 **[HMCTS MSSQL Backup Converter](https://github.com/hmcts/mssql-backup-converter/blob/main/README.md)**  
+
+## 🔹 Expected Issues  
+
+During the pipeline execution, certain **problematic database objects referencing external to DB** are dropped before the import process.  
+
+The **`sqlpackage`** tool performs a validation check on the `.bacpac` file before importing it into the database. If any new problematic objects exist that are not accounted for in the predefined cleanup script, the import will fail.  
+
+To resolve failures, problematic objects should be added to the drop script before re-running the pipeline:  
+
+🔗 **[Modify the cleanup script](https://github.com/hmcts/mssql-backup-converter/blob/main/sql-scripts/GAPS_DROP_PROBLEMATIC.sql)** to include newly identified problematic objects.  
+
+## 📞 Contacts  
+For inquiries regarding the **Gaps2 project**, you can find the relevant contact details on Confluence:  
+
+🔗 **[Ops Runbooks Contacts](https://tools.hmcts.net/confluence/display/DTSPO/Ops-runbooks+contacts)**  

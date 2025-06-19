@@ -1,0 +1,48 @@
+---
+title: Updating Neuvector Policies
+weight: 30
+last_reviewed_on: 2024-03-11
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+The policies for Neuvector are found in the [chart-neuvector](https://github.com/hmcts/chart-neuvector) repo.
+
+If you need to make a change to the policies then you need to update this repo and create a new release of the helm chart.
+
+### Example
+
+The most common thing you may have to change is the admission control policy.
+
+[Here](https://github.com/hmcts/chart-neuvector/pull/77/files) is an example of a pull request showing an update being made to the admission control policy to allow external docker images to be used in the artifactory namespace.
+
+### Releasing a new chart version
+
+When you merge to master in the chart-neuvector repo, a draft release is created.
+
+Find the draft release and click the edit button (the pencil icon) and publish it.
+
+### Updating flux config
+
+Submit a pull request in each of the flux config repos to update the version of the chart.
+
+[Here](https://github.com/hmcts/cnp-flux-config/pull/29662/files) is an example in CFT.
+
+You can also follow the [patching example](../aks/patching-neuvector.html) to see how you can target the different environments separately if you want to test the new chart version first.
+
+### Deleting backup files
+
+Neuvector config is backed up to an Azure File Share. This ensures when the neuvector pods are deleted, the config is restored.
+
+However, this can cause issues when trying to make a change to the config as it won't take effect until you delete the relevant backup files.
+
+In the example linked above, we were updating the namespaces that were allowed to pull third-party docker images to include the artifactory namespace because neuvector was blocking artifactory pods from deploying.
+
+To get neuvector to pick up this change, we had to delete the `admission_control.backup` and `crd.backup` files from the file share.
+
+After deleting the helm release and letting it redeploy, the new admission control policy was picked up and we could deploy artifactory again.
+
+The storage accounts these file shares live in can be found in the Azure Portal by searching for `neuvector`. There is a storage account for each environment neuvector is deployed to.
+
+The storage accounts are tagged with `builtFrom: hmcts/chart-neuvector`.

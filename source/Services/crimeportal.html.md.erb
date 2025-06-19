@@ -1,0 +1,77 @@
+---
+title: Crime Portal
+last_reviewed_on: 2025-03-30
+review_in: 6 months
+weight: 35
+---
+
+# <%= current_page.data.title %>
+
+## Introduction
+
+Crime Portal services are referred to as ‘Follow a Case’ and ‘Follow a Person’ respectively and are used internally via an application.  3rd parties can subscribe to the data using external gateway endpoints and public access is via a browser.
+
+Data comes from the Libra database, which holds data from the Magistrates Court case management system that contains personal details of the defendant(s), Court they were prosecuted at, Offence(s) they were prosecuted for, Outcome of the court case, (e.g. reached a verdict, withdrawn, dismissed etc) whether they were convicted, the nature of the sentence, and time taken for court proceedings.
+
+## Management
+The application is owned by CGI and anything which breaks service, should 1st be agreed with them.  The infrastructure is managed by platform operations.
+
+As a public web service, users could be using the system on a 27x7x365 basis.  However Monday to Friday, 8am to 6 pm are more typical service hours.
+
+### Patching
+Azure Update Manager is used to apply updates to the VMs and automatically reboot them outside of business hours.
+
+## Legacy
+
+Crime Portal is a highly stateful legacy application which has been moved to the cloud. It was not part of the project to rewrite the Java Wildfly based services. Therefore application and LDAP services have been deployed within a docker container running within the respective VMs. These have been doubled into pairs to provide HA and increased throughput.  With the application gateway probing for container health, ensuring session persistence and load balancing.
+
+LDAP services required by Crime Portal could not be migrated to Azure provided platforms, so the existing solution was kept.
+
+## Overview
+
+* Crime Portal replace existing services which have been migrated into HMCTS Azure platform
+* 3-tier Architecture connected to PaaS database
+* Publicly access via Azure Front Door
+* Staging (STG) and Production (Prod) environments
+
+GitHub Repo: [https://github.com/hmcts/crime-portal-infra](https://github.com/hmcts/crime-portal-infra)
+
+ADO Pipeline: PlatformOperations, hmcts.crime-portal-infra
+
+### Access to VMs
+Add users to the correct group
+
+* DTS Crime Portal VM Login (env:staging)
+* DTS Crime Portal VM Admin Login (env:staging)
+
+* DTS Crime Portal VM Login (env:production)
+* DTS Crime Portal VM Admin Login (env:production)
+
+## Application Gateway
+
+Provides session persistence
+
+Load balancing, Ports 80 and 443
+
+TLS termination for integration with Libra in Interim Hosting
+
+* crimeportal-libra-gw-staging-internal-hmcts-net
+* crimeportal-libra-gw-prod-internal-hmcts-net
+
+## Certificates
+
+Function App Managed Certificates
+Pipeline runs weekdays at 6 pm
+Controlling Repo: [github.com/hmcts/azure-enterprise-acme](https://github.com/hmcts/azure-enterprise-acme)
+
+Further Instructions, [hmcts.github.io/ops-runbooks/Certificates/newacme.html](https://hmcts.github.io/ops-runbooks/Certificates/newacme.html)
+
+## Shared Front Door
+
+Crime Portal public endpoints allowed through Heritage Front Door
+Use this repo [github.com/hmcts/oracle-azure-infrastructure](https://github.com/hmcts/oracle-azure-infrastructure)
+
+Host public endpoints
+
+* [github.com/hmcts/oracle-azure-infrastructure](https://crimeportal.staging.apps.hmcts.net)
+* [crimeportal.apps.hmcts.net](https://crimeportal.apps.hmcts.net)

@@ -1,0 +1,51 @@
+---
+title: Upgrading Azure API Management platform version 
+last_reviewed_on: 2024-05-28
+review_in: 12 months
+weight: 150
+---
+
+# <%= current_page.data.title %>
+
+This runbook describes how to upgrade the Azure API Management platform version. 
+
+Stv1 to stv2 migration is a two-step process. The first step is to trigger the migration by moving to the new subnet. The second step is to move back to the old subnet.
+
+- stv1, or Single-tenant version 1, is an Azure-allocated compute infrastructure. It represents an older version of Azure single-tenant compute infrastructure.
+
+- stv2, or Single-tenant version 2, is a more advanced Azure-allocated compute infrastructure. It supports additional features such as availability zones and private endpoints. This version is available for various tiers including Developer, Basic, Standard, and Premium.
+This runbook describes how to upgrade the Azure API Management platform version, specifically migrating from stv1 to stv2.
+
+Follow these steps to perform the migration:
+
+Trigger the migration by moving to the new subnet. This can be done via the pipeline by setting the environment variable trigger_migration to true. After about 20 minutes, stv1 should be upgraded to stv2 and be in the new subnet.
+
+Move stv2 back to the old subnet via the pipeline by setting the environment variable trigger_migration to false. After about 20 minutes, the APIM instance should be back in the old subnet.
+
+For all other environments, you will need to pass the temporary subnet prefix via the component to create the migration subnet as iaas will not be used in the migration.
+
+Ensure the subnet of the API Management route table is the same as the temporary one.
+
+### Updating Firewall
+
+Update hub-terraform-infra with the new private IP. [hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra/tree/master/environments)
+
+Update hub-panorama-terraform with the new private IP. [hub-panoram-terraform](https://github.com/hmcts/hub-panorama-terraform/tree/master/components/configuration/groups/objects/address-objects)
+
+### Updating DNS
+
+Update the private DNS address with new private IP  [Private DNS](https://github.com/hmcts/azure-private-dns/tree/master/environments)
+
+Clean up temporary resources
+
+Wait 40 minutes for temporary IP to disassociate from Azure owned load balancer.
+
+After the migration, Resources clean up via triggering the temp_pip variable which will destroy all temp resources.
+
+Run the pipeline to destroy the temporary resources.
+
+Confirm the migration is successful by checking the APIM instance is in the old subnet and test the API endpoints.
+
+### References
+
+[Migrate to stv2 platform - Azure API Management - VNet injected](https://learn.microsoft.com/en-us/azure/api-management/migrate-stv1-to-stv2-vnet#update-network-configuration)

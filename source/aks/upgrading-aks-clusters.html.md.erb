@@ -1,6 +1,6 @@
 ---
 title: Upgrading AKS Clusters
-last_reviewed_on: 2024-04-12
+last_reviewed_on: 2025-03-10
 review_in: 12 months
 weight: 30
 ---
@@ -16,12 +16,12 @@ This is the normal order we use when upgrading clusters, it does not have to exa
 - Sbox             - (cft-sbox-00-aks, cft-sbox-01-aks/ ss-sbox-00-aks, ss-sbox-01-aks)
 - Ptlsbox          - (cft-ptlsbox-00-aks/ ss-ptlsbox-00-aks)
 - ITHC             - (cft-ithc-00-aks, cft-ithc-01-aks/ ss-ithc-00-aks, ss-ithc-01-aks)
-- Preview          - (cft-preview-01-aks/ ss-dev-01-aks)
+- Preview          - (cft-preview-00-aks/ ss-dev-01-aks)
 - Demo             - (cft-demo-00-aks, cft-demo-01-aks/ ss-demo-00-aks, ss-demo-01-aks)
 - Perftest         - (cft-perftest-00-aks, cft-perftest-01-aks/ ss-test-00-aks, ss-test-01-aks)
 - AAT              - (cft-aat-00-aks, cft-aat-01-aks/ ss-stg-00-aks, ss-stg-01-aks)
-- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks) 
-- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks) 
+- Production       - (prod-00-aks, prod-01-aks/ ss-prod-00-aks, ss-prod-01-aks)
+- Ptl              - (cft-ptl-00-aks/ ss-ptl-00-aks)
 
 ## Planning
 
@@ -51,11 +51,17 @@ If there are deprecations, create a plan to address them before upgrading any cl
 
 If there are no apiVersions being deprecated, then you can proceed with the upgrade, going through the environments above in order.
 
+## Patch Version
+
+Don’t worry about patch versions. As long as the clusters are on the same minor version, it should be fine. For example, if one cluster is on version 1.30.2 and another is on 1.30.0, this is acceptable as both are on the 1.30 minor version.
+
+For more information, refer to the [Azure Kubernetes Service (AKS) supported Kubernetes versions](https://learn.microsoft.com/en-us/azure/aks/supported-kubernetes-versions?tabs=azure-cli#alias-minor-version).
+
 ## Notify teams
 
 Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for announcements rather than notification).
 
-Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters. 
+Utilize the #sds-cloud-native channel if you are involved in activities concerning SDS clusters.
 
 ## Pods and HRs Health Checks
 
@@ -71,49 +77,55 @@ Before upgrading any of the clusters run the following query on the cluster you 
 kubectl get pods -A | wc -l > pods_total_count && kubectl get pods -A > pods_all_status && kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/' > pods_not_running_or_succeeded && kubectl get hr -A > hr_all_status && kubectl get pdb -A > pdb_status && kubectl get hr --all-namespaces | awk '/(Unknown|False)/' > hr_failed_status
 ```
 
-Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files. 
+Three files will be saved in the directory from which you are running the above command and "ll" in the cli to display the files.
 
-- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status. 
+- Investigate failed helm releases and pods in CrashLoopBackOff or ImagePullBackOff Status.
 
 ```command
-kubectl get helm --all-namespaces / kubectl get pods --all-namespaces
+kubectl get pods --all-namespaces
+kubectl get hr --all-namespaces
 ```
 
-- Check if these pods have pod disruption budgets 
+- Check if these pods have pod disruption budgets
 
 ```command
-kubectl get pdb -A
+echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json | jq -r '.items[] | select(.status.disruptionsAllowed==0) | {namespace: .metadata.namespace,disruptionsAllowed: .status.disruptionsAllowed,name: .metadata.name} | [.namespace, .disruptionsAllowed, .name] | @tsv' | sed 's/\t\t/ | /g'
 ```
 
   <%= warning_text('If the <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade. When it set to 0, it essentially prohibiting any voluntary evictions. This means that no pods can be taken down intentionally during maintenance or disruptions.') %>
 
-- We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster
+- We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster. Please remember to revert the PR after upgrade.
 
-  - [PR example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
+  - [SDS example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
+  - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/30547/files)
 
 
-- For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release). 
+- For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).
 
 - To list all failed helm releases
 
 ```command
 kubectl get hr --all-namespaces | awk '!/(True)/'
 ```
+
 - To view helm chart history
 
 ```command
 helm history <chart name> -n <namespace>
 ```
+
 - To roll back helm chart to a prior version or specific version
 
 ```command
-helm rollback <chart name> -n <namespace> / helm rollback <chart name> <version number> -n <namespace>
+helm rollback <chart name> -n <namespace>
+helm rollback <chart name> <version number> -n <namespace>
 ```
 
 - For failed pods, investigate root cause and discuss with teams as required (e.g. pods not starting due to missing keyvault secrets)
 
 ```command
-helm rollback <chart name> -n <namespace> / helm rollback <chart name>  <version number> -n <namespace>
+helm rollback <chart name> -n <namespace>
+helm rollback <chart name>  <version number> -n <namespace>
 ```
 
 - For pods where images beginning with pr- are not found this is often due to the image no longer existing in the ACR. In these, instances you will need to either reach out to the app teams to get it updated or find the latest prod image for that pod in the ACR and put in a PR to fix like this [one](https://github.com/hmcts/cnp-flux-config/pull/17115/files) done previously.
@@ -130,29 +142,63 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 
-  - Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be seperate PR and then pipeline build
+Please remember when you switching from 00 to 01 on the Application Gateway, and 01 to 00, **it is best practice to have the pipeline complete one step at a time**
 
-            1. Remove 00 Cluster IP
-            2. Put back 00 Cluster IP after successful upgrade
-            3. Remove 01 Cluster IP
-            4. Put back 01 Cluster IP after successful upgrade
+E.g.  All below steps should be separate pull requests with a successful pipeline run at each step
 
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer: 
+    1. Remove 00 Cluster IP
+        - Complete successful pipeline run
+    2. Put back 00 Cluster IP after successful upgrade
+        - Complete successful pipeline run
+    3. Remove 01 Cluster IP, run pipeline successfully
+        - Complete successful pipeline run
+    4. Put back 01 Cluster IP after successful upgrade
+        - Complete successful pipeline run
 
-  [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+**Unsure which IP belongs to which cluster?**
 
-- Also update Jenkins to switch from 00 to 01 if you are upgrading 00 cluster
+Check the front end IP of the relevant `kubernetes-internal` loadbalancer:
 
-  - [Example PR](https://github.com/hmcts/cnp-flux-config/pull/30375/files)
+    portal.azure.com
+        -> Load Balancer
+            -> search for `kubernetes-internal`
+                -> filter by the Resource Group
+                    -> click on the load balancer returned by the search
+                        -> click on Frontend IP Configuration
+                            -> the IP Address is the one you need
 
-##  Environment Specific Steps
+## Environment Specific Steps
+
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
-We upgrade PTL/PTLSbox and Preview/Dev in-place, meaning we aren't building another cluster or switching in the appgw unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
+We upgrade PTL/PTLSbox and Preview/Dev/ITHC (only because we have one ITHC cluster currently) in-place, meaning we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
 
-### Ptlsbox, Ptl
+### PTLsbox, PTL, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
-Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades. 
+Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.
+
+We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place upgrade on the current live cluster. This means we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the [Rebuilding AKS Clusters guide](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#environment-specific).
+
+- Once the in-place upgrade has been completed, update the code to reflect the new version. For example, see the [CFT example](https://github.com/hmcts/aks-cft-deploy/tree/main/environments/aks)
+
+- If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
+
+### AAT
+
+Before you upgrade a cluster in the AAT environment, please check which is the active cluster being used by Jenkins before removing either from the application gateway.
+
+**Whichever cluster is the current active cluster should be upgraded last.** The full process is detailed in the [rebuild guides](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging).
+
+The hi-level steps from the guide that matter for upgrading an AAT cluster are:
+
+- Upgrade the non-active cluster as normal
+- Swap Jenkins to use the newly upgraded non-active cluster making it the active cluster
+- Update private DNS entries to point to the upgraded cluster completely removing the old cluster from active status
+- Upgrade the remaining cluster
+
+### Perftest
+
+If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand.
 
 ### Production
 
@@ -181,7 +227,7 @@ Once the changes have been reviewed, approved and merged, run the pipeline for t
 Once completed compare the `hrs` and pods statuses with the ones you saved before the upgrade took place.
 
 <%= warning_text('Issues during an AKS Upgrade')%>
-[Troublehsooting upgrade failures](known-issues.html)
+[Troubleshooting upgrade failures](known-issues.html)
 
 ## After upgrading of a cluster
 
@@ -196,3 +242,21 @@ Once completed compare the `hrs` and pods statuses with the ones you saved befor
 `waiting for update of Node Pool "msnode" (Kubernetes Cluster "ss-sbox-00-aks" / Resource Group "ss-sbox-00-rg"): Code="ReconcileVMSSAgentPoolFailed" Message="Code=\"CannotAddAcceleratedNetworkingNicToAnExistingVirtualMachine\" Message=\"Cannot add network interface '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Network/networkInterfaces/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0|networkInterfaces|aksmsnode' with accelerated networking to an existing virtual machine '/subscriptions/a8140a9e-f1b0-481f-a4de-09e2ee23f7ab/resourceGroups/ss-sbox-00-aks-node-rg/providers/Microsoft.Compute/virtualMachines/|providers|Microsoft.Compute|virtualMachineScaleSets|aksmsnode|virtualMachines|0'`
 
 We've seen quite a few failures with Windows node pools and attaching NICs to VMs, generally happens during patching. In the first case re-try the pipeline, otherwise re-build the cluster.
+
+### Old Chart being used
+
+On the `cft-demo-01-aks` cluster, we have noticed some CronJobs were using older helm chart despite the latest chart version updated on flux config.  This was reporting on `pluto` that those CronJobs are using deprecated kubernetes apis but the problem was that it has not got updated chart.
+
+The only way we managed to fix and get updated chart for the CronJobs is by following [this blog post](https://medium.com/@calvineotieno010/no-i-cannot-delete-it-when-helm-refuses-to-delete-a-release-ac9c64919e2b) by running helm uninstall and then removing the helm release.
+
+### cft-preview cluster needed swapping because address does not have enough capacity for 2301 IP addresses
+
+On the `cft-preview-01-aks` cluster, while upgrading on Azure portal, it thrown below error.
+
+```command
+Failed to save Kubernetes service 'cft-preview-01-aks'. Error: Code="SubnetIsFull" Message="Subnet aks-01 with address prefix 10.101.160.0/19 does not have enough capacity for 2301 IP addresses." Details=[]
+```
+
+The only reason we can think of this error is because the cluster had 119 nodes at that time but still the address space is quite large with 8,192 IPs so not sure why it did not have enough space.
+
+The only solution we had for this is to rebuild and swap the cft-preview-01-aks  cluster with cft-preview-00-aks cluster.  Please follow [Re-building a cluster](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html) guide to find how to rebuild Preview.

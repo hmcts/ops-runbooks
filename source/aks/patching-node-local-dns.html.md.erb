@@ -1,0 +1,30 @@
+---
+title: nodelocaldns or node-local-dns Patching Example
+weight: 30
+last_reviewed_on: 2025-06-02
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for the nodelocaldns app.
+
+## Patching
+
+Review [Releases](https://github.com/kubernetes/dns/releases) page to check for breaking changes.
+
+Please note that the nodelocaldns app is NOT deployed in SDS, so you will only need to patch it in CFT.
+
+[Example PR for upgrading version](https://github.com/hmcts/cnp-flux-config/pull/38801) in CFT.
+
+### Checks to see if upgrade worked correctly
+After above raised PR approved and merged, 
+1. Check if the `node-local-dns-XXXX` pod is running in the `kube-system` namespace.
+2. Describe the node-local-dns pod in the `kube-system` namespace to see if the version has been updated.
+
+```
+kubectl describe pods node-local-dns-sp449  -n kube-system
+
+```
+
+![](Images/patching_apps_7.png)

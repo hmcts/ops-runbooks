@@ -1,6 +1,6 @@
 ---
 title: Tenable Nessus
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-04-24
 review_in: 12 months
 weight: 200
 ---
@@ -9,11 +9,15 @@ weight: 200
 Tenable Nessus is a proprietary vulnerability scanner developed by Tenable. The scanner allows the security team
 to scan devices and check them against the nessus database that contains thousands of known vulnerabilities
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
-and the agents. This runbook will cover the following
+and the agents. 
 
-- Tenable anvironments 
+Access is via the URL https://nessus.hmcts.net/ which is an Azure Entra ID enterprise application called Nessus. (See below for renewing certs)
+
+This runbook will cover the following
+
+- Tenable environments 
 - Deploying agents
-- Verifiying agent installation. 
+- Verifying agent installation. 
 
 This runbook does not cover the finer details of the Terraform bootstrap module.
 
@@ -46,7 +50,7 @@ resource group.
 
 The agent is deployed using terraform bootstrap module  [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap). The module is designed to install to Linux and Windows machines.
 
-> The example given below is specific to the Heritage environemnt.
+> The example given below is specific to the Heritage environment.
 
 #### Steps to setup deployment
 
@@ -115,7 +119,7 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
 ```
 
-- Start port-forwading/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
+- Start port-forwarding/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
 
 ```bash
 ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
@@ -196,3 +200,65 @@ Last connection attempt: 1655998378
 * https://docs.tenable.com/nessus/Content/NessusCLIAgent.htm#Nessuscli-Commands
 
 * https://docs.tenable.com/nessus/Content/RemoveNessusAgentLinux.htm 
+
+
+## Security Center SSL
+
+Tenables Security Center is hosted on a VM for it's environment, created using an Azure marketplace image published by Tenable. These VMs have a certificate which can expire, causing a "BadGateway: This corporate app can't be accessed." error message. 
+The cert can be quickly checked by opening the Tenables Security Center VM's IP address via a web browser on a Windows jump box (JBOX01-PROD). 
+
+Tenable Security Center also sits behind App Proxy, that uses a wildcard cert. If Security Center is not presenting a valid certificate App Proxy will fail to validate the cert and the user will not be able to access Security Center.
+
+
+### Updating the SSL Certificate
+
+If the Tenables Security Center cert "tenable-sc.platform.hmcts.net" has expired, a new one can be accessed from the key vault acmehmctssocXXXX. It should be valid, as it is automatically refreshed by the Function App acmehmctssocXXXX.
+
+(Link to Cert Generation)[https://hmcts.github.io/ops-runbooks/Certificates/letsencrypt.html]
+
+
+Security Center requires the certificate in a .crt and .key format but Azure KeyVault it will most likely present it as a single .pfx file which contains both the cert and the key.
+
+After downloading the .pfx file, convert it to a .crt and .key file pair use the following commands:
+
+```bash
+# Extract the private key.  You may be asked for an Import password, this is blank, so press enter. Then you will be prompted to enter a PEM password. Create something to use in the next two stages but will not need after that.
+openssl pkcs12 -in your-certificate-and-key-combined.pfx -nocerts -out keyfile.key
+
+
+# Decrypt the key, you will be prompted to enter a password, this is the password you entered in the previous step.
+openssl rsa -in keyfile.key -out SecurityCenter.key
+
+
+# Extract the certificate
+openssl pkcs12 -in your-certificate-and-key-combined.pfx -clcerts -nokeys -out SecurityCenter.crt
+```
+
+Once you have the .crt and .key files on your machine, you will have to upload them to the Security Center VM. Open an SSH tunnel to the correct environment, then start your SSH connection to the Tenables Security Center VM, via it's IP address. Authentication is via the https://microsoft.com/devicelogin URL method as MFA is required.  Once connected, beware the SSL connection will close if idle for more than 5 minutes.
+
+The files should be placed in the `/opt/sc/support/conf` directory, use sudo su to gain access.
+
+Option 1 - Update files
+```bash
+# Copy the existing expired cert files
+cd /opt/sc/support/conf/
+cp SecurityCenter.key SecurityCenter_250424.key 
+cp SecurityCenter.crt SecurityCenter_250424.crt 
+
+# Add the new cert files by using 2 terminal sessions. Open local SecurityCenter.key using text editor in one session and the remote SecurityCenter.key file in a 2nd session. Copy and paste the contents, then save the remote file. Repeat with the .crt file.
+```
+
+Option 2 - Adding new files
+```bash
+# Add the 2 new files to `/opt/sc/support/conf` which should be owned by the `tns` user and group and have 0640 permissions.
+chown tns:tns /opt/sc/support/conf/SecurityCenter.crt
+chown tns:tns /opt/sc/support/conf/SecurityCenter.key
+chmod 640 /opt/sc/support/conf/SecurityCenter.crt
+chmod 640 /opt/sc/support/conf/SecurityCenter.key
+```
+
+Once the files are ready, restart the Security Center service to apply the new certificate.
+
+```bash
+systemctl restart SecurityCenter
+```

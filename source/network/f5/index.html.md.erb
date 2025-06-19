@@ -1,0 +1,31 @@
+---
+title: F5
+last_reviewed_on: 2025-03-20
+review_in: 12 months
+weight: 70
+---
+
+# <%= current_page.data.title %>
+
+We have a live instance of F5 (mgmt-vpn-2-vm) which before now was our only instance. Now we have a passive instance which remains turned off until we need to use it to test some changes or an upgrade, called mgmt-vpn.
+
+It is now part of the patching rota to keep mgmt-vpn up to date with our live instance.
+
+### Admin / Access
+- [F5 Admin Portal](https://tools.hmcts.net/confluence/display/DTSPO/F5+Administration)
+- Note: To request access, please contact the platform team in #platform-operations on Slack
+
+
+### Guides
+- [Updating GeoIP Database](F5-GeoIP.html)
+- [Setup access to internal apps](VPN-routing-config.html)
+- [Client VPN Routing](https://tools.hmcts.net/confluence/display/DTSPO/F5+VPN+Client+Routing)
+- [F5 Logfiles & VPN Troubleshooting](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1843333108))
+
+### Troubleshooting
+- [Client Troubleshooting](f5-troubleshooting-clients.html)
+    - [Windows](f5-troubleshooting-clients.html#windows)
+    - [Troubleshooting MacOS](f5-troubleshooting-clients.html#macos) 
+
+### GitHub repositories
+- [GitHub Repository](https://github.com/hmcts/azure-vpn-f5) (not live yet, automation is in progress)

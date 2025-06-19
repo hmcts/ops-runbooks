@@ -1,25 +1,27 @@
 ---
 title: Adding Pages
-last_reviewed_on: 2024-01-26
+last_reviewed_on: 2025-02-25
 review_in: 12 months
 weight: 10
 ---
 
 # <%= current_page.data.title %>
 
-These pages are written in the Markdown, lightweight markup language and stored with a github repo.
+These pages are written in Markdown, a lightweight markup language, and stored in a GitHub repository.
 
 ## Prerequisites
 
-- Basic knowledge of using markdown to create documents
+- Basic knowledge of using markdown to create documents - see [Markdown Guide](https://www.markdownguide.org/) / [Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
 - Access to the repo [hmcts/ops-runbooks](https://github.com/hmcts/ops-runbooks)
 
-## Documentation
+## Documentation Process
 
-Initially, documents should be created in OneNote, Word, or other feature rich editor, to enable the information to be captured.  Once the document is ready, save each page as a file within the folder using the extension .html.md.erb 
+1. Initially create documents in a feature-rich editor (e.g., OneNote, Word, [Macdown](https://macdown.uranusjr.com/)) to capture information
+2. Once the document is ready, save each page as a file with the extension ``.html.md.erb`` in the appropriate folder
 
-## Index Page
-The first page in every folder should be called **index.html.md.erb** and start with these **7 lines of code**.
+## Index Page Structure
+The first page in every folder should be named `index.html.md.erb` and start with these 7 lines of code (do amend title:):
+
 
     ---
     title: Contribution Guide
@@ -28,21 +30,28 @@ The first page in every folder should be called **index.html.md.erb** and start 
     
     # <%%= current_page.data.title %>
     
+The weight parameter controls the pages position in the master index, with lower numbers appearing at the top. Increment the **count by 10** where possible
 
-**Weight** is used to control the pages possition in the master index.  With low numbers at the top.  Where possible **increment the count by 10**. 
 
-## Well Written Pages
+## Best Practices for Well-Written Pages
 
-- Prerequisite Section at top
-- Diagrams (A good diagram, tells the story)
-- Admin Tools
+**Structure**
+
+- Include a Prerequisites section at the top
+- Use diagrams to illustrate effectively (A good diagram, tells the story)
+- Provide information on Admin Tools:
     - Admin portal (URL or IP address)
-    - Instructions to download, install and configure
+    - Instructions for downloading, installing, and configuring
     - Describe with text, how to navigate within the system
-- Follow house style guide
-    - Use emply template for new products and applications
-    - When section is empty, leave it in place but add the word blank to show it is not relivent
-- Core sections
-    - Introduction or Description (What is it)
-    - Prerequisites (Can it be made to work by reader)
-    - Location (Links, URLs, IP addresses or pointers)
+
+**Style Guide**
+
+- Follow the house style guide and check out [guide examples](guide-examples/index.html) to assist you in creating your own guides
+- Use an empty template for new products and applications
+- When section is empty, leave it in place but add the word blank to show it is not relevant 
+
+**Core Sections**
+
+1. Introduction or Description (What is it)
+2. Prerequisites (Can the reader make it work)
+3. Facts (Links, URLs, IP addresses, or pointers)

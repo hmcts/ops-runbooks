@@ -69,7 +69,7 @@ kubectl get pods -A |grep logstash
 
 6) Check if app team need to shutter
 
-Also ensure that app team have turned off case disposer ahead of the reindex.
+Also ensure that app team have removed themselves from case disposer flux config.
 
 7) List the index you are re indexing prior to moving forward
 
@@ -85,7 +85,7 @@ Connect to ccd-data-store DB from Bastion server and run this query:
 SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 ```
 
-9) Get a count of the Dead Letter Queue on elastice search for the case_type_id
+9) Get a count of the Dead Letter Queue on elastic search for the case_type_id
 
 '''
 curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
@@ -106,7 +106,7 @@ curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?p
 
 After this command, please check both indexes exist by running the command from step 7 again.
 
-12) Clone index a secdond time, this will be used as a source for the reindex
+12) Clone index a second time, this will be used as a source for the reindex
 
 '''
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
@@ -132,14 +132,14 @@ curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Cont
 curl -XDELETE localhost:9200/<Your index name>;
 '''
 
-16) Wait for the new defintion to be imported
+16) Wait for the new definition to be imported
 
 Confirm its been imported by running the command from step 7 again.
 
 17) Reindex using the second clone as the source for the reindex
 
 '''
-curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "cloned-nfd_cases-000002"},"dest": {"index": "nfd_cases-000001"}}'
+curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<new index name>"}}'
 '''
 
 18) Check the reindex was successful

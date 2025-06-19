@@ -1,0 +1,43 @@
+---
+title: Flux Bootstrapping
+last_reviewed_on: 2025-06-17
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+When setting up Flux on a kubernetes cluster, it must be "bootstrapped". This is the process whereby the flux controller pods are deployed to the cluster and they are configured to sync with a git repository.
+
+## Repositories
+
+In order to perform bootstrapping, Flux must be able to authenticate into Git repositories which are defined in its config:
+
+- For SDS these are stored in [SDS-Flux-Config](https://github.com/hmcts/sds-flux-config/tree/master/apps/flux-system/base)
+- For CFT these are stored in [CNP-Flux-Config](https://github.com/hmcts/cnp-flux-config/tree/master/apps/flux-system/base)
+
+One of the repos that the Flux must be able to authenticate to is the config repo itself (mentioned above), this repo is created during the bootstrapping phase.
+
+Bootstrapping code for SDS and CFT is stored in following repositories:
+
+- SDS: [AKS-SDS-Deploy](https://github.com/hmcts/aks-sds-deploy/)
+- CFT: [AKS-CFT-Deploy](https://github.com/hmcts/aks-cft-deploy/)
+
+Each repository has its own ADO pipeline which can be run to perform bootstrapping against the clusters, you will notice that the bootstrapping scripts for SDS and CFT are marginally different but mostly work in the exact same way.
+
+Besides bootstrapping stages which are run at the very end, these pipelines also run Terraform to ensure necessary infrastructure and the actual cluster exists before an attempt to bootstrap Flux on it is made.
+
+One of the key steps in the bootstrapping process are:
+
+ - creation of the [Flux-Config GitRepository](https://github.com/hmcts/aks-sds-deploy/blob/master/bootstrap/deploy-flux.sh#L181)
+ - creation of the [GitHub App secret](https://github.com/hmcts/aks-sds-deploy/blob/master/bootstrap/deploy-flux.sh#L150).
+
+These ensure Flux can pulls in entire config with all resources defined within and manage it on a given environment/cluster.
+
+## GitHub authentication
+
+There are several ways to enable Flux to authenticate with GitHub and sync its repositories.
+
+In the past [we used SSH deploy keys](./flux-deploy-keys.html) which were defined on each of the flux-config repositories.
+
+Currently we use [GitHub App authentication](./flux-github-app-auth.html) which solves the problem of the SSH key expiry and the need to do manual key rotations.

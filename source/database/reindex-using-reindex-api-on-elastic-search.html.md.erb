@@ -12,6 +12,7 @@ This provides instructions on how to complete a reindex within Elastic Search us
 This will be made as generic as possible with places to enter the values needed.
 
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
+[Example implementation plan](https://tools.hmcts.net/confluence/display/RSTR/NDL-1.1.0+-+Amend+Elastic+Search+Index+Configuration+Release+Implementation+Plan)
 
 Some changes will include both non-production and production environments. 
 
@@ -61,6 +62,8 @@ ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 
 Most teams do not have dedicated instances but some do.
 
+You can scale the instance down to 0 to stop it running in this [repo](https://github.com/hmcts/cnp-flux-config)
+
 Running this command on the relevant AKS cluster will let you see all logstash instances which can be scaled up and down in the cnp-flux-config repo.
 
 '''
@@ -106,7 +109,9 @@ curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?p
 
 After this command, please check both indexes exist by running the command from step 7 again.
 
-12) Clone index a second time, this will be used as a source for the reindex
+12) Clone index a second time, this will be used as a source for the reindex. 
+
+For clearer referencing end this clone name with a 02 instead of a 01.
 
 '''
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
@@ -129,7 +134,7 @@ curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Cont
 15) Delete the original index
 
 '''
-curl -XDELETE localhost:9200/<Your index name>;
+curl -X DELETE localhost:9200/<Your index name>;
 '''
 
 16) Wait for the new definition to be imported
@@ -165,7 +170,7 @@ curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Cont
 Then run this command for each clone to remove them.
 
 '''
-curl -XDELETE localhost:9200/<Your index name>;
+curl -X DELETE localhost:9200/<Your index name>;
 '''
 
 20) Ensure you scale the logstash instance back to 1.

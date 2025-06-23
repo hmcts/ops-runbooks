@@ -56,6 +56,10 @@ jobs:
         with:
           ruby-version: '3.4.4'
           bundler-cache: true
+
+      - name: Update activesupport
+        run: bundle update activesupport
+        
       - name: Build
         run: bundle install --full-index && bundle exec middleman build
       - name: 'Check for broken links'

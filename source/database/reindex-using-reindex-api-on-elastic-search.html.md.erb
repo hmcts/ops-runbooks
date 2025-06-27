@@ -66,9 +66,9 @@ You can scale the instance down to 0 to stop it running in this [repo](https://g
 
 Running this command on the relevant AKS cluster will let you see all logstash instances which can be scaled up and down in the cnp-flux-config repo.
 
-'''
+```
 kubectl get pods -A |grep logstash
-'''
+```
 
 6) Check if app team need to shutter
 
@@ -76,9 +76,9 @@ Also ensure that app team have removed themselves from case disposer flux config
 
 7) List the index you are re indexing prior to moving forward
 
-'''
+```
 Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
-'''
+```
 
 8) Check overall DB count prior to deletion
 
@@ -90,22 +90,21 @@ SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 
 9) Get a count of the Dead Letter Queue on elastic search for the case_type_id
 
-'''
+```
 curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
-
-``'
+```
 
 10) Change main index to read only mode for cloning
 
-'''
+```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
-'''
+```
 
 11) Clone the index for backup incase of rollback
 
-'''
+```
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
-'''
+```
 
 After this command, please check both indexes exist by running the command from step 7 again.
 
@@ -113,29 +112,29 @@ After this command, please check both indexes exist by running the command from 
 
 For clearer referencing end this clone name with a 02 instead of a 01.
 
-'''
+```
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
-'''
+```
 
 Note: For this cloned index please ensure the name has a 2 at the end instead of a 1.
 
 13) Set original index back to read only mode
 
-'''
+```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
-'''
+```
 
 14) Set the second cloned index to read only mode
 
-'''
+```
 curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": true}}'
-'''
+```
 
 15) Delete the original index
 
-'''
+```
 curl -X DELETE localhost:9200/<Your index name>;
-'''
+```
 
 16) Wait for the new definition to be imported
 
@@ -143,42 +142,42 @@ Confirm its been imported by running the command from step 7 again.
 
 17) Reindex using the second clone as the source for the reindex
 
-'''
+```
 curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<new index name>"}}'
-'''
+```
 
 18) Check the reindex was successful
 
-'''
+```
 Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
-'''
+```
 
 If the index count isnt up to what is expected but no error was shown in step 17, then please run the below command and check again.
 
-'''
+```
 curl -X GET "localhost:9200/_refresh?pretty"
-'''
+```
 
 19) If the reindex was successful begin removing both of the clones that were created.
 
 For removing clone 02 make sure you run the below command to remove the read only setting.
 
-'''
+```
 curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": false}}'
-'''
+```
 
 Then run this command for each clone to remove them.
 
-'''
+```
 curl -X DELETE localhost:9200/<Your index name>;
-'''
+```
 
 20) Ensure you scale the logstash instance back to 1.
 
 
 ### Rollback
 
-If we need to rollback we can use the cloned index from step 8 that was done before deleting the index.  
+If we need to rollback we can use the cloned index from step 11 that was done before deleting the index.  
 
 This will save us a lot of time and risk, where we dont have to a full re-index.
 

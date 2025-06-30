@@ -81,6 +81,8 @@ Also ensure that app team have removed themselves from case disposer flux config
 
 7) List the index you are re indexing prior to moving forward
 
+Please make sure to remove the 000001 from the end of the index name when running the below command, this ensure all clones will also be listed.
+
 ```
 Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
 ```
@@ -125,7 +127,7 @@ curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?p
 
 Note: For this cloned index please ensure the name has a 2 at the end instead of a 1.
 
-13) Set original index back to read only mode
+13) Set original index back to write mode.
 
 ```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
@@ -143,17 +145,22 @@ curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Cont
 curl -X DELETE localhost:9200/<Your index name>;
 ```
 
-16) Wait for the new definition to be imported
+16) Wait for the new definition to be imported by the service team.
 
-Confirm its been imported by running the command from step 7 again.
+Confirm its been imported by running the command from step 7 again, it will show as having no cases in it but it should exist.
 
 17) Reindex using the second clone as the source for the reindex
 
+This will take a while depending on the size of the index, so please be patient.
+The curl we run can time out but rest assured it will still run in the background.
+
 ```
-curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<new index name>"}}'
+curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<your index name>"}}'
 ```
 
 18) Check the reindex was successful
+
+Even after Step 17 is complete this can take some time to complete, so please be patient.
 
 ```
 Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
@@ -175,8 +182,10 @@ curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Cont
 
 Then run this command for each clone to remove them.
 
+Please remove them one at a time.
+
 ```
-curl -X DELETE localhost:9200/<Your index name>;
+curl -X DELETE localhost:9200/<clone index name>;
 ```
 
 20) Ensure you scale the logstash instance back to 1.

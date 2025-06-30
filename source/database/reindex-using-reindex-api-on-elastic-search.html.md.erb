@@ -197,18 +197,12 @@ If we need to rollback we can use the cloned index from step 11 that was done be
 
 This will save us a lot of time and risk, where we dont have to a full re-index.
 
-Please ensure that the original index exists and is empty prior to doing the rollback steps (i.e. if you started doing a reindex and then needed to rollback part-way through, you would need to delete the index and have the service import their definition file again to recreate an empty one to clone into)
+Before rolling back please make sure that the current main index is removed as we wont be able to clone to into it and will be creating it again with the clone command below.
 
 1) Restore the backed up index:
 
 ```
-curl -X PUT "localhost:9200/cloned-<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d'
-{
-   "settings": {
-     "index.blocks.write": true
-   }
- }
-'
+curl -X PUT "localhost:9200/cloned-<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d'{"settings": {"index.blocks.write": true}}'
 ```
 
 ```

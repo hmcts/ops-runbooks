@@ -14,6 +14,11 @@ This will be made as generic as possible with places to enter the values needed.
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
 [Example implementation plan](https://tools.hmcts.net/confluence/display/RSTR/NDL-1.1.0+-+Amend+Elastic+Search+Index+Configuration+Release+Implementation+Plan)
 
+Example index name: `nfd_cases-000001`
+Example case_type_id: `NFD`
+Example index clone1 name:`cloned-nfd_cases-000001`
+Example index clone2 name: `cloned-nfd_cases-000002`
+
 Some changes will include both non-production and production environments. 
 
 1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)
@@ -101,6 +106,8 @@ curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type
 ```
 
 11) Clone the index for backup incase of rollback
+
+Make sure this clones name ends in a 01 like the main index.
 
 ```
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"

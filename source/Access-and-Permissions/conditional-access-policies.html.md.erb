@@ -1,0 +1,83 @@
+---
+title: Implementing Conditonal Access Policies
+weight: 30
+last_reviewed_on: 2025-06-01
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+Conditional Access policy management is now automated via code, improving reviewability, traceability, and reducing manual effort.
+
+---
+
+### Key Points
+
+- **IaC Approach:** All policies managed using Terraform and the AzureAD provider.
+- **Repository:** [hmcts/conditional-access-policies-terraform](https://github.com/hmcts/conditional-access-policies-terraform)
+- **Code Review:** GAs set as CODEOWNERS for PR approvals.
+- **Import:** Existing policies imported to Terraform state.
+- **API Limitations:** Deployment parallelism set to 1 request/sec to avoid throttling.
+
+---
+
+### Step-by-Step Implementation
+
+#### 1. Repository Setup
+
+- Repo: `hmcts/conditional-access-policies-terraform`
+- Includes: README, contributing guide, and CODEOWNERS listing GAs.
+
+#### 2. Pipeline and Pre-checks
+
+- Azure DevOps pipeline uses a pre-built Terraform pre-check template:
+  - `steps/terraform-precheck.yaml@cnp-azuredevops-libraries`
+- Runs linting, validation, and formatting before plan/apply.
+
+#### 3. Service Connection and Permissions
+
+- Azure Service Connection in DevOps using Service Principal: `GA-Prod-Tenant`
+- API permissions granted:
+  - `Policy.ReadWrite.ConditionalAccess`
+  - `Policy.Read.All`
+  - `Group.ReadWrite.All`
+  - `User.Read.All`
+  - `Application.Read.All`
+- Admin consent provided for all permissions.
+
+#### 4. Terraform Configuration
+
+Each policy is defined using the `azuread_conditional_access_policy` resource.
+
+**Example:**
+
+```hcl
+resource "azuread_conditional_access_policy" "example_policy" {
+  display_name = "Example Conditional Access Policy"
+  state        = "enabled"
+  conditions {
+    client_app_types = [
+      "browser",
+      "mobileAppsAndDesktopClients",
+      "easSupported",
+      "other"
+    ]
+    applications { included_applications = ["All"] }
+    locations    { included_locations = ["All"] }
+    platforms    { included_platforms = ["all"] }
+    users        { included_users = ["All"] }
+  }
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
+  }
+}
+```
+
+#### 5. Importing Existing Policies
+
+- Import with:
+  ```sh
+  terraform import azuread_conditional_access_policy.existing_policy <policy_id>
+  ```
+- Policy IDs retrieved via Azure CLI.

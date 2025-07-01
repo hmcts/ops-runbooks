@@ -1,6 +1,6 @@
 ---
 title: Heritage Virtual Machine List
-last_reviewed_on: 2025-06-30
+last_reviewed_on: 2025-07-01
 review_in: 12 months
 weight: 30
 ---
@@ -9,37 +9,43 @@ weight: 30
 
 This is a list of virtual machines across all heritage subscriptions. Along with some relevant data.
 
-List last updated: 15/07/22
+List last updated: 01/07/2025
 
 | VM Name                | Service | Tier | Environment | Active | Operating System | Subscription | Subscription ID | Resource Group |
 |------------------------|---------|------|-------------|--------|------------------|--------------|-----------------|----------------|
-| PCAPS-APP-VM01         | CAPS | Application | Prod | FALSE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
+| crime-portal-frontend-vm01-prod | crime-portal | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | CRIME-PORTAL-RG-PROD |
+| glimr-app-vm01-prod    | glimr | Application | Prod | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | GLIMR-RG-PROD |
+| glimr-ssrs-vm01-prod   | glimr | Application | Prod | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | GLIMR-RG-PROD |
+| martha-vm1-prod        | martha | Application | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | MARTHA-RG |
 | PCAPS-APP-VM01-RESTORE | CAPS | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
 | PCAPS-APP-VM02-RESTORE | CAPS | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
 | PCAPS-DB-VM01          | CAPS | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
-| PCAPS-DB-VM01-RESTORE  | CAPS | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
 | PCAPS-DB-VM02          | CAPS | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
-| PCAPS-DB-VM02          | CAPS | Database | Prod | FALSE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG-asr |
 | PCAPS-WEB-VM01         | CAPS | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
 | PCAPS-WEB-VM02         | CAPS | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCAPS-RG |
 | PCMAN-APP-VM01         | CaseMan | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
 | PCMAN-APP-VM02         | CaseMan | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
 | PCMAN-DB-VM01          | CaseMan | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
-| PCMAN-DB-VM01          | CaseMan | Database | Prod | FALSE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG-asr |
 | PCMAN-DB-VM02          | CaseMan | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
 | PCMAN-WEB-VM01         | CaseMan | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
 | PCMAN-WEB-VM02         | CaseMan | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PCMAN-RG |
 | PINT-CGI-M-VM-W        | Internal | CGI Bastion | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
 | PINT-CGI-M-VM01        | Internal | CGI Bastion | Prod | FALSE | Windows | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
 | PINT-DEVOPS-VM01       | Internal | DevOps | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PDEVOPS-RG |
-| PINT-MGMT-VM-L         | Internal | Management | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
 | PINT-MGMT-VM-W         | Internal | Management | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
-| PINT-MGMT-VM01         | Internal | Management | Prod | FALSE | Windows | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
-| PINT-MGMT-VM02         | Internal | Management | Prod | FALSE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PINT-RG |
 | POEM-MGMT-VM01         | OEM | Management | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | POEM-RG |
 | POEM-MGMT-VM02         | OEM | Management | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | POEM-RG |
 | PSUPS-REP-VM01         | SUPS | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PSUPS-RG |
 | PSUPS-REP-VM02         | SUPS | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | PSUPS-RG |
+| allpay-vm1-prod        | allpay | Application | Prod | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | allpay-rg |
+| crime-portal-frontend-vm02-prod | crime-portal | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | crime-portal-rg-prod|
+| crime-portal-ldap-vm01-prod | crime-portal | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | crime-portal-rg-prod|
+| crime-portal-ldap-vm02-prod | crime-portal | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | crime-portal-rg-prod|
+| glimr-app-vm02-prod | glimr | Application | Prod | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | glimr-rg-prod|
+| martha-vm2-prod | martha | Application | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | martha-rg |
+| sdrs-frontend-vm01-prod | sdrs | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | SDRS-RG-PROD |
+| sdrs-frontend-vm02-prod | sdrs | Application | Prod | TRUE | Linux | DTS-HERITAGE-INTSVC-PROD | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | SDRS-RG-PROD |
+| crime-portal-ldap-vm02-stg | crime-portal | Application | Staging | TRUE | Linux | DTS-HERITAGE-INTSVC-STG | 17390ec1-5a5e-4a20-afb3-38d8d726ae45 | crime-portal-rg-stg |
 | NCAPS-APP-VM01         | CAPS | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NCAPS-RG |
 | NCAPS-APP-VM02         | CAPS | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NCAPS-RG |
 | NCAPS-DB-VM01          | CAPS | Database | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NCAPS-RG |
@@ -52,18 +58,24 @@ List last updated: 15/07/22
 | NCMAN-WEB-VM02         | CaseMan | Web | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NCMAN-RG |
 | NINT-GCI-M-VM-W        | Internal | CGI Bastion | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NINT-RG |
 | NINT-DEVOPS-VM01       | Internal | DevOps | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NDEVOPS-RG |
-| NINT-MGMT-VM-L | Internal | Management | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NINT-RG |
 | NINT-MGMT-VM-W | Internal | Management | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NINT-RG |
+| crime-portal-frontend-vm01-stg | crime-portal | Application | Staging | TRUE | Linux | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | crime-portal-rg-stg |
+| crime-portal-frontend-vm02-stg | crime-portal | Application | Staging | TRUE | Linux | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | crime-portal-rg-stg |
+| crime-portal-ldap-vm01-stg | crime-portal | Application | Staging | TRUE | Linux | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | crime-portal-rg-stg |
+| glimr-app-vm01-stg | glimr | Application | Staging | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | glimr-rg-stg |
+| glimr-app-vm02-stg | glimr | Application | Staging | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | glimr-rg-stg |
+| glimr-ssrs-vm01-stg | glimr | Application | Staging | TRUE | Windows Server 2022 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | glimr-rg-stg |
+| martha-vm1-stg | martha | Application | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | martha-rg |
+| martha-vm2-stg | martha | Application | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | martha-rg |
+| sdrs-frontend-vm01-stg | sdrs | Application | Staging | TRUE | Linux | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | sdrs-rg-stg |
 | NOEM-MGMT-VM01 | OEM | Management | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NOEM-RG |
 | NOEM-MGMT-VM02 | OEM | Management | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NOEM-RG |
 | NSUPS-REP-VM01 | SUPS | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NSUPS-RG |
-| NSUPS-REP-VM01 | SUPS | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NSUPS-RG |
-| Update-testing-vm01 | Other | Other | Staging | FALSE | Linux | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | Update-deployment-testing |
-| PEXT-CGI-VM-W | External | CGI Bastion | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
+| NSUPS-REP-VM02 | SUPS | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-INTSVC-STG | ae75b9fb-7d34-4112-82ff-64bd3855ce27 | NSUPS-RG |
 | PEXT-CGI-M-VM01 | External | CGI Bastion | Prod | FALSE | Windows | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
-| PEXT-MGMT-VM-L | External | Management | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
 | PEXT-MGMT-VM-W | External | Management | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
 | PEXT-WIN-UPD-01 | Other | Other | Prod | FALSE | Windows | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
+| PEXT-CGI-M-VM-W | Core | Management | Prod | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PEXT-RG |
 | PMCOL-APP-VM01 | MCOL | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
 | PMCOL-APP-VM02 | MCOL | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
 | PMCOL-DB-VM01 | MCOL | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
@@ -71,19 +83,15 @@ List last updated: 15/07/22
 | PMCOL-DB-VM02 | MCOL | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
 | PMCOL-WEB-VM01 | MCOL | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
 | PMCOL-WEB-VM02 | MCOL | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PMCOL-RG |
-| POAG-OUD-VM-01 | IDAM | Oracle Unified Directory | Prod | TRUE | RHEL 6.10 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | EXTERNALSPOKE-RG |
+| POAG-OUD-VM01 | IDAM | Oracle Unified Directory | Prod | TRUE | RHEL 6.10 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | EXTERNALSPOKE-RG |
 | POAG-WEB-VM01 | IDAM | Web | Prod | TRUE | RHEL 6.10 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | EXTERNALSPOKE-RG |
 | POAG-WEB-VM02 | IDAM | Web | Prod | TRUE | RHEL 6.10 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | EXTERNALSPOKE-RG |
 | PPCOL-APP-VM01 | PCOL | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
 | PPCOL-APP-VM02 | PCOL | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
 | PPCOL-DB-VM01 | PCOL | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
-| PPCOL-DB-VM01 | PCOL | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
+| PPCOL-DB-VM02 | PCOL | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
 | PPCOL-WEB-VM01 | PCOL | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
 | PPCOL-WEB-VM02 | PCOL | Web | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PPCOL-RG |
-| PSDT-APP-VM01 | SDT | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PSDT-RG |
-| PSDT-APP-VM02 | SDT | Application | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PSDT-RG |
-| PSDT-DB-VM01 | SDT | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PSDT-RG |
-| PSDT-DB-VM02 | SDT | Database | Prod | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-PROD | c170c61a-f00f-4295-a718-634e27af1597 | PSDT-RG |
 | NEXT-CGI-M-VM-W | External | CGI Bastion | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NEXT-RG |
 | NEXT-MGMT-VM-L | External | Management | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NPCOL-RG |
 | NEXT-MGMT-VM-W | External | Management | Staging | TRUE | Windows Server 2019 Datacenter | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | next-rg |
@@ -102,7 +110,3 @@ List last updated: 15/07/22
 | NPCOL-DB-VM01 | PCOL | Database | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NPCOL-RG |
 | NPCOL-WEB-VM01 | PCOL | Web | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NPCOL-RG |
 | NPCOL-WEB-VM02 | PCOL | Web | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NPCOL-RG |
-| NSDT-APP-VM01 | SDT | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NSDT-RG |
-| NSDT-APP-VM02 | SDT | Application | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NSDT-RG |
-| NSDT-DB-VM01 | SDT | Database | Staging | TRUE | RHEL 7.7 | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NSDT-RG |
-| NTRANS-MCOL-VM01 | MCOL | Other | Staging | TRUE | Linux | DTS-HERITAGE-EXTSVC-STG | 9c604868-4643-43b8-9eb1-4c348c739a3e | NTRANS-RG |

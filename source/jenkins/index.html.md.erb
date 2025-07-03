@@ -61,6 +61,12 @@ If it's not a security vulnerability, raise a tech improvement ticket for it to 
 
 Proceed to patch the ptl environment and perform the same steps.
 
+If there are updates to Helm charts, you should test these out on ptlsbox first to confirm if any changes to code is needed.
+
+Once you've confirmed ptlsbox Jenkins is working using the same steps from above, you can proceed to upgrading the helm charts in ptl.
+
+See [example](https://github.com/hmcts/cnp-flux-config/pull/39324/files) of potential breaking changes that can occur when upgrading the helm charts to new major versions.
+
 ## Configuration
 
 All instances are 100% managed as code, you should never have to edit any configuration manually.

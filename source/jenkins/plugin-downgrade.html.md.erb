@@ -14,7 +14,7 @@ Renovate checks plugin versions and [automatically upgrades them each morning](h
 If an issue has arisen with a new version of a plugin and it needs to be downgraded:
 
 * [Downgrade it](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/plugins.txt) in the image
-* Deploy the [new image on CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) and [on SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml)
+* Deploy the [new image on CFT](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml) and [on SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml)
 
 * Jenkins may run into issues when downgrading plugins, if this is the case:
 

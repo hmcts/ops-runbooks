@@ -27,6 +27,12 @@ There are two sets of Jenkins instances, SDS and CFT, both have a sandbox instan
 
 ## Jenkins patching
 
+> ⚠️ **Note:** Before starting, send notifications out ahead of time on **#cloud-native-announce** and **#sds-cloud-native** to let teams know patching will be occurring. 
+
+> You should endeavour to patch Jenkins early in the morning before 8am on a weekday so we can identify issues and roll back, if required. 
+
+> A change request is not necessary.
+
 The container image is built from [cnp-jenkins-docker](https://github.com/hmcts/cnp-jenkins-docker).
 
 Renovate creates pull requests to update plugins and Dependabot creates pull requests to update the Jenkins controller version.
@@ -34,6 +40,32 @@ Renovate creates pull requests to update plugins and Dependabot creates pull req
 Currently promotion of the Jenkins image is done by manually updating the tag in flux.
 
 There's documentation for [Promoting a new Jenkins image](https://github.com/hmcts/cnp-jenkins-docker#promoting-a-new-jenkins-image) in the cnp-jenkins-docker repository.
+
+When a new docker image has been published, renovate will pick this up and create a new pull request in [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) and [sds-flux-config](https://github.com/hmcts/sds-flux-config).
+
+There will be separate pull requests for ptl and ptlsbox.
+
+You should merge the PR for ptlsbox and then check each Jenkins instance to ensure it has updated by going to about section of the site e.g. [https://sds-sandbox-build.hmcts.net/manage/about/](https://sds-sandbox-build.hmcts.net/manage/about/)
+
+Run the plum and toffee pipelines (at least one of frontend or backend AND the infrastructure pipeline) to ensure there are no issues being caused by upgraded plugins or the Jenkins version itself.
+
+Check the settings page, e.g. [https://sds-sandbox-build.hmcts.net/manage/](https://sds-sandbox-build.hmcts.net/manage/), and confirm there are no remaining vulnerabilities in plugins or any other recommendations.
+
+If there are recommendations or deprecations, fix them.
+
+If there are security vulnerabilities, follow the advice from the maintainers. If a fix is not yet possible, set a reminder to revisit this in a few days.
+
+<%= warning_text('Security vulnerabilities should not be ignored!') %>
+
+If it's not a security vulnerability, raise a tech improvement ticket for it to be dealt with by a squad.
+
+Proceed to patch the ptl environment and perform the same steps.
+
+If there are updates to Helm charts, you should test these out on ptlsbox first to confirm if any changes to code is needed.
+
+Once you've confirmed ptlsbox Jenkins is working using the same steps from above, you can proceed to upgrading the helm charts in ptl.
+
+See [example](https://github.com/hmcts/cnp-flux-config/pull/39324/files) of potential breaking changes that can occur when upgrading the helm charts to new major versions.
 
 ## Configuration
 

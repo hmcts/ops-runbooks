@@ -555,6 +555,8 @@ scalesets
 scm
 SCM
 screenshots
+sdrs
+SDRS
 sdshmcts
 sdsprod
 SDSPTL
@@ -594,6 +596,7 @@ sshkey
 sshpass
 sso
 ssptl
+ssrs
 stackoverflow
 stakeholders
 Staticfile

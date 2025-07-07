@@ -9,10 +9,9 @@ weight: 10
 
 Currently, WAF provisioning is managed via Terraform, with configuration migrated between appliances using export/import features. Management is handled through the Control Centre, with access controlled via trusted keys and tunneling.
 
-The Barracuda Web Application Firewalls (WAFs) are deployed in pairs for each environment (DEV, SIT, NFT, PRP/PRX, PRD) to protect Common Platform and Rota applications in the Crime domain. However, it is not confirmed if these WAFs are zone redundant. 
+The Barracuda Web Application Firewalls are deployed in pairs for each environment (DEV, SIT, NFT, PRP/PRX, PRD) in Crime. 
 
-The next upgrade cycle will focus on deploying new WAF instances using the latest images, ensuring each pair is distributed across different availability zones for improved resilience.
-
+The next upgrade cycle will focus on deploying new WAF instances using the latest images, ensuring each pair is distributed across zones redundantly. This will enhance resilience and performance, allowing for seamless failover and load balancing across the each of the firewall.
 
 ## Guides
 

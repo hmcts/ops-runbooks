@@ -1,0 +1,84 @@
+---
+title: Barracuda Web Application Firewall Deployments
+last_reviewed_on: 2025-07-07
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This page provides information on the deployment and configuration of the Barracuda Web Application Firewall (WAF). The WAF is deployed using the [cpp-terraform-azurerm-waf](https://github.com/hmcts/cpp-terraform-azurerm-waf) repository.
+
+Deployments are managed via Terraform, with environment-specific configuration supplied through `.tfvars` files containing the required values. The deployment pipeline can be found [here](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=468) (ensure you set the environment name to match your `.tfvars` file when running the pipeline). The destroy pipeline is available [here](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=469).
+
+<img src="images/pipleine.png" style="height:450px;">
+
+## Connecting to the WAF
+
+To connect to the WAF, you must be on the Crime VPN. The following example shows how to connect to the nonlive WAF.
+
+First, get the IP address of the WAF. Then use the command below to create an SSH tunnel, forwarding port 8000 on the WAF to port 8020 on your local machine (you can choose a different local port if you prefer):
+
+```sh
+ssh -L 8020:10.89.192.16:8000 DEVJUMPL01.cpp.nonlive
+```
+
+Once the tunnel is established, you can access the WAF by navigating to `http://localhost:8020` in your web browser.
+
+## Setting up the WAF
+
+If you want to connect to the old WAF, you can find the password in HashiCorp Vault at the path `secret/terraform/dev/waf_admin_password`. The username will be `admin`.
+
+To set up the WAF, follow these steps:
+
+- Get a backup of the current configuration by exporting it from the old WAF. If it is a newer firmware version, you can export the JSON configuration. If it is an older version, you will need to do a manual backup. For manual backup instructions, see [Barracuda WAF - Configuration options](https://tools.hmcts.net/confluence/display/EI/Barracuda+WAF+-+Configuration+options).
+- Once you have the backup, import it into the new WAF. This will ensure that all your existing rules and settings are preserved. If your new WAF supports importing the JSON configuration, you can export the JSON configuration and save it in the [cpp-terraform-azurerm-waf](https://github.com/hmcts/cpp-terraform-azurerm-waf) repository.
+- After importing from backup, export the JSON configuration from the new WAF and save it in the [cpp-terraform-azurerm-waf repository](https://github.com/hmcts/cpp-terraform-azurerm-waf/tree/main/backup). This will serve as a reference for future deployments and ensure that you have a backup of the current configuration.
+- Finally, set up High Availability (HA) for the WAF under advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. (Use the vault secret found in HashiCorp Vaul in this path "secret/terraform/dev" as the vault secret then add the IP address of the other WAF in the peer WAH to join the HA pair together like below.)
+
+<img src="images/high-availability.png" style="height:450px;">
+
+
+## Testing and Switch Over to the New WAF
+
+Deploy load balancers to route traffic to the new WAF. The load balancers should be configured to point to the new WAF IP addresses. You can find the IP addresses in the `terraform.tfvars` file for your environment.
+
+- You will need to test all the streaming services and website translations to ensure that they are working as expected with the new WAF. (It is best to compare with the old one.)
+
+<img src="images/services.png" style="height:450px;">
+
+The three major services to test are:
+
+- CCM
+- IDAM
+
+Each stream is a separate service, so you will need to test each one.
+
+The APIGW service is not working with the new WAF, so it is not included in the testing, as it is also down on the old WAF.
+
+<img src="images/website-translations.png" style="height:450px;">
+
+To test the stream services, you will need to update the IP address of the main service host in the backend pool of the load balancer. The best way to find out which load balancer to update is to run an `nslookup` on the domain name of the service; this will point you to the correct load balancer. The IP address it resolves to is the load balancer frontend IP address.
+
+```
+Server:		127.0.0.1
+Address:	127.0.0.1#53
+
+Non-authoritative answer:
+Name:	onlineplea.dev.cjscp.org.uk
+Address: 51.11.44.0 
+```
+
+As you can see, the IP address is the load balancer frontend IP address, so you will need to update the backend pool of the load balancer to point to the new WAF IP address.
+
+If you do not know which load balancer to update, you can search for the IP address in the Azure portal, and it will show which load balancer it is attached to.
+
+Once you have found the load balancer, check the frontend configuration to see which frontend IP address the domain resolves to. For example, the frontend IP address for `onlineplea.dev.cjscp.org.uk` is `51.11.44.0`, which resolves to `WAF-FRONTEND-01`. It will use the backend pool of `WAF-FRONTEND-01` to route the traffic to the new WAF IP address.
+
+The IP address of the host in the backend pool needs to be updated to the new WAF IP address. To send traffic to the new WAF, you will need to switch the admin state of the host in the backend pool to "up" and the old WAF to "down". This will ensure that traffic is routed to the new WAF while the old WAF is still available for fallback if needed.
+
+<img src="images/admin-state.png" style="height:450px;">
+
+Before switching the admin state, ensure that the new WAF is fully operational and has been tested with the services, and announce it in the cpp-devops Slack channel. If there is any issue, you can roll back if needed by switching the admin state.
+
+Test the service by accessing it through the domain name of the service. For example, you can access the `onlineplea.dev.cjscp.org.uk` service by navigating to `https://onlineplea.dev.cjscp.org.uk/` in your web browser.

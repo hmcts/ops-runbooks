@@ -104,6 +104,6 @@ XXXX
 ruleset
 pmd
 DEVJUMPL
-mpd*
+mpd
 onlineplea
 wafcc

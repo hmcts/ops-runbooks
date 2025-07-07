@@ -48,11 +48,9 @@ Deploy load balancers to route traffic to the new WAF. The load balancers should
 
 Each stream is a separate service, so you will need to test each one.
 
-The APIGW service is not working with the new WAF, so it is not included in the testing, as it is also down on the old WAF.
-
 <img src="images/website-translations.png" style="height:450px;">
 
-To test the stream services, you will need to update the IP address of the main service host in the backend pool of the load balancer. The best way to find out which load balancer to update is to run an `nslookup` on the domain name of the service; this will point you to the correct load balancer. The IP address it resolves to is the load balancer frontend IP address.
+To test the stream services, you will need to update the IP address of the main service host in the backend pool of the load balancer. The best way to find out which load balancer to update is to query the the domain name of the service; this will point you to the correct load balancer. The IP address it resolves to is the load balancer frontend IP address.
 
 The IP address is the load balancer frontend IP address, so you will need to update the backend pool of the load balancer to point to the new WAF IP address.
 

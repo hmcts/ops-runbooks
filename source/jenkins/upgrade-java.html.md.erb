@@ -48,9 +48,9 @@ After the Jenkins agents have been upgraded you can look into upgrading the Jenk
 Upgrade SDS first and then CFT.
 
 1. Firstly merge in the changes to the Docker image that you made earlier. Make note of the tag that is created when you merge it in by checking the build log. This alone won't upgrade the Java version as you will need to update the tag that is used. Upon merge, check the [jenkins/jenkins repository](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/rpe-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/hmctspublic/repository) for the updated tag. You should also be able to see it in the build log when you merge your changes.
-2. Bump the Docker image tag for [SDS PTLSBOX](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-controller-version.yaml) or [CFT SBOX-INTSVC](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins-controller-version.yaml).
-3. Bump the Docker image tag for [SDS PROD](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml) or [CFT PROD](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-controller-version.yaml).
-4. Point the flux config to use that new tag by updating the [SDS PROD flux config](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml) or the [CFT PROD flux config](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-controller-version.yaml)
+2. Bump the Docker image tag for [SDS PTLSBOX](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) or [CFT SBOX-INTSVC](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins-controller-version.yaml).
+3. Bump the Docker image tag for [SDS PROD](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) or [CFT PROD](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml).
+4. Point the flux config to use that new tag by updating the [SDS PROD flux config](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml)
 5. After 10 - 15 minutes check the runtime version on Jenkins and verify that the upgrade was successful for SDS by running [Toffee tests](https://sds-build.hmcts.net/blue/organizations/jenkins/HMCTS_Nightly_Sandbox/sds-toffee-frontend/) or for CFT run the [Plum tests](https://build.hmcts.net/job/HMCTS_a_to_c/job/cnp-plum-frontend/job/master/).
 
 #### Rollback Agents
@@ -58,7 +58,7 @@ Revert changes to [SDS](https://github.com/hmcts/sds-flux-config/blob/master/app
 Decrement the Docker image version [CNP Jenkins Docker](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile).
 
 #### Rollback Controller
-Revert changes to [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-controller-version.yaml) and [CFT](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-controller-version.yaml).
+Revert changes to [SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml) and [CFT](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins-controller-version.yaml).
 Decrement the Docker image version [CNP Jenkins Docker](https://github.com/hmcts/cnp-jenkins-docker/blob/master/jenkins/Dockerfile).
 
 #### Examples

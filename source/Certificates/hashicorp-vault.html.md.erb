@@ -1,0 +1,51 @@
+---
+title: Requesting SSL Certificates via Hashicorp Vault
+last_reviewed_on: 2025-07-08
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Follow the [confluence document](https://tools.hmcts.net/confluence/display/DTSPO/Hashicorp+Vault+-+How+to+use+and+interact+with+Vault) to get connected to vault.
+
+For this, you may require the root token instead of oidc, depending on what permission level you have.
+
+You can find the token in one of the keyvaults.
+
+Once you are connected to the vault using the instructions above, you can request the certificate.
+
+```
+vault write pki_mnl_int/issue/mnl-nl-cjscp-org-uk common_name="<full domain name>" ttl="1h"
+```
+
+For example:
+
+```
+vault write pki_mnl_int/issue/mnl-nl-cjscp-org-uk common_name="darts-gateway.mnl.nl.cjscp.org.uk" ttl="1h"
+```
+
+The cert will be generated and saved in the vault.
+
+The output of the command will give you a fingerprint which you can use to verify the domain name using:
+
+```
+vault read -format=json pki_mnl_int/cert/<fingerprint> | jq -r '.data.certificate' | openssl x509 -noout -subject -ext subjectAltName
+```
+
+This will give you something like this:
+
+```
+subject=CN=darts-gateway.mnl.nl.cjscp.org.uk
+X509v3 Subject Alternative Name: 
+    DNS:darts-gateway.mnl.nl.cjscp.org.uk
+```
+
+## Adding the certificate to the application gateway for Crime
+
+An integration has been configured to copy the cert to Azure Keyvault to use with application gateway.
+
+Add your certificate to the config using the [correct format](https://github.com/hmcts/cpp-terraform-azurerm-imz/blob/c76bdd3f13522e846b2b6c339ba079fd2e112ce4/vars/mdv.tfvars#L562-L565).
+
+And specify the certificate in the [listener settings](https://github.com/hmcts/cpp-terraform-azurerm-imz/blob/c76bdd3f13522e846b2b6c339ba079fd2e112ce4/vars/mdv.tfvars#L550).
+

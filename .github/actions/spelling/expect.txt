@@ -102,3 +102,8 @@ VNETs
 wsdl
 XXXX
 ruleset
+pmd
+DEVJUMPL
+mpd
+onlineplea
+wafcc

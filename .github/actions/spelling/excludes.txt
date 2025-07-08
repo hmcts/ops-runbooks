@@ -10,3 +10,7 @@ ignore$
 ^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$
 (?:^|/)accounts\.html\.md\.erb$
 pmd
+DEVJUMPL
+mpd
+onlineplea
+wafcc

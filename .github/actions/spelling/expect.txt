@@ -26,6 +26,7 @@ datacentre
 Datlassian
 DBfor
 deevanapalli
+DEVJUMPL
 devrot
 dockerfiles
 dsl
@@ -39,6 +40,7 @@ geolocationfile
 GEOLOCATIONUPDATES
 Glust
 gluster
+Hashicorp
 IMZ
 Jacomb
 Jenkinsfiles
@@ -55,12 +57,18 @@ Manan
 mdv
 MDVADMVPNHA
 Miniport
+mnl
 Moj
+mpd
 myregistry
 nodelocaldns
 NONLINE
+noout
 NSGs
+oidc
+onlineplea
 paramatised
+pki
 pmd
 prd
 PRDATL
@@ -74,6 +82,7 @@ recoverypoint
 regitries
 Resouce
 Rns
+ruleset
 ruxit
 SBZ
 sku
@@ -99,11 +108,6 @@ utilisation
 Virtualbox
 virtualwan
 VNETs
+wafcc
 wsdl
 XXXX
-ruleset
-pmd
-DEVJUMPL
-mpd
-onlineplea
-wafcc

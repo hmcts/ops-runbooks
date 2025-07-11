@@ -57,7 +57,6 @@ Don’t worry about patch versions. As long as the clusters are on the same mino
 
 For more information, refer to the [Azure Kubernetes Service (AKS) supported Kubernetes versions](https://learn.microsoft.com/en-us/azure/aks/supported-kubernetes-versions?tabs=azure-cli#alias-minor-version).
 
-
 ## Notify teams
 
 Please post a notification in the #cloud-native-announce channel to notify people which clusters will be upgraded (Please refrain from using @here, as this is intended for announcements rather than notification).
@@ -108,11 +107,13 @@ echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json
 ```command
 kubectl get hr --all-namespaces | awk '!/(True)/'
 ```
+
 - To view helm chart history
 
 ```command
 helm history <chart name> -n <namespace>
 ```
+
 - To roll back helm chart to a prior version or specific version
 
 ```command
@@ -141,21 +142,37 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 
-  - Please remember when you switching from 00 cluster to 01 on Application Gateway, and 01 to 00, the best practice is to have pipeline build done which has both IP addresses.  Eg.  All below should be separate PR and then pipeline build
+Please remember when you switching from 00 to 01 on the Application Gateway, and 01 to 00, **it is best practice to have the pipeline complete one step at a time**
 
-            1. Remove 00 Cluster IP
-            2. Put back 00 Cluster IP after successful upgrade
-            3. Remove 01 Cluster IP
-            4. Put back 01 Cluster IP after successful upgrade
+E.g.  All below steps should be separate pull requests with a successful pipeline run at each step
 
-- Unsure which IP belongs to which cluster? Check the front end IP of the kubernetes-internal loadbalancer:
+    1. Remove 00 Cluster IP
+        - Complete successful pipeline run
+    2. Put back 00 Cluster IP after successful upgrade
+        - Complete successful pipeline run
+    3. Remove 01 Cluster IP, run pipeline successfully
+        - Complete successful pipeline run
+    4. Put back 01 Cluster IP after successful upgrade
+        - Complete successful pipeline run
 
-  [portal.azure.com](https://portal.azure.com) > Load Balancer > search for 'kubernetes-internal' > filter by the Resource Group > click on the load balancer returned by the search > click on Frontend IP Configuration > the IP Address is the one you need
+**Unsure which IP belongs to which cluster?**
 
-##  Environment Specific Steps
+Check the front end IP of the relevant `kubernetes-internal` loadbalancer:
+
+    portal.azure.com
+        -> Load Balancer
+            -> search for `kubernetes-internal`
+                -> filter by the Resource Group
+                    -> click on the load balancer returned by the search
+                        -> click on Frontend IP Configuration
+                            -> the IP Address is the one you need
+
+## Environment Specific Steps
+
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
 We upgrade PTL/PTLSbox and Preview/Dev/ITHC (only because we have one ITHC cluster currently) in-place, meaning we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the Rebuilding AKS Clusters guide.
-### Ptlsbox, Ptl, AAT
+
+### PTLsbox, PTL, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
 Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.
@@ -166,11 +183,20 @@ We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place up
 
 - If the configuration doesn't update after your pull request has been merged, you can change it manually in the [Jenkins Configuration](https://build.platform.hmcts.net/configure)
 
-### aat
+### AAT
 
-Before you upgrade a cluster in the AAT environment, please check which is the active cluster being used by Jenkins before removing either from the application gateway. This process is detailed in the [rebuild guides](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging).
+Before you upgrade a cluster in the AAT environment, please check which is the active cluster being used by Jenkins before removing either from the application gateway.
 
-### perftest
+**Whichever cluster is the current active cluster should be upgraded last.** The full process is detailed in the [rebuild guides](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#dev-preview-aat-staging).
+
+The hi-level steps from the guide that matter for upgrading an AAT cluster are:
+
+- Upgrade the non-active cluster as normal
+- Swap Jenkins to use the newly upgraded non-active cluster making it the active cluster
+- Update private DNS entries to point to the upgraded cluster completely removing the old cluster from active status
+- Upgrade the remaining cluster
+
+### Perftest
 
 If we are upgrading `cft-perftest-00-aks` and `cft-perftest-01-aks`, we have to agree on time with on this channel `perftest-cluster` beforehand.
 

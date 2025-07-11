@@ -1,6 +1,6 @@
 ---
 title: Terraform
-last_reviewed_on: 2024-07-26
+last_reviewed_on: 2025-03-31
 review_in: 12 months
 weight: 210
 ---
@@ -9,8 +9,6 @@ weight: 210
 
 This is a space for any guides relating to work with Terraform.
 
-- [Terrafrom Validation](./terraform-validation.html)
-
-- [Terraform Import](./terraform-import.html)
-
-- [Terraform Known Issues](./terraform-known-issues.html)
+<% current_page.children.each do |page| %>
+- [<%= page.data.title %>](<%= page.url %>)
+<% end %>

@@ -1,0 +1,177 @@
+---
+title: Atlassian Infrastructure
+last_reviewed_on: 2025-05-20
+review_in: 12 months
+weight: 15
+---
+
+# <%= current_page.data.title %>
+Atlassian Apps - Jira, Confluence and Crowd
+
+New infrastructure was deployed for all Atlassian apps as part of work to migrate from single server to flexible server. The [atlassian-infrastructure](https://github.com/hmcts/atlassian-infrastructure) has all the IaC as well as automation scripts.
+
+environments built
+* Production - this replaced "PRD"
+* Staging - this replaced "PRP"
+
+
+## Virtual Machines
+
+Please take a look at this [documentation](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=DTSPO&title=ODP+0002+-+Atlassian+Interim+Hosting+Deployment+Approach) on confluence which has detailed list of VMs and existing setup and the diagram.
+
+There are total 9 VMs in the production environment, 3 VMs for Jira, 2 VMs for Confluence, 1 VM for Crowd and 3 VMs for GlusterFS.
+
+All resources are stored in either [atlassian-prod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/atlassian-prod-rg/overview) or [atlassian-nonprod-rg](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/b7d2bd5f-b744-4acc-9c73-e068cec2e8d8/resourceGroups/atlassian-nonprod-rg/overview)
+
+```bash
+Prod
+
+#### Jira VMs
+* atlassian-prod-jira-01
+* atlassian-prod-jira-02
+* atlassian-prod-jira-03
+
+#### Confluence VMs
+* atlassian-prod-confluence-02
+* atlassian-prod-confluence-04
+
+#### Crowd VM - this is used to handle the authentication.
+* atlassian-prod-crowd-01
+
+#### GlusterFS VMs - GlustFS is used to store file attachments.
+* atlassian-prod-gluster-01
+* atlassian-prod-gluster-02
+* atlassian-prod-gluster-03
+
+#### Postgres Flexible Server
+atlassian-prod-flex-server
+
+staging / non prod VM's following the same naming convention but with "nonprod" instead of "prod"
+```
+
+Please note that there are other important resources like Application Gateways, Load Balancer, NSGs, VNETs, SendGrid etc. which are not mentioned here.
+
+## PlatOps responsibility
+
+The internal tooling team have access to the servers and databases in both production and staging, as well as in-depth knowledge of how the Atlassian apps work. This means that self-service is normally possible.
+
+What cant the internal team do? 
+
+The team does not have access to Azure, or the automation scripts. This means that PlatOps will need to provide assistance in these spaces. This includes any network related issues or features.
+
+## Accessing the VMs
+1. Connect to the F5 VPN - available at https://portal.platform.hmcts.net/
+
+2. Download the private key "test-private-key" from the key vault [atlassian-nonprod-kv](https://portal.azure.com/#@HMCTS.NET/asset/Microsoft_Azure_KeyVault/Secret/https://atlasssian-prod-kv.vault.azure.net/secrets/test-private-key), and save it to a file.  
+
+3. Set the correct permissions on the file and 
+```bash
+run chmod 600 <privatekeyfilename>
+```
+
+4. SSH to the desired VM.
+```bach
+ssh -i <privatekeyfilename> atlassian-admin@<VM-IP>
+```
+
+###NOTE: as the VM's are restores of a previous production environment, the local hostname will be different from the Azure display name. Verify you are on the right host by its local IP address!
+
+For example Jira node 1 in staging and production will both the same hostname as "PRDATL01AJRA01.cp.cjs.hmcts.net"
+
+## Auto SSL renewal process
+
+The environments have been built to use Lets Encrypt SSL certificates via the [acmebot](https://acmedtssdsprod.azurewebsites.net/dashboard)
+
+This means that the certificates renew  regularly (every 3 months) so automation has been created to automatically renew these certs within the environment.
+
+The bash function responsible for this is [check_and_replace_cert function](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/components/general/scripts/functions.sh#L118-L209)
+
+* Query if the latest cert from the KeyVault has a newer expiry date than the cert already on the servers.
+* If it does, it will update the certificate on the servers
+* if the current time is within an agreed window (before 8am), the services will be restarted automatically to pick up the new cert.
+* If the latest cert has the same expiry date as the current cert, no action will be taken.
+
+The [Atlassian pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1022) runs every Monday morning at 7am, this is to poll for any certificate updates.
+
+## SendGrid account
+
+There is a SendGrid SaaS account within the `atlassian-prod-rg resource` group, code and pipeline for provisioning and managing this account can be found [here](https://github.com/hmcts/rdo-sendgrid/blob/master/terraform/modules/atlassian/10-sendgrid.tf).  
+The account, like all the other SendGrid accounts is deployed using an ARM template as there is no provisioner for this within Terraform.  
+If you are making changes to this, you might want to verify them first by running `az deployment group what-if <arm-tpl-file> <config>` to see what the template deployment
+will actually change as this is not really visible within the Terraform plan itself.
+
+## Jira emails
+
+Jira is configured to send emails over SMTP to localhost where they are queued by locally running [Postfix server](https://www.postfix.org/).  
+Should an issue occur where Postfix is unable to relay the emails to SendGrid, it will queue them up and once issue is resolved gradually send the emails to clear the backlog.  
+You will usually be able to observe this within Postfix logs or within SendGrid account dashboard where the number of sent emails will grow.  
+Postfix configuration is held in `/etc/postfix/main.cf` and its log is kept in `/var/log/maillog`.  
+This is where (among other things) following key settings are configured:
+
+- the address of the SendGrid smtp server to relay the emails to
+- path to a file with the credentials (API key)
+
+Postfix authenticates to SendGrid SMTP server with a `username:password` which follows this pattern: `apikey:<apikey_value>`.  
+You can verify that the API key works using [Telnet by following this article](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/getting-started-smtp#send-an-smtp-email-using-telnet).  
+Jira API keys are managed with a Terraform provider [here](https://github.com/hmcts/atlassian-infrastructure/blob/master/components/general/sendgrid.tf) using a dedicated provisioner.  
+The value of the API key within Postfix config can be automatically updated by the pipeline if appropriate flag is set to true, [script for this can be found here](https://github.com/hmcts/atlassian-infrastructure/blob/master/components/general/scripts/functions.sh#L211).  
+Keep in mind that the script provisioner will only get triggered if one of the scripts has been updated.
+
+## Confluence emails
+
+Confluence does not use Postfix as an intermediary for sending the emails and SendGrid SMTP server host and credentials are set directly within its configuration.  
+Due to this, the configuration for the API key has not been automated for this application, instead it uses an API key that has been manually created within the SendGrid account
+and securely shared with the Atlassian team who configured Confluence to use it.  
+You can view all existing API key names and IDs within SendGrid Account along with their permissions.  
+If you need to get the actual value of the API key for some reason, this cannot be retrieved from the SendGrid account after initial creation, but all currently existing key values have been saved within key vaults and can be retrieved from there.  
+
+## Email domain authentication
+
+In a case where the SendGrid account would need to be recreated or migrated, it is important to remember that before any emails can be sent, we will need to prove that we own the email domain we want to send the emails from first.  
+Otherwise, the emails will not be sent and you will see some authentication/authorisation errors in postfix log.  
+Validation is done through [Domain Authentication](https://www.twilio.com/docs/sendgrid/ui/account-and-settings/how-to-set-up-domain-authentication) request within the SendGrid account - some automatically generated DNS Records are shared which then need to be added to the email domain.  
+The email domain we are using is: `cjscp.justice.gov.uk` and it does not live within the Azure, but Amazon Route 53 which is managed by legal services web master.  
+Should you need to migrate the account for any reason you can send a request for the new DNS Records to be added to: domains@digital.justice.gov.uk.  
+Domain authentication can be manually triggered through SendGrid account interface but this is also automatically done by the [Terraform here](https://github.com/hmcts/atlassian-infrastructure/blob/master/components/general/sendgrid.tf#L44).  
+You can see that the DNS Records generated by the SendGrid are printed as outputs for you in the pipeline.  
+Similar process to the above has to be followed to enable [link branding within the emails](https://www.twilio.com/docs/sendgrid/ui/account-and-settings/how-to-set-up-link-branding).
+
+## FAQ
+## How are services restarted?
+You can restart the services when logged into the servers with
+
+```bash
+systemctl restart jira
+```
+replace "Jira" with the service you want to restart, such as "Crowd" or "Confluence" 
+
+You can also set the automation to restart the services by adjusting this [environment var](https://github.com/hmcts/atlassian-infrastructure/blob/e752b4c28370416590c2bc9f3549dda6bcd58508/environments/prod/prod.tfvars#L4) 
+
+## What do the automation scripts do?
+On each VM, there is a terraform remote-exec to trigger bash scripts which complete various bits of a setup on the VMs. These scripts complete the following:
+
+* Configure staging with a different base URL - staging.tools.hmcts.net
+* Grants permissions to app users, such as the jira user.
+* Updates the local hosts file
+* Runs SSL renewal checks
+* Points the app the correct database
+* Sets the content of a robots.txt file
+* Configure postfix on Jira VMs with an API key created within the SendGrid account (only happens when the API key value has changed and an appropriate flag is set to true)
+* optionally restarts the app service
+
+## How was the staging env built?
+
+See [Atlassian Staging Build](atlassian-staging-build.html)
+
+
+## Troubleshooting
+
+**1.** If you are unable to access the VMs, please make sure you are connected to F5 VPN and using the correct private key and the private key is in the correct format.
+
+**2.** For some reason, if you see errors on the application, please make sure GlusterFS shares are mounted correctly on the VMs.
+e.g  `jira_shared` should be mounted here `/var/atlassian/application-data/jira/shared`
+
+Please use `mount -a` command to mount them correctly.
+
+There was problem where the share was not mounted correctly after auto shutdown, we have got cronjob on the staging VMs to run the mounting every hour, the script checks if the Share is mounted or not and if not, it will attempt to mount it.
+

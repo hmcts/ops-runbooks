@@ -33,7 +33,7 @@ If you want to connect to the old WAF, you can find the password in HashiCorp Va
 - After importing from backup, export the JSON configuration from the new WAF and save it in the [cpp-terraform-azurerm-waf repository](https://github.com/hmcts/cpp-terraform-azurerm-waf/tree/main/backup). This will serve as a reference for future deployments and ensure that you have a backup of the current configuration.
 - Finally, set up High Availability (HA) for the WAF under the Advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. Use the vault secret found in HashiCorp Vault at the path `secret/terraform/dev` as the vault secret, then add the IP address of the other WAF in the peer WAF to join the HA pair together as shown below.
 
-![High Availability](images/high-availability.png)
+<img src="images/high-availability.png" style="height:450px;">
 
 ## Testing and Switch Over to the New WAF
 

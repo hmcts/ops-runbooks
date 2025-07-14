@@ -27,18 +27,13 @@ Once the tunnel is established, you can access the WAF by navigating to `http://
 
 ## Setting up the WAF
 
-If you want to connect to the old WAF, you can find the password in HashiCorp Vault at the path `secret/terraform/dev/waf_admin_password`. The username will be `admin`.
-
-To set up the WAF, follow these steps:
-
-To set up the WAF, follow these steps:
-
+If you want to connect to the old WAF, you can find the password in HashiCorp Vault at the path `secret/terraform/dev/waf_admin_password`. The username will be `admin`.To set up the WAF, follow these steps:
 - Get a backup of the current configuration by exporting it from the old WAF. If it is a newer firmware version, you can export the JSON configuration. If it is an older version, you will need to do a manual backup. For manual backup instructions, see [Barracuda WAF - Configuration options](https://tools.hmcts.net/confluence/display/EI/Barracuda+WAF+-+Configuration+options).
 - Once you have the backup, import it into the new WAF. This will ensure that all your existing rules and settings are preserved. If your new WAF supports importing the JSON configuration, you can export the JSON configuration and save it in the [cpp-terraform-azurerm-waf](https://github.com/hmcts/cpp-terraform-azurerm-waf) repository. For importing, a full manual export and import process is recommended as mentioned here: [Export & Import](https://tools.hmcts.net/confluence/display/EI/Barracuda+WAF+-+Configuration+options).
 - After importing from backup, export the JSON configuration from the new WAF and save it in the [cpp-terraform-azurerm-waf repository](https://github.com/hmcts/cpp-terraform-azurerm-waf/tree/main/backup). This will serve as a reference for future deployments and ensure that you have a backup of the current configuration.
-- Finally, set up High Availability (HA) for the WAF under the Advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. (Use the vault secret found in HashiCorp Vault at the path "secret/terraform/dev" as the vault secret, then add the IP address of the other WAF in the peer WAF to join the HA pair together as shown below.)
+- Finally, set up High Availability (HA) for the WAF under the Advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. Use the vault secret found in HashiCorp Vault at the path `secret/terraform/dev` as the vault secret, then add the IP address of the other WAF in the peer WAF to join the HA pair together as shown below.
 
-<img src="images/high-availability.png" style="height:450px;">
+![High Availability](images/high-availability.png)
 
 ## Testing and Switch Over to the New WAF
 
@@ -52,17 +47,40 @@ Each stream is a separate service, so you will need to test each one.
 
 <img src="images/website-translations.png" style="height:450px;">
 
-To test the stream services, you will need to update the IP address of the main service host in the backend pool of the load balancer. The best way to find out which load balancer to update is to query the the domain name of the service; this will point you to the correct load balancer. The IP address it resolves to is the load balancer frontend IP address.
+To test the stream services, update the IP address of the main service host in the backend pool of the load balancer. The best way to find out which load balancer to update is to query the domain name of the service; this will point you to the correct load balancer. The IP address it resolves to is the load balancer frontend IP address.
 
-The IP address is the load balancer frontend IP address, so you will need to update the backend pool of the load balancer to point to the new WAF IP address.
+## Testing Stream Services
+
+There are three main stream services that need to be tested:
+
+**APIGW**  
+To test this service after you have updated the IP address, you will need to get a test certificate as it is required for testing the connectivity of APIM.
+
+To get the test certificate, you can ask AJ to generate one, then run the following command to test the connectivity:
+
+```sh
+curl https://apigw.dev03.cjscp.org.uk/echo/resource --cert test_cert.cpp.nonlive.pem --key test_cert.cpp.nonlive.pem 
+```
+
+After running the command, you will receive an empty reply, which means the connectivity is working.
+
+**CCM**  
+This service can be tested by updating the IP address of the host in the backend pool of the load balancer to point to the new WAF IP address and updating the load balancer admin state to "up". You can then access the service through the domain name.
+
+**IDAM**  
+Update the NSG of the APIM web app to allow the new WAF subnet to access the IDAM service. See this PR for reference: [whitelist waf subnet for DEV](https://github.com/hmcts/cpp-terraform-azurerm-idam/pull/64)
 
 If you do not know which load balancer to update, you can search for the IP address in the Azure portal, and it will show which load balancer it is attached to.
 
 Once you have found the load balancer, check the frontend configuration to see which frontend IP address the domain resolves to. For example, the frontend IP address for `onlineplea.dev.cjscp.org.uk` is `51.11.44.0`, which resolves to `WAF-FRONTEND-01`. It will use the backend pool of `WAF-FRONTEND-01` to route the traffic to the new WAF IP address.
 
-The IP address of the host in the backend pool needs to be updated to the new WAF IP address. To send traffic to the new WAF, you will need to switch the admin state of the host in the backend pool to "up" and the old WAF to "down". This will ensure that traffic is routed to the new WAF while the old WAF is still available for fallback if needed.
+## Switching Over to the New WAF
 
-<img src="images/admin-state.png" style="height:450px;">
+To transition traffic to the new WAF, update the backend pool of the relevant load balancer to use the new WAF IP address. Change the admin state of the new WAF host to "up" and set the old WAF host to "down." This routes traffic to the new WAF while keeping the old WAF available for fallback. Before making the switch, ensure the new WAF is fully tested and announce the change in the cpp-devops Slack channel. If needed, you can roll back by reverting the admin state.
+
+<img src="images/admin-state.png" >
+
+Test each service by accessing its domain name to confirm traffic is routed through the new WAF.
 
 Before switching the admin state, ensure that the new WAF is fully operational and has been tested with the services, and announce it in the cpp-devops Slack channel. If there is any issue, you can roll back if needed by switching the admin state.
 

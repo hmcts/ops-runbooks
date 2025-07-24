@@ -1,0 +1,373 @@
+---
+title: Upgrading Crime AKS Clusters
+last_reviewed_on: 2025-07-24
+review_in: 12 months
+weight: 30
+---
+
+# Upgrading Crime AKS Clusters
+
+# Node image only upgrade
+
+> **Note:** It is far more sensible to scale down the environment before doing this work or perform the upgrade during early evening.
+
+---
+
+### Example: Scale down (NFT01)
+
+```sh
+kubectl scale deployments -n ns-nft-ccm-01 --replicas=0 --all
+```
+
+### Example: Scale up (NFT01)
+
+```sh
+kubectl scale deployments -n ns-nft-ccm-01 --replicas=1 --all
+```
+
+_Change the namespace as per your environment._
+
+---
+
+Below are example upgrades. Please change parameters where necessary. Node image upgrades don't require any changes to TF config before or after the upgrade.
+
+
+1. You can see what is the latest node image version available for your node pools with the following command. Make a note of value `latestNodeImageVersion` from the output.
+
+   **System agent node pool**
+
+   ```sh
+   az aks nodepool get-upgrades \
+   --nodepool-name sysagentpool \
+   --cluster-name K8-LAB-APPS-01 \
+   --resource-group RG-LAB-APPS-01
+   ```
+
+   ```json
+   {
+   "id": "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourcegroups/RG-LAB-APPS-01/providers/Microsoft.ContainerService/managedClusters/K8-LAB-APPS-01/agentPools/sysagentpool/upgradeProfiles/default",
+   "kubernetesVersion": "1.21.7",
+   "latestNodeImageVersion": "AKSUbuntu-1804gen2containerd-2022.05.16",
+   "name": "default",
+   "osType": "Linux",
+   "resourceGroup": "RG-LAB-APPS-01",
+   "type": "Microsoft.ContainerService/managedClusters/agentPools/upgradeProfiles",
+   "upgrades": null
+   }
+   ```
+
+   **Worker agent node pool**
+
+   ```sh
+   az aks nodepool get-upgrades \
+   --nodepool-name wrkagentpool \
+   --cluster-name K8-LAB-APPS-01 \
+   --resource-group RG-LAB-APPS-01
+   ```
+
+   ```json
+   {
+   "id": "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourcegroups/RG-LAB-APPS-01/providers/Microsoft.ContainerService/managedClusters/K8-LAB-APPS-01/agentPools/wrkagentpool/upgradeProfiles/default",
+   "kubernetesVersion": "1.21.7",
+   "latestNodeImageVersion": "AKSUbuntu-1804gen2containerd-2022.05.16",
+   "name": "default",
+   "osType": "Linux",
+   "resourceGroup": "RG-LAB-APPS-01",
+   "type": "Microsoft.ContainerService/managedClusters/agentPools/upgradeProfiles",
+   "upgrades": null
+   }
+   ```
+
+2. You can now compare it with the current node image version in use by your node pool by running
+
+   ```sh
+   az aks nodepool show \
+   --resource-group RG-LAB-APPS-01 \
+   --cluster-name K8-LAB-APPS-01 \
+   --name sysagentpool \
+   --query nodeImageVersion
+   ```
+
+   ```
+   "AKSUbuntu-1804gen2containerd-2022.04.27"
+   ```
+
+   ```sh
+   az aks nodepool show \
+   --resource-group RG-LAB-APPS-01 \
+   --cluster-name K8-LAB-APPS-01 \
+   --name wrkagentpool \
+   --query nodeImageVersion
+   ```
+
+   ```
+   "AKSUbuntu-1804gen2containerd-2022.04.27"
+   ```
+
+3. Upgrade all nodes in all node pools to latest. Note flag `--node-image-only` to make sure we are only upgrading node image.
+
+   Optional flags `--name mynodepool` to only upgrade a specified node pool.
+
+   Optional flag `--max-surge` can be specified with percentage or value. This is to configure the number of nodes to be used for upgrades so they complete faster. Higher the percentage/number will cause more disruption to services. The default is 1 node at a time.
+
+   Make sure you have enough IP address in the subnet before setting `--max-surge` as each node requires 40 IP address.
+
+   ```sh
+   az aks upgrade \
+   --resource-group RG-LAB-APPS-01 \
+   --name K8-LAB-APPS-01 \
+   --node-image-only
+   ```
+
+4. You can check the rollout of the new image by using below command.
+
+   ```sh
+   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.kubernetes\.azure\.com\/node-image-version}{"\n"}{end}'
+   ```
+
+   ```
+   aks-sysagentpool-37382573-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-sysagentpool-37382573-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-wrkagentpool-15829037-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-wrkagentpool-15829037-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-wrkagentpool-15829037-vmss000002    AKSUbuntu-1804gen2containerd-2022.04.27
+   ```
+
+   ```sh
+   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.kubernetes\.azure\.com\/node-image-version}{"\n"}{end}'
+   ```
+
+   ```
+   aks-sysagentpool-37382573-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-sysagentpool-37382573-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-sysagentpool-37382573-vmss000002    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-wrkagentpool-15829037-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-wrkagentpool-15829037-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
+   aks-wrkagentpool-15829037-vmss000002    AKSUbuntu-1804gen2containerd-2022.04.27
+   ```
+
+   ```sh
+   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.kubernetes\.azure\.com\/node-image-version}{"\n"}{end}'
+   ```
+
+   ```
+   aks-sysagentpool-37382573-vmss000002    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-sysagentpool-37382573-vmss000001    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-sysagentpool-37382573-vmss000003    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-wrkagentpool-15829037-vmss000000    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-wrkagentpool-15829037-vmss000002    AKSUbuntu-1804gen2containerd-2022.05.16
+   aks-wrkagentpool-15829037-vmss000004    AKSUbuntu-1804gen2containerd-2022.05.16
+   ```
+
+   You can also check the upgrade status from portal and watch on k9s.
+
+   **Kubernetes service → Settings → Node Pools**
+   ![Image](Images/NodeImage_Nodepool_upgrade_status_from_cluster_resource.png)
+
+   From vmss: **Resource group MC_<cluster resource group>_<cluster name>_<region> → system/worker vmss → Settings → Instances**
+   ![Image](Images/NodeImage_Upgrade_status_from_vmss.png)
+   Watch using k9s tool
+   ![Image](Images/Nodeimageupdate_k9s.png)
+
+5. You can check if the upgrade is completed by running below command
+
+   ```sh
+   az aks show \
+   --resource-group RG-LAB-APPS-01 \
+   --name K8-LAB-APPS-01 | grep "provisioningState"
+   ```
+
+   ```json
+   "provisioningState": "Succeeded",
+   "provisioningState": "Succeeded",
+   "provisioningState": "Succeeded",
+   ```
+
+---
+
+## Troubleshooting:
+
+If the nodes in a nodepool are not getting upgraded or if you see from portal the status is showing as failed you can check below steps.
+
+1. **Issue when draining a node** Kubernetes might have failed to drain a node. The common reason for this will be PDB (Pod disruption budget) maxUnavailable set to 0.
+
+   You can check kubernetes events to see if the upgrade is failed while draining a node.
+
+   ```sh
+   kubectl get events --all-namespaces
+   ```
+
+   Using k9s:
+   ![Image](Images/NodeImage_Error_draining_the_node.png)
+   ![Image](Images/NodeImage_Error_draining_the_node_message.png)
+
+2. **The node pool subnet don't have enough IP address** The upgrade will fail if there are no enough IP address left to spun up a new node. You can check this from kubernetes service activity log.
+   ![Image](Images/NodeImage_Error_from_activity_logs.png)
+
+---
+
+# References
+
+- [Node Image Upgrade - Azure Documentation](https://docs.microsoft.com/en-us/azure/aks/node-image-upgrade)
+
+---
+
+# Kubernetes Version upgrade
+
+> **Note:** It is far more sensible to scale down the environment before doing this work or perform the upgrade during early evening.
+
+---
+
+Below are example upgrades. Please change parameters where necessary. Kubernetes version upgrade require updates to TF vars and statefile which will be covered by below steps. Need to check and update manifests/helm charts if any API's which we are using are deprecated in the new version of kubernetes before the upgrade. You can check whats deprecated here: https://kubernetes.io/docs/reference/using-api/deprecation-guide/
+
+1. Check for available AKS cluster upgrades
+
+   ```sh
+   az aks get-upgrades --resource-group RG-LAB-APPS-01 --name K8-LAB-APPS-01 --output table
+   ```
+
+   ```
+   Name     ResourceGroup    MasterVersion    Upgrades
+   -------  ---------------  ---------------  ----------------------
+   default  RG-LAB-APPS-01   1.21.7           1.21.9, 1.22.4, 1.22.6
+   ```
+
+2. Set max surge for node pools The max surge can be increased for lower environments to speed up the upgrade process but for live environments its recomended to set at 33%.
+
+   Make sure you have enough IP address in the subnet before setting `--max-surge` as each node requires 40 IP address.
+
+   ```sh
+   az aks nodepool update -n wrkagentpool -g RG-LAB-APPS-01 --cluster-name K8-LAB-APPS-01 --max-surge 33%
+   az aks nodepool update -n sysagentpool -g RG-LAB-APPS-01 --cluster-name K8-LAB-APPS-01 --max-surge 33%
+   ```
+
+3. Upgrade the kubernetes version
+
+   ```sh
+   az aks upgrade \
+   --resource-group RG-LAB-APPS-01 \
+   --name K8-LAB-APPS-01 \
+   --kubernetes-version 1.21.9
+   ```
+
+   Check the upgrade status Using az cli and kubectl
+
+   ```sh
+   az aks show --resource-group RG-LAB-APPS-01 --name K8-LAB-APPS-01 --output table
+   ```
+
+   ```
+   Name            Location    ResourceGroup    KubernetesVersion    ProvisioningState    Fqdn
+   --------------  ----------  ---------------  -------------------  -------------------  ---------------------------------------------
+   K8-LAB-APPS-01  uksouth     RG-LAB-APPS-01   1.21.9               Updating             k8-lab-apps-01-6eba7dde.hcp.uksouth.azmk8s.io
+   ```
+
+   ```sh
+   kubectl get events
+   ```
+
+   ```
+   default 2m1s Normal Drain node/aks-nodepool1-96663640-vmss000001 Draining node: [aks-nodepool1-96663640-vmss000001]
+   default 9m22s Normal Surge node/aks-nodepool1-96663640-vmss000002 Created a surge node [aks-nodepool1-96663640-vmss000002 nodepool1] for agentpool %!s(MISSING)
+   ```
+
+   ```sh
+   az aks show --resource-group RG-LAB-APPS-01 --name K8-LAB-APPS-01 --output table
+   ```
+
+   ```
+   Name            Location    ResourceGroup    KubernetesVersion    ProvisioningState    Fqdn
+   --------------  ----------  ---------------  -------------------  -------------------  ---------------------------------------------
+   K8-LAB-APPS-01  uksouth     RG-LAB-APPS-01   1.21.9               Succeeded            k8-lab-apps-01-6eba7dde.hcp.uksouth.azmk8s.io
+   ```
+
+   ![Image](Images/Screenshot_2022-06-01_at_11.34.07.png)
+
+   From Azure portal
+
+   ![Image](Images/Screenshot_2022-05-31_at_13.58.47.png)
+
+   Ignore the version from below image as it should be 1.21.9
+
+   ![Image](Images/Screenshot_2022-06-01_at_11.27.15.png)
+   ![Image](Images/Screenshot_2022-05-31_at_15.40.21.png)
+   ![Image](Images/Screenshot_2022-06-01_at_11.41.33.png)
+
+
+4. Update Terraform vars and statefile
+
+   Update TF vars for a specific environment Repo [cpp-terraform-azurerm-aks](https://github.com/hmcts/cpp-terraform-azurerm-aks/pull/159/files)
+
+   ![Image](Images/image-2025-6-11_12-33-44.png)
+
+
+Run terraform pipeline to update the statefile Pipleine: [DevOps Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=44)
+
+Run against a specific environment where the upgrade as been performed.
+
+Observe that Terraform will notify the orchestrator_version has been changed outside of Terraform.
+
+Proceed to apply the TF config and this will update the statefile.
+
+---
+
+## Troubleshooting:
+
+1. Make sure you have enough IP address in the subnets before performing an upgrade. This can vary depending on the max surge specified during the upgrade. Each extra node requires 40 IP address to be free.
+
+   If there is no enough IP address space you will see below error in cluster activity log.
+
+   ![Image](Images/Screenshot_2022-05-31_at_15.40.21.png)
+---
+
+# References
+
+- [Upgrade an AKS cluster - Azure Documentation](https://docs.microsoft.com/en-us/azure/aks/upgrade-cluster#upgrade-an-aks-cluster)
+- [AKS Kubernetes Version Support Policy](https://docs.microsoft.com/en-us/azure/aks/supported-kubernetes-versions?tabs=azure-cli)
+
+---
+
+# Important info from above URL:
+
+## Support policy
+
+When a new minor version is introduced, the oldest minor version and patch releases supported are deprecated and removed. For example, the current supported version list is:
+
+```
+1.17.a
+1.17.b
+1.16.c
+1.16.d
+1.15.e
+1.15.f
+```
+
+AKS releases 1.18.*, removing all the 1.15.* versions out of support in 30 days.
+
+In addition to the above, AKS supports a maximum of two patch releases of a given minor version. So given the following supported versions:
+
+**Current Supported Version List**
+
+```
+1.17.8, 1.17.7, 1.16.10, 1.16.9
+```
+
+If AKS releases 1.17.9 and 1.16.11, the oldest patch versions are deprecated and removed, and the supported version list becomes:
+
+**New Supported Version List**
+
+```
+1.17.*9*, 1.17.*8*, 1.16.*11*, 1.16.*10*
+```
+
+## Release and deprecation process
+
+You can reference upcoming version releases and deprecations on the AKS Kubernetes Release Calendar.
+
+For new minor versions of Kubernetes:
+
+- AKS publishes a pre-announcement with the planned date of a new version release and respective old version deprecation on the AKS Release notes at least 30 days prior to removal.
+- AKS uses Azure Advisor to alert users if a new version will cause issues in their cluster because of deprecated APIs. Azure Advisor is also used to alert the user if they are currently out of support.
+- AKS publishes a service health notification available to all users with AKS and portal access, and sends an email to the subscription administrators with the planned version removal dates.
+
+Users have 30 days from version removal to upgrade to a supported minor version release to continue receiving support.

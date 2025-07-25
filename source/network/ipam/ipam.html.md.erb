@@ -109,3 +109,11 @@ Please also reference the following GitHub repo link for more information regard
 The following Azure DevOps pipeline is run daily at 8:00 AM and can be manually run to sync the newly created VNET with ipam.
 
 [Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=979&_a=summary)
+
+### Add External Subnets via YAML files
+
+Functionality has been added enabling the IPAM repo(https://github.com/hmcts/ipam-manage) to add external subnets using YAML files.
+
+Please see the 'external.sh' script in the repo for the logic and the following YAML file subnet data example.
+
+[Interim Hosting YAML](https://github.com/hmcts/ipam-manage/blob/master/interim-hosting.yaml)

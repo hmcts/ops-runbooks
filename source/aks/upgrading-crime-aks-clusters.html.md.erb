@@ -7,7 +7,7 @@ weight: 30
 
 # Upgrading Crime AKS Clusters
 
-# Node image only upgrade
+## Node image only upgrade
 
 > **Note:** It is far more sensible to scale down the environment before doing this work or perform the upgrade during early evening.
 
@@ -133,10 +133,6 @@ Below are example upgrades. Please change parameters where necessary. Node image
    aks-wrkagentpool-15829037-vmss000002    AKSUbuntu-1804gen2containerd-2022.04.27
    ```
 
-   ```sh
-   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.kubernetes\.azure\.com\/node-image-version}{"\n"}{end}'
-   ```
-
    ```
    aks-sysagentpool-37382573-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
    aks-sysagentpool-37382573-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
@@ -144,10 +140,6 @@ Below are example upgrades. Please change parameters where necessary. Node image
    aks-wrkagentpool-15829037-vmss000000    AKSUbuntu-1804gen2containerd-2022.04.27
    aks-wrkagentpool-15829037-vmss000001    AKSUbuntu-1804gen2containerd-2022.04.27
    aks-wrkagentpool-15829037-vmss000002    AKSUbuntu-1804gen2containerd-2022.04.27
-   ```
-
-   ```sh
-   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.kubernetes\.azure\.com\/node-image-version}{"\n"}{end}'
    ```
 
    ```
@@ -206,13 +198,13 @@ If the nodes in a nodepool are not getting upgraded or if you see from portal th
 
 ---
 
-# References
+## References
 
 - [Node Image Upgrade - Azure Documentation](https://docs.microsoft.com/en-us/azure/aks/node-image-upgrade)
 
 ---
 
-# Kubernetes Version upgrade
+## Kubernetes Version upgrade
 
 > **Note:** It is far more sensible to scale down the environment before doing this work or perform the upgrade during early evening.
 
@@ -232,7 +224,7 @@ Below are example upgrades. Please change parameters where necessary. Kubernetes
    default  RG-LAB-APPS-01   1.21.7           1.21.9, 1.22.4, 1.22.6
    ```
 
-2. Set max surge for node pools The max surge can be increased for lower environments to speed up the upgrade process but for live environments its recomended to set at 33%.
+2. Set max surge for node pools The max surge can be increased for lower environments to speed up the upgrade process but for live environments it's recommended to set at 33%.
 
    Make sure you have enough IP address in the subnet before setting `--max-surge` as each node requires 40 IP address.
 
@@ -301,7 +293,9 @@ Below are example upgrades. Please change parameters where necessary. Kubernetes
    ![Image](Images/image-2025-6-11_12-33-44.png)
 
 
-Run terraform pipeline to update the statefile Pipleine: [DevOps Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=44)
+Run terraform pipeline to update the statefile Pipleine: [DevOps Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=44).
+Add pipeline parameters such as agentPool and platform depending on whether you are running the pipeline for nonlive or live.
+In addition, you can say select environment based on the cluster which is getting the upgrade.
 
 Run against a specific environment where the upgrade as been performed.
 
@@ -320,14 +314,14 @@ Proceed to apply the TF config and this will update the statefile.
    ![Image](Images/Screenshot_2022-05-31_at_15.40.21.png)
 ---
 
-# References
+## References
 
 - [Upgrade an AKS cluster - Azure Documentation](https://docs.microsoft.com/en-us/azure/aks/upgrade-cluster#upgrade-an-aks-cluster)
 - [AKS Kubernetes Version Support Policy](https://docs.microsoft.com/en-us/azure/aks/supported-kubernetes-versions?tabs=azure-cli)
 
 ---
 
-# Important info from above URL:
+## Important info from above URL:
 
 ## Support policy
 

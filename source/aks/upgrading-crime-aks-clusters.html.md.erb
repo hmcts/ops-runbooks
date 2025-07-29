@@ -14,7 +14,7 @@ weight: 30
 ---
 
 ### Example: Scale down (NFT01)
-
+Note: If downtime is acceptable, you can scale down the ccm namespace (e.g., ns-<env>-ccm-01), as it hosts most of the workload.
 ```sh
 kubectl scale deployments -n ns-nft-ccm-01 --replicas=0 --all
 ```

@@ -18,9 +18,5 @@ APIGW
 dbsetup
 fileservice
 nonroot
-Pankaj
-postgress
 Verma
-VUL
 dbsetup
-fileservice

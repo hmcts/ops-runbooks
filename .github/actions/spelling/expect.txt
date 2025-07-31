@@ -124,8 +124,4 @@ wafcc
 wrkagentpool
 wsdl
 XXXX
-nonroot
-postgress
-Verma
-VUL
 fileservice

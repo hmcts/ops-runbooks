@@ -745,10 +745,4 @@ nlv
 nessusagent
 nfd
 eas
-nonroot
-Pankaj
-postgress
-Verma
-VUL
-dbsetup
 fileservice

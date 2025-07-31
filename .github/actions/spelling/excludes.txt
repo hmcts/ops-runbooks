@@ -15,7 +15,3 @@ mpd
 onlineplea
 wafcc
 APIGW
-dbsetup
-nonroot
-Verma
-dbsetup

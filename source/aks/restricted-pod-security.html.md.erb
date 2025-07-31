@@ -1,0 +1,72 @@
+---
+title: Restricted Pod Security
+last_reviewed_on: 2025-07-31
+review_in: 12 months
+weight: 35
+---
+
+# <%= current_page.data.title %>
+
+## Restricted Pod Security on AKS Clusters
+
+This document addresses the need to apply Kubernetes Pod Security Standards—specifically the "Restricted" policy—on HMCTS AKS clusters to mitigate vulnerability VUL-6485, which is caused by pods running as root. The "Restricted" policy enforces modern container hardening best practices, including non-root execution.
+
+We will be using the manual approach with OPA: explicitly add `runAsNonRoot` to all workloads and enforce with OPA. However, this is high maintenance and may not cover all cases.
+
+First, you need to edit the Helm chart and values file to ensure it is running as a non-root user:
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+```
+
+An example of this can be found in the cpp-helm chart repo. See [Example PR](https://github.com/hmcts/cpp-helm-chart/pull/309/files). In most cases, you will need to edit the templates that contain the job and reference the securityContext field. If you are unsure about the required indentation, you can run the Helm chart locally and do a dry run to check if it is correct.
+
+```yaml
+securityContext:
+{{ toYaml .Values.securityContext | indent 10 }} 
+```
+
+After you have edited the Helm chart, you will need to test the chart. There are a few options to test the chart:
+
+Option 1: Package the chart using helm package and push it to Azure Container Registry (ACR), then deploy it to the cluster using the aks-deploy validation stack pipeline. This pipeline [https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=339](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=339) will create the service and deploy the chart to the cluster in a specified namespace.
+
+Option 2: Use the helm upgrade command and install the chart to a test namespace on the cluster. This will allow you to test the chart without pushing it to ACR.
+
+helm upgrade --install fileservice-dbsetup dbsetup --namespace ns-ste-ccm-92
+
+Edit the cpp-aks-deploy Helmsman variable so the chart is updated to the latest version. Please ensure that every change made to the chart is accompanied by a version update, as semantic versioning is used. See [Example PR](https://github.com/hmcts/cpp-aks-deploy/pull/409/files)
+
+## Verifying running as non-root ##
+
+Login to the cluster and check if the Helm chart has been deployed correctly. You can use the following command to check the pods
+
+helm list -n <namespace>
+
+Get the pod associated with the Helm release by running the following command:
+
+kubectl get pods -n <namespace> -l release=<release-name>
+
+This command lists all pods in the specified namespace that are associated with the given Helm release. Replace <namespace> with your target namespace and <release-name> with your Helm release name.
+
+To verify that the pod is running as a non-root user, you can describe the pod and check the security context. You can do this using either k9s (go to shell and run id) or by running the following command:
+
+  kubectl exec -n <namespace> <pod-name> -- id
+
+
+[Images](/Images/nonroot.png)
+
+
+[Images](/Images/k9s-nonroot.png)
+
+The above screenshot shows the k9s interface where you can see the security context of the pod. You can see that runAsNonRoot is set to true and runAsUser is set to 1000.
+
+Example Dockerfile changes:
+
+RUN useradd -ms /bin/bash postgress
+USER postgress
+
+This change creates a new user called postgress and sets it as the user for the container. However, if you are not able to run as a non-root user, you may need to modify the Docker image in cpp-dockerfile to ensure that the application runs as a non-root user. This may involve changing the user in the Dockerfile or modifying the application to run as a non-root user. You may need rebuild the Docker image and push it to ACR. See example PR [here](https://github.com/hmcts/cpp-docker-images/pull/88/files) Once the image has been updated, run the pipeline to deploy the changes to Azure Container Registry: Build Pipeline  https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=345
+
+Once you have verified that the pod is running as a non-root user, you can proceed to deploy the chart to the production namespace. You will need to speak to release manager Pankaj to add the image changes to the next change release so it is roll out to other environments. 

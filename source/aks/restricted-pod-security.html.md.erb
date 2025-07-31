@@ -55,10 +55,10 @@ To verify that the pod is running as a non-root user, you can describe the pod a
   kubectl exec -n <namespace> <pod-name> -- id
 
 
-![non-root example](/Images/nonroot.png)
+![non-root example](/Images/aks-security.png)
 
 
-![k9s non-root example](Images/k9s-nonroot.png)
+![k9s non-root example](Images/k9s-aks-security.png)
 
 The above screenshot shows the k9s interface where you can see the security context of the pod. You can see that runAsNonRoot is set to true and runAsUser is set to 1000.
 

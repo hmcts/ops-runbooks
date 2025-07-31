@@ -16,7 +16,6 @@ onlineplea
 wafcc
 APIGW
 dbsetup
-fileservice
 nonroot
 Verma
 dbsetup

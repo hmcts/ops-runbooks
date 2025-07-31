@@ -124,7 +124,5 @@ wafcc
 wrkagentpool
 wsdl
 XXXX
-fileservice
 dbsetup
 nonroot
-VUL

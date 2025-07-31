@@ -15,3 +15,10 @@ mpd
 onlineplea
 wafcc
 APIGW
+dbsetup
+fileservice
+nonroot
+Pankaj
+postgress
+Verma
+VUL

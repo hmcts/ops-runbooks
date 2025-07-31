@@ -124,3 +124,6 @@ wafcc
 wrkagentpool
 wsdl
 XXXX
+dbsetup
+fileservice
+postgress

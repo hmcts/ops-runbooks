@@ -21,7 +21,7 @@ Before making any changes, verify that the APIM instance is reachable.
 
 You can do this by accessing a cluster and running the following `curl` command:
 
-![Checking connectivity](images Migration to APIM
+![Checking connectivity](images/checking-connectivity.png)
 
 Update DNS so that all APIM URLs (gateway, portal, and management) route through APIM instead of AppGW. This involves updating all listeners currently using AppGW to point to APIM.
 
@@ -31,7 +31,9 @@ Steps:
 - For each listener, check the backend pool and backend host to identify APIM instances.
 - Update all listeners to point to APIM instead of AppGW.
 
-![AppGW listeners](images/appgw-listenerso update DNS records:
+![AppGW listeners](images/appgw-listeners.png)
+
+Update DNS records:
 
 1. Log in to the ADDS server by following this guide:  
    [How to verify and configure DNS in MDVADDS](https://tools.hmcts.net/confluence/display/CNP/How+to+verify+and+configure+the+DNS+in+MDVADDS) or SSH into the server:
@@ -50,12 +52,7 @@ curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
 
 2) Check if DNS resolves to the APIM instance by updating your local hosts file.
 
-3) You can also verify connectivity from the ADO agent in the pipeline by running a curl command. Either SSH into the ADO agent or run a pipeline that executes:
-
-
-```sh
-curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
-```
+3) You can also verify connectivity from the ADO agent in the pipeline by running a curl command. Either SSH into the ADO agent or run a pipeline job with it too. 
 
 [resolving-connection](images/resolving-connection.png)
 
@@ -73,7 +70,7 @@ embedded_devops
 release_devops
 sre_team
 
-## Decommission App Gateway
+## Decommission App GatewayChat
 
 Remove the AppGW code from the cpp-automation-terraform repository.
 

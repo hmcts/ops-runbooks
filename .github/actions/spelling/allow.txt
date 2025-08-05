@@ -745,8 +745,6 @@ nlv
 nessusagent
 nfd
 eas
-fileservice
-postgress
 Widdowson
 Pankaj
 mpdjumpl

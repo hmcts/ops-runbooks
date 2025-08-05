@@ -1,0 +1,63 @@
+---
+title: Decommission App Gateway
+last_reviewed_on: 2025-07-07
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+In this document, we cover the process of decommissioning an Application Gateway (AppGW) in the Crime environment. The AppGW V1 instances are being phased out in favor of Azure API Management (APIM). Beginning April 28, 2026, the Application Gateway V1 SKU will be retired and will no longer be supported.
+
+This document outlines the steps to decommission the AppGW and ensure that all traffic is routed through APIM instead.
+
+We need to ensure that all listeners currently using the AppGW are migrated to APIM. This includes updating DNS records and network security groups (NSGs) to allow traffic through APIM.
+
+## Checking Connectivity
+
+Before making any changes, it is important to verify that the APIM instance is reachable.
+
+You can do this by going on a cluster and running the following curl command:
+
+[checking connectivity](images/checking-connectivity.png)
+
+## Migration to APIM
+
+We need to update DNS so that all APIM URLs (gateway, portal, and management) go via APIM instead of the App Gateway. This can be done by updating all the listeners that are currently using the AppGW to point to APIM.
+
+- Go to the AppGW and navigate to Settings > Listeners.
+- For each listener, check the backend pool and backend host to find the APIM instances.
+- Update all the listeners to point to the APIM instances instead of the AppGW instances.
+
+[appgw listeners](images/appgw-listeners.png)
+
+## Updating DNS
+
+To update the DNS records, follow these steps:
+
+- Log in to the AADS Server by following this guide: https://tools.hmcts.net/confluence/display/CNP/How+to+verify+and+configure+the+DNS+in+MDVADDS or SSH into the server:
+
+```sh
+ssh -f -N -L 33895:<adds ip>:3389 mpdjumpl01.cp.cjs.hmcts.net
+```
+
+
+Once the DNS entry has been updated to point to APIM, you will need to verify connectivity by performing some tests:
+
+Go to a cluster and run a curl command to see if it resolves to the APIM instance.
+Locally, check if the DNS resolves to the APIM instance by updating your local hosts file.
+You can also check connectivity from the ADO agent in the pipeline by running a curl command to see if it resolves to the APIM instance. To do this, you can either SSH into the ADO agent or run a pipeline that executes a curl command to check connectivity.
+
+```sh
+curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
+```
+
+[resolving-connection](images/resolving-connection.png)
+
+
+The above command should return a response, confirming that it is connected to the APIM instance and resolving to the correct IP address.
+
+Make sure NSGs are updated so that the cluster can communicate with APIM (currently it points to the gateway IP). You can check connectivity from the cluster, locally through the hosts file, or through the ADO agent in the pipeline. Inform BAU of the change before merging by posting in the cpp-devops channel and tagging the following people and groups: James Widdowson, Pankaj Verma, embedded_devops, release_devops, sre_team.
+
+## Decommission App Gateway
+Remove the code for the AppGW in the cpp-automation-terraform repo. (Please note to do this as part of the release and wait until the release is complete before removing the code.) For any questions when the release is completed, please speak to release manager Pankaj Verma.

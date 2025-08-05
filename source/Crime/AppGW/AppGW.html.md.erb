@@ -48,6 +48,13 @@ Go to a cluster and run a curl command to see if it resolves to the APIM instanc
 Locally, check if the DNS resolves to the APIM instance by updating your local hosts file.
 You can also check connectivity from the ADO agent in the pipeline by running a curl command to see if it resolves to the APIM instance. To do this, you can either SSH into the ADO agent or run a pipeline that executes a curl command to check connectivity.
 
+
+**Note:**  
+Replace `<apim-domain>` with the DNS name of your APIM instance (e.g., `my-apim-instance.azure-api.net`), and `<apim-ip>` with the public IP address of your APIM instance.  
+- You can find the APIM domain in the Azure Portal under your APIM resource's "Custom domains" or "Gateway URL".  
+- To get the public IP address, go to the APIM resource in the Azure Portal, select "Overview", and look for the "Gateway" public IP, or use the Azure CLI:  
+  ```sh
+  az network public-ip show --resource-group <resource-group> --name <public-ip-name> --query "ipAddress" -o tsv
 ```sh
 curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
 ```

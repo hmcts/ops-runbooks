@@ -64,7 +64,9 @@ curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
 
 The above command should return a response, confirming that it is connected to the APIM instance and resolving to the correct IP address.
 
-Make sure NSGs are updated so that the cluster can communicate with APIM (currently it points to the gateway IP). You can check connectivity from the cluster, locally through the hosts file, or through the ADO agent in the pipeline. Inform BAU of the change before merging by posting in the cpp-devops channel and tagging the following people and groups: James Widdowson, Pankaj Verma, embedded_devops, release_devops, sre_team.
+- Make sure NSGs are updated so that the cluster can communicate with APIM (currently it points to the gateway IP).
+- You can check connectivity from the cluster, locally through the hosts file, or through the ADO agent in the pipeline.
+- Inform BAU of the change before merging by posting in the cpp-devops channel and tagging the following people and groups: James Widdowson, Pankaj Verma, embedded_devops, release_devops, sre_team.
 
 ## Decommission App Gateway
 Remove the code for the AppGW in the cpp-automation-terraform repo. (Please note to do this as part of the release and wait until the release is complete before removing the code.) For any questions when the release is completed, please speak to release manager Pankaj Verma.

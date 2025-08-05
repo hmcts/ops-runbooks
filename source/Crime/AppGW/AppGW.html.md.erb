@@ -44,7 +44,10 @@ ssh -f -N -L 33895:<adds ip>:3389 mpdjumpl01.cp.cjs.hmcts.net
 
 Once the DNS entry has been updated to point to APIM, you will need to verify connectivity by performing some tests:
 
-Go to a cluster and run a curl command to see if it resolves to the APIM instance.
+On the `crime-prod` AKS cluster, run the following command to verify that the APIM instance is reachable and resolves correctly:
+
+```sh
+curl --resolve <apim-domain>:443:<apim-ip> https://<apim-domain>
 Locally, check if the DNS resolves to the APIM instance by updating your local hosts file.
 You can also check connectivity from the ADO agent in the pipeline by running a curl command to see if it resolves to the APIM instance. To do this, you can either SSH into the ADO agent or run a pipeline that executes a curl command to check connectivity.
 

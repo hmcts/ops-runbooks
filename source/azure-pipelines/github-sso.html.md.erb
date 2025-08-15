@@ -23,6 +23,17 @@ If you do get this error, this means you need to authorise the PAT for use with 
 
 GitHub have an official guide on how to do this which can be found [here](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
 
+## How GitHub automatic provisioning is configured in Microsoft Entra ID
+
+We use Microsoft Entra ID's SCIM provisioning to automate GitHub organisation membership. When a user is added to an Entra group that is mapped to a GitHub organisation or team, Entra will provision the user and add them to the corresponding GitHub organisation automatically.
+
+Key points:
+- Enterprise application in Entra: `GitHub`
+- Default access group for users to access GitHub is: `DTS GitHub Access`
+
+For details on how to connect Entra ID to GitHub's SCIM provisioning API and configure group-to-organisation mappings, see:
+- [Configuring user provisioning to GitHub from Entra](https://learn.microsoft.com/en-us/entra/identity/saas-apps/github-provisioning-tutorial#configuring-user-provisioning-to-github)
+
 ## Which account are PATs created under?
 
 We have a central account `HMCTS Platform Operations` that we use to create PATs that will be used by multiple pipelines within the Azure DevOps

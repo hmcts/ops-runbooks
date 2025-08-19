@@ -1,0 +1,50 @@
+---
+title: Cloud Gateway VPN Gateways
+weight: 10
+last_reviewed_on: 2025-08-18
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+In the Crime tenants, we have two VPN gateways that route traffic to the HMCTS Azure tenant.
+
+There is one VPN gateway per Crime tenant and they reside in the [MDV](https://portal.azure.com/#@hmctsnonlive.onmicrosoft.com/resource/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-IMZ-01/providers/Microsoft.Network/virtualNetworkGateways/VG-MDV-OLDAZURE-01/overview) and [MPD](https://portal.azure.com/#@cp.cjs.hmcts.net/resource/subscriptions/9ab65d81-930d-4cc0-a93d-367e14676bc0/resourceGroups/RG-MPD-IMZ-01/providers/Microsoft.Network/virtualNetworkGateways/VG-MPD-OLDAZURE-01/overview) environments.
+
+These gateways allow traffic to flow between the two Crime tenants and to the HMCTS tenant.
+
+This is achieved using both site-to-site and vnet-to-vnet connections that route traffic through Cloud Gateway or directly to the HMCTS tenant.
+
+Some more information on the gateways and their connections can be found [here](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1843333646).
+
+## Where is the IaC for the VPN gateways?
+
+The code for the VPN gateways can be found in the [cpp-automation-terraform](https://github.com/hmcts/cpp-automation-terraform) repository.
+
+- [MDV](https://github.com/hmcts/cpp-automation-terraform/blob/main/environments/non-live/mdv/integration_dmz/21-gateways.tf)
+- [MPD](https://github.com/hmcts/cpp-automation-terraform/blob/main/environments/live/mpd/integration_dmz/21-gateways.tf)
+
+This repo contains the code to deploy:
+
+- VPN Gateways 
+- Local Network Gateways
+- Site-to-Site connections
+- Vnet-to-Vnet connections
+
+
+## What services use the VPN gateways?
+
+The VPN gateways are used by the following services, among others:
+
+- CJSC
+- Court Store
+- DARTS
+- Libra
+
+You can see which services use which connections on this [Confluence page](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1843333646).
+
+Third party contacts for Crime services can be found [here](https://tools.hmcts.net/confluence/display/HSS/Third+Party+Contacts+SRE). At the time of writing, the following contacts were used:
+
+- CJSC: [Richard Hanley](mailto:richard.hanley@q-solution.co.uk)
+- Court Store: [Thomas Roberts](mailto:thomas.roberts@justice.gov.uk)
+- DARTS: [Brian Hingston](mailto:brian.hingston@cgi.com)
+- Libra: [Neil Green](mailto:neil.green@cgi.com)

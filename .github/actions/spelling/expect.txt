@@ -22,6 +22,7 @@ CAHOSTVERIFY
 cdef
 cdes
 Chirag
+Chundur
 containerised
 customisations
 CVP
@@ -29,6 +30,7 @@ Dac
 datacentre
 Datlassian
 DBfor
+dbsetup
 dde
 deevanapalli
 DEVJUMPL
@@ -42,6 +44,7 @@ Eyetan
 ffff
 ffffffff
 ffffffffffff
+fileservice
 geolocationfile
 GEOLOCATIONUPDATES
 Glust
@@ -76,9 +79,11 @@ noout
 NSGs
 oidc
 onlineplea
+openvpn
 paramatised
 pki
 pmd
+postgress
 prd
 PRDATL
 prepatch
@@ -115,8 +120,10 @@ tns
 toset
 totp
 TTLs
+Tunnelblick
 Txx
 utilisation
+Verma
 Virtualbox
 virtualwan
 VNETs
@@ -124,11 +131,3 @@ wafcc
 wrkagentpool
 wsdl
 XXXX
-dbsetup
-fileservice
-postgress
-Verma
-Widdowson
-Pankaj
-mpdjumpl
-Chundur

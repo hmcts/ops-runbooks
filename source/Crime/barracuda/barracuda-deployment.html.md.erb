@@ -22,6 +22,9 @@ First, get the IP address of the WAF. Then use the command below to create an SS
 ```sh
 ssh -L 8020:10.89.192.16:8000 DEVJUMPL01.cpp.nonlive
 ```
+typical crime vpn troubleshooting applies,
+ip address is the target waf
+New machines require jumphost to match target env
 
 Once the tunnel is established, you can access the WAF by navigating to `http://localhost:8020` in your web browser.
 

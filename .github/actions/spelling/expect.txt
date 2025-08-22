@@ -82,6 +82,7 @@ noout
 NSGs
 oidc
 onlineplea
+openvpn
 paramatised
 pki
 pmd
@@ -122,6 +123,7 @@ tns
 toset
 totp
 TTLs
+Tunnelblick
 Txx
 utilisation
 Verma

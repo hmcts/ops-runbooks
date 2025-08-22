@@ -23,6 +23,7 @@ cdef
 cdes
 Chirag
 Chundur
+CJSC
 containerised
 customisations
 CVP
@@ -49,8 +50,10 @@ geolocationfile
 GEOLOCATIONUPDATES
 Glust
 gluster
+hanley
 Hashicorp
 hcp
+hingston
 IMZ
 Jacomb
 Jenkinsfiles

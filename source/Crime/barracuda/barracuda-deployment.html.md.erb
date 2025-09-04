@@ -38,7 +38,15 @@ Once you have the backup, import it into the new WAF. This will ensure that all 
 
 After importing from backup, export the JSON configuration from the new WAF and save it in the [cpp-terraform-azurerm-waf repository](https://github.com/hmcts/cpp-terraform-azurerm-waf/tree/main/backup). This will serve as a reference for future deployments and ensure that you have a backup of the current configuration.
 
-Finally, set up High Availability (HA) for the WAF under the Advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. Use the vault secret found in HashiCorp Vault at the path `secret/terraform/dev` as the vault secret, then add the IP address of the other WAF in the peer WAF to join the HA pair together as shown below.
+Finally, set up High Availability (HA) for the WAF under the Advanced tab. This involves configuring the WAF to work in a pair, ensuring that if one WAF fails, the other can take over without service interruption. Use the vault secret found in HashiCorp Vault at the path `secret/terraform/dev` as the vault secret (for the 2023 machines), then add the IP address of the other WAF in the peer WAF to join the HA pair together as shown below.
+username is still admin
+New WAF passwords (2025 machines) are located in AZ KV in format:
+KV-[env]-CCM-01 e.g. KV-SIT-CCM-01
+
+Secret name:
+SITDMZBWAF0--vmss-admin-password  (for 001 machine)
+SITDMZBWAF1--vmss-admin-password (for 101)
+
 
 <img src="images/high-availability.png" style="height:450px;">
 

@@ -16,7 +16,7 @@ This documentation will guide you through checking and updating the **self-hoste
 **Note:** This activity is disruptive and will cause artifactory to stop working as the pods are redeployed in a statefulset. To minimize disruptions to teams the following paths can be taken:
 
 - A: Complete the patch early in the morning, similar to a jenkins upgrade, to avoid disruptions.
-- B: Advise teams in advance of the patching activity on the Platform Operatipions channel.
+- B: Advise teams in advance of the patching activity on the Platform Operations channel.
 - C: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1329/files), **before** upgrading.
 
 If any issues arise during the patching process, [troubleshooting steps](#troubleshooting) are provided at the bottom of this page. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.

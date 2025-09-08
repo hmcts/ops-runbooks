@@ -16,13 +16,13 @@ This documentation will guide you through checking and updating the **self-hoste
 **Note:** This activity is disruptive and will cause artifactory to stop working as the pods are redeployed in a statefulset. To minimize disruptions to teams the following paths can be taken:
 
 - A: Complete the patch early in the morning, similar to a jenkins upgrade, to avoid disruptions.
-- B: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1266/files), **before** upgrading.
+- B: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1329/files), **before** upgrading.
 
 If any issues arise during the patching process, [troubleshooting steps](#troubleshooting) are provided at the bottom of this page. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
 ## Artifactory Patching Process
 
-### 1. Updating CFT PTLSBOX
+### 1. Updating CFT PTLSBOX (Non-Prod)
 
   • Create a new file named `artifactory-sbox.yaml` in the [artifactory directory](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory "apps/artifactory/artifactory"), add the following and update to the latest version.
 
@@ -80,7 +80,7 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 
   • Ensure you can access [Artifacory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/treeGeneral/hmcts) website. **Note:** you will need to be connected to F5 VPN to access this link.
 
-### 3. Update CFT PTL
+### 3. Update CFT PTL (Prod)
 
   • Remove `artifactory-sbox.yaml` file and its corresponding code from `kustomization.yaml` made in step 1.
 

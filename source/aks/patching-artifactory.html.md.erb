@@ -1,7 +1,7 @@
 ---
 title: Artifactory Patching
 weight: 30
-last_reviewed_on: 2025-02-26
+last_reviewed_on: 2025-09-08
 review_in: 12 months
 ---
 
@@ -11,18 +11,19 @@ Artifactory is utilized in the context of managing and updating software depende
 
 There are [3 additional files](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/ptl-intsvc) within artifactory: `admin-pw.yaml`, `join-key.yaml` and `master-key.yaml`. These files are necessary for Artifactory to operate, `admin-pw.yaml` is used to login to artifactory, `join-key.yaml` and `master-key.yaml` are used internally and are needed for the startup of Artifactory.
 
-This documentation will guide you through checking and updating the **self-hosted version** of Artifactory being used. This process involves checking the upstream [Artifactory's version](https://github.com/jfrog/charts/blob/master/stable/artifactory-oss/Chart.yaml) verifying that the Artifactory Helm Release has accepted the latest changes, and ensuring the pods are healthy and that [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is accessible.
+This documentation will guide you through checking and updating the **self-hosted version** of Artifactory being used. This process involves checking the upstream [Artifactory's version GitHub](https://github.com/jfrog/charts/blob/master/stable/artifactory-oss/Chart.yaml) & [Artifactory's version Jfrog Releases](https://jfrog.com/help/r/jfrog-release-information/important-self-hosted-changes)verifying that the Artifactory Helm Release has accepted the latest changes, and ensuring the pods are healthy and that [Artifcatory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/tree/General/hmcts) is accessible.
 
 **Note:** This activity is disruptive and will cause artifactory to stop working as the pods are redeployed in a statefulset. To minimize disruptions to teams the following paths can be taken:
 
 - A: Complete the patch early in the morning, similar to a jenkins upgrade, to avoid disruptions.
-- B: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1329/files), **before** upgrading.
+- B: Advise teams in advance of the patching activity on the Platform Operatipions channel.
+- C: Temporarily disable Artifactory, following the [example pr](https://github.com/hmcts/cnp-jenkins-library/pull/1329/files), **before** upgrading.
 
 If any issues arise during the patching process, [troubleshooting steps](#troubleshooting) are provided at the bottom of this page. These steps involve identifying and resolving any errors or conflicts that may occur, such as missing namespaces or configuration discrepancies.
 
 ## Artifactory Patching Process
 
-### 1. Updating CFT PTLSBOX (Non-Prod)
+### 1. Updating CFT PTLSBOX - [example non-prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-27408) 
 
   • Create a new file named `artifactory-sbox.yaml` in the [artifactory directory](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory "apps/artifactory/artifactory"), add the following and update to the latest version.
 
@@ -36,10 +37,10 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
     chart:
         spec:
           chart: artifactory-oss
-          version: 107.90.9 <- update to latest version
+          version: 107.111.8 <- update to latest version
   ```
 
-  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.90.9`
+  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.111.8`
 
   • Make the changes to the bottom of `kustomization.yaml` file found in [sbox-intsvc directory](https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml "apps/artifactory/sbox-intsvc/base/kustomization.yaml").
 
@@ -54,7 +55,7 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 
 ### 2. Check new version on CFT PTLSBOX
 
-  • [Connect to CFT PTLSBOX cluster](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters)
+  • [Connect to CFT PTLSBOX cluster](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1497c3d7-ab6d-4bb7-8a10-b51d03189ee3/resourceGroups/cft-ptlsbox-00-rg/providers/Microsoft.ContainerService/managedClusters/cft-ptlsbox-00-aks/overview)
 
   • Run the command below and ensure the Helm Release is showing **True** and is running the latest chart version.
 
@@ -75,16 +76,22 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
   • For further confirmation, ensure that the grep command below returns the chart version that you have applied.
 
   ```command
-  kubectl describe pods -n artifactory artifactory-oss-0 | grep chart=artifactory-107.90.9
+  kubectl describe pods -n artifactory artifactory-oss-0 | grep chart=artifactory-107.111.8 (put your version here)
   ```
 
   • Ensure you can access [Artifacory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/treeGeneral/hmcts) website. **Note:** you will need to be connected to F5 VPN to access this link.
 
-### 3. Update CFT PTL (Prod)
+  • A successful upgrade will look like the below.
+
+  <img src=images/artifactory-checks.png  width="600">
+
+### 3. Update CFT PTL - [example Prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-27408) 
+
+  • Ensure Artifactory is still disabled from step 1.
 
   • Remove `artifactory-sbox.yaml` file and its corresponding code from `kustomization.yaml` made in step 1.
 
-  • Update the version in `artifactory.yaml` to latest version eg, (7.90.9) <- ensure `10` is in front of the version.
+  • Update the version in `artifactory.yaml` to latest version eg, (7.111.8) <- ensure `10` is in front of the version.
 
   ```yaml
   ...
@@ -92,7 +99,7 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
   chart:
     spec:
       chart: artifactory-oss
-      version: 107.90.9
+      version: 107.111.8
 
   ...
   ```
@@ -101,6 +108,11 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 
   • Repeat [step 2](#2-check-new-version-on-cft-ptlsbox) for **'CFT PTL cluster'** checking the Helm release is on the new version and ensuring the pods are healthy.
 
+  • [Connect to CFT PTL cluster](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/cft-ptl-00-rg/providers/Microsoft.ContainerService/managedClusters/cft-ptl-00-aks/overview)
+
+  • Once all the checks are done for CFT PTL and no issues have arisen, re-en-enable Artifactory by following the [example pr](https://github.com/hmcts/cnp-jenkins-library/commit/5565dd39fedb2493c67bf6837c5d034ca77722f8).
+
+ 
 ## Related Links
 
   [cnp-flux repo](https://github.com/hmcts/cnp-flux-config)

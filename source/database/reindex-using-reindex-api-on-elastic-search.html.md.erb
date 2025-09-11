@@ -1,0 +1,243 @@
+---
+title: How to reindex using Reindex API on Elastic Search
+last_reviewed_on: 2025-06-18
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This provides instructions on how to complete a reindex within Elastic Search using the reindexing API.
+
+This will be made as generic as possible with places to enter the values needed.
+
+A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
+[Example implementation plan](https://tools.hmcts.net/confluence/display/RSTR/NDL-1.1.0+-+Amend+Elastic+Search+Index+Configuration+Release+Implementation+Plan)
+
+Example index name: `nfd_cases-000001`
+Example case_type_id: `NFD`
+Example index clone1 name:`cloned-nfd_cases-000001`
+Example index clone2 name: `cloned-nfd_cases-000002`
+
+Some changes will include both non-production and production environments. 
+
+1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)
+
+2) Make sure you are connected to the F5 VPN
+
+3) Connect to the bastion server
+
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
+
+Non-prod:
+```
+ssh bastion-nonprod.platform.hmcts.net
+```
+
+Prod:
+```
+ssh bastion-prod.platform.hmcts.net
+```
+
+4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
+
+For a list of IP addresses for each env, go to:
+
+ DEMO:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ PERFTEST:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ AAT:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+
+ Production:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+
+Connect to Elastic Search node from relevant bastion:
+
+```
+ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
+```
+
+5) 	Stop the logstash instance that the team uses, this is to avoid any issues from scheduled jobs
+
+Most teams do not have dedicated instances but some do.
+
+You can scale the instance down to 0 to stop it running in this [repo](https://github.com/hmcts/cnp-flux-config)
+
+Running this command on the relevant AKS cluster will let you see all logstash instances which can be scaled up and down in the cnp-flux-config repo.
+
+```
+kubectl get pods -A |grep logstash
+```
+
+6) Check if app team need to shutter
+
+Also ensure that app team have removed themselves from case disposer flux config.
+
+7) List the index you are re indexing prior to moving forward
+
+Please make sure to remove the 000001 from the end of the index name when running the below command, this ensure all clones will also be listed.
+
+```
+Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
+```
+
+8) Check overall DB count prior to deletion
+
+Connect to ccd-data-store DB from Bastion server and run this query:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
+```
+
+9) Get a count of the Dead Letter Queue on elastic search for the case_type_id
+
+```
+curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+```
+
+10) Change main index to read only mode for cloning
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
+```
+
+11) Clone the index for backup incase of rollback
+
+Make sure this clones name ends in a 01 like the main index.
+
+```
+curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
+```
+
+After this command, please check both indexes exist by running the command from step 7 again.
+
+12) Clone index a second time, this will be used as a source for the reindex. 
+
+For clearer referencing end this clone name with a 02 instead of a 01.
+
+```
+curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
+```
+
+Note: For this cloned index please ensure the name has a 2 at the end instead of a 1.
+
+13) Set original index back to write mode.
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
+```
+
+14) Set the second cloned index to read only mode
+
+```
+curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": true}}'
+```
+
+15) Delete the original index
+
+```
+curl -X DELETE localhost:9200/<Your index name>;
+```
+
+16) Wait for the new definition to be imported by the service team.
+
+Confirm its been imported by running the command from step 7 again, it will show as having no cases in it but it should exist.
+
+17) Reindex using the second clone as the source for the reindex
+
+This will take a while depending on the size of the index, so please be patient.
+The curl we run can time out but rest assured it will still run in the background.
+
+```
+curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<your index name>"}}'
+```
+
+18) Check the reindex was successful
+
+Even after Step 17 is complete this can take some time to complete, so please be patient.
+
+```
+Curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
+```
+
+If the index count isnt up to what is expected but no error was shown in step 17, then please run the below command and check again.
+
+```
+curl -X GET "localhost:9200/_refresh?pretty"
+```
+
+19) If the reindex was successful begin removing both of the clones that were created.
+
+For removing clone 02 make sure you run the below command to remove the read only setting.
+
+```
+curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": false}}'
+```
+
+Then run this command for each clone to remove them.
+
+Please remove them one at a time.
+
+```
+curl -X DELETE localhost:9200/<clone index name>;
+```
+
+20) Ensure you scale the logstash instance back to 1.
+
+
+### Rollback
+
+If we need to rollback we can use the cloned index from step 11 that was done before deleting the index.  
+
+This will save us a lot of time and risk, where we dont have to a full re-index.
+
+Before rolling back please make sure that the current main index is removed as we wont be able to clone into it and will be creating it again with the clone command below.
+
+1) Restore the backed up index:
+
+```
+curl -X PUT "localhost:9200/cloned-<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d'{"settings": {"index.blocks.write": true}}'
+```
+
+```
+curl -X POST "localhost:9200/cloned-<Your index name>/_clone/<Your index name>?pretty"
+```
+
+Verify the numbers match:
+
+```
+curl --silent localhost:9200/_cat/indices | grep <Your index name> 
+```
+
+2) Set the index alias
+
+
+```
+curl -X POST "localhost:9200/_aliases?pretty" -H 'Content-Type: application/json' -d' { "actions": [ { "add": { "index": "<Your index name>", "alias": "<your alias>" } } ] } '
+```
+
+Search to verify:
+
+```
+curl -X GET "localhost:9200/_alias/<your alias>?pretty"
+```
+
+3) Check if any cases need reindexing on the DB:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>' and marked_by_logstash = 'false';
+```
+
+4) Service teams to do a search to verify if it has the correct number of cases.
+
+5) Remove the cloned index:
+
+```
+curl -XDELETE localhost:9200/cloned-<Your index name>;
+```

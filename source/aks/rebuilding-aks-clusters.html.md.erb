@@ -50,8 +50,11 @@ You will find the same Environment variables for the PRs shown above in this con
 - Change Jenkins to use the other cluster, e.g. [cnp-flux-config#19886](https://github.com/hmcts/cnp-flux-config/pull/19886/files) .
   - After merging above PR, **IF** Jenkins is not updated, [check Here](https://build.platform.hmcts.net/configure), you **MUST** manually change Jenkins config to use the other cluster.
 - If it is a preview environment, swap external DNS active cluster, example [PR](https://github.com/hmcts/cnp-flux-config/pull/19889)
-- If it is an AAT Environment, you will need to update the Private DNS record to point to the new cluster, example private DNS [PR](https://github.com/hmcts/azure-private-dns/pull/833/).
-  - The private DNS should be set to the kubernetes internal loadbalancer IP (Traefik).
+- If it is an AAT Environment, you will need to update the Private DNS record to point to the new cluster
+  - There are 2 locations for this change:
+      - The first is `environments/staging/service-core-compute-aat-internal.yml`, example [PR](https://github.com/hmcts/azure-private-dns/pull/833/).
+      - The second is `environments/staging/aat-platform-hmcts-net.yml`, example [PR](https://github.com/hmcts/azure-private-dns/pull/916/files).
+  - The private DNS entries should be set to the kubernetes internal loadbalancer IP (Traefik).
   - See [common upgrade](https://hmcts.github.io/ops-runbooks/aks/upgrading-aks-clusters.html#pods-and-hrs-health-checks) steps for how to retrieve the IP address"
 - Create a test PR, normally we just make a README change to [rpe-pdf-service](https://github.com/hmcts/rpe-pdf-service).
   - Example [PR](https://github.com/hmcts/rpe-pdf-service/pull/318). Check the PR in Jenkins has successfully run through the stage [AKS deploy - preview](https://build.hmcts.net/blue/organizations/jenkins/HMCTS_j_to_z%2Frpe-pdf-service/detail/PR-843/18/pipeline/217)

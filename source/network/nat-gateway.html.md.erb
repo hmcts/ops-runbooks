@@ -1,0 +1,61 @@
+---
+title: NAT Gateway - Egress Traffic Flow
+last_reviewed_on: 2025-07-11
+review_in: 12 months
+weight: 75
+---
+
+# <%= current_page.data.title %>
+
+## Overview
+
+The NAT Gateway is a managed Azure service that provides outbound internet connectivity for resources in our virtual
+networks. It has been implemented to centralize and improve the management of egress traffic that was previously
+handled directly by our Palo Alto firewall VMs.
+
+## Architecture
+
+![NAT Gateway Infrastructure Diagram](images/nat_gateway.png)
+
+- **NAT Gateway** deployed with zone redundancy for high availability
+- Public IP addresses attached to the NAT Gateway
+- Palo Alto firewalls route traffic through the NAT Gateway for internet egress
+- Centralized outbound connectivity management
+
+## Configuration Details
+
+### Public IP Addresses
+
+The NAT Gateway is configured with the following public IP addresses (Production environment):
+
+- `hmcts-hub-prod-int-palo-inet-out-pip-0`
+- `hmcts-hub-prod-int-palo-inet-out-pip-1`
+
+These IPs were previously assigned to the individual Palo Alto firewall VMs.
+
+### Routing Configuration
+
+- **Subnet**: `hub-transit-public` subnet routes traffic through the NAT Gateway
+- **Firewall Integration**: Palo Alto firewalls maintain their security inspection role while delegating NAT functions to the gateway
+- **Availability Zones**: NAT Gateway provides zone-redundant connectivity
+
+## Monitoring and Troubleshooting
+
+### Azure Portal Access
+
+| Environment | Instance |
+|------------|----------|
+| Sandbox | [hmcts-hub-sbox-int-nat-gateway](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ea3a8c1e-af9d-4108-bc86-a7e2d267f49c/resourceGroups/hmcts-hub-sbox-int/providers/Microsoft.Network/natGateways/hmcts-hub-sbox-int-nat-gateway/overview) |
+| Non-Prod | [hmcts-hub-nonprodi-nat-gateway](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Network/natGateways/hmcts-hub-nonprodi-nat-gateway/overview) |
+| Production | [hmcts-hub-prod-int-nat-gateway](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/0978315c-75fe-4ada-9d11-1eb5e0e0b214/resourceGroups/hmcts-hub-prod-int/providers/Microsoft.Network/natGateways/hmcts-hub-prod-int-nat-gateway/overview) |
+
+### Key Metrics to Monitor
+
+- **SNAT Connection Count**: Monitor active outbound connections
+- **SNAT Port Utilization**: Track port usage to prevent exhaustion
+- **Data Processed**: Monitor bandwidth utilization
+- **Packet Drop Count**: Identify potential connectivity issues
+
+## Related Documentation
+
+- [Palo Alto Firewall Configuration](palo-alto/index.html)

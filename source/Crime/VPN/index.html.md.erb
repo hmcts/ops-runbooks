@@ -1,0 +1,72 @@
+---
+title: Updating VPN Routes for Tunnelblick  
+last_reviewed_on: 2025-08-19  
+review_in: 12 months  
+weight: 20  
+---
+
+# <%= current_page.data.title %>
+
+## Updating VPN Routes for Tunnelblick
+
+### Non-live VPN Machines
+
+The non-live VPN machines are:
+
+- MDVADMVPNHA201.cpp.nonlive
+- MDVADMVPNHA202.cpp.nonlive
+
+### Process for Updating VPN Routes
+
+To update routes for the Tunnelblick VPN, follow these steps:
+
+#### 1. Raise and Merge Pull Requests
+
+Raise and merge PRs on both Gerrit and GitHub. Example PRs:
+
+- Gerrit: [https://codereview.mdv.cpp.nonlive/c/automation.ansible/+/195681](https://codereview.mdv.cpp.nonlive/c/automation.ansible/+/195681)
+- GitHub: [https://github.com/hmcts/crime-idam-automation-ansible/pull/11](https://github.com/hmcts/crime-idam-automation-ansible/pull/11)
+
+**Note:** We didn't apply changes from automation.ansible as Ansible may not have been applied to non-live machines for a very long time and may break something.
+
+#### 2. Notify Teams
+
+**Important:** Adding new routes requires restarting the OpenVPN service, which will briefly disconnect VPN sessions. Notify the following channels:
+
+- `#cpp-devops`
+- `#platform-operations`
+
+Let them know that VPN sessions will be disconnected briefly and they should be able to reconnect.
+
+#### 3. Login to VPN VMs
+
+Login to each VPN VM. You should be able to login from local provided you are connected to VPN and have the relevant SSH config.
+
+#### 4. Check Current Configuration
+
+Once logged in, check the current OpenVPN server configuration:
+
+```bash
+cat /etc/openvpn/server.conf
+```
+
+#### 5. Add New Routes
+
+Add and save your changes to the configuration file. For example:
+
+```bash
+push "route 10.40.10.0 255.255.254.0"
+```
+
+#### 6. Restart OpenVPN Service
+
+Check the service status and restart it:
+
+```bash
+systemctl status openvpn@server.service
+systemctl restart openvpn@server.service
+```
+
+#### 7. Repeat on Second VM
+
+Repeat the same steps on the other VPN box (MDVADMVPNHA202.cpp.nonlive).

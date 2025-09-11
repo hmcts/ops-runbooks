@@ -1,0 +1,28 @@
+---
+title: Creating a new pipeline
+last_reviewed_on: 2025-08-11
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+When you create a new GitHub repo with an azure pipeline, you need to do a few things in Azure DevOps for the pipeline to start working.
+
+First, go to the [project](https://dev.azure.com/hmcts/PlatformOperations/_build) in Azure DevOps and click `New Pipeline`.
+
+Choose GitHub as the source for your YAML file and sign in, if prompted.
+
+Click on `You may also select a specific connection`.
+
+![specific_connection](images/specific-connection.png).
+
+Choose the hmcts installation token.
+
+Search for the GitHub repo and click on it.
+
+On the next page, choose `Existing Azure Pipelines YAML file` and enter the file path of the file in the repo.
+
+Review and save.
+
+The pipeline should now be configured in Azure DevOps.

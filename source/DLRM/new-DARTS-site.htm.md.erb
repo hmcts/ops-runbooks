@@ -1,0 +1,29 @@
+---
+title: Setup connectivity for a new DARTs Site
+last_reviewed_on: 2025-08-26
+review_in: 24 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+DARTs Sites have both an inbound and an outbound connectivity requirement to SDS AKS. The DARPCs and Mid tiers need to connect to DARTs via the Application Gateway and the DARTs application (pods in AKS) needs to connect to DARPCs and Mid Tiers.
+
+## Pre-requisites
+
+PlatOps have a very limited view into the network estate of the MoJ, so the following pre-requisites must be met:
+
+- The new site can route traffic to/from Cloud Gateway (this may be via the MoJ WAN).
+- The new site's address range (CIDR) must be known and shared with PlatOps at the time of the request.
+
+Unfortunately, PlatOps cannot help gather this information due to our limited access/view past CloudGateway.
+
+### Cloud Gateway Firewall Changes.
+
+Raise a request on the CloudGateway portal to add the new site's CIDR into the `GRP-MoJ-DARTS-Sites` address group. This will ensure the traffic is allowed by the Cloud Gateway Firewall by the rules:
+- LIVE-DARTS-MoJ_P-AZ-AppGW
+- LIVE-DARTS-AKS-MoJ-DARPC
+
+### Palo Alto Firewall change
+
+Create a new address object for the new site's CIDR. Add it to the [GRP-MoJ-DARTS-Sites](https://github.com/hmcts/hub-panorama-terraform/blob/master/components/configuration/groups/objects/address-groups/04-address-groups-prod.tf) address group.

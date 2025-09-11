@@ -1,0 +1,26 @@
+---
+title: ServiceNow MySQL Database Restore
+last_reviewed_on: 2025-09-11
+review_in: 3 months
+weight: 150
+---
+
+# <%= current_page.data.title %>
+
+## 1. Infrastructure
+
+GitHub repo: [hmcts/servicenow-infrastructure](https://github.com/hmcts/servicenow-infrastructure)
+
+Pipeline: [hmcts.servicenow-infrastructure](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1141&_a=summary)
+
+## 2. Azure Resources
+
+- Resource Group: `rg-servicenow-prod`
+- Storage Account: `servicenowprodukssa`
+- Private Endpoint VNet: `ss-prod-vnet`
+- Private Endpoint Subnet: `private-endpoints`
+
+## 4. References
+
+- Story: [Create Storage Account (with SFTP) and deploy it using ADO pipeline](https://tools.hmcts.net/jira/browse/DTSPO-27441)
+- Epic: [ServiceNow MySQL Flexible Server creation](https://tools.hmcts.net/jira/browse/DTSPO-27439)

@@ -14,6 +14,7 @@ atlassian
 atlassiannonprod
 atlasssian
 azmk
+azsftp
 bacpac
 bak
 Bance
@@ -22,7 +23,6 @@ CAHOSTVERIFY
 cdef
 cdes
 Chirag
-Chundur
 CJSC
 containerised
 customisations
@@ -50,10 +50,8 @@ geolocationfile
 GEOLOCATIONUPDATES
 Glust
 gluster
-hanley
 Hashicorp
 hcp
-hingston
 IMZ
 Jacomb
 Jenkinsfiles
@@ -64,6 +62,7 @@ jira
 journalctl
 kalyan
 keyfile
+lhr
 libragob
 libragobrestore
 Manan
@@ -72,6 +71,7 @@ MDVADMVPNHA
 Miniport
 mnl
 Moj
+mojcppprod
 mpd
 mynodepool
 myregistry
@@ -103,6 +103,7 @@ Rns
 ruleset
 ruxit
 SBZ
+sftpmig
 sku
 sourced
 sourceregistry
@@ -111,6 +112,7 @@ sourcetag
 spn
 sqldb
 sqlpackage
+sshfs
 statefile
 statefulset
 ste

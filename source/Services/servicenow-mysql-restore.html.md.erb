@@ -41,11 +41,13 @@ This stores the private key at the specified path. Associate the public key with
 After logging into the `bastion-prod` VM as root user:
 
 1. Create a new directory:
+
    ```bash
    mkdir -p ~/azsftp2
    ```
 
 2. Mount the Storage Account using the private key:
+
    ```bash
    sshfs \
      "servicenowprodukssa.mysql-backup.mysql@servicenowprodukssa.blob.core.windows.net:/" \
@@ -59,11 +61,13 @@ After logging into the `bastion-prod` VM as root user:
    ```
 
 3. Verify if the SFTP mount is active:
+
    ```bash
    mount | grep sshfs
    ```
 
 4. Test the mount by creating directories and files:
+
    ```bash
    cd ~/azsftp2
    mkdir test
@@ -80,6 +84,7 @@ After logging into the `bastion-prod` VM as root user:
 1. Receive the private key from the ServiceNow team via email and decrypt it using the password they provided.
 
 2. Connect to ServiceNow SFTP:
+
    ```bash
    sftp -i private_key mojcppprod_sftpmig@sftp-lhr.service-now.com
    ```
@@ -89,6 +94,7 @@ After logging into the `bastion-prod` VM as root user:
 #### 3.4.2 Download Database Files
 
 1. After connecting to ServiceNow SFTP, verify the uploaded files:
+
    ```bash
    sftp> ls -l
    -rw-r-xr--    1 0        0        527356255387 Sep  9 15:02 CHG66945130_mojcppprod_1.sql.gz
@@ -96,11 +102,13 @@ After logging into the `bastion-prod` VM as root user:
    ```
 
 2. Set the mounted location as the download destination:
+
    ```bash
    sftp> lcd /root/azsftp2
    ```
 
 3. Download the database file:
+
    ```bash
    sftp> reget CHG66945130_mojcppprod_1.sql.gz
    ```

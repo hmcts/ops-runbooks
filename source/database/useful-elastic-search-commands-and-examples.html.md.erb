@@ -1,0 +1,78 @@
+---
+title: Useful Elastic Search Commands and Examples
+last_reviewed_on: 2025-09-22
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This document provides a list of useful Elastic Search commands and examples for working with Elastic Search.
+
+All of the commands are set out to be run from the Elastic search VMs.
+
+## Get a count of cases in an index
+
+To get a count of cases in an index, use the following command:
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <index_name>
+```
+Replace `<index_name>` with the name of the index you want to check. For example, to get a count of cases in the civil cases index, use:
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil_cases
+```
+
+## Refresh all indexes
+
+To refresh all indexes, use the following command:
+
+```
+curl -X GET "localhost:9200/_refresh?pretty"
+```
+
+## How to check field count for an index
+
+To check the field count for an index, use the following command:
+
+```
+curl -s -XGET localhost:9200/<index_name>/_mapping?pretty | grep type | wc -l
+```
+
+Replace `<index_name>` with the name of the index you want to check. For example, to check the field count for the civil cases index, use:
+
+```
+curl -s -XGET localhost:9200/civil_cases-000001/_mapping?pretty | grep type | wc -l
+```
+
+## How to delete an index
+
+To delete an index, use the following command:
+
+```
+curl -X DELETE localhost:9200/<index_name>;
+``` 
+
+Replace `<index_name>` with the name of the index you want to delete. For example, to delete the civil cases index, use:
+
+```
+curl -X DELETE localhost:9200/civil_cases-000001;
+```
+
+This wont come up often and if it does its typically only during a re-index change.
+
+## How to check the Dead Letter Queue (DLQ) for case types
+
+To check the Dead Letter Queue (DLQ) for case types, use the following command:
+
+```
+curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<case_type_id>\""}}}'
+```
+
+Replace `<case_type_id>` with the case type ID you want to check. For example, to check the DLQ for the civil case type, use:
+
+```
+curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"CIVIL\""}}}'
+```
+

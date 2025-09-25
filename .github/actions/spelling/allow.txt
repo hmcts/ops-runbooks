@@ -754,3 +754,5 @@ DARPC
 DARPCs
 optimisation
 servicenowprodukssa
+DLQ
+XGET

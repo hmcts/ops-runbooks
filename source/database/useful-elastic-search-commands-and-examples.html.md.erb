@@ -11,9 +11,37 @@ This document provides a list of useful Elastic Search commands and examples for
 
 All of the commands are set out to be run from the Elastic search VMs.
 
-## Get a count of cases in an index
+## Check cluster health, stats and node information
 
-To get a count of cases in an index, use the following command:
+To check the health of the cluster, use the following command:
+
+```
+curl -X GET "localhost:9200/_cluster/health?pretty"
+```
+
+To get cluster stats, use the following command:
+
+```
+curl -X GET "localhost:9200/_cluster/stats?pretty"
+```
+
+To check node information, use the following command:
+
+```
+curl -X GET "localhost:9200/_nodes?pretty"
+```
+
+## List all indexes
+
+To list all indexes, use the following command:
+
+```
+curl -X GET "localhost:9200/_cat/indices?v"
+```
+
+## Get a count of cases in a specific index
+
+To get a count of cases in a specific index, use the following command:
 
 ```
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <index_name>
@@ -75,4 +103,16 @@ Replace `<case_type_id>` with the case type ID you want to check. For example, t
 ```
 curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"CIVIL\""}}}'
 ```
+## How to clear cases out of the Dead Letter Queue (DLQ)
 
+To clear cases out of the Dead Letter Queue (DLQ), use the following command:
+
+```
+curl -XPOST --header "content-type: application/JSON" ' http://localhost:9200/.logstash_dead_letter/_delete_by_query?conflicts=proceed&pretty' -d '{"query": {"query_string": { "query":"<case_type_id>"}}}'
+```
+
+Replace `<case_type_id>` with the case type ID you want to clear. For example, to clear the DLQ for the civil case type, use:
+
+```
+curl -XPOST --header "content-type: application/JSON" ' http://localhost:9200/.logstash_dead_letter/_delete_by_query?conflicts=proceed&pretty' -d '{"query": {"query_string": { "query":"CIVIL"}}}'
+``` 

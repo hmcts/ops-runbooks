@@ -199,7 +199,7 @@ ServiceNow database name: `servicenow`
 
     ```bash
     cd /mnt/servicenowrestore
-    mkir CHG66945130_mojcppprod_1
+    mkdir CHG66945130_mojcppprod_1
     cd CHG66945130_mojcppprod_1
     pv ../CHG66945130_mojcppprod_1.sql.gz | zcat | mawk -f ../split_by_table-faster.awk
     ```

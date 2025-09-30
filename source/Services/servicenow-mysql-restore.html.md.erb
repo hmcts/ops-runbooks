@@ -209,7 +209,6 @@ ServiceNow database name: `servicenow`
     Scale up the MySQL Flexible Server to at least vCore=8 and Storage IOPS=12k for faster import.
 
 6. Create the ServiceNow database
-
     - Go to Azure Portal and find the MySQL Flexible Server.
     - Go to Settings > Databases > Add database.
     - Enter `servicenow` as the database name.
@@ -218,7 +217,7 @@ ServiceNow database name: `servicenow`
 
 7. Import the database schema
 
-Create mysql.cnf in `/mnt/servicenowrestore` with the following content:
+    Create mysql.cnf in `/mnt/servicenowrestore` with the following content:
 
     ```ini
     [client]
@@ -240,18 +239,16 @@ Create mysql.cnf in `/mnt/servicenowrestore` with the following content:
     Another issue is that MariaDB supports more indexes per table than MySQL. MySQL allows a maximum of 64 indexes.
 
     The following tables needs some indexes removed from the schema file (total index count in brackets):
-
     - cmdb (69 indexes)
     - cmdb$par1 (65 indexes)
     - task (68 indexes)
 
     The last issue is the fact that MariaDB supports larger inline columns of type VARCHAR. Change the ROW_FORMAT to
-    DYNAMIC for the following tables:
-
+    DYNAMIC for the following tables.
     - cmdb
     - cmdb$par1
 
-Now you can import the schema into MySQL:
+    Now you can import the schema into MySQL:
 
     ```bash
     pv CHG66945130_mojcppprod_1_schema.mysql.sql | mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf servicenow
@@ -305,7 +302,6 @@ Now you can import the schema into MySQL:
 10. Clean up
 
     After the import is complete, remember to:
-
     - Unmount the SFTP mount from the bastion VM.
     - Unmount the data disk and detach it from the bastion VM.
     - Delete the data disk. (The database dump is still in the Storage Account)

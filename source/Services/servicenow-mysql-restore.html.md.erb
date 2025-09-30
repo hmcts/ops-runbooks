@@ -259,12 +259,12 @@ Now you can import the schema into MySQL:
 
 8. Further data optimisation
 
-    The tables `sys_object_source` and `sys_attachment_doc` have a lot of data and they will take too long to import. For tables
+    The table `sys_object_source` has a lot of data and it will take too long to import. For tables
     like this, it is better to convert the SQL file into a CSV file and use `LOAD DATA LOCAL INFILE` command to import the
     data. This is way more efficient.
 
-    You will need to convert the SQL files for these tables into chunks of CSV files. We used chunks of 500k rows per CSV file.
-    For each table then load the chunks one by one (parallel only between tables).
+    You will need to convert the SQL files for this table into chunks of CSV files. We used chunks of 500k rows per CSV file.
+    Load the chunks one by one as parallel runs lock the table and causes transaction timeout errors.
 
     Each CSV will need respective SQL file that will look something like this:
 
@@ -299,7 +299,8 @@ Now you can import the schema into MySQL:
     ls CHG66945130_mojcppprod_1/*.sql | parallel --joblog parallel.log -j16 "mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf servicenow < {}"
     ```
 
-    You can monitor the progress by looking at the parallel.log file.
+    You can monitor the progress by looking at the parallel.log file. It will take around 18 hours to complete, there are
+    just a few tables that will take more than 10 hours to complete.
 
 10. Clean up
 

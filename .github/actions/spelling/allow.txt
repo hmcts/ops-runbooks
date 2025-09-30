@@ -754,3 +754,16 @@ DARPC
 DARPCs
 optimisation
 servicenowprodukssa
+sqladmin
+mklabel
+gpt
+mkpart
+mnt
+servicenowrestore
+zcat
+rapidgzip
+mkdir
+cnf
+vcore
+joblog
+cmdb

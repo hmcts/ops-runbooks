@@ -17,8 +17,7 @@ Pipeline: [hmcts.servicenow-infrastructure](https://dev.azure.com/hmcts/Platform
 
 - Resource Group: `rg-servicenow-prod`
 - Storage Account: `servicenowprodukssa`
-- Private Endpoint VNet: `ss-prod-vnet`
-- Private Endpoint Subnet: `private-endpoints`
+- MySQL Flexible Server: `servicenow-mysql-prod`
 
 ## 3. Storage Account Setup and Database Download
 
@@ -115,6 +114,204 @@ After logging into the `bastion-prod` VM as root user:
 
    **Note:** The download process took several hours as the file is approximately 492 GB in size.
 
-## 4. References
+## 4. MySQL Server Setup
+
+Connection details:
+
+- Host: `10.144.36.11`
+- Port: `3306`
+
+Admin username: `sqladmin`
+
+ServiceNow database name: `servicenow`
+
+## 5. ServiceNow Database Restore
+
+1. Create and attach a 2-4TB data disk to the Bastion Prod VM.
+
+2. Create a new disk partition, format and mount it:
+
+    ```bash
+    # List the SCSI buses
+    ls /sys/class/scsi_host/
+
+    # run for all buses and replace X with the host number to scan for new disks
+    echo "- - -" > /sys/class/scsi_host/hostX/scan
+
+    # Locate the new disk
+    lsblk
+
+    # Create a new partition, replace the X with the letter of the new disk
+    parted /dev/sdX
+    parted> mklabel gpt
+    parted> mkpart primary 0% 100%
+    parted> quit
+
+    # Format the new partition
+    mkfs.ext4 /dev/sdX1
+
+    # Create a mount point and mount the new partition
+    mkdir /mnt/servicenowrestore
+    mount /dev/sdX1 /mnt/servicenowrestore
+    chmod 700 /mnt/servicenowrestore
+    ```
+
+3. Download the MySQL backup file from the Storage Account
+
+    We use azCopy as it is much faster than using the SFTP mount.
+
+    ```bash
+
+    # Replace SAS_TOKEN with the actual SAS token generated from the Azure portal
+    azcopy copy 'https://servicenowprodukssa.blob.core.windows.net/mysql-backup/CHG66945130_mojcppprod_1.sql.gz?SAS_TOKEN' '/mnt/servicenowrestore/CHG66945130_mojcppprod_1.sql.gz'
+    ```
+
+4. Split the SQL file into individual tables for parallel import
+
+    In `/mnt/servicenowrestore` create split_by_table.awk with the following content:
+
+    ```awk
+    BEGIN {
+      header = "/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;\n"
+      header = header "/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;\n"
+      header = header "/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;\n"
+      header = header "/*!40101 SET NAMES utf8mb4 */;\n"
+      header = header "/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;\n"
+      header = header "/*!40103 SET TIME_ZONE=\"+00:00\" */;\n"
+      header = header "/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;\n"
+      header = header "/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\" */;\n"
+      header = header "/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;\n\n"
+    }
+
+    /^-- Dumping data for table / {
+      if (out) close(out);
+      counter++;
+      out = counter ".sql";
+      printf "%s", header > out;
+    }
+
+    /^-- Dumping data for table / || out { print > out }
+    ```
+
+    Use zcat or alternatively rapidgzip (faster) and the above AWK script. We use mawk as it is faster than gawk.
+
+        Note: this will take two or more hours to complete.
+
+    ```bash
+    cd /mnt/servicenowrestore
+    mkdir CHG66945130_mojcppprod_1
+    cd CHG66945130_mojcppprod_1
+    pv ../CHG66945130_mojcppprod_1.sql.gz | zcat | mawk -f ../split_by_table-faster.awk
+    ```
+
+5. Temporarily scale up the MySQL Flexible Server
+
+    Scale up the MySQL Flexible Server to at least vCore=8 and Storage IOPS=12k for faster import.
+
+6. Create the ServiceNow database
+
+    - Go to Azure Portal and find the MySQL Flexible Server.
+    - Go to Settings > Databases > Add database.
+    - Enter `servicenow` as the database name.
+    - Select `utf8mb4` as the character set.
+    - Select `utf8mb4_0900_ai_ci` as the collation.
+
+7. Import the database schema
+
+Create mysql.cnf in `/mnt/servicenowrestore` with the following content:
+
+    ```ini
+    [client]
+    user=<mysql_admin_username>
+    password=<password>
+    host=<mysql_ip_address>
+    port=<mysql_port>
+    ```
+
+    The schema file has been exported from MariaDB and therefore there are some incompatibilities that need to be resolved
+    before it can be imported into Azure MySQL instance.
+
+    First, the per table encryption in Azure MySQL is not supported so it needs to be removed from the schema file.
+
+    ```bash
+    sed 's/ `ENCRYPTED`=YES//g' CHG66945130_mojcppprod_1_schema.sql > CHG66945130_mojcppprod_1_schema.mysql.sql
+    ```
+
+    Another issue is that MariaDB supports more indexes per table than MySQL. MySQL allows a maximum of 64 indexes.
+
+    The following tables needs some indexes removed from the schema file (total index count in brackets):
+
+    - cmdb (69 indexes)
+    - cmdb$par1 (65 indexes)
+    - task (68 indexes)
+
+    The last issue is the fact that MariaDB supports larger inline columns of type VARCHAR. Change the ROW_FORMAT to
+    DYNAMIC for the following tables:
+
+    - cmdb
+    - cmdb$par1
+
+Now you can import the schema into MySQL:
+
+    ```bash
+    pv CHG66945130_mojcppprod_1_schema.mysql.sql | mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf servicenow
+    ```
+
+8. Further data optimisation
+
+    The table `sys_object_source` has a lot of data and it will take too long to import. For tables
+    like this, it is better to convert the SQL file into a CSV file and use `LOAD DATA LOCAL INFILE` command to import the
+    data. This is way more efficient.
+
+    You will need to convert the SQL files for this table into chunks of CSV files. We used chunks of 500k rows per CSV file.
+    Load the chunks one by one as parallel runs lock the table and causes transaction timeout errors.
+
+    Each CSV will need respective SQL file that will look something like this:
+
+    ```sql
+    SET unique_checks = 0;
+    SET foreign_key_checks = 0;
+    SET sql_log_bin = 0;
+
+    LOAD DATA LOCAL INFILE '/mnt/servicenowrestore/csv_files/sys_object_source_part_1.csv'
+    INTO TABLE sys_object_source
+    FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+    LINES TERMINATED BY '\n';
+    ```
+
+    Then command like that can be used to load all the CSV chunks:
+
+    ```bash
+    ls csv_files/*.sql | parallel --joblog parallel_5775.log -j1 "mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf --local-infile=1 servicenow < {}"
+    ```
+
+    You can monitor the progress by looking at the parallel.log file.
+
+9. Import the database data into MySQL in parallel
+
+    Run the import command using GNU parallel with 16 parallel jobs:
+
+        Note: This will take a couple of days for MySQL instance: vcore=8 and storage IOPS=12k.
+
+    ```bash
+    cd /mnt/servicenowrestore
+    ls CHG66945130_mojcppprod_1/*.sql | parallel --joblog parallel.log -j16 "mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf servicenow < {}"
+    ```
+
+    You can monitor the progress by looking at the parallel.log file. It will take around 18 hours to complete, there are
+    just a few tables that will take more than 10 hours to complete.
+
+10. Clean up
+
+    After the import is complete, remember to:
+
+    - Unmount the SFTP mount from the bastion VM.
+    - Unmount the data disk and detach it from the bastion VM.
+    - Delete the data disk. (The database dump is still in the Storage Account)
+    - Scale down the MySQL Flexible Server to its original size.
+
+
+## 6. References
 
 - Epic: [ServiceNow MySQL Flexible Server creation](https://tools.hmcts.net/jira/browse/DTSPO-27439)

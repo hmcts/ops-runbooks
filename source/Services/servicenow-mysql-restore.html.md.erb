@@ -283,7 +283,7 @@ Now you can import the schema into MySQL:
     Then command like that can be used to load all the CSV chunks:
 
     ```bash
-    ls csv_files/*.sql | parallel --joblog parallel_5775.log -j1 "mysql --defaults-extra-file=/root/snimport/mysql.cnf --local-infile=1 servicenow < {}"
+    ls csv_files/*.sql | parallel --joblog parallel_5775.log -j1 "mysql --defaults-extra-file=/mnt/servicenowrestore/mysql.cnf --local-infile=1 servicenow < {}"
     ```
 
     You can monitor the progress by looking at the parallel.log file.

@@ -39,6 +39,51 @@ Finally, set up High Availability (HA) for the WAF under the Advanced tab. This 
 
 <img src="images/high-availability.png" style="height:450px;">
 
+### Initial Configuration and Licensing
+
+When you open the UI for the first time after deploying the VMs, it will ask you for the token. You can use the existing licence token from the [Barracuda WAF Discovery - Licence information](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1568510547#BarracudaWAFDiscovery-Licenceinformation) page or get a trial licence token (ask Babu for trial licence tokens).
+
+**Important:** Make sure the backup is restored on both of the VMs and then paired; otherwise one is going to overwrite the other one.
+
+### Basic Configuration Steps
+
+1. **Set Time Zone**: Navigate to Basic → Administration → Time Zone and set it to GMT.
+
+2. **Configure High Availability Pair**:
+   - Go to Advanced → High Availability
+   - Copy the secret using the command:
+     ```sh
+     vault read secret/terraform/prd/waf_cluster_secret
+     ```
+   - Add the secret and keep the cluster name as it is
+   - Save the configuration (this may restart the WAF)
+   - In the peer IP address field, add the primary IP of the second VM (you will need to type it in manually as pasting is not supported)
+
+### Verify WAF Configuration
+
+After completing the initial setup, confirm the following details on the WAF UI:
+
+**Basic → Services**: Verify that all services are showing green status. If any service is not green, troubleshoot to identify the issue.
+
+For example, in the PRD environment, some services' status was not green after initial deployment, mainly because the new subnet range was not allowed on the NSG of the particular service. The ROTA service (`10.202.70.7`) attached to the LoadBalancer required whitelisting on the NSG group `NS-PRD-ROT-WEB-01`. See [this PR](https://github.com/hmcts/cpp-automation-terraform/pull/97) for reference.
+
+**Stream IP Configuration**: Ensure that all streams have their own IP address assigned.
+
+For example, in the PRD environment, the CCM stream automatically selected the IP of the WAF machine, but for the APIGW stream, we had to manually change it (by editing the entry on the WAF UI) to the secondary IP of the NIC.
+
+**Security Policy → Policy Manager**: Verify that the policies match the expected configuration.
+
+**Website → Website Translations**: Ensure all website translations match the expected configuration.
+
+### Update Azure Configuration
+
+Navigate to Basic → Azure Configuration and copy the following from the existing WAF to the new WAF:
+- Authentication Key
+- Application ID
+- Tenant ID
+
+After entering these details, click "Test Configuration" to verify the Azure integration is working correctly.
+
 ## Testing and Switch Over to the New WAF
 
 Deploy load balancers to route traffic to the new WAF. The load balancers should be configured to point to the new WAF IP addresses. You can find the IP addresses in the `terraform.tfvars` file for your environment.

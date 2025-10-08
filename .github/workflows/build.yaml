@@ -56,6 +56,8 @@ jobs:
         with:
           ruby-version: '3.3.4'
           bundler-cache: true
+      - name: Build site
+        run: middleman build --verbose
       - name: Build
         run: bundle exec middleman build
       - name: 'Check for broken links'

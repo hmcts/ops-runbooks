@@ -69,7 +69,7 @@ curl -X GET "localhost:9200/_refresh?pretty"
 ## How to check field count for an index
 
 This command is used to get a rough count of the fields within an index, We have a daily check set up that runs this so it will only be needed during reindexing changes.
-The commmand was created due to an issue with a service team breaching the field limit blocking the ability to amend the definition or add new cases to the index.
+The command was created due to an issue with a service team breaching the field limit blocking the ability to amend the definition or add new cases to the index.
 Our limit is 10000, but if the field count approaches 8000 service teams need to be made aware as it will begin failing. 
 
 To check the field count for an index, use the following command:
@@ -82,7 +82,7 @@ Replace `<index_name>` with the name of the index you want to check.
 
 ## How to delete an index
 
-This command is only used during and after a reindexing change. Intially to remmove the old index and then to remove any clones/backups.
+This command is only used during and after a reindexing change. Intially to remove the old index and then to remove any clones/backups.
 
 To delete an index, use the following command:
 

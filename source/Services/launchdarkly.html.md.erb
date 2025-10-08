@@ -66,3 +66,19 @@ To report an issue or for support log in to [https://support.launchdarkly.com/](
 
 To create a new support ticket, start by clicking on the Chat bot at the bottom right off the page, after answering a few question
 a new ticket will be created for you by the system.
+
+## Onboarding a New Team
+To onboard a new team to LaunchDarkly, follow these steps:
+
+1. **Create a New Project**:
+   - To add a new Team to LaunchDarkly add entry to [launchdarkly-terraform](https://github.com/hmcts/launchdarkly-terraform/blob/master/terraform.tfvars) repo.
+
+2. **Add Team members to relevant Group**:
+   - Navigate to the [Azure Access](https://github.com/hmcts/azure-access/) repo.
+   - Add user to the the relevant LaunchDarkly group i.e., `DTS LaunchDarkly` in **[prod_users](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml)** file.
+   - Merge the PR after review.
+
+Some older documentation around LaunchDarkly can be found in following confluence pages:
+- [LaunchDarkly Admin Access](https://tools.hmcts.net/confluence/display/DIV/Setup+LaunchDarkly+Admin+Access).
+- [LaunchDarkly Integration](https://tools.hmcts.net/confluence/display/RCCD/LaunchDarkly+Integration)
+- [LaunchDarkly HLD](https://tools.hmcts.net/confluence/display/RPE/LaunchDarkly+HLD)

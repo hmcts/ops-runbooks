@@ -1,0 +1,120 @@
+---
+title: ServiceNow MySQL Database Authentication
+last_reviewed_on: 2025-10-08
+review_in: 3 months
+weight: 150
+---
+
+# <%= current_page.data.title %>
+
+## 1. Infrastructure
+
+GitHub repo: [hmcts/servicenow-infrastructure](https://github.com/hmcts/servicenow-infrastructure)
+
+Pipeline: [hmcts.servicenow-infrastructure](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1141&_a=summary)
+
+## 2. Azure Resources
+
+- Resource Group: `rg-servicenow-prod`
+- Storage Account: `servicenowprodukssa`
+- MySQL Flexible Server: `servicenow-mysql-prod`
+
+## 3. Prerequisites
+- brew install mysql-client
+
+
+## 4. Authentication Setup
+Creating required entra groups, access packages and updating the MySQL Flexible server to support authentication.
+
+## 4.1 Create Entra Groups and Assign Users
+
+First the following entra groups were created via the [azure-access](https://github.com/hmcts/azure-access) repo in the users>groups.yaml
+- DTS ServiceNow MySQL DB Access for Administrators
+- DTS ServiceNow MySQL DB Access for Users
+
+Then added the required group to the user in the prod_users.yaml e.g. 
+    ``` - name: Natasha.Gharssa@justice.gov.uk
+          groups:
+          - DTS ServiceNow MySQL DB Access for Administrators
+    ```
+
+## 4.2 Create Access Packages
+
+Next use the [azure-access-packages](https://github.com/hmcts/azure-access-packages) repo to create the two access pacakges 
+- Production MySQL Administrative Access SC
+- Production MySQL User Access SC
+
+First add the new entra groups create earlier to the entitlement-catalogs.yml to the Databases catalog e.g. 
+    ```- name: "Databases"
+         description: "Grants access to databases"
+         published: true
+         externally_visible: true
+         resources:
+           - "DTS ServiceNow MySQL DB Access for Administrators"
+           - "DTS ServiceNow MySQL DB Access for Users"
+    ```
+
+Next create two new entitlement-packages to the entitlement-packages.yml by using previous packages as a guide
+    ```- name: "Production MySQL Administrative Access SC"
+         description: "Grants admin access to MySQL SeviceNow Flexible Server"
+         catalog_name: "Databases"
+         policies:
+           - name: "self-approval-with-justification"
+             requestor_groups:
+               - "DTS Platform Operations SC"
+         resource_roles:
+           - "DTS ServiceNow MySQL DB Access for Administrators"
+
+       - name: "Production MySQL User Access SC"
+         description: "Grants user access to MySQL SeviceNow Flexible Server"
+         catalog_name: "Databases"
+         policies:
+           - name: "self-approval-with-justification"
+             requestor_groups:
+               - "DTS Platform Operations SC"
+         resource_roles:
+           - "DTS ServiceNow MySQL DB Access for Users"
+    ```
+
+## 4.3 Adding support for authentication using Entra ID and setting Administrator
+The following PR was created to add support for Entra ID authentication, to allow users to log in using Microsoft Entra ID within the ServiceNow infrastructure.
+It implements and updates logic to assign or set an administrator role or permissions for example the creation of the "azurerm_user_assigned_identity" resource
+and configuration of the MySQL admin_group.
+
+[Support Entra ID auth and set admin](https://github.com/hmcts/servicenow-infrastructure/pull/9)
+
+## 5. Setting up Azure AD group 'DTS ServiceNow MySQL DB Access for Users' with read-only permissions
+Create an Azure AD user and maps the user to "ServiceNowReaders"
+    ```CREATE AADUSER 'DTS ServiceNow MySQL DB Access for Users' AS SerivceNowReaders;
+    ```
+
+Grant read-only permissions to the ServiceNowReaders user aka DTS ServiceNow MySQL DB Access for Users
+    ```GRANT SELECT ON servicenow.* TO 'SerivceNowReaders'@'%';
+    ```
+
+Then reload the MySQL's privilege tables from disk so the permission changes happen straight away
+    ```FLUSH PRIVILEGES;
+    ```
+
+## 6. Logging onto MySQL Flexible Server 
+Ensure you have requested and received the following [access packages](https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/overview)
+- Production MySQL Administrative Access SC
+- Administrative Access - Production Bastion Server
+And connected to the F5 VPN
+
+Next open a terminal and ssh onto the bastion-prod.platform.hmcts.net jumpbox to create a tunnel from your local machine.
+This allows you to connect via a local port and use mysql commands from you terminal.
+    ```ssh -L 3306:servicenow-mysql-prod.mysql.database.azure.com:3306 bastion-prod.platform.hmcts.net
+    ```
+Next - keeping the current terminal window open- open a new window and run the command to load the token need to connect to the database
+    ```TOKEN=$(az account get-access-token --resource-type oss-rdbms --output tsv --query accessToken)
+    ```
+    Finally you can run mysql command below to connect to the database using Administrato or User privilages.
+    ```mysql -h 127.0.0.1 --user "<username>" --enable-cleartext-plugin --password=$TOKEN
+    ```
+username for Administrators: DTS ServiceNow MySQL DB Access for Administrators
+username for Users: DTS ServiceNow MySQL DB Access for Users
+
+## 7. References
+
+- Epic: [ServiceNow MySQL Flexible Server creation](https://tools.hmcts.net/jira/browse/DTSPO-27439)

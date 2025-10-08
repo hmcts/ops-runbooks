@@ -1,0 +1,84 @@
+---
+title: LaunchDarkly
+last_reviewed_on: 2025-10-08
+review_in: 1 year
+weight: 131
+---
+
+# <%= current_page.data.title %>
+
+## Introduction
+LaunchDarkly is a feature management platform that helps software teams release, control, and experiment with features
+in real time. It enables developers to deploy code whenever they want and use feature flags to
+turn functionality on or off without redeploying, allowing for safer releases, targeted rollouts, and A/B testing—all
+while improving collaboration between engineering and product teams.
+
+At renewal, we will be required to provide a breakdown of our usage. Below are some information that will help you extract the information needed.
+
+## License Definitions
+
+*Service Connection* _(Back end)_ - The number of Microservices, Replicas and Environments connected to LaunchDarkly for 1 month.
+
+*Context* _(Front End)_ - The number of client-side monthly active Contexts. A Context is typically a client side monthly active user (cMAU) or a monthly active device.
+
+*Key* _(Experimentation)_ - The number of users or context bucketed in an experiment on a monthly basis.
+
+## How to Extract Usage Information
+Follow the steps below to extract the information needed for renewal.
+1. Log in to LaunchDarkly: [https://app.launchdarkly.com/](https://app.launchdarkly.com/). Use your HMCTS credentials to sign in.
+
+   <details>
+   <summary>View screenshot!</summary>
+
+   ![SSO signing page](./images/LD-0.png)
+   </details>
+
+2. Navigate to the **Settings** by clicking cog icon in the bottom left corner beside your avatar.
+
+   <details>
+   <summary>View screenshot!</summary>
+
+   ![Setting page](./images/LD-1.png)
+   </details>
+
+3. In the left-hand menu, click on **Plan Usage**.
+
+   <details>
+   <summary>View screenshot!</summary>
+
+   ![Plan usage](./images/LD-2.png)
+   </details>
+
+   <details>
+   <summary>View screenshot!</summary>
+
+   ![Plan usage](./images/LD-3.png)
+   </details>
+
+4. Here, you will find a detailed breakdown of your current usage, including the number of service connections.
+5. In the left-hand menu, click on can also click **Diagnostic Usage**.
+6. Here, you will find a detailed breakdown of your current usage, including the number of service connections, contexts, and keys.
+7. If you need further assistance, you can reach out to LaunchDarkly support or refer to their [documentation](https://launchdarkly.com/docs/home/account/metrics) for more detailed guidance.
+
+You can filter based on the date range you need, typically the last 12 months for renewal purposes.
+
+To report an issue or for support log in to [https://support.launchdarkly.com/](https://support.launchdarkly.com/) using your HMCTS credentials.
+
+To create a new support ticket, start by clicking on the Chat bot at the bottom right off the page, after answering a few question
+a new ticket will be created for you by the system.
+
+## Onboarding a New Team
+To onboard a new team to LaunchDarkly, follow these steps:
+
+1. **Create a New Project**:
+   - To add a new Team to LaunchDarkly add entry to [launchdarkly-terraform](https://github.com/hmcts/launchdarkly-terraform/blob/master/terraform.tfvars) repo.
+
+2. **Add Team members to relevant Group**:
+   - Navigate to the [Azure Access](https://github.com/hmcts/azure-access/) repo.
+   - Add user to the the relevant LaunchDarkly group i.e., `DTS LaunchDarkly` in **[prod_users](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml)** file.
+   - Merge the PR after review.
+
+Some older documentation around LaunchDarkly can be found in following confluence pages:
+- [LaunchDarkly Admin Access](https://tools.hmcts.net/confluence/display/DIV/Setup+LaunchDarkly+Admin+Access).
+- [LaunchDarkly Integration](https://tools.hmcts.net/confluence/display/RCCD/LaunchDarkly+Integration)
+- [LaunchDarkly HLD](https://tools.hmcts.net/confluence/display/RPE/LaunchDarkly+HLD)

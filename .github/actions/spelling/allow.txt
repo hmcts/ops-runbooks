@@ -756,3 +756,16 @@ optimisation
 servicenowprodukssa
 DLQ
 XGET 
+sqladmin
+mklabel
+gpt
+mkpart
+mnt
+servicenowrestore
+zcat
+rapidgzip
+mkdir
+cnf
+vcore
+joblog
+cmdb

@@ -33,7 +33,8 @@ First the following entra groups were created via the [azure-access](https://git
 - DTS ServiceNow MySQL DB Access for Users
 
 Then added the required group to the user in the prod_users.yaml e.g. 
-    ``` - name: Natasha.Gharssa@justice.gov.uk
+    ```
+        - name: Natasha.Gharssa@justice.gov.uk
           groups:
           - DTS ServiceNow MySQL DB Access for Administrators
     ```
@@ -45,7 +46,8 @@ Next use the [azure-access-packages](https://github.com/hmcts/azure-access-packa
 - Production MySQL User Access SC
 
 First add the new entra groups create earlier to the entitlement-catalogs.yml to the Databases catalog e.g. 
-    ```- name: "Databases"
+    ```
+       - name: "Databases"
          description: "Grants access to databases"
          published: true
          externally_visible: true
@@ -55,7 +57,8 @@ First add the new entra groups create earlier to the entitlement-catalogs.yml to
     ```
 
 Next create two new entitlement-packages to the entitlement-packages.yml by using previous packages as a guide
-    ```- name: "Production MySQL Administrative Access SC"
+    ```
+       - name: "Production MySQL Administrative Access SC"
          description: "Grants admin access to MySQL SeviceNow Flexible Server"
          catalog_name: "Databases"
          policies:
@@ -85,15 +88,18 @@ and configuration of the MySQL admin_group.
 
 ## 5. Setting up Azure AD group 'DTS ServiceNow MySQL DB Access for Users' with read-only permissions
 Create an Azure AD user and maps the user to "ServiceNowReaders"
-    ```CREATE AADUSER 'DTS ServiceNow MySQL DB Access for Users' AS SerivceNowReaders;
+    ```
+       CREATE AADUSER 'DTS ServiceNow MySQL DB Access for Users' AS SerivceNowReaders;
     ```
 
 Grant read-only permissions to the ServiceNowReaders user aka DTS ServiceNow MySQL DB Access for Users
-    ```GRANT SELECT ON servicenow.* TO 'SerivceNowReaders'@'%';
+    ```
+       GRANT SELECT ON servicenow.* TO 'SerivceNowReaders'@'%';
     ```
 
 Then reload the MySQL's privilege tables from disk so the permission changes happen straight away
-    ```FLUSH PRIVILEGES;
+    ```
+       FLUSH PRIVILEGES;
     ```
 
 ## 6. Logging onto MySQL Flexible Server 
@@ -104,13 +110,16 @@ And connected to the F5 VPN
 
 Next open a terminal and ssh onto the bastion-prod.platform.hmcts.net jumpbox to create a tunnel from your local machine.
 This allows you to connect via a local port and use mysql commands from you terminal.
-    ```ssh -L 3306:servicenow-mysql-prod.mysql.database.azure.com:3306 bastion-prod.platform.hmcts.net
+    ```
+       ssh -L 3306:servicenow-mysql-prod.mysql.database.azure.com:3306 bastion-prod.platform.hmcts.net
     ```
 Next - keeping the current terminal window open- open a new window and run the command to load the token need to connect to the database
-    ```TOKEN=$(az account get-access-token --resource-type oss-rdbms --output tsv --query accessToken)
+    ```
+       TOKEN=$(az account get-access-token --resource-type oss-rdbms --output tsv --query accessToken)
     ```
     Finally you can run mysql command below to connect to the database using Administrator or User privileges.
-    ```mysql -h 127.0.0.1 --user "<username>" --enable-cleartext-plugin --password=$TOKEN
+    ```
+       mysql -h 127.0.0.1 --user "<username>" --enable-cleartext-plugin --password=$TOKEN
     ```
 username for Administrators: DTS ServiceNow MySQL DB Access for Administrators
 username for Users: DTS ServiceNow MySQL DB Access for Users

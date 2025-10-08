@@ -109,7 +109,7 @@ This allows you to connect via a local port and use mysql commands from you term
 Next - keeping the current terminal window open- open a new window and run the command to load the token need to connect to the database
     ```TOKEN=$(az account get-access-token --resource-type oss-rdbms --output tsv --query accessToken)
     ```
-    Finally you can run mysql command below to connect to the database using Administrato or User privileges.
+    Finally you can run mysql command below to connect to the database using Administrator or User privileges.
     ```mysql -h 127.0.0.1 --user "<username>" --enable-cleartext-plugin --password=$TOKEN
     ```
 username for Administrators: DTS ServiceNow MySQL DB Access for Administrators

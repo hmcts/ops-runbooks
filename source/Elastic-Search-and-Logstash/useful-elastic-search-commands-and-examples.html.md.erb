@@ -68,7 +68,7 @@ curl -X GET "localhost:9200/_refresh?pretty"
 
 ## How to check field count for an index
 
-This command is used to get a rough count of the fields within an index, We have a daily check set up that runs this so it will only be needed during reindexing changes.
+This command is used to get a rough count of the fields within an index. We have a daily check set up that runs this so it will only be needed during reindexing changes.
 The command was created due to an issue with a service team breaching the field limit blocking the ability to amend the definition or add new cases to the index.
 Our limit is 10000, but if the field count approaches 8000 service teams need to be made aware as it will begin failing. 
 

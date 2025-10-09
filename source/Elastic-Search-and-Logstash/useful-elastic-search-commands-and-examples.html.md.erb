@@ -75,7 +75,7 @@ Our limit is 10000, but if the field count approaches 8000 service teams need to
 To check the field count for an index, use the following command:
 
 ```
-curl -s -XGET localhost:9200/<index_name>/_mapping?pretty | grep type | wc -l
+curl -s -X GET localhost:9200/<index_name>/_mapping?pretty | grep type | wc -l
 ```
 
 Replace `<index_name>` with the name of the index you want to check. 

@@ -754,6 +754,8 @@ DARPC
 DARPCs
 optimisation
 servicenowprodukssa
+DLQ
+XGET 
 sqladmin
 mklabel
 gpt

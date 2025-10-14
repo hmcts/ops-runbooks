@@ -1,0 +1,332 @@
+---
+title: How to delete Elastic Search Index
+last_reviewed_on: 2025-03-19
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This provides instructions on how to delete Elastic Search index.  Civil cases will be used as an example.
+
+A change request should be raised for Production, which will be scheduled for out of hours.  As part of the change get Get confirmation on the case type.
+
+Example change request: CHG5014955 (Civil - Re-index fields in ccd for new mappings) & Implementation plan: https://tools.hmcts.net/confluence/x/QwaHa
+
+Some changes may include both AAT & Production environments.
+
+For non-production environments use non-prod Bastion and the prod Bastion for production
+
+1) Request JIT access for non-prod or prod Bastion servers (https://myaccess.microsoft.com/)
+
+2) Make sure you are logged into the F5 VPN
+
+3) Connect to the non-prod or prod Bastion server
+
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
+
+Non-prod:
+```
+ssh bastion-nonprod.platform.hmcts.net
+```
+
+Prod:
+```
+ssh bastion-prod.platform.hmcts.net
+```
+
+4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
+
+For a list of IP addresses for each env, go to:
+
+ DEMO:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ PERFTEST:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ AAT:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+
+ Production:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+
+Connect to Elastic Search node:
+
+```
+ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
+```
+
+5) Application team may shutter the service
+
+6) List all indices prior to deletion
+
+```
+curl localhost:9200/_cat/indices?v
+```
+
+To do via a specific service for example civil_cases:
+
+```
+curl localhost:9200/_cat/indices?v |grep civil_cases*
+```
+
+or
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+```
+
+7) Check overall DB count prior to deletion
+
+Connect to ccd-data-store DB from Bastion server
+
+For example civil:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
+```
+
+8) Clone the index (backup incase of rollback)
+
+```
+curl -X PUT "localhost:9200/civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": true
+   }
+ }
+'
+```
+
+```
+curl -X POST "localhost:9200/civil_cases-000001/_clone/cloned-civil_cases-000001?pretty"
+```
+
+Verify the numbers match:
+
+```
+curl --silent localhost:9200/_cat/indices | grep civil_cases-000001 
+```
+
+```
+curl -X PUT "localhost:9200/civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": false
+   }
+ }
+'
+```
+
+9) Delete the Index
+
+For example civil:
+
+```
+curl -XDELETE localhost:9200/civil_cases-000001;
+```
+
+10) Application team will Merge CCD Definition File and creating new index.
+
+This step is mandatory even when no changes have been made to the definition file.
+
+This is because we need the new definition file to recreate the index so the following steps can populate it.
+
+11) Re-trigger the indexing of old cases
+
+If AAT is included in the same change then do this first before proceeding to production.
+
+Connect to ccd_data_store DB via Bastion
+
+For example civil:
+
+If small amount of cases (i.e. 10K) then run the following:
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE case_type_id='CIVIL' AND marked_by_logstash = true; 
+```
+
+If more than 10K cases then do the following:
+  
+Create temp table - the example below is civil_tmp_<date>:
+
+```
+create table civil_tmp_<date> as select id from case_data where case_type_id = 'CIVIL' and marked_by_logstash = true;
+```
+
+Re-trigger index by increasing the offset by 10000 each time:
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 0 limit 10000);
+
+```
+
+Once the batch of 10000 completes check the status:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+curl localhost:9200/_cat/indices?v |grep civil_cases
+```
+
+or
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+```
+
+Start the next batch once all cross check have been done - increasing the offset by 10000 each time:
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 10000 limit 10000);
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM civil_tmp_<date> order by 1 offset 20000 limit 10000);
+```
+.. etc
+
+Keep increasing the offset until completed.
+ 
+12) Check the progress of the indexing and overall counts to confirm completion - using another session
+
+For example civil:
+
+Check progress:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+curl localhost:9200/_cat/indices?v |grep civil_cases
+```
+
+or
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep civil
+```
+
+The overall indexing count should be approximately the same as the overall DB count to confirm when completed:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL';
+```
+
+If the progress is taking too long check to see if the logstash pods are running on the CCD namespace for CFT AKS cluster and has not crashed with OOM and restarted.
+Check the pod status and logs.
+
+The limits applied above should prevent this from happening so not too many cases are being ingested at once.
+
+For example - ccd-logstash-logstash-0. This is an example where the logstash pod crashed due to OOM:
+
+```
+Containers:
+  logstash:
+    Container ID:   containerd://c1b4368adf07b060534329240b03d87c1a72b265144997ea77a671fe2563a270
+    Image:          hmctspublic.azurecr.io/imported/logstash/logstash:7.16.1
+    Image ID:       hmctspublic.azurecr.io/imported/logstash/logstash@sha256:8b55dd0bcf34783e5653a26da577cec14980a8ecf838cf3ab309329ebe0c124c
+    Port:           9600/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 09 Nov 2023 22:01:28 +0000
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Thu, 09 Nov 2023 06:38:07 +0000
+      Finished:     Thu, 09 Nov 2023 22:01:27 +0000
+```
+
+AKS commands to check logstash pods on CFT AKS cluster (check how long it has been running to determine if it crashed):
+
+```
+Kubectl get pods -n ccd |grep logstash
+ccd-logstash-cmc-logstash-0                        1/1     Running     0               7d7h
+ccd-logstash-divorce-logstash-0                    1/1     Running     0               7d7h
+ccd-logstash-ethos-logstash-0                      1/1     Running     0               7d7h
+ccd-logstash-logstash-0                            1/1     Running     1 (3d20h ago)   7d7h
+ccd-logstash-probate-logstash-0                    1/1     Running     0               7d7h
+ccd-logstash-probateman-logstash-0                 1/1     Running     0               7d7h
+ccd-logstash-sscs-logstash-0                       1/1     Running     0               7d7h
+```
+
+Get information about the pod and if there were any restarts due to OOM:
+
+```
+kubectl describe pod <logstash pod name> -n ccd
+```
+
+Check logs for pod:
+
+```
+kubectl logs <logstash pod name> -n ccd
+```
+
+13) Remove the temp table
+
+```
+DROP TABLE IF EXISTS civil_tmp_<date>;
+```
+
+14) Remove the cloned index:
+
+```
+curl -XDELETE localhost:9200/cloned-civil_cases-000001;
+```
+
+15) Application team may unshutter the service.
+
+
+### Rollback
+
+If we need to rollback we can use the cloned index from step 8 that was done before deleting the index.  
+
+This will save us a lot of time and risk, where we dont have to a full re-index.
+
+Please ensure that the original index exists and is empty prior to doing the rollback steps (i.e. if you started doing a reindex and then needed to rollback part-way through, you would need to delete the index and have the service import their definition file again to recreate an empty one to clone into)
+
+1) Restore the backed up index:
+
+```
+curl -X PUT "localhost:9200/cloned-civil_cases-000001/_settings?pretty" -H 'Content-Type: application/json' -d'
+{
+   "settings": {
+     "index.blocks.write": true
+   }
+ }
+'
+```
+
+```
+curl -X POST "localhost:9200/cloned-civil_cases-000001/_clone/civil_cases-000001?pretty"
+```
+
+Verify the numbers match:
+
+```
+curl --silent localhost:9200/_cat/indices | grep civil_cases-000001 
+```
+
+2) Set the index alias
+
+
+```
+curl -X POST "localhost:9200/_aliases?pretty" -H 'Content-Type: application/json' -d' { "actions": [ { "add": { "index": "civil_cases-000001", "alias": "civil_cases" } } ] } '
+```
+
+Search to verify:
+
+```
+curl -X GET "localhost:9200/_alias/civil_cases?pretty"
+```
+
+3) Check if any cases need reindexing:
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = 'CIVIL' and marked_by_logstash = 'false';
+```
+
+4) Service teams to do a search to verify if it has the correct number of cases.
+
+5) Remove the cloned index:
+
+```
+curl -XDELETE localhost:9200/cloned-civil_cases-000001;
+```

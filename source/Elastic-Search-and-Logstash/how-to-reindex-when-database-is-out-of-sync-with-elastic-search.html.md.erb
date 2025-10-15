@@ -1,0 +1,300 @@
+
+---
+title: How to reindex when Elastic Search and Database are out of sync
+last_reviewed_on: 2025-10-09
+review_in: 12 month
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This provides instructions on how to complete a reindex of an elastic search index when data between elastic search and the database is out of sync. 
+
+This will be made as generic as possible with places to enter the values as needed
+
+A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
+
+Insert example implementation plan and change, Source from will 
+
+Example index name: `civil_cases-000001`
+Example case_type_id: `CIVIL`
+Example temporary table name: `civil_tmp_09102025`
+
+
+Some changes will include both non-production and production environments. 
+
+## Prerequisite steps
+
+Most changes in production will have a few prerequisite steps to complete before starting the reindex.
+
+1) Increase the logstash pod duplicates to 2
+
+This is done to assist with logstash stability and performance during the reindex. Make sure this is done in hours before the change as CCD team need to approve.
+
+2) Once pods are increased raise the PR for lowering
+
+Again because CCD team need to approve its best to raise this in hours before the change. So it can be merged once the change is completed.
+
+3) Take a count of the DLQ for the case_type_id to be reindexed
+
+```
+curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+```
+
+
+1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)
+2) Make sure you are connected to the F5 VPN
+3) Connect to the bastion server
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
+Non-prod:
+```
+ssh bastion-nonprod.platform.hmcts.net
+```
+Prod:
+```
+ssh bastion-prod.platform.hmcts.net
+```
+4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
+For a list of IP addresses for each env, go to:
+ DEMO:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ PERFTEST:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ 
+ AAT:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+ Production:
+ https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+
+ Connect to Elastic Search node from relevant bastion:
+```
+ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
+```
+
+5) Service team shutter the service being impacted.
+
+6) Get a count of the index
+
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+```
+
+
+7) Get a count of the Dead Letter Queue on elastic search for the case_type_id
+
+```
+curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+```
+
+8) Change the index to read only for cloning in case of roll back.
+
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
+```
+
+9) Clone the index for backup in case of rollback
+
+When naming the clone please use the normal index name with "cloned-" in front of it for ease of use and consistency.
+
+
+```
+curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
+```
+
+10) Set original index back to write mode
+
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
+```
+
+11) Check DB count of service
+
+Connect to ccd-data-store from the relevant Bastion (live or non live)
+
+Is it worth adding DB connection instructions?
+
+Once connected run the following command to get a count of cases to be re indexed.
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
+```
+
+12) Create temp table as the source for re indexing
+
+The temp table step is only needed if we are above 10K cases but its still good practice to follow in smaller case counts. 
+
+
+```
+create table <your case type id>_tmp_<date> as select id from case_data where case_type_id = '<your case type id>' and marked_by_logstash = true;
+```
+
+Running the below command should allow you to confirm the tmp table created as expected.
+
+```
+SELECT count(*) from <your case type id>_tmp_<date>;
+```
+
+13) Delete the index ahead of re indexing
+
+```
+curl -X DELETE localhost:9200/<Your index name>;
+```
+
+14) Service team will Merge CCD Definition File and creating new index.
+
+15) Take another count of the index to confirm it is re uploaded
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+```
+
+16) Start the re index process by running the following command on the database
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM <your case type id>_tmp_<date> order by 1 offset 0 limit 10000);
+```
+
+This will update 10K cases at a time from the temporary table to be re indexed.
+For jurisdictions with larger/more complex cases the 10K may need to be reduced to 5K or even 1K. The service team should be able to advise on this.
+
+The first batch of 10K will usually take slightly longer than average completing within 15-20 minutes.
+
+17) Check the status of the re index on elastic search
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+```
+
+Running this on the elastic search node should show the index count increasing as the re index progresses.
+It will likely take about 10-15 minutes for the cases to update in elastic search after the update command has completed on the database. 
+
+18) Repeat the update command increasing the offset each time until all cases have been re indexed.
+
+Do not kick off the next batch until you have confirmed the previous batch has been indexed in elastic search.
+
+```
+UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM <your case type id>_tmp_<date> order by 1 offset 10000 limit 10000);
+```
+
+This example assumes batches of 10K but note that will need to be adjusted if smaller batches are required.
+
+19) Once all cases have been re-indexed confirm counts match between the database and elastic search.
+
+Database count:
+```
+SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
+```
+
+ElasticSearch count:
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+```
+
+20) Clean up the temp table and cloned index
+
+Temp table clean up command:
+
+```
+DROP TABLE IF EXISTS <your case type id>_tmp_<date>;
+```
+
+Cloned index clean up command:
+
+```
+curl -X DELETE localhost:9200/cloned-<Your index name>;
+```
+
+21) Service team to unshutter the service.
+
+
+### Rollback steps
+
+If at any point you need to roll back the changes the following steps should be followed:
+
+1) Delete the new index that was created as part of the re index
+
+```
+curl -X DELETE localhost:9200/<Your index name>;
+```
+
+2) Clone the backup index back to the original name
+
+```
+curl -X POST "localhost:9200/cloned-<Your index name>/_clone/<Your index name>?pretty"
+```
+
+3) Verify that the index has been cloned back correctly
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+``` 
+
+You should see the clone alongside the original index with the original count.
+
+4) Set the index to write mode
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
+```
+
+5) Set the index alias of our restore index
+
+Check with service team what the alias should be if unsure.
+
+```
+curl -X POST "localhost:9200/_aliases?pretty" -H 'Content-Type: application/json' -d' { "actions": [ { "add": { "index": "<your index name>", "alias": "<your index alias>" } } ] } '
+```
+
+Run this command to verify the alias has been set correctly
+
+```
+curl -X GET "localhost:9200/_alias/<your index alias>?pretty"
+```
+
+6) Service teams to verify if the rollback has been successful
+
+7) If rollback is successful clean up the cloned index and temp table.
+
+Temp table clean up command:
+
+```
+DROP TABLE IF EXISTS <your case type id>_tmp_<date>;
+``` 
+
+Cloned index clean up command:
+
+```
+curl -X DELETE localhost:9200/cloned-<Your index name>;
+```
+
+## Troubleshooting
+
+### Cases are missing from the re index
+If after running the update command on the database and waiting the expected time for cases to appear in the index but a section are still missing.
+They may have fallen into the dead letter queue.  Below are commands to check the dead letter queue and pull cases if necessary.
+
+Count the DLQ for specific jurisdictions:
+
+```
+curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+```
+
+Pull cases from the DLQ for specific jurisdictions:
+
+```
+curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+```
+
+If there is a large amount of cases in the DLQ you may need to limit the output to a smaller number, the following command should work for this purpose.
+
+```
+curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+```
+
+Where Y is the number of cases you want to pull from the DLQ.

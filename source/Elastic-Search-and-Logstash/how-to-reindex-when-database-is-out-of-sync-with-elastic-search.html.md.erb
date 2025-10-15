@@ -1,4 +1,3 @@
-
 ---
 title: How to reindex when Elastic Search and Database are out of sync
 last_reviewed_on: 2025-10-09
@@ -23,7 +22,7 @@ Example temporary table name: `civil_tmp_09102025`
 
 Some changes will include both non-production and production environments. 
 
-## Prerequisite steps
+### Prerequisite steps
 
 Most changes in production will have a few prerequisite steps to complete before starting the reindex.
 
@@ -40,6 +39,8 @@ Again because CCD team need to approve its best to raise this in hours before th
 ```
 curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
+
+### Steps to complete reindex
 
 
 1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)

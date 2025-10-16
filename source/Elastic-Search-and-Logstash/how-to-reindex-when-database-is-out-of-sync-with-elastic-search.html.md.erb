@@ -13,7 +13,7 @@ This will be made as generic as possible with places to enter the values as need
 
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
 
-Insert example implementation plan and change, Source from will 
+Example implementation plan: https://tools.hmcts.net/confluence/x/57W2c
 
 Example index name: `civil_cases-000001`
 Example case_type_id: `CIVIL`
@@ -43,10 +43,25 @@ Again because CCD team need to approve its best to raise this in hours before th
 curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
+4) Get a count of the index for the jurisdiction to be reindexed
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
+```
+
+5) Get a count of the cases in the database for the case_type_id
+
+```
+SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
+```
+
+The counts of the Database, index and DLQ are usually good to have for estimating the time the reindexing will take. 
+
 ### Steps to complete reindex
 
 
 1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)
+2) Also request administrative access to the relevant database (https://myaccess.microsoft.com/)
 2) Make sure you are connected to the F5 VPN
 3) Connect to the bastion server
 ```
@@ -121,7 +136,15 @@ curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type
 
 Connect to ccd-data-store from the relevant Bastion (live or non live)
 
-Is it worth adding DB connection instructions?
+To connect to the database use the following commands:
+
+```
+DB_HOST=ccd-data-store-api-postgres-db-v15-<environment you are reindexing>.postgres.database.azure.com
+DB_NAME=ccd_data_store
+DB_USER="DTS\ Platform\ Operations\ PostgreSQL\ Admin\ Access\ SC"
+PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query accessToken -o tsv)
+psql "sslmode=require host=${DB_HOST} dbname=${DB_NAME} user=${DB_USER} port=5432 password=${PGPASSWORD}"
+```
 
 Once connected run the following command to get a count of cases to be re indexed.
 
@@ -200,7 +223,15 @@ ElasticSearch count:
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
 ```
 
-20) Clean up the temp table and cloned index
+If the counts do not match check the DLQ for any cases that may have failed to index using the commands in the troubleshooting section below.
+
+20) Service team complete checks and unshutter the service.
+
+### Post Implementation steps
+
+1) Lower the logstash pod duplicates back to 1 by merging the PR raised in the prerequisite steps.
+
+2) Clean up the temp table and cloned index.
 
 Temp table clean up command:
 
@@ -210,13 +241,11 @@ DROP TABLE IF EXISTS <your case type id>_tmp_<date>;
 
 Cloned index clean up command:
 
+Ensure the cloned index is deleted and not the live index.
+
 ```
 curl -X DELETE localhost:9200/cloned-<Your index name>;
 ```
-
-21) Service team to unshutter the service.
-
-
 ### Rollback steps
 
 If at any point you need to roll back the changes the following steps should be followed:

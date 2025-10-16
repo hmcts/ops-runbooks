@@ -30,6 +30,9 @@ Most changes in production will have a few prerequisite steps to complete before
 
 This is done to assist with logstash stability and performance during the reindex. Make sure this is done in hours before the change as CCD team need to approve.
 
+This can be done by raising a PR to change the number of replicas in the relevant environment within the cnp-flux-config repo.
+Some teams have their own instance of logstash so confirm with teams if they have a specific instance that needs to be changed.
+
 2) Once pods are increased raise the PR for lowering
 
 Again because CCD team need to approve its best to raise this in hours before the change. So it can be merged once the change is completed.
@@ -299,3 +302,34 @@ curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_le
 ```
 
 Where Y is the number of cases you want to pull from the DLQ.
+
+## Cases are taking longer than expected to re index
+If cases are taking too long to reindex theres a chance that the logstash instance has hit an out of memory error.
+While unlikely thanks to the limits on the updates it can happen. Running the following commands should let you know if this is the case.
+
+```
+Kubectl get pods -n ccd | grep logstash
+```
+
+All of our logstash pods live in the ccd namespace so this should show all logstash pods. 
+
+In the event one of the pods has recently restarted you can describe the pod to check why it restarted, if it was out of memory lower the batch size for the update command.
+This command should work for describing the pod:
+
+```
+kubectl describe pod <logstash pod name> -n ccd
+```
+
+Our logstash pods are setup to hit the DB with queries constantly so to confirm if the pod is still working as expected you can check the logs with the following command.
+
+```
+kubectl logs <logstash pod name> -n ccd
+```
+
+If you see something like this the pod is healthy.
+
+```
+[2025-10-16T09:13:22,101][INFO ][logstash.inputs.jdbc     ][main][eb3d7b3b9b9a180615b49300b1c73b9aa68faa44355c7a8f4e27e7c00dc6acdf] (0.009306s) UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false AND jurisdiction != 'DIVORCE' AND jurisdiction != 'CIVIL' AND jurisdiction != 'PUBLICLAW' AND jurisdiction != 'CMC' AND jurisdiction != 'PROBATE' AND jurisdiction != 'SSCS' AND jurisdiction != 'EMPLOYMENT' RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data
+```
+
+The pod will auto restart if an out of memory error is hit, so all you need to do is lower the batch size for the update command.

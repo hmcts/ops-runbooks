@@ -72,7 +72,6 @@ Miniport
 mnl
 Moj
 mojcppprod
-mpd
 mynodepool
 myregistry
 nodelocaldns
@@ -93,6 +92,7 @@ prepatch
 privatednszonename
 privatekeyfilename
 PRX
+PUBLICLAW
 pvc
 Qube
 recoverypoint
@@ -132,7 +132,6 @@ Verma
 Virtualbox
 virtualwan
 VNETs
-wafcc
 wrkagentpool
 wsdl
 XXXX

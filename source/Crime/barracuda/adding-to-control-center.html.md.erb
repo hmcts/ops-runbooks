@@ -9,8 +9,7 @@ weight: 20
 
 ## Steps to Add the WAF
 
-1. Once you have the token (see instructions below), navigate to **Advanced > Control Center** in the WAF interface. You should see a page like this:
-
+Once you have the token, navigate to **Advanced > Control Center** in the WAF interface. You should see a page like this:
 
 ![Control Center Screenshot](images/control-center.png)
 
@@ -21,8 +20,12 @@ weight: 20
 7. Click **Save**.
 8. You should see a confirmation message indicating that the WAF has been successfully connected to the Control Center.
 
----
+If you would like to use the local admin account to connect to the Control Center, use these credentials:
 
+username: `admin`
+password: found in the vault at `secret/terraform/mpd/wafcc_admin_password`
+
+---
 ## Getting the Token from the Control Center
 
 1. Log in to the Barracuda Control Center.

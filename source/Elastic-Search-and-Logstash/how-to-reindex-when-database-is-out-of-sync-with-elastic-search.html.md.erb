@@ -12,6 +12,7 @@ This provides instructions on how to complete a reindex of an elastic search ind
 This will be made as generic as possible with places to enter the values as needed
 
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
+The requesting service team will need to raise a change request on Halo. https://hmcts.haloitsm.com/
 
 Example implementation plan: https://tools.hmcts.net/confluence/x/57W2c
 
@@ -26,14 +27,14 @@ Some changes will include both non-production and production environments.
 
 Most changes in production will have a few prerequisite steps to complete before starting the reindex.
 
-1) Increase the logstash pod duplicates to 2
+1) Increase the logstash pod replica count to 2
 
 This is done to assist with logstash stability and performance during the reindex. Make sure this is done in hours before the change as CCD team need to approve.
 
 This can be done by raising a PR to change the number of replicas in the relevant environment within the cnp-flux-config repo.
 Some teams have their own instance of logstash so confirm with teams if they have a specific instance that needs to be changed.
 
-2) Once pods are increased raise the PR for lowering
+2) Once pods are increased raise the PR for lowering the pod replicas back to 1.
 
 Again because CCD team need to approve its best to raise this in hours before the change. So it can be merged once the change is completed.
 
@@ -75,6 +76,10 @@ Prod:
 ```
 ssh bastion-prod.platform.hmcts.net
 ```
+
+Additional instructions for accessing the bastions can be found here:
+https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions
+
 4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
 For a list of IP addresses for each env, go to:
  DEMO:

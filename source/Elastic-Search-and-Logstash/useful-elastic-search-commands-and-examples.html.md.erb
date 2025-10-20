@@ -13,6 +13,46 @@ All of the commands are set out to be run from the Elastic search VMs.
 
 Some of the commands show below will require either a case_type_id or an index name to be specified, Service teams should be able to provide this.
 
+## How to connect to the Elastic Search VMs
+To connect to the Elastic Search VMs, you will need to use SSH to connect to the bastion server first, and then from there connect to the Elastic Search VMs.
+
+The first step is to get access to the bastion server. You can request access [here](https://myaccess.microsoft.com/)
+
+Once access request has been approved run the following commands to connect to the bastion server:
+
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
+Non-prod:
+```
+ssh bastion-nonprod.platform.hmcts.net
+```
+Prod:
+```
+ssh bastion-prod.platform.hmcts.net
+```
+
+Additional instructions for accessing the bastions can be found here:
+[Bastion Documentation](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
+
+Once you are connected to the bastion server, you can then connect to the Elastic Search VMs.
+For a list of IP addresses for each env, go to:
+
+[DEMO](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[PERFTEST](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[AAT](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[Production](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+Connect to Elastic Search node from relevant bastion:
+```
+ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
+```
+
+The logstash ssh key can be found in the ccd-prod key vault under the ccd-ELASTIC-SEARCH-PRIVATE-KEY secret. 
+
 ## Check cluster health, stats and node information
 These commands will typically be used for confirming the health of the cluster and nodes.
 We usually only need to check this when we hear of issues through platops help.

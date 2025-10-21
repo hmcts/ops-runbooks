@@ -12,13 +12,18 @@ This provides instructions on how to complete a reindex of an elastic search ind
 This will be made as generic as possible with places to enter the values as needed
 
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
-The requesting service team will need to raise a change request on Halo. https://hmcts.haloitsm.com/
+The requesting service team will need to raise a change request on [Halo](https://hmcts.haloitsm.com/)
 
-Example implementation plan: https://tools.hmcts.net/confluence/x/57W2c
+[Example implementation plan](https://tools.hmcts.net/confluence/x/57W2c)
 
 Example index name: `civil_cases-000001`
+In this runbook where you see <your index name> something similar to this is expected.
+
 Example case_type_id: `CIVIL`
-Example temporary table name: `civil_tmp_09102025`
+In this runbook where you see <your case type id> something similar to this is expected.
+
+Example temporary table name: `civil_tmp_09102025` 
+In this runbook where you see <your case type id>_tmp_<date> something similar to this is expected.
 
 
 Some changes will include both non-production and production environments. 
@@ -62,9 +67,19 @@ The counts of the Database, index and DLQ are usually good to have for estimatin
 
 
 1) Request JIT access for the relevant environments bastion. (https://myaccess.microsoft.com/)
+
 2) Also request administrative access to the relevant database (https://myaccess.microsoft.com/)
-2) Make sure you are connected to the F5 VPN
-3) Connect to the bastion server
+
+Documentation for requesting access can be found [here](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
+
+3) Make sure you are connected to the [F5 VPN](https://portal.platform.hmcts.net/)
+
+4) Connect to the bastion server
+
+We recommend that you have two terminal sessions open during the change, one for the Database instance and another for the elastic search instance.
+
+This is because we need to jump between the database and Elastic search VM during the change.
+
 ```
 az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 ```
@@ -78,29 +93,27 @@ ssh bastion-prod.platform.hmcts.net
 ```
 
 Additional instructions for accessing the bastions can be found here:
-https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions
+[Bastion Documentation](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
 
-4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
+5) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
 For a list of IP addresses for each env, go to:
- DEMO:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
- 
- PERFTEST:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
- 
- AAT:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
- Production:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
 
- Connect to Elastic Search node from relevant bastion:
+[DEMO](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[PERFTEST](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[AAT](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[Production](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+Connect to Elastic Search node from relevant bastion:
 ```
 ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 ```
 
-5) Service team shutter the service being impacted.
+6) Service team shutter the service being impacted. This step will be covered in the implementation plan for the change.
 
-6) Get a count of the index
+7) Get a count of the index
 
 
 ```
@@ -108,20 +121,20 @@ curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your in
 ```
 
 
-7) Get a count of the Dead Letter Queue on elastic search for the case_type_id
+8) Get a count of the Dead Letter Queue on elastic search for the case_type_id
 
 ```
 curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
-8) Change the index to read only for cloning in case of roll back.
+9) Change the index to read only for cloning in case of roll back.
 
 
 ```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
 ```
 
-9) Clone the index for backup in case of rollback
+10) Clone the index for backup in case of rollback
 
 When naming the clone please use the normal index name with "cloned-" in front of it for ease of use and consistency.
 
@@ -130,14 +143,14 @@ When naming the clone please use the normal index name with "cloned-" in front o
 curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
 ```
 
-10) Set original index back to write mode
+11) Set original index back to write mode
 
 
 ```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
 ```
 
-11) Check DB count of service
+12) Check DB count of service
 
 Connect to ccd-data-store from the relevant Bastion (live or non live)
 
@@ -157,7 +170,7 @@ Once connected run the following command to get a count of cases to be re indexe
 SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 ```
 
-12) Create temp table as the source for re indexing
+13) Create temp table as the source for re indexing
 
 The temp table step is only needed if we are above 10K cases but its still good practice to follow in smaller case counts. 
 
@@ -172,32 +185,34 @@ Running the below command should allow you to confirm the tmp table created as e
 SELECT count(*) from <your case type id>_tmp_<date>;
 ```
 
-13) Delete the index ahead of re indexing
+14) Delete the index ahead of re indexing
 
 ```
 curl -X DELETE localhost:9200/<Your index name>;
 ```
 
-14) Service team will Merge CCD Definition File and creating new index.
+15) Service team will Merge CCD Definition File and creating new index.
 
-15) Take another count of the index to confirm it is re uploaded
+16) Take another count of the index to confirm it is re uploaded
 
 ```
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
 ```
 
-16) Start the re index process by running the following command on the database
+17) Start the re index process by running the following command on the database
 
 ```
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM <your case type id>_tmp_<date> order by 1 offset 0 limit 10000);
 ```
 
-This will update 10K cases at a time from the temporary table to be re indexed.
-For jurisdictions with larger/more complex cases the 10K may need to be reduced to 5K or even 1K. The service team should be able to advise on this.
+This will update 10,000 cases at a time from the temporary table to be re indexed.
+For jurisdictions with larger/more complex cases the 10K may need to be reduced to 5,000 or even 1,000. 
 
-The first batch of 10K will usually take slightly longer than average completing within 15-20 minutes.
+The service team should be able to advise on the size/complexity of the cases. 
 
-17) Check the status of the re index on elastic search
+The first batch of 10,000 will usually take slightly longer than average completing within 15-20 minutes.
+
+18) Check the status of the re index on elastic search
 
 ```
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
@@ -206,7 +221,9 @@ curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your in
 Running this on the elastic search node should show the index count increasing as the re index progresses.
 It will likely take about 10-15 minutes for the cases to update in elastic search after the update command has completed on the database. 
 
-18) Repeat the update command increasing the offset each time until all cases have been re indexed.
+19) Repeat the update command increasing the offset each time until all cases have been re indexed, the offset will be the size of the previous batch. 
+
+So if the batch was 10,000 you would increase the offset by 10,000.
 
 Do not kick off the next batch until you have confirmed the previous batch has been indexed in elastic search.
 
@@ -214,9 +231,9 @@ Do not kick off the next batch until you have confirmed the previous batch has b
 UPDATE case_data SET marked_by_logstash = false WHERE id IN (SELECT id FROM <your case type id>_tmp_<date> order by 1 offset 10000 limit 10000);
 ```
 
-This example assumes batches of 10K but note that will need to be adjusted if smaller batches are required.
+This example assumes batches of 10,000 but note that will need to be adjusted if smaller batches are required.
 
-19) Once all cases have been re-indexed confirm counts match between the database and elastic search.
+20) Once all cases have been re-indexed confirm counts match between the database and elastic search.
 
 Database count:
 ```
@@ -228,9 +245,9 @@ ElasticSearch count:
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your index name>
 ```
 
-If the counts do not match check the DLQ for any cases that may have failed to index using the commands in the troubleshooting section below.
+If the counts do not match check the DLQ for any cases that may have failed to index using the commands in the [troubleshooting section](#troubleshooting).
 
-20) Service team complete checks and unshutter the service.
+21) Service team complete checks and unshutter the service.
 
 ### Post Implementation steps
 

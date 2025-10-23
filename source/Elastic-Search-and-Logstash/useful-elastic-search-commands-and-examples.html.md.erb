@@ -1,0 +1,178 @@
+---
+title: Useful Elastic Search Commands and Examples
+last_reviewed_on: 2025-09-22
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+This document provides a list of useful Elastic Search commands and examples for working with Elastic Search.
+
+All of the commands are set out to be run from the Elastic search VMs.
+
+Some of the commands show below will require either a case_type_id or an index name to be specified, Service teams should be able to provide this.
+
+## How to connect to the Elastic Search VMs
+To connect to the Elastic Search VMs, you will need to use SSH to connect to the bastion server first, and then from there connect to the Elastic Search VMs.
+
+The first step is to get access to the bastion server. You can request access [here](https://myaccess.microsoft.com/)
+
+Once access request has been approved run the following commands to connect to the bastion server:
+
+```
+az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
+```
+Non-prod:
+```
+ssh bastion-nonprod.platform.hmcts.net
+```
+Prod:
+```
+ssh bastion-prod.platform.hmcts.net
+```
+
+Additional instructions for accessing the bastions can be found here:
+[Bastion Documentation](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
+
+Once you are connected to the bastion server, you can then connect to the Elastic Search VMs.
+For a list of IP addresses for each env, go to:
+
+[DEMO](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[PERFTEST](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[AAT](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[Production](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+Connect to Elastic Search node from relevant bastion:
+```
+ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
+```
+
+The logstash ssh key can be found in the ccd-prod key vault under the ccd-ELASTIC-SEARCH-PRIVATE-KEY secret. 
+
+## Check cluster health, stats and node information
+These commands will typically be used for confirming the health of the cluster and nodes.
+We usually only need to check this when we hear of issues through platops help.
+
+To check the health of the cluster, use the following command:
+
+```
+curl -X GET "localhost:9200/_cluster/health?pretty"
+```
+
+To get cluster stats, use the following command:
+
+```
+curl -X GET "localhost:9200/_cluster/stats?pretty"
+```
+
+To check node information, use the following command:
+
+```
+curl -X GET "localhost:9200/_nodes?pretty"
+```
+
+## List all indexes
+
+This command can be used to get a full list of all indexes managed in Elastic Search, helpful if teams aren't sure of a specific index name and we need to help narrow it down.
+
+To list all indexes, use the following command:
+
+```
+curl -X GET "localhost:9200/_cat/indices?v"
+```
+
+## Get a count of cases in a specific index
+
+This command will return a count of cases within a specific index, usually only ran when requested by service teams.
+
+To get a count of cases in a specific index, use the following command:
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <index_name>
+```
+Replace `<index_name>` with the name of the index you want to check. 
+
+## Refresh all indexes
+
+This command will refresh all indexes and is usually only used when re indexing via the API method to ensure the re index is complete.
+
+To refresh all indexes, use the following command:
+
+```
+curl -X GET "localhost:9200/_refresh?pretty"
+```
+
+## How to check field count for an index
+
+This command is used to get a rough count of the fields within an index. We have a daily check set up that runs this so it will only be needed during reindexing changes.
+The command was created due to an issue with a service team breaching the field limit blocking the ability to amend the definition or add new cases to the index.
+Our limit is 10000, but if the field count approaches 8000 service teams need to be made aware as it will begin failing. 
+
+To check the field count for an index, use the following command:
+
+```
+curl -s -X GET localhost:9200/<index_name>/_mapping?pretty | grep type | wc -l
+```
+
+Replace `<index_name>` with the name of the index you want to check. 
+
+## How to delete an index
+
+This command is only used during and after a reindexing change. Intially to remove the old index and then to remove any clones/backups.
+
+To delete an index, use the following command:
+
+```
+curl -X DELETE localhost:9200/<index_name>;
+``` 
+
+Replace `<index_name>` with the name of the index you want to delete. 
+
+
+## How to check the Dead Letter Queue (DLQ) for case types
+
+This may be requested by service teams in platops help if they suspect cases are failing to index, if they provide the case_type_id the below command can get a count of cases.
+
+To check the Dead Letter Queue (DLQ) for case types, use the following command:
+
+```
+curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<case_type_id>\""}}}'
+```
+
+Replace `<case_type_id>` with the case type ID you want to check.
+
+## How to pull cases from the Dead Letter Queue (DLQ) for investigation
+
+In some events service teams may need us to pull cases from the DLQ to email over for investigation, they should provide a case_type_id for us to use.
+
+To pull cases from the DLQ for investigation, use the following command:
+
+```
+curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+```
+
+In cases where there are a large number of cases in the DLQ for the case_type_id provided, try utilising the below command to limit the number of cases returned.
+
+```
+curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+```
+
+Where `Y` is the number of cases you want to return.
+
+Replace `<case_type_id>` with the case type ID you want to pull from the DLQ.
+
+## How to clear cases out of the Dead Letter Queue (DLQ)
+
+If a team has confirmed that all cases in the DLQ are fully investigated they may require us to manually clear them out which is what the below command does, they should provide a case_type_id for us to use.
+
+To clear cases out of the Dead Letter Queue (DLQ), use the following command:
+
+```
+curl -XPOST --header "content-type: application/JSON" ' http://localhost:9200/.logstash_dead_letter/_delete_by_query?conflicts=proceed&pretty' -d '{"query": {"query_string": { "query":"<case_type_id>"}}}'
+```
+
+Replace `<case_type_id>` with the case type ID you want to clear.

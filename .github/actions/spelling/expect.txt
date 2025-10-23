@@ -93,6 +93,7 @@ prepatch
 privatednszonename
 privatekeyfilename
 PRX
+PUBLICLAW
 pvc
 Qube
 recoverypoint

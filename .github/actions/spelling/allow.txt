@@ -754,6 +754,8 @@ DARPC
 DARPCs
 optimisation
 servicenowprodukssa
+DLQ
+XGET 
 sqladmin
 mklabel
 gpt
@@ -767,3 +769,10 @@ cnf
 vcore
 joblog
 cmdb
+Serivce
+Sevice
+AADUSER
+Gharssa
+acdf
+faa
+PUBLICLAW

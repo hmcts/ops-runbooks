@@ -1,31 +1,36 @@
 ---
 title: Adding a Barracuda WAF to the Control Center
-last_reviewed_on: 2025-07-07
+last_reviewed_on: 2025-10-14
 review_in: 12 months
 weight: 20
 ---
 
 # <%= current_page.data.title %>
 
-To add a Barracuda WAF to the Control Center:
+## Steps to Add the WAF
 
-Log in to the Barracuda Control Center and obtain the token. (You will need an account to log in to the Control Center. Please speak to Babu or AJ to create one for you. Otherwise, you can log in with the admin account. The password for the Control Center should be in the vault at "secret/terraform/mpd/wafcc_admin_password".)
+Once you have the token, navigate to **Advanced > Control Center** in the WAF interface. You should see a page like this:
 
-- Once you have the token, you can use it to add the WAF to the Control Center. [Find more details here](https://campus.barracuda.com/product/webapplicationfirewall/doc/96013142/connecting-the-barracuda-web-application-firewall-to-the-barracuda-waf-control-center)
+![Control Center Screenshot](images/control-center.png)
 
-Occasionally, the WAF may not be able to connect to the Control Center and you may get this error: "Error communicating with the WAF Control Center."
+3. Enter the token you obtained from the Control Center.
+4. Click **Connect to Control Center**.
+5. Enter your Control Center credentials.
+6. Enter the Control Center IP address: `51.140.24.220`.
+7. Click **Save**.
+8. You should see a confirmation message indicating that the WAF has been successfully connected to the Control Center.
 
-In this case, you will need to check the WAF s network configuration and ensure that it can reach the Control Center or it could be that it old server need removing from the Control Center. 
+If you would like to use the local admin account to connect to the Control Center, use these credentials:
 
-To remove the old WAF from the Control Center, follow these steps:
+username: `admin`
+password: found in the vault at `secret/terraform/mpd/wafcc_admin_password`
 
-1. Log in to the Barracuda Control Center
+---
+## Getting the Token from the Control Center
 
-2. Navigate to the Control Center
-
-3. Go to Account Management > Connected Devices
-
-4. Locate the old WAF in the list of connected devices
+1. Log in to the Barracuda Control Center.
+2. Navigate to the **Connect Products** page.
+3. Copy the **validation token**.
 
 5. Click on the WAF you want to remove and disconnect it
 
@@ -40,3 +45,8 @@ To remove the old WAF from the Control Center, follow these steps:
    - Then in the Control Center, go to Account Management > Connected Devices > Resolve Conflict  (bottom of the page)
 
     <img src="images/waf-resolve.png">
+
+
+[Find more details here](https://campus.barracuda.com/product/webapplicationfirewall/doc/96013142/connecting-the-barracuda-web-application-firewall-to-the-barracuda-waf-control-center)
+
+If you have any issues, please see - [Troubleshooting Page](troubleshooting.html)

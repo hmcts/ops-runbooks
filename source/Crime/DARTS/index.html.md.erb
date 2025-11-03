@@ -1,0 +1,41 @@
+---
+title: DARTS Connectivity (Crime -> SDS)
+last_reviewed_on: 2025-10-31
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## Network Flow
+
+![Network Flow Diagram](images/darts-connectivity.png)
+
+Above is a network flow diagram outlining the connectivity between DARTS in Crime and DARTS in SDS.
+
+**In summary:**
+
+- Request sent from stagingdarts pod to outbound App Gateway.
+- App Gateway forwards traffic via VPN Gateway to Cloud Gateway network.
+- Request is SNAT'd by appropriate Cloud Gateway firewall rule and sent onward to VWAN within HMCTS tenant.
+- Request is forwarded to the appropriate AKS App Gateway (Prod goes via Hub Palo Alto).
+- AKS App Gateway sends request on to a darts-gateway pod on one of the AKS clusters in its backend pool.
+
+## Outbound Application Gateway Configuration
+
+There is an outbound App Gateway in each of the Crime tenants:
+
+- [GW-MDV-IMZ-APPGW-OUT](https://portal.azure.com/#@hmctsnonlive.onmicrosoft.com/resource/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-IMZ/providers/Microsoft.Network/applicationGateways/GW-MDV-IMZ-APPGW-OUT/overview)
+- [GW-MPD-IMZ-APPGW-OUT](https://portal.azure.com/#@cp.cjs.hmcts.net/resource/subscriptions/9ab65d81-930d-4cc0-a93d-367e14676bc0/resourceGroups/RG-MPD-IMZ/providers/Microsoft.Network/applicationGateways/GW-MPD-IMZ-APPGW-OUT/overview)
+
+## Relevant Repositories
+
+- [cpp-terraform-azurerm-imz](https://github.com/hmcts/cpp-terraform-azurerm-imz) - Terraform code for Application Gateways.
+- [cpp-terraform-network](https://github.com/hmcts/cpp-terraform-network) - Terraform code for Private DNS config.
+
+## Dynatrace Monitoring
+
+Monitoring has been configured within Dynatrace to trigger alerts when the backend pool of the outbound App Gateway becomes unhealthy.
+
+- [Crime - DARTS - PROD - Strategic Platform - Live](https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.settings/#settings/azuremonitoring;gf=all) - Dynatrace Connection
+- [DARTS - Azure Application Gateway unhealthy hosts](https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.settings/ui/settings/builtin:anomaly-detection.metric-events?gtf=-2h&gf=all&filter=summary%3Adarts&id=3ee731c9-fa17-396d-98c0-b2f7051af855) - DARTS Metric Event

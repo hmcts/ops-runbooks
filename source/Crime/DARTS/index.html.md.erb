@@ -17,7 +17,7 @@ Above is a network flow diagram outlining the connectivity between DARTS in Crim
 
 - Request sent from stagingdarts pod to outbound App Gateway.
 - App Gateway forwards traffic via VPN Gateway to Cloud Gateway network.
-- Request is SNAT'd by appropriate Cloud Gateway firewall rule and sent onward to VWAN within HMCTS tenant.
+- Request is SNATd by appropriate Cloud Gateway firewall rule and sent onward to VWAN within HMCTS tenant.
 - Request is forwarded to the appropriate AKS App Gateway (Prod goes via Hub Palo Alto).
 - AKS App Gateway sends request on to a darts-gateway pod on one of the AKS clusters in its backend pool.
 

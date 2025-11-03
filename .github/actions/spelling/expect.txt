@@ -107,6 +107,7 @@ SBZ
 sftpmig
 sku
 SNAT'd
+SNATd
 sourced
 sourceregistry
 sourcerepository

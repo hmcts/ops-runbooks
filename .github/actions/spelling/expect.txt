@@ -106,6 +106,7 @@ ruxit
 SBZ
 sftpmig
 sku
+SNAT'd
 sourced
 sourceregistry
 sourcerepository
@@ -114,6 +115,7 @@ spn
 sqldb
 sqlpackage
 sshfs
+stagingdarts
 statefile
 statefulset
 ste

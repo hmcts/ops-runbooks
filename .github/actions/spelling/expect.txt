@@ -36,6 +36,7 @@ dde
 deevanapalli
 DEVJUMPL
 devrot
+dnat
 dockerfiles
 dsl
 eba
@@ -106,6 +107,7 @@ ruxit
 SBZ
 sftpmig
 sku
+SNATd
 sourced
 sourceregistry
 sourcerepository
@@ -114,6 +116,7 @@ spn
 sqldb
 sqlpackage
 sshfs
+stagingdarts
 statefile
 statefulset
 ste

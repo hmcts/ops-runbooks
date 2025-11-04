@@ -18,7 +18,7 @@ Above is a network flow diagram outlining the connectivity between DARTS in Crim
 - Request sent from stagingdarts pod to outbound App Gateway.
 - App Gateway forwards traffic via VPN Gateway to Cloud Gateway network.
 - Request is SNATd by appropriate Cloud Gateway firewall rule and sent onward to VWAN within HMCTS tenant.
-- Request is forwarded to the appropriate AKS App Gateway (Prod goes via Hub Palo Alto).
+- Request is forwarded to the appropriate AKS App Gateway via the Palo Alto Firewall.
 - AKS App Gateway sends request on to a darts-gateway pod on one of the AKS clusters in its backend pool.
 
 ## Outbound Application Gateway Configuration
@@ -33,7 +33,7 @@ The gateways have listeners which listen for requests sent to either of these tw
 - https://darts-gateway.mnl.nl.cjscp.org.uk (NonLive)
 - https://darts-gateway.mlv.lv.cjscp.org.uk (Live)
 
-When a request is received, it is forwarded on to the specified backend target. In NonLive the target is the SDS Demo AKS backend App Gateway(aks00-demo-agw), and in Live the target is the DNAT IP address(sds-aks-ingress-backend-prod-dnat) of the SDS Prod AKS backend App Gateway on the Hub Palo Alto.
+When a request is received, it is forwarded on to the specified backend target. In NonLive the target is the SDS Demo AKS backend App Gateway(aks00-demo-agw) via Palo Alto ingress(sds-aks-ingress-backend-demo), and in Live the target is the SDS Prod AKS backend App Gateway(aks00-demo-agw) via Palo Alto DNAT ingress(sds-aks-ingress-backend-prod-dnat).
 
 Cookie-based affinity is enabled on both gateways for sticky sessions.
 

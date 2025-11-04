@@ -1,0 +1,79 @@
+---
+title: ElasticSearch License Update
+last_reviewed_on: 2025-11-04
+review_in: 12 months
+weight: 25
+---
+
+# <%= current_page.data.title %>
+
+This provides instructions on how to update ElasticSearch licenses across different environments.
+
+## License File
+
+Closer to time of renewal, we should get license files provided by Elastic via email. Email normally contains a link. Follow the link and after agreeing T&C, it will show license file for Production and Non-Production.
+
+![License Download Interface](images/license-download-interface.png)
+
+**Important:** 
+- **Prod** license should be applied to Prod only
+- **Non-Prod** license should be applied to all other environments i.e. Demo, ITHC, Perftest & AAT
+
+## Process Overview
+
+License should be applied on each cluster locally as of now. (This can be automated using TF).
+
+## Connect to ES Node
+
+You can pick any online node. For detailed connection instructions, see the [Deleting Elastic Search Index](deleting-elastic-search-index.html) runbook.
+
+## Check Cluster Health
+
+```bash
+curl -X GET http://localhost:9200/_cluster/health?pretty
+```
+
+![Cluster Health Output Example](images/cluster-health-output.png)
+
+## Check Current License
+
+```bash
+curl -X GET "localhost:9200/_license?pretty"
+```
+
+![License Check Output Example](images/license-check-output.png)
+
+Take a note of `"expiry_date"` and this should be updated after applying the new license.
+
+## Create License File
+
+Create a file called `license.json` (you can choose any name, but make sure to use the same name in the following command).
+![Create License file Example](images/create-license-file.png)
+
+## Update License
+
+```bash
+curl -XPUT -u elkadmin 'http://localhost:9200/_license' -H "Content-Type: application/json" -d @license.json
+```
+
+It will ask for password which can be found in KeyVault under the key `"ccd-ELASTIC-SEARCH-PASSWORD"`. For each environment, KeyVault and password is different.
+
+![Update License Example](images/update-license.png)
+
+## Verify License Update
+
+Check license again and see if it has extended `"expiry_date"`:
+
+```bash
+curl -X GET "localhost:9200/_license?pretty"
+```
+![Verify License Update Example](images/verify-license-update.png)
+
+
+## Troubleshooting
+
+> **Note:** You may need to explicitly disable the below key/pair in elastic config if there are any issues. License file won't be accepted until all issues are resolved. Config file location is `/etc/elasticsearch/elasticsearch.yml` and it is managed through Terraform.
+
+```yaml
+xpack.security.enabled: false
+```

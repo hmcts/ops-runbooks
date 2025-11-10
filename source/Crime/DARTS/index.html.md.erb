@@ -42,9 +42,9 @@ Outbound requests will have the hostname overridden and set to the corresponding
 - http://darts-gateway.demo.platform.hmcts.net (NonLive)
 - http://darts-gateway.platform.hmcts.net (Live)
 
-### SSL Certificates
+### TLS Certificates
 
-Both DARTS listeners have SSL certificates associated. The certs were generated in Hashicorp Vault and are imported into Azure Key Vault via automation in [cpp-aks-ops](https://github.com/hmcts/cpp-aks-ops). Auto-renewal is also configured in this repo so there should be no need for manual intervention.
+Both DARTS listeners have TLS certificates associated. The certs were generated in Hashicorp Vault and are imported into Azure Key Vault via automation in [cpp-aks-ops](https://github.com/hmcts/cpp-aks-ops). Auto-renewal is also configured in this repo so there should be no need for manual intervention.
 
 - [NonLive](https://portal.azure.com/#@hmctsnonlive.onmicrosoft.com/resource/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-IMZ/providers/Microsoft.Network/applicationGateways/GW-MDV-IMZ-APPGW-OUT/listeners)
 - [Live](https://portal.azure.com/#@cp.cjs.hmcts.net/resource/subscriptions/9ab65d81-930d-4cc0-a93d-367e14676bc0/resourceGroups/RG-MPD-IMZ/providers/Microsoft.Network/applicationGateways/GW-MPD-IMZ-APPGW-OUT/listeners)
@@ -53,7 +53,7 @@ Both DARTS listeners have SSL certificates associated. The certs were generated 
 
 - [cpp-terraform-azurerm-imz](https://github.com/hmcts/cpp-terraform-azurerm-imz) - Terraform code for Application Gateways.
 - [cpp-terraform-network](https://github.com/hmcts/cpp-terraform-network) - Terraform code for Private DNS config.
-- [cpp-aks-ops](https://github.com/hmcts/cpp-aks-ops) - Listener SSL certificate automation.
+- [cpp-aks-ops](https://github.com/hmcts/cpp-aks-ops) - Listener TLS certificate automation.
 
 ## Dynatrace Monitoring
 

@@ -1,0 +1,96 @@
+---
+title: configuring Tenable nessus
+last_reviewed_on: 2025-11-11
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Configuration of Tenable SC, Nessus Manager and Nessus scanner are similar to each other but differ slightly. Tenable SC should be configured first. Please see below step by step guide.
+
+## Tenable SC Setup
+
+### Browse Tenable SC URL
+
+**Live**: https://tenable-sc.mlv.lv.cjscp.org.uk/
+
+![Tenable SC Initial Screen](images/tenable-sc-initial.png)
+
+### Start Configuration
+
+Click next to start configuration.
+
+![Quick Setup Guide](images/quick-setup-guide.png)
+
+### Upload License File for Tenable SC
+
+![Upload License](images/upload-license.png)
+
+Once license has been updated and activated, click next.
+
+### Add Details for Nessus Scanners
+
+![Add Nessus Scanners](images/add-nessus-scanners.png)
+
+Details for Repository, Organisation and LDAP can be skipped.
+
+### Create Users
+
+On User screen add username and Password for:
+- **Security manager** (Scan related configuration) 
+- **Administrator** (Configuration of SC)
+
+Make a note of these credentials.
+
+Then go to review screen and confirm.
+
+![review screen](images/review-screen.png)
+### Initialization
+
+It will take few minutes to initialise, and setup will be completed. Then click on complete setup. This will take you to the main screen:
+
+![Setup Complete](images/setup-complete.png)
+![Setup Complete1](images/setup-complete1.png)
+
+## Nessus Scanners/Manager Configuration
+
+### Browse Nessus Scanner URL
+
+Browse one of the Nessus scanner URL:
+https://nessus-scanners-prod_3.mlv.lv.cjscp.org.uk:8834
+
+You will see screen like below to start configuration.
+
+![Nessus Scanner Initial](images/nessus-scanner-initial.png)
+
+### Select Configuration Option
+
+On the next screen, select appropriate option.
+
+![Select Configuration](images/select-configuration.png)
+![Select Configuration1](images/select-configuration1.png)
+
+### Add Credentials
+
+Add username and password and keep it safe.
+
+![Add Credentials](images/add-credentials.png)
+
+### Initialization
+
+Once you click on submit, it will start initialise and take few minutes.
+
+![Initializing](images/initializing.png)
+
+### Successful Setup
+
+Once initialised, it will be redirected to below screen if successful. Nessus-Manager will have a tab for sensors as shown below.
+
+![Successful Setup](images/successful-setup.png)
+
+### Get Linking Key
+
+Click on the sensors, which will show the linking key. This key is very important when you need to connect agents to the Nessus manager. This will go in KeyVault (in CNP) or in HashiCorp Vault (in Crime) as a secret.
+
+![Linking Key](images/linking-key.png)

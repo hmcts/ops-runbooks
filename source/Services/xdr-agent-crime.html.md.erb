@@ -51,7 +51,7 @@ Example:
 xdr_tags: "hmcts,server,idam"
 ```
 
-These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
+These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/projects/ansible/2.3-archive/intro_inventory.html).
 
 Its possible the level to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. The vars file can be created as necessary.
 
@@ -175,7 +175,7 @@ The end result targets VMs which are members of all three groups (so VMs which a
 
 If combining groups to form a pattern for ANSIBLE_LIMIT, in most cases the _:&_ operator should be used. This specifies the limit should only be VMs that intersect all three groups. 
 
-Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
+Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/projects/ansible/2.3-archive/intro_patterns.html).
 
 
 ### Jenkins

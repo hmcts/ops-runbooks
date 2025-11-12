@@ -49,7 +49,7 @@ An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC tea
 
 ### Where to set these?
 
-These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_inventory.html).
+These need setting in the automation.ansible repository. The vars live at /sp-ansible/group_vars & /sp-ansible/host_vars. Information on Ansible variables is available in the [official documentation](https://docs.ansible.com/projects/ansible/2.3-archive/intro_inventory.html).
 
 Its possible the level at which you wish to set these variables doesn't have a pre-existing vars file. e.g. there may not be a host_vars/X file for your host or a group_vars/X file for the group level. If you find this, create the necessary vars file.
 
@@ -94,7 +94,7 @@ The parameters are reactive and will update based on the Subscription & Limit dr
 
 Select the subscription which contains the target VMs. Then select the chosen limit scope. When the Limit selection is chosen, the corresponding Group, ResourceGroup or Host dropdowns will populate.
 
-Alternatively, choose Limit type of Custom Limit and provide a custom limit. Be careful with this and formulate your ansible limit correctly. Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/archive/ansible/2.3/intro_patterns.html).
+Alternatively, choose Limit type of Custom Limit and provide a custom limit. Be careful with this and formulate your ansible limit correctly. Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/projects/ansible/2.3-archive/intro_patterns.html).
 
 Click 'Build' and the pipeline will run with the chosen Limit. Failure is possible, please review any error output thoroughly. This is likely to be caused by authentication/sudo escalation issues which will need resolving between PlatOps/the application team.
 

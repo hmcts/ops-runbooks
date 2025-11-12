@@ -19,15 +19,15 @@ This document details the procedure to do this.
 
 ### ANSIBLE_EXTRA_VARS Parameter
 
-_xdr_tags_ is the only ansible variable that needs declaring for the xdr deployment role to work. There are two ways this can be declared; via the adhoc pipeline ANSIBLE_EXTRA_VARS parameter or via the group/host vars in the automation.ansible repository under _sp-ansible/_ directory. 
+_xdr_tags_ is the only ansible variable that needs declaring for the xdr deployment role to work. There are two ways this can be declared; via the adhoc pipeline ANSIBLE*EXTRA_VARS parameter or via the group/host vars in the automation.ansible repository under \_sp-ansible/* directory.
 
 The recommended method is to use the ANSIBLE_EXTRA_VARS parameter. The reasoning for this is that it is much easier to provide via the pipeline parameter compared to updating the automation.ansible group/host vars. Also, moving forward we will be trying to avoid VM deployments in the future so for the time being the role will not be included in the main deploy.yml playbook in automation.ansible. This is the playbook which is run against VMs to install/configure them with things required by Crime Platops.
 
 <img src="images/xdr-crime-deploy-extra-vars.png" style="width:600px;">
 
------
+---
 
-Provide ANSIBLE_EXTRA_VARS in the format above. This is a string with each tag separated by a pipe symbol. 
+Provide ANSIBLE_EXTRA_VARS in the format above. This is a string with each tag separated by a pipe symbol.
 
 An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC team as members. Please reach out to MoJ SoC if unsure of tags to use.
 
@@ -35,8 +35,8 @@ An MS Team channel exists called "HMCTS - Tagging Catch Up" with the MoJ SoC tea
 
 Other variables are defaulted within the Role and do not need setting in automation.ansible repo inventory.
 
-As MoJ SoC use their 'nonprod' instance of Cortex XSIAM more like a sandbox instance, all VMs whether nonlive or live should use the 'prod' XDR installer package. As such, this is now set in the role defaults and doesn't need defining explicitly in group or host vars.  
-  
+As MoJ SoC use their 'nonprod' instance of Cortex XSIAM more like a sandbox instance, all VMs whether nonlive or live should use the 'prod' XDR installer package. As such, this is now set in the role defaults and doesn't need defining explicitly in group or host vars.
+
 The only exception to this is 'sa_key'. This has been set on the 'all' group and is already usable by all hosts.
 
 ### Declaring xdr_tags through Host/Group vars - Not Recommended
@@ -63,8 +63,6 @@ The pipelines in Jenkins for deployment are the pre-existing adhoc pipelines. Th
 
 <img src="images/xdr-crime-deploy-adhoc-pipelines.png" style="width:600px;">
 
-
-
 ### Using the Pipelines
 
 Pick the pipeline for the applicable environment. These are paramatised:
@@ -73,11 +71,9 @@ Pick the pipeline for the applicable environment. These are paramatised:
 
 <img src="images/xdr-crime-deploy-params-2.png" style="width:600px;">
 
-
-
 <img src="images/xdr-crime-deploy-limiting.png" style="width:600px;">
 
---------
+---
 
 #### AUTOMATION_ANSIBLE_VERSION
 
@@ -87,9 +83,9 @@ For now set this as _xdr-agent-deploy_.
 
 #### JENKINS_ANSIBLE_ENVIRONMENT
 
-This is named strangely. This sets the _stack_ to target. All _stacks_ for the environment will be available in the dropdown. 
+This is named strangely. This sets the _stack_ to target. All _stacks_ for the environment will be available in the dropdown.
 
-This option must be chosen. 
+This option must be chosen.
 
 #### ANSIBLE_PLAYBOOK
 
@@ -111,17 +107,17 @@ This is the ansible limit field. In the backend of Jenkins this is how the limit
 
 The ANSIBLE_LIMIT provided in the box is combined with the stack that is chosen for JENKINS_ANSIBLE_ENVIRONMENT to form the true limit string that is fed to the ansible-playbook command.
 
-An example of this where a single host is given as the limit: 
+An example of this where a single host is given as the limit:
 
 ```
 DEVROT01AAPSV01.cpp.nonlive:&stack_devrot01:stack_devrot01
 ```
 
-Why the stack is repeated twice is unknown however there is probably an underlying reason. The duplication does not alter the end result of the limit. 
+Why the stack is repeated twice is unknown however there is probably an underlying reason. The duplication does not alter the end result of the limit.
 
 The end result of the limit is the intersection of VMs given to ANSIBLE_LIMIT parameter and the stack that is chosen. So VMs that are targeted are those that are in both of the groups for example.
 
-This underlying formulation of the true limit restricts the scope of VMs which can be targeted. This makes it much safer to run given the ANSIBLE_LIMIT parameter can be left empty or given the * character which acts as a wildcard for all. Without this the scope it would be possible to target all VMs in the Strategic subscription (Strategic non-live for .non-live Jenkins, Strategic live for .live Jenkins).
+This underlying formulation of the true limit restricts the scope of VMs which can be targeted. This makes it much safer to run given the ANSIBLE_LIMIT parameter can be left empty or given the \* character which acts as a wildcard for all. Without this the scope it would be possible to target all VMs in the Strategic subscription (Strategic non-live for .non-live Jenkins, Strategic live for .live Jenkins).
 
 #### All Other Parameters
 
@@ -131,11 +127,11 @@ All other parameters should be left blank.
 
 Ansible in automation.ansible repo utilises a _inventory script_ which dynamically queries Azure and fetches existing VMs. It does this on a subscription level and groups the VMs in the following way:
 
- - azure
- - location
- - resource_group
- - security_group
- - tag key_value
+- azure
+- location
+- resource_group
+- security_group
+- tag key_value
 
 _tag key_value_ groups by Azure tags. Each Azure tag key & value form its own group in the syntax:
 
@@ -149,9 +145,9 @@ Host2
 Host3
 ```
 
-As seen in the ANSIBLE_LIMIT section above, the true limit passed to the ansible-playbook command is using a _tag key_value_ group. This is the _stack_ tag on VMs in Azure.
+As seen in the ANSIBLE*LIMIT section above, the true limit passed to the ansible-playbook command is using a \_tag key_value* group. This is the _stack_ tag on VMs in Azure.
 
-Crime use different tags to tag useful information about a VM to the VM in Azure. Other tags include application, tier, stack, project & platform. 
+Crime use different tags to tag useful information about a VM to the VM in Azure. Other tags include application, tier, stack, project & platform.
 
 Teams rolling out xdr agents should formulate a strategy utilising these tag groupings. For instance, if the rollout strategy requires targeting a tier at a time then investigate the tier tagging across the environment and utilise this in your limiting.
 
@@ -167,16 +163,15 @@ This will combine to form a true limit of:
 application_rota:&tier_rot:&stack_devrot01:stack_devrot01
 ```
 
-The end result targets VMs which are members of all three groups (so VMs which are tagged with these key value combinations): 
+The end result targets VMs which are members of all three groups (so VMs which are tagged with these key value combinations):
 
 - _application_rota_
 - _tier_rot_
 - _stack_devrot01_
 
-If combining groups to form a pattern for ANSIBLE_LIMIT, in most cases the _:&_ operator should be used. This specifies the limit should only be VMs that intersect all three groups. 
+If combining groups to form a pattern for ANSIBLE*LIMIT, in most cases the *:&\_ operator should be used. This specifies the limit should only be VMs that intersect all three groups.
 
 Information on Ansible limiting is available in the [official documentation](https://docs.ansible.com/projects/ansible/2.3-archive/intro_patterns.html).
-
 
 ### Jenkins
 
@@ -195,7 +190,6 @@ The SAS token itself is stored in Vault and Ansible's Vault lookup plugin is use
 
 The Role has the ability to update tag information in-place. Simply update xdr_tags variable and re-run the xdr-ansible-deploy pipeline.
 
-
 ### Verify Installation
 
 Verify installation in the Cortex XSIAM Portal. Certain PlatOps members have access (Rees, Chirag, Jordan H). This can also be confirmed by MOJ SoC Engineers in the MS Teams chat.
@@ -213,7 +207,6 @@ To check the agent is running on the VM:
 ```bash
 systemctl status traps_pmd.service
 ```
-
 
 ### Uninstall
 
@@ -243,13 +236,11 @@ This will automatically remove the VM from the [XSIAM Cortex portal](https://jus
 
 [Detailed documentation](https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/8.4/Cortex-XDR-Agent-Administrator-Guide/Uninstall-the-Cortex-XDR-Agent-for-Linux).
 
-
 ## Developing the Role
 
-We have created a [test environment repo](https://github.com/hmcts/cpp-ansible-test-environment/) which mimics the python & ansible setup used in Crime's main PlatOps Jenkins instance. 
+We have created a [test environment repo](https://github.com/hmcts/cpp-ansible-test-environment/) which mimics the python & ansible setup used in Crime's main PlatOps Jenkins instance.
 
 The README details how to setup a local machine environment for development that is compatible with the Jenkins environment. It uses Vagrant & the Virtualbox driver to build a local VM and automate Ansible against it.
-
 
 ## Troubleshooting
 

@@ -1,0 +1,42 @@
+---
+title: App Registration Secret Automation
+last_reviewed_on: 2025-10-14
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## Automating App Registration Secret Management
+
+This repository includes automation for managing secrets for Azure AD app registrations. The process ensures that secrets are created, rotated, and stored securely without manual intervention. This process supports the DCS tenant and Crime Non-Prod and Prod environments.
+
+### Features
+
+- **Automated Secret Creation**: Secrets for app registrations are automatically generated using Terraform.
+- **Secure Storage**: Secrets are stored securely in Azure Key Vault and HashiCorp Vault.
+- **Rotation Support**: Secrets can be rotated periodically to enhance security.
+
+### Prerequisites
+
+- Terraform installed and configured.
+- Generate an Entra AD application and service principal with secrets.
+- Enable secret rotation.
+- Save secrets in Azure Key Vault and HashiCorp Vault for secure storage.
+
+### How to Add a New Secret
+
+To create a new secret, refer to the detailed steps in the [GitHub pull request](https://github.com/hmcts/cpp-terraform-azurerm-azuread/pull/613/commits/c1e54763b8ce63438422b31e7668b4c7d0305ea2).
+
+### Secret Storage
+
+Secrets are saved in both Azure Key Vault and HashiCorp Vault. The storage paths are as follows:
+
+- **Key Vault Location**:
+
+- Non-Live: `KV-MDV-CCM-0`
+- Live: `KV-MPD-CCM-01`
+
+- **HashiCorp Vault Paths**:
+  - Non-Live: `secret/terraform/mdv/serviceaccounts/secret`
+  - Live: `secret/terraform/mpd/serviceaccounts/secret`

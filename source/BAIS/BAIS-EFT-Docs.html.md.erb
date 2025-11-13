@@ -36,7 +36,7 @@ These rules reside in the PlatOps-Hub directory on `eftbais01_prod` and `eftbais
 The event rules pull files from `probate-aat` and `probate-prod` containers on the `green` storage account in `rdo-hub-sftp-prod`.
 The prod rules then upload the rules to IronMountain via SFTP and the AAT rules simply keep the files on disk and delete them after a week.
 
-## Troublteshootng
+## Troubleshooting
 
 Basic connectivity can be verified by checking Server -> LocalHost -> PlatOps Hub -> Connection Profiles. Each network flow will have a connection profile with it. These have a `Test` option in each of their settings that will attempt to connect to the remote. This can use used to diagnose potential connectivity issues.
 

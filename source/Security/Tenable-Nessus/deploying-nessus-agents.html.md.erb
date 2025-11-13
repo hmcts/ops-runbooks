@@ -1,0 +1,48 @@
+---
+title: Deploying nessus agents
+last_reviewed_on: 2025-11-12
+review_in: 12 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+Once TenableSC, Nessus Manager and Nessus scanners has been configured, agents can be deployed. When deploying the agents, we need the following in the configuration.
+
+## Required Configuration Parameters
+
+- **Nessus_server** = `<IP or FQDN of Nessus-manager>`
+- **Nessus Key** = `<This will be the linking key from Nessus manager>`
+- **Nessus group** = (Optional unless asked by SecOps)
+
+We have different way of deploying agents in Crime and CNP.
+
+## CNP
+
+We are using VM-Bootstrap module to deploy Nessus Agents on the VMs.
+[Here](https://github.com/hmcts/terraform-module-vm-bootstrap) is the link for VM-Bootstrap module. And below is the example usage:
+
+```hcl
+module "vm-bootstrap" {
+  .
+  .
+  .
+
+  nessus_server = var.nessus_server
+  nessus_key    = var.nessus_key
+  nessus_groups = var.nessus_groups
+  .
+  .
+  .
+}
+```
+
+## Crime
+
+In Crime, we are using Ansible playbook which runs via Jenkins to install the agents. In Jenkins, ansible adhoc job can be run with following parameters.
+
+![Jenkins Ansible Parameters](images/jenkins-ansible-parameters.png)
+
+## Important Note
+
+When running initially, use smallest `ANSIBLE_LIMIT` i.e. single host and verify that agent has been installed and linked to the manager.

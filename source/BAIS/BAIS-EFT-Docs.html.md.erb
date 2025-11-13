@@ -36,9 +36,11 @@ These rules reside in the PlatOps-Hub directory on `eftbais01_prod` and `eftbais
 The event rules pull files from `probate-aat` and `probate-prod` containers on the `green` storage account in `rdo-hub-sftp-prod`.
 The prod rules then upload the rules to IronMountain via SFTP and the AAT rules simply keep the files on disk and delete them after a week.
 
-A currently unknown problem with EFT causes the event rules to fail to pull certain files from the storage account when running on both EFT nodes.
-To get around this, the prod rules are currently set to run on `eftbais01_prod` only. CGI have an open support ticket with Pro2Col to investigate the issue.
-More details can be found in [DTSPO-16891](https://tools.hmcts.net/jira/browse/DTSPO-16891) and [DTSPO-18322](https://tools.hmcts.net/jira/browse/DTSPO-18322).
+## Troubleshooting
+
+Basic connectivity can be verified by checking Server -> LocalHost -> PlatOps Hub -> Connection Profiles. Each network flow will have a connection profile with it. These have a `Test` option in each of their settings that will attempt to connect to the remote. This can use used to diagnose potential connectivity issues.
+
+For more in-depth troubleshooting, check the Reports tab. There are a wide variety of reports EFT can generate, check for the ones starting with `Event Rules - ` for our purposes. From there, a report can be filtered by site (always `PlatOps-Hub`) and then further by the name of the event rule. Reports can be exported as HTML and provide a comprehensive overview of all attempted transfers within a specified time window.
 
 ## Pro2Col Contact
 

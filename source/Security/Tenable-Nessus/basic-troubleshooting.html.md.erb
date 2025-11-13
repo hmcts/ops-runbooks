@@ -1,0 +1,68 @@
+---
+title: Basic Troubleshooting
+last_reviewed_on: 2025-11-13
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+There are some basic troubleshooting steps and basic checks that we can do in case of any issues:
+
+## Verify Agent Status
+
+On the VM, run:
+
+```bash
+sudo systemctl status nessusagent
+```
+
+or
+
+```bash
+nessuscli agent status
+```
+
+Ensure the agent is **running** and **linked** to the correct Nessus Manager.
+
+## Restart Agent
+
+On the VM, run:
+
+```bash
+systemctl restart nessusagent
+```
+
+## Review Logs
+
+On the VM, run:
+
+```bash
+tail -f /opt/nessus_agent/var/nessus/logs/nessus-agent.log
+```
+
+Look for errors like:
+- Communication issues
+- Plugin load failures
+
+## Confirm Linking
+
+On the VM, run:
+
+```bash
+nessuscli agent info
+```
+
+Look for:
+- **Linked to**: correct Nessus Manager hostname/IP
+- **Status**: `Connected`
+
+If not linked, re-link it again.
+
+## Relink Agent
+
+On the VM, run:
+
+```bash
+nessuscli agent link --key=<linking_key> --host=<manager_host> --port=<manager_port>
+```

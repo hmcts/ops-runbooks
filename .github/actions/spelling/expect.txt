@@ -142,3 +142,4 @@ wsdl
 XXXX
 xpack
 serviceaccounts
+hashivault 

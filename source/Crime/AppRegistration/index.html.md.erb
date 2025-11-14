@@ -9,11 +9,12 @@ weight: 20
 
 ## Automating App Registration Secret Management
 
-This document contain the automation for managing secrets for Azure AD app registrations. The process ensures that secrets are created, rotated, and stored securely without manual intervention. This process supports the DCS tenant and Crime Non-Prod and Prod environments.
+This document outlines the automated process for managing secrets for Azure AD app registrations. The automation ensures that secrets are securely created, rotated, and stored without manual intervention. It supports the DCS tenant and the Crime Non-Prod and Prod environments.
 
-- **Automated Secret Creation**: Secrets for app registrations are automatically generated using Terraform.
-- **Secure Storage**: Secrets are stored securely in Azure Key Vault and HashiCorp Vault.
-- **Rotation Support**: Secrets can be rotated periodically to enhance security.
+Key Features:
+Automated Secret Creation: Secrets for app registrations are generated automatically using Terraform.
+Secure Storage: Secrets are securely stored in Azure Key Vault and HashiCorp Vault.
+Periodic Rotation: Secrets are rotated periodically to enhance security.
 
 ### How to Add a New Secret
 
@@ -21,7 +22,7 @@ To create a new secret, refer to the detailed steps in the [GitHub pull request]
 
 ### Secret Storage
 
-Secrets are saved in both Azure Key Vault and HashiCorp Vault. The storage paths are as follows:
+Secrets are stored in both Azure Key Vault and HashiCorp Vault. The storage paths are as follows:
 
 - **Key Vault Location**:
 
@@ -33,3 +34,23 @@ Secrets are saved in both Azure Key Vault and HashiCorp Vault. The storage paths
   - Live: `secret/terraform/mpd/serviceaccounts/secret`
 
 More details can be found on the repo [here](https://github.com/hmcts/cpp-terraform-azurerm-azuread).
+
+
+### Create Secret for existing App Registration
+
+To create a secret for an existing app registration, reference the client_id (object ID) variable for the new secret. Below is an example configuration:
+
+```hcl
+  {
+    client_id                   = "existing-app-registration-object_id"
+    name                        = "new-secret-name"
+    create_secret               = true
+    write_secret_to_hashivault  = true
+    secret_end_date_relative    = "8760h" # 1 year
+    enable_rotation             = true
+  }
+```
+### Secret Expiry
+
+We recommend setting the secret duration to 1 year (8760h) to ensure regular rotation and enhanced security. Adjust the secret_end_date_relative value as needed, using hourly increments.
+

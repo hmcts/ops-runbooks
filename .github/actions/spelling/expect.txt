@@ -141,3 +141,5 @@ wrkagentpool
 wsdl
 XXXX
 xpack
+serviceaccounts
+hashivault 

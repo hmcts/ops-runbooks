@@ -1,0 +1,40 @@
+---
+title: ElasticSearch Reindexing Guidance
+last_reviewed_on: 2025-11-11
+review_in: 12 months
+weight: 15
+---
+
+# <%= current_page.data.title %>
+
+Due to the length of time each reindexing takes with the associated impact, and that the reindexing process is fairly manual, 
+it is intended to provide a more automated method which can reduce the time spent on reindexing.
+
+## Background
+
+CCD uses Elasticsearch to support searching of cases, allowing consumers to be able to make flexible queries with JSON using Elasticsearch's [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl.html).
+The source of truth for case data is within the CCD Data Store database, and there is a Logstash process in place which is regularly polling the CCD database
+to pull cases which have had updates in CCD from the database into Elasticsearch. More information on the general Elasticsearch and Logstash setups can be
+found in the [Elasticsearch LLD](https://tools.hmcts.net/confluence/display/RCCD/CCD+ElasticSearch+and+new+search+API+Design+LLD).
+
+Service teams configure the different case types within their jurisdictions in their CCD Definition Files, where they define the fields that make up their
+case type. An Elasticsearch [index](https://www.elastic.co/blog/what-is-an-elasticsearch-index) for a case type contains a [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping.html)
+which declares each of the case fields in the case type (as per the Definition File), along with their types e.g. a field which is defined as a [CCD Date type](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=RCCD&title=CCD+Supported+Field+Types#CCDSupportedFieldTypes-ccdTypeDate)
+in the Definition File is mapped to an appropriate date format in Elasticsearch, so that it can be searched against in logical ways for its type.
+The mapping for each CCD field type to appropriate Elasticsearch type is defined [in the Definition Store](https://github.com/hmcts/ccd-definition-store-api/blob/9db6d9f5a228c1994ebd30f1fa0bef00021b1851/elastic-search-support/src/main/resources/application.yml#L69).
+The index itself then contains records for each of the cases belonging to the associated case type, and if any cases are attempting to be ingested which don't conform to the mapping, they will be rejected and not go through successfully into the index.
+
+Once a mapping for a field is defined in Elasticsearch, it cannot be changed to another type without deleting the entire index.
+A couple of common reasons this might occur in practice is if a service team need to change the data type of an existing CCD field to a slightly different
+type (see [Impact of CCD definition updates on the existing ES Mapping](https://tools.hmcts.net/confluence/display/RCCD/CCD+ElasticSearch+and+new+search+API+Design+LLD#CCDElasticSearchandnewsearchAPIDesignLLD-ImpactofCCDdefinitionupdatesontheexistingESMapping))
+or if the service makes use of [marking fields as non-searchable](https://tools.hmcts.net/confluence/display/RCCD/CCD+ElasticSearch+and+new+search+API+Design+LLD#CCDElasticSearchandnewsearchAPIDesignLLD-Non-SearchableFieldsandTypes)
+for performance reasons. The process for these types of scenarios involves deleting the index (which includes deleting all the cases for the related case type in Elasticsearch),
+recreating the index for the case type with the new intended mapping (most easily achieved by importing the new Definition File with the intended changes),
+and then pulling all the existing cases into Elasticsearch by triggering some types of changes for all the relevant ones for the case type so that the
+Logstash process registers some types of changes and pulls them in to Elasticsearch. An example way of doing this "reindexing" process is described in
+[Indexing existing CCD cases](https://tools.hmcts.net/confluence/display/RCCD/CCD+ElasticSearch+and+new+search+API+Design+LLD#CCDElasticSearchandnewsearchAPIDesignLLD-IndexingexistingCCDcases),
+and the Production runbook that PlatOps use to do this is described in more detail [here](deleting-elastic-search-index.html).
+
+Whenever this type of change is required in Production the impact is that the CCD search will return no or partial results in the gap between deleting the
+index until the reindexing is fully completed, and this process can take hours for services with lots of cases. An example case type of Civil in recent
+attempts has taken around 3 hours to reindex 130k cases, and there are services with case types which can contain millions of cases in Production. 

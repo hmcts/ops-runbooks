@@ -298,6 +298,12 @@ You should see the clone alongside the original index with the original count.
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
 ```
 
+If you run this command afterwards it should show the blocks write is set to false.
+
+```
+curl -X GET http://localhost:9200/<Your index name>/_settings?pretty
+```
+
 5) Set the index alias of our restore index
 
 Check with service team what the alias should be if unsure.

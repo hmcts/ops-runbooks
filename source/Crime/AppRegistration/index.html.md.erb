@@ -13,16 +13,16 @@ This document outlines the automated process for managing secrets for Azure AD a
 
 Key Features:
 Automated Secret Creation: Secrets for app registrations are generated automatically using Terraform.
-Secure Storage: Secrets are securely stored in Azure Key Vault and HashiCorp Vault.
+Secure Storage: Secrets are securely stored in Azure Key Vault and HashiCorp Vault(optional).
 Periodic Rotation: Secrets are rotated periodically to enhance security.
 
 ### How to Add a New Secret
 
-To create a new secret, refer to the detailed steps in the [GitHub pull request](https://github.com/hmcts/cpp-terraform-azurerm-azuread/pull/613/commits/c1e54763b8ce63438422b31e7668b4c7d0305ea2).
+To create a new secret, refer to the detailed steps in the [GitHub pull request](https://github.com/hmcts/cpp-terraform-azurerm-azuread/pull/623/files).
 
 ### Secret Storage
 
-Secrets are stored in both Azure Key Vault and HashiCorp Vault. The storage paths are as follows:
+Secrets are stored in both Azure Key Vault and HashiCorp Vault(optional). The storage paths are as follows:
 
 - **Key Vault Location**:
 

@@ -1,6 +1,6 @@
 ---
 title: How to reindex using Reindex API on Elastic Search
-last_reviewed_on: 2025-06-18
+last_reviewed_on: 2025-11-26
 review_in: 12 months
 weight: 20
 ---
@@ -42,23 +42,17 @@ ssh bastion-prod.platform.hmcts.net
 ```
 
 4) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
-
 For a list of IP addresses for each env, go to:
 
- DEMO:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
- 
- PERFTEST:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
- 
- AAT:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+[DEMO](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-demo/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
 
- Production:
- https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces
+[PERFTEST](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/7a4e3bd5-ae3a-4d0c-b441-2188fee3ff1c/resourceGroups/ccd-elastic-search-perftest/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[AAT](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/ccd-elastic-search-aat/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
+
+[Production](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/8999dec3-0104-4a27-94ee-6588559729d1/resourceGroups/ccd-elastic-search-prod/providers/Microsoft.Network/networkSecurityGroups/ccd-cluster-nsg/networkInterfaces)
 
 Connect to Elastic Search node from relevant bastion:
-
 ```
 ssh -p22  elkadmin@<ip address> -i <logstash ssh key>
 ```
@@ -101,7 +95,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
-10) Change main index to read only mode for cloning
+10) Block writing to main index ahead of cloning
 
 ```
 curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
@@ -127,38 +121,32 @@ curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?p
 
 Note: For this cloned index please ensure the name has a 2 at the end instead of a 1.
 
-13) Set original index back to write mode.
-
-```
-curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": false}}'
-```
-
-14) Set the second cloned index to read only mode
+13) Set the second cloned index to read only mode
 
 ```
 curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": true}}'
 ```
 
-15) Delete the original index
+14) Delete the original index
 
 ```
 curl -X DELETE localhost:9200/<Your index name>;
 ```
 
-16) Wait for the new definition to be imported by the service team.
+15) Wait for the new definition to be imported by the service team.
 
 Confirm its been imported by running the command from step 7 again, it will show as having no cases in it but it should exist.
 
-17) Reindex using the second clone as the source for the reindex
+16) Reindex using the second clone as the source for the reindex
 
 This will take a while depending on the size of the index, so please be patient.
 The curl we run can time out but rest assured it will still run in the background.
 
 ```
-curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>"},"dest": {"index": "<your index name>"}}'
+curl -X POST "localhost:9200/_reindex?pretty" -H 'Content-Type: application/json' -d'{"source": {"index": "<Your second clones name>","size":100},"dest": {"index": "<your index name>"}}'
 ```
 
-18) Check the reindex was successful
+17) Check the reindex was successful
 
 Even after Step 17 is complete this can take some time to complete, so please be patient.
 
@@ -172,7 +160,7 @@ If the index count isnt up to what is expected but no error was shown in step 17
 curl -X GET "localhost:9200/_refresh?pretty"
 ```
 
-19) If the reindex was successful begin removing both of the clones that were created.
+18) If the reindex was successful begin removing both of the clones that were created.
 
 For removing clone 02 make sure you run the below command to remove the read only setting.
 
@@ -188,7 +176,7 @@ Please remove them one at a time.
 curl -X DELETE localhost:9200/<clone index name>;
 ```
 
-20) Ensure you scale the logstash instance back to 1.
+19) Ensure you scale the logstash instance back to 1.
 
 
 ### Rollback steps

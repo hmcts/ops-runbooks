@@ -163,23 +163,33 @@ If the index count isnt up to what is expected but no error was shown in step 17
 curl -X GET "localhost:9200/_refresh?pretty"
 ```
 
-18) If the reindex was successful begin removing both of the clones that were created.
+18) Ensure you scale the logstash instance back to 1.
 
-For removing clone 02 make sure you run the below command to remove the read only setting.
+### Post Implementation steps
+
+A day or two after the reindex has been completed and verified by the service team, please follow these steps to clean up.
+
+1) Check for all indexes
+
+```
+curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
+```
+
+2) Remove the read only setting on the second clone
 
 ```
 curl -X PUT "localhost:9200/<Your second clones name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.read_only": false}}'
 ```
 
-Then run this command for each clone to remove them.
+3) Delete the cloned indexes
 
-Please remove them one at a time.
+Run the below command for each of the clones.
+
+Please run these 1 at a time to ensure no mistakes are made.
 
 ```
 curl -X DELETE localhost:9200/<clone index name>;
 ```
-
-19) Ensure you scale the logstash instance back to 1.
 
 
 ### Rollback steps

@@ -1,6 +1,6 @@
 ---
 title: App Registration Secret Automation
-last_reviewed_on: 2025-11-14
+last_reviewed_on: 2025-12-04
 review_in: 12 months
 weight: 20
 ---
@@ -11,10 +11,11 @@ weight: 20
 
 This document outlines the automated process for managing secrets for Azure AD app registrations. The automation ensures that secrets are securely created, rotated, and stored without manual intervention. It supports the DCS tenant and the Crime Non-Prod and Prod environments.
 
-Key Features:
-Automated Secret Creation: Secrets for app registrations are generated automatically using Terraform.
-Secure Storage: Secrets are securely stored in Azure Key Vault and HashiCorp Vault(optional).
-Periodic Rotation: Secrets are rotated periodically to enhance security.
+**Key Features:**
+
+- **Automated Secret Creation:** Secrets for app registrations are generated automatically using Terraform.
+- **Secure Storage:** Secrets are securely stored in Azure Key Vault and HashiCorp Vault (optional).
+- **Periodic Rotation:** Secrets are rotated periodically to enhance security.
 
 ### How to Add a New Secret
 
@@ -22,34 +23,55 @@ To create a new secret, refer to the detailed steps in the [GitHub pull request]
 
 ### Secret Storage
 
-Secrets are stored in both Azure Key Vault and HashiCorp Vault(optional). The storage paths are as follows:
+Secrets are stored in both Azure Key Vault and HashiCorp Vault (optional). The storage paths are as follows:
 
-- **Key Vault Location**:
+**Key Vault Location**:
 
 - Non-Live: `KV-MDV-CCM-0`
 - Live: `KV-MPD-CCM-01`
 
-- **HashiCorp Vault Paths**:
-  - Non-Live: `secret/terraform/mdv/serviceaccounts/secret`
-  - Live: `secret/terraform/mpd/serviceaccounts/secret`
+**HashiCorp Vault Paths**:
+
+- Non-Live: `secret/terraform/mdv/serviceaccounts/secret`
+- Live: `secret/terraform/mpd/serviceaccounts/secret`
 
 More details can be found on the repo [here](https://github.com/hmcts/cpp-terraform-azurerm-azuread).
 
+### Create New Secrets
 
-### Create Secret for existing App Registration
+Creating a new secret for an app registration can be done by adding a new block in the Terraform configuration in the tfvars file for the respective environment. See [this example](https://github.com/hmcts/cpp-terraform-azurerm-azuread/blob/main/vars/nonlive/identities.tfvars#L115-L121) that shows the rotation configuration for an existing app registration.
+
+Below is an example configuration for creating a new secret:
+
+```hcl
+{
+  name                       = "test"
+  create_secret              = true
+  write_secret_to_hashivault = false
+  secret_end_date_relative   = "8760h"
+  enable_rotation            = true
+}
+```
+
+### Create Secret for Existing App Registration
 
 To create a secret for an existing app registration, reference the client_id (object ID) variable for the new secret. Below is an example configuration:
 
 ```hcl
-  {
-    client_id                   = "existing-app-registration-object_id"
-    name                        = "new-secret-name"
-    create_secret               = true
-    write_secret_to_hashivault  = true
-    secret_end_date_relative    = "8760h" # 1 year
-    enable_rotation             = true
-  }
+{
+  client_id                   = "existing-app-registration-object_id"
+  name                        = "new-secret-name"
+  create_secret               = true
+  write_secret_to_hashivault  = true
+  secret_end_date_relative    = "8760h" # 1 year
+  enable_rotation             = true
+}
 ```
+
+For more details on importing existing app registrations, refer to the [Example PR](https://github.com/hmcts/cpp-terraform-azurerm-azuread/pull/649/files).
+
+Once the Terraform configuration is updated, the pipeline will be triggered automatically every Monday at 7 PM to create or rotate secrets as per the configuration. 
+
 ### Secret Expiry
 
 We recommend setting the secret duration to 1 year (8760h) to ensure regular rotation and enhanced security. Adjust the secret_end_date_relative value as needed, using hourly increments.

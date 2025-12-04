@@ -1,0 +1,65 @@
+---
+title: Installing terraform-docs
+last_reviewed_on: 2025-12-04
+review_in: 12 months
+weight: 220
+---
+
+# <%= current_page.data.title %>
+
+## What is terraform-docs?
+
+`terraform-docs` is a utility to generate documentation from Terraform modules in various output formats. It automatically generates and updates documentation for your Terraform modules based on variables, outputs, resources, and other module components.
+
+## Installation Options
+
+There are two ways to install `terraform-docs` depending on your requirements.
+
+### Option 1: GitHub Action (Just terraform-docs, no pre-commit configs)
+
+You can integrate `terraform-docs` using a GitHub Action. Simply add the following workflow file to your repository at `.github/workflows/terraform-docs.yml`:
+
+```yaml
+name: Generate terraform docs
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Render terraform docs and push changes back to PR
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
+```
+
+Once the above workflow is added, it will automatically generate and commit documentation changes to your PR when you create or update a pull request targeting the `main` branch.
+
+For an example implementation, see this PR: [cpp-module-terraform-azurerm-appinsights#12](https://github.com/hmcts/cpp-module-terraform-azurerm-appinsights/pull/12/files).
+
+### Option 2: Install with pre-commit (normally non-Crime repos)
+
+For local development, you can install `terraform-docs` along with `pre-commit` hooks:
+
+```shell
+$ brew install pre-commit terraform-docs
+$ pre-commit install
+```
+
+If you add a new hook, make sure to run it against all files:
+
+```shell
+$ pre-commit run --all-files
+```
+
+This approach ensures documentation is generated before commits are made, keeping your README files up to date locally.

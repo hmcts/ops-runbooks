@@ -80,6 +80,11 @@ To onboard a new team to LaunchDarkly, follow these steps:
    - Add user to the the relevant LaunchDarkly group i.e., `DTS LaunchDarkly` in **[prod_users](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml)** file.
    - Merge the PR after review.
 
+## Renew an expired certificate
+If the certificate expires, you can generate a new one in Azure under [Enterprise Applications](https://portal.azure.com/?l=en.en-gb#view/Microsoft_AAD_IAM/ManagedAppMenuBlade/~/Overview/objectId/e16d8b75-a799-4428-9063-e076e06b9ff2/appId/e0076553-560c-4f9a-9cd2-a4b5fdcd956f/preferredSingleSignOnMode~/null/servicePrincipalType/Application/fromNav/). Under manage, click onto Single sign-on. Within SAML certificate you'll be able to see the current certs and their expiry date. Generate a new certificate and download a copy.
+Then click onto the [LaunchDarkly Admin Access Security settings](https://app.launchdarkly.com/settings/security), and under SSO management hit 'edit SAML configuration'. Then you can upload the new certificate.
+NOTE: if the certificate expires, you'll need to open a ticket on [Support](https://support.launchdarkly.com/) and ask them to disable SSO. Then you'll be able to login with a justice.gov.uk account to complete the upload. For previous ticket reference, look up [109624](https://support.launchdarkly.com/hc/en-us/requests/109624).
+
 Some older documentation around LaunchDarkly can be found in following confluence pages:
   - [LaunchDarkly Admin Access](https://tools.hmcts.net/confluence/display/DIV/Setup+LaunchDarkly+Admin+Access).
   - [LaunchDarkly Integration](https://tools.hmcts.net/confluence/display/RCCD/LaunchDarkly+Integration)

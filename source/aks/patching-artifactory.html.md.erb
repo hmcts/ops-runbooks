@@ -1,7 +1,7 @@
 ---
 title: Artifactory Patching
 weight: 30
-last_reviewed_on: 2025-09-08
+last_reviewed_on: 2025-12-12
 review_in: 12 months
 ---
 
@@ -23,7 +23,7 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 
 ## Artifactory Patching Process
 
-### 1. Updating CFT PTLSBOX - [example non-prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-27408) 
+### 1. Updating CFT PTLSBOX - [example non-prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-28932) and enabling Artifactory is disabled.
 
   • Create a new file named `artifactory-sbox.yaml` in the [artifactory directory](https://github.com/hmcts/cnp-flux-config/tree/master/apps/artifactory/artifactory "apps/artifactory/artifactory"), add the following and update to the latest version.
 
@@ -37,10 +37,10 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
     chart:
         spec:
           chart: artifactory-oss
-          version: 107.111.8 <- update to latest version
+          version: 107.117.19 <- update to latest version
   ```
 
-  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.111.8`
+  **Note:** The layout of Artifactory versioning includes 10 at the beginning. This version would be `7.117.19`
 
   • Make the changes to the bottom of `kustomization.yaml` file found in [sbox-intsvc directory](https://github.com/hmcts/cnp-flux-config/blob/master/apps/artifactory/sbox-intsvc/base/kustomization.yaml "apps/artifactory/sbox-intsvc/base/kustomization.yaml").
 
@@ -76,22 +76,22 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
   • For further confirmation, ensure that the grep command below returns the chart version that you have applied.
 
   ```command
-  kubectl describe pods -n artifactory artifactory-oss-0 | grep chart=artifactory-107.111.8 (put your version here)
+  kubectl describe pods -n artifactory artifactory-oss-0 | grep chart=artifactory-107.117.19 (put your version here)
   ```
 
-  • Ensure you can access [Artifacory](https://artifactory.sandbox.platform.hmcts.net/ui/repos/treeGeneral/hmcts) website. **Note:** you will need to be connected to F5 VPN to access this link.
+  • Ensure you can access Artifacory website [link](https://artifactory.sandbox.platform.hmcts.net/ui/repos/treeGeneral/hmcts). **Note:** you will need to be connected to F5 VPN to access this link.
 
   • A successful upgrade will look like the below.
 
    [](aks/Images/artifactory-checks.png)
 
-### 3. Update CFT PTL - [example Prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-27408) 
+### 3. Update CFT PTL - [example Prod ticket](https://tools.hmcts.net/jira/browse/DTSPO-28933) 
 
   • Ensure Artifactory is still disabled from step 1.
 
   • Remove `artifactory-sbox.yaml` file and its corresponding code from `kustomization.yaml` made in step 1.
 
-  • Update the version in `artifactory.yaml` to latest version eg, (7.111.8) <- ensure `10` is in front of the version.
+  • Update the version in `artifactory.yaml` to latest version eg, (7.117.19) <- ensure `10` is in front of the version.
 
   ```yaml
   ...
@@ -99,7 +99,7 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
   chart:
     spec:
       chart: artifactory-oss
-      version: 107.111.8
+      version: 107.117.9
 
   ...
   ```
@@ -110,8 +110,9 @@ If any issues arise during the patching process, [troubleshooting steps](#troubl
 
   • [Connect to CFT PTL cluster](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/cft-ptl-00-rg/providers/Microsoft.ContainerService/managedClusters/cft-ptl-00-aks/overview)
 
-  • Once all the checks are done for CFT PTL and no issues have arisen, re-en-enable Artifactory by following the [example pr](https://github.com/hmcts/cnp-jenkins-library/commit/5565dd39fedb2493c67bf6837c5d034ca77722f8).
+  • Ensure you can access Artifacory prod website[link](https://artifactory.platform.hmcts.net/ui/repos/tree/General/maven-remotes)
 
+  • Once all the checks are done for CFT PTL and no issues have arisen, re-enable Artifactory by following the [example pr](https://github.com/hmcts/cnp-jenkins-library/commit/5565dd39fedb2493c67bf6837c5d034ca77722f8).
  
 ## Related Links
 

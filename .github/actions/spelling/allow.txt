@@ -223,6 +223,7 @@ fluxcd
 fluxcdbot
 fluxcloud
 flywaydb
+FNI
 forgerock
 Fortigate
 Fortigates

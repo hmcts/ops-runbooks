@@ -1,6 +1,6 @@
 ---
 title: Camunda How To Guides
-last_reviewed_on: 2025-03-10
+last_reviewed_on: 2025-12-16
 review_in: 12 months
 weight: 50
 ---
@@ -200,3 +200,11 @@ Instead of setting a removal time and waiting for cleanup jobs, you can directly
 - Running a Delete operation is pretty similar to running a Set Removal Time operation, except you should select "Delete finished process instances" or "Delete decision instances"
 
     <img src="images/deleteOperations.png">
+
+## Provide Usage Metrics Report to Camunda Support
+
+Camunda Support may request usage metrics to help with the subscription renewal process.
+
+- On the Cockpit Camunda portal go to [Execution Metrics](https://camunda-bpm.platform.hmcts.net/app/admin/default/#/system?section=system-settings-metrics)
+
+Select the Display legacy metrics (FNI/EDE) option and at the bottom copy the output under the Annual usage metrics by subscription term and save this in a file to send to Camunda Support.

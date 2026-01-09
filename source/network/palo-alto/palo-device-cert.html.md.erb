@@ -8,7 +8,7 @@ review_in: 12 months
 # <%= current_page.data.title %>
 
 ## Prerequisites
-1. Be connected to the F5 VPN and login in via the UI as a admin user not SSO session.
+1. Be connected to the F5 VPN and login in via the UI as a admin user not SSO session [link](https://hmcts.github.io/ops-runbooks/network/palo-alto/adminportal.html#admin-portal).
 2. Check if the certificate has expired by navigating to the Palo > Select Device > Setup > Management and under the header 'Device Certificate'. Check under 'Current Device Certificate Status' to see if it states 'valid' then no further action is required, if it states 'expired' proceed to renew by carrying out the remaining steps.
 3. Log into the Palo Customer Support Portal, you will need to have an account setup for this. If you do not have an account, please ask on the PlatformOperations channel on slack, for a current user to assist you in creating one.
 4. Ensure you have the device serial number for the device you are updating the certificate for before proceeding.
@@ -17,5 +17,5 @@ review_in: 12 months
 1. In the Palo Customer Support Portal -  click on 'Products' in left menu panel > Select 'Device Certificates'
 2. Then click the 'Generate OTP' button > select Next-Gen Firewall > from the drop down list, select the relevant device serial number obtained from step 4 in Prerequisites.
 3. Copy the OTP code provided, as it this required for the next step and save this ie notepad.
-4. Navigate to the Palo Alto Device via the UI (as admin user); Select Device > Setup > Management and click 'Get Certificate' and paste the OTP code from step 4.
+4. Navigate to the Palo Alto Device via the UI as admin user, then select Device > Setup > Management and click 'Get Certificate' and paste the OTP code from step 4.
 5. Refresh the UI and ensure the certificate status is now 'valid'.

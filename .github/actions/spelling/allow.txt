@@ -303,6 +303,7 @@ javascripts
 javatester
 jayne
 JBOX
+JCas
 jcmd
 jdbase
 jdbc

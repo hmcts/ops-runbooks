@@ -1,0 +1,119 @@
+---
+title: Dual ACR publish (Jenkins)
+last_reviewed_on: 2026-01-13
+review_in: 12 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+## Purpose
+
+This guide documents the **Dual ACR publish** capability in the CFT Jenkins shared library.
+
+It enables a controlled transition between registries by publishing the same:
+
+- container images
+- Helm charts (OCI)
+
+to both a **primary** and a **secondary** Azure Container Registry (ACR).
+
+## Where the behaviour lives
+
+- Jenkins shared library:
+  - `hmcts/cnp-jenkins-library`
+  - PR: https://github.com/hmcts/cnp-jenkins-library/pull/1375
+
+- Jenkins global configuration (enablement + secondary registry details):
+  - `hmcts/cnp-flux-config/apps/jenkins/jenkins/sbox-intsvc/jenkins.yaml`
+  - `hmcts/cnp-flux-config/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml`
+
+## How it works
+
+### Primary registry
+
+The primary registry is injected by the shared library wrapper `withRegistrySecrets(...)`.
+
+`withRegistrySecrets(...)` reads these secrets from the Jenkins controller Key Vault (based on `INFRA_VAULT_NAME`) and exposes them as environment variables:
+
+- `public-registry-name` -> `REGISTRY_NAME`
+- `public-registry-rg` -> `REGISTRY_RESOURCE_GROUP`
+- `public-registry-sub` -> `REGISTRY_SUBSCRIPTION`
+
+The Key Vault secrets are the source of truth for the primary registry.
+
+### Secondary registry
+
+When dual publish is enabled, the library also uses the secondary registry configured via environment variables:
+
+- `SECONDARY_REGISTRY_NAME`
+- `SECONDARY_REGISTRY_RESOURCE_GROUP`
+- `SECONDARY_REGISTRY_SUBSCRIPTION`
+
+### Enablement flags (important)
+
+There are two similarly named flags:
+
+- `DUAL_ACR_PUBLISH`
+  - This is the **toggle** read by `withRegistrySecrets(...)`.
+  - If `true`, `withRegistrySecrets(...)` requires all `SECONDARY_*` variables to be set.
+
+- `DUAL_ACR_PUBLISH_ENABLED`
+  - This is an **internal runtime flag** set by `withRegistrySecrets(...)` after validating the secondary configuration.
+  - Classes such as `Acr.groovy` and `Helm.groovy` read this flag to decide whether to execute the secondary publish steps.
+
+## What gets dual-published
+
+When dual publish is active:
+
+- Container images:
+  - build (`az acr build`) occurs against both registries
+  - promotion/retag (`az acr import`) occurs against both registries
+  - cleanup (`az acr run ... acr purge`) occurs against both registries
+
+- Helm charts:
+  - charts are checked and pushed to both registries as OCI artefacts
+  - targets are of the form `oci://<registry>.azurecr.io/helm/<chart>`
+
+## Enabling dual publish globally (CFT Jenkins)
+
+Dual publish is enabled via Jenkins Configuration as Code (JCasC) global node properties.
+
+In `cnp-flux-config`, set the following environment variables for each Jenkins controller:
+
+- `DUAL_ACR_PUBLISH: "true"`
+- `SECONDARY_REGISTRY_NAME: <name>`
+- `SECONDARY_REGISTRY_RESOURCE_GROUP: <rg>`
+- `SECONDARY_REGISTRY_SUBSCRIPTION: <subscription>`
+
+## Current CFT environment configuration
+
+Scope note: at the time of writing, this is configured for the CFT Jenkins controllers via `cnp-flux-config`.
+
+These are the secondary ACR settings configured globally on the Jenkins controllers:
+
+| Environment | Jenkins controller | Secondary ACR | Resource group | Subscription |
+|---|---|---|---|---|
+| Sandbox (sbox) | `sbox-intsvc` | `hmctssbox` | `cnp-acr-rg` | `bf308a5c-0624-4334-8ff8-8dca9fd43783` |
+| Prod (ptl) | `ptl-intsvc` | `hmctsprod` | `rpe-acr-prod-rg` | `8999dec3-0104-4a27-94ee-6588559729d1` |
+
+## Operational checks
+
+1. Pick a pipeline that publishes an image and/or Helm chart.
+2. In the build console log, look for the message from `withRegistrySecrets(...)`:
+   - `Dual ACR publish mode is ENABLED - publishing to both primary (...) and secondary (...) registries`
+3. Confirm the logs include secondary actions, for example:
+   - `Logging into secondary ACR: <secondary>`
+   - `Building image to secondary ACR: <secondary>`
+   - `Checking secondary ACR for chart: <secondary>`
+4. Confirm artefacts exist in both registries.
+
+Example Helm check:
+
+    helm pull oci://<registry>.azurecr.io/helm/<chart> --version <x.y.z>
+
+## Disabling dual publish
+
+To disable dual publish globally, set `DUAL_ACR_PUBLISH` to `false` (or remove it) in the relevant Jenkins controller JCasC.
+
+If `DUAL_ACR_PUBLISH=true` but any `SECONDARY_*` variable is missing, builds wrapped in `withRegistrySecrets(...)` will fail fast with a clear error.

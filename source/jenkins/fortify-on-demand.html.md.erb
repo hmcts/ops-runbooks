@@ -1,0 +1,108 @@
+---
+title: Fortify on Demand (FoD) scanning on Jenkins
+last_reviewed_on: 2026-01-13
+review_in: 12 months
+weight: 25
+---
+
+# <%= current_page.data.title %>
+
+Fortify is used for static security scanning and vulnerability reporting in HMCTS Jenkins pipelines (driven by SecOps).
+
+## Enablement (repo change)
+
+- **Regular pipeline:** call `enableFortifyScan()` inside `withPipeline { ... }` (runs in parallel with other static checks and is non-blocking by default).
+- **Nightly pipeline:** call `enableFortifyScan()` inside `withNightlyPipeline { ... }`.
+
+## Prerequisites (repo config)
+
+- A FoD **releaseId** must be available via either:
+  - `FORTIFY_RELEASE_ID`, or
+  - `config/fortify-client.properties` containing `fortify.client.releaseId=<id>`.
+
+## Credentials (what’s needed and where)
+
+Fortify uses **two credential types**:
+
+### 1) Fortify scan credentials (team Key Vault)
+
+- Stored in the team Key Vault as:
+  - `fortify-on-demand-username`
+  - `fortify-on-demand-password` (FoD PAT)
+- Used by the Fortify scan step.
+- In the shared pipeline this is read from the repo’s pipeline Key Vault (default: `${product}-${env}`) via `withFortifySecrets(...)` in `hmcts/cnp-jenkins-library`.
+
+### 2) FoD API OAuth credentials (Jenkins credentials via Flux)
+
+- Jenkins has a `usernamePassword` credential id `fortify-on-demand-oauth` used for FoD API access (vulnerability reporting).
+- This is managed as code via Jenkins Configuration-as-Code (JCasC) in:
+  - CFT Jenkins: <https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins.yaml>
+  - SDS Jenkins: <https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/jenkins.yaml>
+- Each Jenkins platform has **sandbox** and **production** instances, with corresponding **sandbox/prod Key Vaults** backing the credential values.
+- In practice, **Flux applies the JCasC config** to the Jenkins controller and Jenkins pulls the underlying secret values from its configured Key Vault, so rotation is done by updating the Key Vault secret values and letting Jenkins pick them up on restart/reload.
+
+#### Jenkins Key Vault names (reference)
+
+These are the Key Vaults configured on the Jenkins controllers (used to populate Jenkins credentials via JCasC):
+
+- **CFT Jenkins**
+  - sandbox: `cftsbox-intsvc`
+  - production: `cftptl-intsvc`
+- **SDS Jenkins**
+  - sandbox: `ptlsbox`
+  - production: `ptl`
+
+#### Rotation (OAuth client id/secret)
+
+- Update the OAuth `client_id`/`client_secret` values in the **Jenkins controller Key Vault** for the relevant instance (CFT/SDS + sandbox/prod).
+- Jenkins credentials are populated by Flux/JCasC from those Key Vault values.
+
+## Where the code lives
+
+- Pipeline enablement and stages: `hmcts/cnp-jenkins-library` (`enableFortifyScan()`, `sectionBuildAndTest`, `sectionNightlyTests`)
+- Scan credentials helper: `hmcts/cnp-jenkins-library/vars/withFortifySecrets.groovy`
+- Vulnerability reporting + OAuth helper:
+  - `hmcts/cnp-jenkins-library/vars/fortifyVulnerabilityReport.groovy`
+  - `hmcts/cnp-jenkins-library/vars/withFortifyOAuthSecrets.groovy`
+  - `hmcts/cnp-jenkins-library/src/uk/gov/hmcts/contino/FortifyVulnerabilityReporter.groovy`
+
+## Outputs
+
+- Jenkins archives Fortify artifacts under `Fortify Scan/` (scan summary + vulnerability report files).
+- FoD portal for a release: `https://emea.fortify.com/Redirect/Releases/<releaseId>`
+
+## Validate FoD API access (local)
+
+Use the **OAuth client** (not PAT) to confirm API access:
+
+```bash
+API_BASE_URL="https://api.emea.fortify.com"
+CLIENT_ID="..."       # FoD OAuth client_id
+CLIENT_SECRET="..."   # FoD OAuth client_secret
+SCOPE="api-tenant"
+RELEASE_ID="12345"
+
+TOKEN="$(curl -sS -X POST "${API_BASE_URL}/oauth/token" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'grant_type=client_credentials' \
+  --data-urlencode "scope=${SCOPE}" \
+  --data-urlencode "client_id=${CLIENT_ID}" \
+  --data-urlencode "client_secret=${CLIENT_SECRET}" | jq -r .access_token)"
+
+curl -sS -H "Authorization: Bearer ${TOKEN}" -H 'Accept: application/json' \
+  "${API_BASE_URL}/api/v3/releases/${RELEASE_ID}"
+
+curl -sS -G "${API_BASE_URL}/api/v3/releases/${RELEASE_ID}/vulnerabilities" \
+  -H "Authorization: Bearer ${TOKEN}" -H 'Accept: application/json' \
+  --data-urlencode 'includeFixed=false' --data-urlencode 'includeSuppressed=false' \
+  --data-urlencode 'offset=0' --data-urlencode 'limit=50'
+```
+
+## Support / escalation
+
+- Ask in Slack: `#fortify` (Tai Jordan monitors this; use the channel in case of absence).
+
+## Common issues (quick checks)
+
+- **No vulnerability report generated:** confirm releaseId is set and the Jenkins credential `fortify-on-demand-oauth` exists on the controller.
+- **401/invalid credentials during scan:** confirm the team Key Vault contains `fortify-on-demand-username/password` and the PAT is current.

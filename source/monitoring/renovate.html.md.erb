@@ -1,0 +1,103 @@
+---
+title: Renovate
+last_reviewed_on: 2026-01-12
+review_in: 12 months
+weight: 40
+---
+# <%= current_page.data.title %>
+
+## Overview
+
+Renovate is an automated dependency update tool that keeps dependencies up-to-date. It automates the process of finding new versions, creating pull requests (PRs), and reviewing changes, saving valuable time and effort.
+
+Renovate scans your repositories for outdated dependencies and automatically creates PRs with detailed information about updates, including age, adoption, passing rates, and complete changelogs. The tool supports multiple deployment strategies:
+
+- **Renovate CLI (Open source)** - The core engine that can be run in CI/CD pipelines. Supported by the open-source community.
+- **Mend Renovate Cloud** - A Mend-hosted application that runs Renovate jobs and responds to repository activity.
+- **Mend Renovate Self-hosted** - A self-hosted application with full scalability and advanced features.
+- **Mend Repository Integrations (Remediate)** - An application running Renovate jobs that includes transitive scanning, vulnerability (CVE) detection, and targeted security fixes.
+
+## Key Features
+
+- **Pull requests for dependency updates** - Creates PRs directly in your repositories with comprehensive update information
+- **Automatic job scheduling and webhooks** - Configurable scheduling with real-time webhook handling for repository events
+- **Merge Confidence workflows** - Groups, filters, and automatically merges high-confidence dependency updates
+- **Monorepo support** - Works seamlessly with monorepo structures
+- **Multi-language support** - Supports dependencies across multiple programming languages and package managers
+
+For more detailed information, visit the [official Renovate documentation](https://docs.renovatebot.com/).
+
+## Managing Mend.io Organisation Secrets
+
+When using Mend Renovate Cloud or the Mend Developer Platform, you may need to manage organisation-level secrets for authentication with private registries or for accessing protected resources.
+
+### Organisation Settings and Secrets
+
+Renovate configuration can be set at multiple levels within the Mend Developer Platform:
+
+- **Organisation level** - Settings inherited by all projects and repositories
+- **Project level** (Azure DevOps and GitHub only) - Settings inherited by repositories within the project
+- **Repository level** - Settings specific to individual repositories
+
+### Accessing Organisation Settings
+
+1. Log in to the [Mend Developer Portal](https://developer.mend.io/)
+
+    a. You can use your **GitHub** account to log into the Mend.io HMCTS Organisation.
+
+2. Navigate to your organisation's **Settings**
+3. Access the **Secrets** or **Environment Variables** section (availability depends on your SCM platform)
+
+### Configuring Secrets
+
+Organisation administrators can configure secrets that will be available to all Renovate jobs within the organisation. These secrets typically include:
+
+- Private registry credentials (npm, PyPI, Maven, etc.)
+- GitHub tokens for accessing private repositories
+- API keys and authentication tokens
+- Custom certificate authorities
+
+#### Referencing Secrets
+
+Once a secret is available it can be referenced in a similar method to GitHub secrets using curly braces and `secrets.<name>`
+
+    {{ secrets.MyOrgSecret }}
+
+#### Existing Secrets
+
+At present we only have 2 secrets within Mend.io that are used by Renovate.
+
+Both secrets are related to a Renovate App Registration that was created to allow Renovate to access Azure Container Registry.
+
+These secrets are referenced in our global Renovate config found in the [.github](https://github.com/hmcts/.github/blob/master/renovate-config.json) repository:
+
+    "username": "{{ secrets.RENOVATE_ACR_APPID }}",
+    "password": "{{ secrets.RENOVATE_ACR_SECRET }}"
+
+The value for `RENOVATE_ACR_SECRET` will expire at some point in future, the App Registration is being monitored by our Daily Checks so we will be notified when it is due to expire and the process for updating is simply to update the `RENOVATE_ACR_SECRET` secret in the Mend.io organisation secrets discussed on this page.
+
+### Configuration Hierarchy
+
+Secrets configured at the organisation level are inherited by all projects and repositories unless explicitly overridden at a lower level. Organisation administrators can enforce consistent secret management across the organisation by:
+
+1. Setting the **"Disable Project-level Override"** toggle (Azure DevOps and GitHub only) to prevent project admins from overriding organisation-level secrets
+2. Setting the **"Disable Repo-level Override"** toggle to prevent repository admins from overriding project or organisation-level secrets
+
+This ensures that sensitive credentials are managed consistently and securely across all repositories.
+
+### Best Practices
+
+- **Use organisation-level secrets** for credentials that are needed across multiple repositories
+- **Rotate secrets regularly** to maintain security
+- **Limit access** - Only grant necessary permissions to organisation administrators who manage secrets
+- **Audit access** - Regularly review who has access to organisation secrets
+
+For more information on configuring Mend <% current_page.data.title %> for your specific SCM platform, refer to the [Mend Developer Platform documentation](https://docs.mend.io/integrations/latest/mend-developer-platform).
+
+### Useful Links
+
+- [Mend.io Website](https://www.mend.io/renovate/)
+- [Renovate Documentation](https://docs.renovatebot.com/)
+- [Mend Renovate Documentation](https://docs.mend.io/renovate/latest/)
+- [Mend Developer Platform](https://docs.mend.io/integrations/latest/mend-developer-platform)
+- [Configuration Hierarchy and Inheritance](https://docs.mend.io/integrations/latest/configuration-hierarchy-and-inheritance)

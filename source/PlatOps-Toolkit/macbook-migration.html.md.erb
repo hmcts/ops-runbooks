@@ -109,8 +109,39 @@ If you work with the Crime infrastructure, follow the setup guides on your new M
 - [Crime VPN & Gerrit Access Setup](https://tools.hmcts.net/confluence/spaces/DATS/pages/1597739711/Crime+VPN+Gerrit+Access+Setup+In+Simple+Steps#CrimeVPN&GerritAccess&SetupInSimpleSteps-IfonMacOS)
 - [MacBook Setup for AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1498639128/MacBook+Setup+for+AKS)
 
+## Step 8: Crime VPN Setup - Tunnelblick
+
+Transfer your VPN configuration:
+
+1. **Export the VPN config from your old MacBook**
+   - Export the existing Crime VPN configuration file from Tunnelblick
+
+2. **Transfer the `.tblkSetup` file to your new MacBook**
+   - Transfer the `.tblkSetup` file to your new machine using OneDrive, Slack, or another secure method
+      - See screenshot:
+
+      ![tunnelblick_export](images/tunnelblick_export.png)
+
+3. **Request Temporary Admin Access**
+   - You will need to raise a temporary admin request to setup the VPN on your new MacBook
+   - Follow the [Temporary Admin Escalation Process](https://tools.hmcts.net/confluence/spaces/DATS/pages/1824151238/1.+Temporary+Admin+Escalation+Process) for detailed instructions
+
+
+4. **Import the VPN configuration on your new MacBook**
+   - Open Tunnelblick and import the `.tblkSetup` file when you have the Admin rights
+   - Verify the connection works before proceeding
+
+## Step 9: Verify Setup
+
+Verify your new MacBook is properly configured:
+
+- Open F5 VPN from [https://portal.platform.hmcts.net/](https://portal.platform.hmcts.net/) and confirm it connects correctly
+- If you have Crime access, verify Crime VPN connectivity
+  - Connect to Tunnelblick nonlive VPN
+  - Check Gerrit is accessible - https://codereview.mdv.cpp.nonlive/
+  
+
 ## References
 
 - [EUC Advice for Non-Admin MacBook Developers](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1824144132&spaceKey=DATS&title=EUC%2BAdvice%2BNonAdmin%2BMacbook%2BDevelopers)
-- [Homebrew Documentation](https://brew.sh/)
-- [GitHub: PlatOps Setup](https://github.com/hmcts/platops-setup)
+

@@ -9,6 +9,7 @@ AJRA
 alfapp
 alfweb
 APIGW
+appdir
 ASNs
 atlassian
 atlassiannonprod
@@ -52,8 +53,10 @@ GEOLOCATIONUPDATES
 Glust
 gluster
 Hashicorp
+hashivault
 hcp
 IMZ
+intellij
 Jacomb
 Jenkinsfiles
 jfmd
@@ -94,7 +97,6 @@ prepatch
 privatednszonename
 privatekeyfilename
 PRX
-PUBLICLAW
 pvc
 Qube
 recoverypoint
@@ -122,6 +124,7 @@ statefulset
 ste
 STECCM
 sysagentpool
+tblk
 Tenables
 themisgatewayapi
 thw
@@ -139,7 +142,6 @@ VNETs
 wafcc
 wrkagentpool
 wsdl
-XXXX
 xpack
-serviceaccounts
-hashivault 
+XXXX
+zshrc

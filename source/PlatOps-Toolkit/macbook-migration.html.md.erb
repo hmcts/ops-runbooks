@@ -1,0 +1,116 @@
+---
+title: Guide to Switch from One MacBook to Another
+last_reviewed_on: 2026-01-14
+review_in: 12 months
+weight: 15
+---
+
+# <%= current_page.data.title %>
+
+This guide provides step-by-step instructions to migrate your development environment and configuration from your old MacBook to a new one.
+
+## Step 1: Install Applications on New MacBook
+
+On your **new laptop**, install necessary applications from the SelfServe portal:
+
+1. Install core applications you use daily (examples: VS Code, Microsoft Office, Sublime Text, Firefox, Adobe Reader, iTerm2, IntelliJ IDEA, etc.)
+2. Log in to communication and productivity apps:
+   - Slack
+   - Microsoft Teams
+   - Outlook
+   - Any other tools relevant to your work
+
+Use your justice account for all authentication.
+
+## Step 2: Export Homebrew Packages from Old MacBook
+
+On your **old laptop**, export all Homebrew-installed applications:
+
+```bash
+# List all installed Homebrew packages
+brew list
+
+# Update Homebrew and create a Brewfile
+brew update
+brew bundle dump --file Brewfile --describe --force
+```
+
+### Verify the Export (Optional)
+
+To confirm all packages were captured:
+
+```bash
+brew bundle list --file ~/Brewfile
+```
+
+## Step 3: Transfer Brewfile to New MacBook
+
+Transfer the `~/Brewfile` from your old laptop to your new one using:
+
+- OneDrive (if you are logged into both machines)
+- Slack
+
+Place the file in an accessible location (e.g., `~/Downloads/Brewfile`)
+
+## Step 4: Import Homebrew Packages on New MacBook
+
+On your **new laptop**, install all packages from the Brewfile:
+
+```bash
+brew update
+brew bundle --file ~/Downloads/Brewfile
+```
+
+### Installing Cask Applications
+
+For macOS-specific applications (cask installations), ensure they are installed to the `~/Applications` directory:
+
+```bash
+# Install a cask application to ~/Applications
+brew install --cask --force intellij-idea --appdir=~/Applications
+
+# Uninstall a cask application
+brew uninstall --cask --force intellij-idea
+```
+
+## Step 5: Copy Shell Configuration (.zshrc)
+
+Transfer your shell configuration file from the old MacBook:
+
+```bash
+# On old MacBook - display your zsh configuration
+cat ~/.zshrc
+```
+
+Copy the output and create the same file on your new MacBook:
+
+```bash
+# On new MacBook - create or update ~/.zshrc with the content from your old machine
+nano ~/.zshrc  # or use your preferred editor
+```
+
+You can transfer the file via OneDrive or Slack if preferred.
+
+## Step 6: Copy SSH Configuration
+
+SSH keys and configuration are essential for accessing Git repositories and VMs:
+
+```bash
+# Copy the entire ~/.ssh/ directory from old to new MacBook
+# This includes private keys, public keys, and SSH config files
+```
+
+**Important**: Ensure you copy everything in the `~/.ssh/` directory to avoid SSH authentication issues when accessing Crime VMs and other infrastructure.
+
+## Step 7: Crime Setup (If Applicable)
+
+If you work with the Crime infrastructure, follow the setup guides on your new MacBook:
+
+- [Crime VPN & Gerrit Access Setup](https://tools.hmcts.net/confluence/spaces/DATS/pages/1597739711/Crime+VPN+Gerrit+Access+Setup+In+Simple+Steps#CrimeVPN&GerritAccess&SetupInSimpleSteps-IfonMacOS)
+- [MacBook Setup for AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1498639128/MacBook+Setup+for+AKS)
+
+## References
+
+- [EUC Advice for Non-Admin MacBook Developers](https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1824144132&spaceKey=DATS&title=EUC%2BAdvice%2BNonAdmin%2BMacbook%2BDevelopers)
+- [Homebrew Documentation](https://brew.sh/)
+- [GitHub: PlatOps Setup](https://github.com/hmcts/platops-setup)

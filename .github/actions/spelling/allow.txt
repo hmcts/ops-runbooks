@@ -267,7 +267,9 @@ hmcts
 hmctsfslogixnonprodstor
 hmctsfslogixprodstor
 hmctsprivate
+hmctsprod
 hmctspublic
+hmctssbox
 hmi
 HMRC
 hns

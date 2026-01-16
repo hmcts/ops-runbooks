@@ -92,7 +92,9 @@ resources:
 
 ```
 
-- Update `resources` in the overlays i.e. all of non-prod clusters. For example `sbox`
+- Update `resources` in the overlays i.e. all of non-prod clusters sbox, ithc, demo, aat, perftest, etc.
+
+For example `sbox`
 
 `apps/azureserviceoperator-system/sbox/base/kustomization.yaml`
 
@@ -106,6 +108,7 @@ resources:
 ```
 
 - Commit changes and raise a PullRequest
+- Remove the temporary folders `aso-2_17_0` and `cert-manager-1_19_2` created in non-prod step.
 
 ## How to verify
 

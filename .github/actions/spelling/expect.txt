@@ -11,14 +11,18 @@ alfweb
 APIGW
 appdir
 ASNs
+aso
 atlassian
 atlassiannonprod
 atlasssian
+azinfra
 azmk
 azsftp
+azureserviceoperator
 bacpac
 bak
 Bance
+bdf
 cabcdefg
 CAHOSTVERIFY
 cdef
@@ -37,6 +41,7 @@ dde
 deevanapalli
 DEVJUMPL
 devrot
+dgwzf
 dnat
 dockerfiles
 dsl
@@ -55,8 +60,6 @@ gluster
 Hashicorp
 hashivault
 hcp
-hmctsprod
-hmctssbox
 IMZ
 intellij
 Jacomb
@@ -68,9 +71,12 @@ jira
 journalctl
 kalyan
 keyfile
+ldhx
+leaderelection
 lhr
 libragob
 libragobrestore
+managedidentity
 Manan
 mdv
 MDVADMVPNHA
@@ -136,6 +142,7 @@ totp
 TTLs
 Tunnelblick
 Txx
+userassignedidentities
 utilisation
 Verma
 Virtualbox

@@ -1,0 +1,152 @@
+---
+title: AzureServiceOperator Patching Example
+weight: 30
+last_reviewed_on: 2026-01-15
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+# *Introduction*
+
+Azure Service Operator (ASO) patching involves two components: the ASO controller and certificate manager. Both will be patched and rolled out to the Cloud Native Platform, CFT, and SDS service groups. The CNP is built on AKS. For AKS clusters or environments provisioned for CFT and SDS, refer to [Environments](https://hmcts.github.io/cloud-native-platform/environments/#environments) page on the HMCTS way.
+
+Check the release notes for both components to identify any breaking changes in the version being rolled out.
+
+- ASO: https://github.com/Azure/azure-service-operator/releases
+- Certificate manager: https://github.com/cert-manager/cert-manager/releases
+
+# *Upgrade Steps*
+
+This example demonstrates upgrading ASO from 2.10.0 to 2.17.0 and cert-manager from 1.14.4 to 1.19.2 in CFT sbox clusters `cft-sbox-00-aks` and `cft-sbox-01-aks`. Release v2.17.0 contains no breaking changes.
+
+## In Non-Prod Clusters
+
+### Steps
+
+- clone the repo [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) and copy `apps/azureserviceoperator-system/aso` folder contains base kustomisation yaml files to `apps/azureserviceoperator-system/aso-2_17_0`, `cert-manager` to `apps/azureserviceoperator-system/cert-manager-1_19_2`
+- Update resource urls.
+
+aso-2_17_0/kustomisation.yaml
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/Azure/azure-service-operator/releases/download/v2.17.0/azureserviceoperator_v2.17.0.yaml
+patches:
+.....
+```
+
+cert-manager-1_19_2/kustomization.yaml
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/jetstack/cert-manager/releases/download/v1.19.2/cert-manager.yaml
+
+```
+
+- Update sbox kustomization overlay
+
+`apps/azureserviceoperator-system/sbox/base/kustomization.yaml`
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../aso-2_17_0
+  - ../../cert-manager-1_19_2
+  - aso-controller-settings.yaml
+
+```
+
+- Commit changes and raise a PullRequest
+
+## In Production Clusters
+
+Assuming the ASO v2.17.0 has been upgraded in all of non-prod clusters, hence their overlay kustomization yaml files look like the one defined in the sbox kustomization file.
+
+### Steps
+
+- Update `resources` in the base file
+
+`apps/azureserviceoperator-system/aso/kustomization.yaml`
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/Azure/azure-service-operator/releases/download/v2.17.0/azureserviceoperator_v2.17.0.yaml
+patches:
+```
+
+`apps/azureserviceoperator-system/cert-manager/kustomization.yaml`
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/jetstack/cert-manager/releases/download/v1.19.2/cert-manager.yaml
+
+```
+
+- Update `resources` in the overlays i.e. all of non-prod clusters. For example `sbox`
+
+`apps/azureserviceoperator-system/sbox/base/kustomization.yaml`
+
+```bash
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - aso-controller-settings.yaml
+
+```
+
+- Commit changes and raise a PullRequest
+
+## How to verify
+
+To see if the ASO is deployed and working you can run the following `kubectl` commands
+
+1. Check the ASO controller version
+
+```bash
+kubectl get deployment -n azureserviceoperator-system  azureserviceoperator-controller-manager \
+    -o jsonpath="{.spec.template.spec.containers[0].image}" | cut -d':' -f2
+```
+
+1. List the ASO controller pods
+
+```bash
+kubectl get pods -n azureserviceoperator-system
+```
+
+# Troubleshooting
+
+## Controller Leader Selection Issue
+
+If you see a `CrashLoopBackOff` status in the ASO controller pod list
+
+```bash
+NAME                                                       READY   STATUS             RESTARTS       AGE
+azureserviceoperator-controller-manager-698bdf5766-2ldhx   0/1     CrashLoopBackOff   7 (118s ago)   20m
+azureserviceoperator-controller-manager-7f8754c46-dgwzf    1/1     Running            1 (12h ago)    12h
+```
+
+or logs in the pod e.g. azureserviceoperator-controller-manager-698bdf5766-2ldhx
+
+```bash
+I0112 10:08:07.641392       1 manager.go:500] "Will update CRD" logger="controllers" crd="userassignedidentities.managedidentity.azure.com" diffResult="VersionDifferent" filterReason="CRD named \"managedidentity.azure.com/UserAssignedIdentity\" matched pattern \"managedidentity.azure.com/*\"" reason="The version was different between existing and goal CRD \"managedidentity.azure.com/UserAssignedIdentity\""
+I0112 10:08:07.641405       1 manager.go:348] "Acquiring leader lock..." logger="controllers"
+I0112 10:08:07.641461       1 leaderelection.go:257] attempting to acquire leader lease azureserviceoperator-system/controllers-leader-election-azinfra-generated...
+
+```
+
+Pod 698bdf5766-2ldhx (running ASO 2.17.0) is attempting to become the leader but is waiting for a leader lock currently held by pod 7f8754c46-dgwzf (running ASO 2.10.0). The ASO controller Deployment uses a `RollingUpdate` strategy, so Flux should shut down the 2.10 pod to release the leader lock for the 2.17 pod to acquire. However, this shutdown failed to occur. To solve the issue you just need to scale down the ReplicaSet for 2.10 to `0`
+
+```bash
+kubectl scale rs azureserviceoperator-controller-manager-7f8754c46 -n azureserviceoperator-system --replicas=0
+```

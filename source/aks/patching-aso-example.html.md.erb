@@ -18,7 +18,7 @@ Check the release notes for both components to identify any breaking changes in 
 
 # *Upgrade Steps*
 
-This example demonstrates upgrading ASO from 2.10.0 to 2.17.0 and cert-manager from 1.14.4 to 1.19.2 in CFT sbox clusters `cft-sbox-00-aks` and `cft-sbox-01-aks`. Release v2.17.0 contains no breaking changes.
+This example demonstrates upgrading ASO from 2.10.0 to 2.17.0 and cert-manager from 1.14.4 to 1.19.2 in CFT sbox clusters `cft-sbox-00-aks` and `cft-sbox-01-aks`. Both releases contain no breaking changes.
 
 ## In Non-Prod Clusters
 
@@ -108,23 +108,36 @@ resources:
 ```
 
 - Commit changes and raise a PullRequest
-- Remove the temporary folders `aso-2_17_0` and `cert-manager-1_19_2` created in non-prod step.
+- Once the prod deployment succeeds, raise another PullRequest to remove the temporary folders `aso-2_17_0` and `cert-manager-1_19_2` created in the non-prod step.
 
 ## How to verify
 
 To see if the ASO is deployed and working you can run the following `kubectl` commands
 
-1. Check the ASO controller version
+1. List the ASO controller pods
+
+```bash
+kubectl get pods -n azureserviceoperator-system
+```
+
+2. Check the ASO controller version
 
 ```bash
 kubectl get deployment -n azureserviceoperator-system  azureserviceoperator-controller-manager \
     -o jsonpath="{.spec.template.spec.containers[0].image}" | cut -d':' -f2
 ```
 
-1. List the ASO controller pods
+3. List the cert-manager pods
 
 ```bash
-kubectl get pods -n azureserviceoperator-system
+kubectl get pods -n cert-manager
+```
+
+4. Check the cert-manager version
+
+```bash
+kubectl get deployment -n cert-manager cert-manager \
+    -o jsonpath="{.spec.template.spec.containers[0].image}" | cut -d':' -f2
 ```
 
 # Troubleshooting

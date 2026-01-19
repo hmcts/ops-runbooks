@@ -1,0 +1,28 @@
+---
+title: Requesting RBAC access via Access Packages
+weight: 30
+last_reviewed_on: 2026-01-19
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+As part of the HMCTS Disaster Recovery review, direct permissions pose a risk in cyber-attack scenarios. Direct RBAC access for human users on persistent data resources has been removed.
+
+## How to get Azure privileged roles
+
+In order to get access to any environments (except Sandbox), you must be assigned to an Entra group that has been granted the necessary RBAC role on the target subscription, resource group, or resource.
+
+For example, if you require Contributor access to the DTS-SHAREDSERVICES-DEMO subscription, you will need to be added to the Entra group named `DTS Contributors Eligible (sub: dts-sharedservices-demo)`.
+
+You can verify whether you are already a member of this group by checking [this repository](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml).
+
+This group confirms you are eligible for Contributor access to the DTS-SHAREDSERVICES-DEMO subscription.
+
+### How to request access
+
+Request the access package [from MyAccess](https://myaccess.microsoft.com/@CJSCommonPlatform.onmicrosoft.com#/access-packages).
+
+![RBAC access request](images/rbac1.png)
+
+You will not need to wait for approval. You only need to provide a brief justification for audit purposes.

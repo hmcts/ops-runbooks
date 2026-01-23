@@ -1,6 +1,7 @@
 acmehmctssoc
 ACNF
 ACRD
+acrsync
 aeb
 Afresco
 agentpool
@@ -29,7 +30,10 @@ cdef
 cdes
 Chirag
 CJSC
+clusterrole
+clusterrolebinding
 containerised
+coreutils
 customisations
 CVP
 Dac
@@ -47,6 +51,7 @@ dockerfiles
 dsl
 eba
 EDB
+emoji
 Enda
 Eyetan
 ffff
@@ -68,6 +73,7 @@ jfmd
 jfrou
 jfrt
 jira
+JMES
 journalctl
 kalyan
 keyfile
@@ -85,8 +91,10 @@ mnl
 Moj
 mojcppprod
 mpd
+myapi
 mynodepool
 myregistry
+myworker
 nodelocaldns
 nodepool
 NONLINE
@@ -115,6 +123,7 @@ Rns
 ruleset
 ruxit
 SBZ
+serviceaccount
 sftpmig
 sku
 SNATd
@@ -136,6 +145,7 @@ tblk
 Tenables
 themisgatewayapi
 thw
+timeframe
 tns
 toset
 totp

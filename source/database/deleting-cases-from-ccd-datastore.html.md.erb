@@ -1,6 +1,6 @@
 ---
 title: Deleting a case from CCD Datastore Database
-last_reviewed_on: 2025-06-27
+last_reviewed_on: 2026-01-26
 review_in: 12 months
 weight: 20
 ---
@@ -11,7 +11,7 @@ This is a 2-stage process that requires you delete the case from the database fi
 
 ## 1. Delete cases from CCD Data Store Database [ccd-data-store-api-postgres-db-v15-prod.postgres.database.azure.com]
 
-Hop on to the bastion and run the script below. 
+Hop on to the bastion and run the script below. Note: it is likely you will need to request JIT access to "Production PostgreSQL Administrative Access SC" in order to be able to run this script.
 
 The script takes a .txt file as an argument. The file should contain a list of valid CCD Data Store 16-digit unique reference numbers that need deleting. Each case needs deleting from a number of tables in DataStore.  The first two tables may be empty, but the bottom two will most certainly contain data.
 

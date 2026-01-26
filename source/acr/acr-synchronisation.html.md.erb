@@ -49,6 +49,10 @@ The tool follows this sequence on each execution:
 
 **Time 3:05** - Sync Monitor runs but finds pods still running `myapp:prod-v1.2.2` ✗ Alert sent
 
+_Example of an alert:_
+
+![alt text](images/acr-sync-alert.png)
+
 This indicates a potential issue with image automation (Flux/ArgoCD), registry credentials, or network connectivity.
 
 ## Components
@@ -148,13 +152,11 @@ Store these values in encrypted secrets:
 
 The ACR-AKS Sync Monitor will route Slack alerts to team-specific channels by looking for the `slackChannel` label on Kubernetes namespaces. If a namespace has this label configured, alerts for images in that namespace will be sent to the team's designated Slack channel instead of the default monitoring channel.
 
-Namespace owners typically configure this label when setting up their namespace. For example:
-```bash
-# Example: a namespace owner would have set up their namespace with:
-kubectl label namespace my-app slackChannel=my-team-alerts
-```
+Namespace labels are applied via Flux.
+Teams configure their team specific labels within their App folder e.g. [civil](https://github.com/hmcts/cnp-flux-config/blob/master/apps/civil/base/kustomize.yaml#L11)
 
-If a namespace does not have the `slackChannel` label, alerts will be sent to the default `SLACK_CHANNEL` configured in the HelmRelease.
+Flux then uses these values to substitute into Namespace configuration at deployment time [here](https://github.com/hmcts/cnp-flux-config/blob/master/apps/base/namespace.yaml#L6).
+
 
 ### Step 4: Deploy via Flux
 

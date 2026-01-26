@@ -1,0 +1,630 @@
+---
+title: ACR and AKS Synchronisation Monitoring
+last_reviewed_on: 2026-01-23
+review_in: 6 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+This page describes the ACR-AKS Sync Monitor tool, which continuously verifies that AKS clusters are running the latest production-ready container images from Azure Container Registry (ACR).
+
+## Overview
+
+The ACR-AKS Sync Monitor is a Kubernetes-native monitoring tool designed to detect deployment lag when container images are not updated in AKS clusters within an expected timeframe after being pushed to ACR. When drift is detected (images not updated within 3 minutes of ACR push), the tool sends alerts to Slack with detailed information about the mismatch.
+
+This is particularly useful for:
+- Detecting failed or delayed image deployments
+- Troubleshooting image synchronization issues between registries
+- Verifying that production clusters are running the latest versions
+- Identifying manual interventions or rollbacks that need investigation
+
+## How It Works
+
+### Monitoring Flow
+
+The tool follows this sequence on each execution:
+
+1. **Query Kubernetes API**: Retrieves all namespaces and running pods in the AKS cluster
+2. **Filter and Extract**: Identifies production images (those tagged with `prod-*`) and deduplicates them
+3. **Authenticate with ACR**: Obtains OAuth2 tokens from Azure Container Registry
+4. **Query ACR**: Retrieves all available `prod-*` tags for each repository
+5. **Compare Versions**: Compares deployed image tags against the latest ACR tags
+6. **Detect Drift**: Calculates the time difference between the latest ACR image and deployed image
+7. **Alert on Drift**: If drift exceeds 3 minutes, sends Slack notification with details
+
+### Example Scenario
+
+**Time 0:00** - Developer pushes new image to ACR: `myapp:prod-v1.2.3`
+
+**Time 0:01** - Flux/ArgoCD detects new image and updates deployment
+
+**Time 0:02** - AKS pulls and starts new pod with `myapp:prod-v1.2.3`
+
+**Time 5:00** - ACR-AKS Sync Monitor runs and finds all pods are updated ✓ No alert
+
+**Failure Scenario:**
+
+**Time 0:00** - Developer pushes image to ACR: `myapp:prod-v1.2.3`
+
+**Time 3:05** - Sync Monitor runs but finds pods still running `myapp:prod-v1.2.2` ✗ Alert sent
+
+_Example of an alert:_
+
+![alt text](images/acr-sync-alert.png)
+
+This indicates a potential issue with image automation (Flux/ArgoCD), registry credentials, or network connectivity.
+
+## Components
+
+### Main Script: `check-acr-aks-sync-rest.sh`
+
+The core monitoring script that performs all synchronization checks.
+
+#### Key Features
+
+- **Kubernetes API Integration**: Uses service account tokens to authenticate with the Kubernetes API
+- **Multi-Registry Support**: Handles both `hmctsprivate.azurecr.io` and `hmctsprod.azurecr.io` with separate authentication
+- **Token Caching**: Caches ACR access tokens for 45 seconds (tokens valid for 60 seconds) to reduce API calls
+- **Namespace Filtering**: Skips system namespaces (`kube-system`, `admin`, `default`, `kube-node-lease`, `kube-public`, `neuvector`)
+- **Team-Aware Alerts**: Routes Slack notifications to team-specific channels based on namespace labels
+- **Production Image Focus**: Only monitors images tagged with `prod-*` to avoid false alerts on test images
+- **Efficient Parsing**: Uses bash parameter expansion and `jp` (JMESPath) for optimal performance
+
+#### Performance Optimizations
+
+- Parameter expansion (`${var%%/*}`) instead of shell pipelines
+- Cached namespace timestamps to reduce system calls
+- Single `jp` call to parse large ACR responses
+- Direct file operations instead of using `cat` pipes
+
+### Container Image: `Dockerfile`
+
+The monitoring tool runs in a containerized environment:
+
+- **Base Image**: `alpine:3.23` (minimal, ~5MB footprint)
+- **Dependencies**:
+  - `curl` - For HTTP requests to Kubernetes API and ACR
+  - `coreutils` - For date and timestamp calculations
+  - `jp` (v0.2.1) - JMESPath CLI tool for JSON parsing
+- **Entry Point**: Automatically runs `check-acr-aks-sync-rest.sh`
+
+### Kubernetes Job: `example-job.yaml`
+
+Sample Kubernetes Job manifest showing how to deploy the monitor:
+
+- **Namespace**: `admin` (typically where monitoring tools run)
+- **Image Policy**: `Always` (ensures latest version of monitoring tool is used)
+- **Configuration**: Via environment variables and Kubernetes Secrets
+- **Execution**: One-time job with no automatic restart
+- **RBAC**: Requires service account with permissions to list namespaces and pods
+
+## Deployment
+
+### Prerequisites
+
+- Access to an AKS cluster with Kubernetes API available
+- Service account with permissions to:
+  - List namespaces: `api/v1/namespaces`
+  - List pods: `api/v1/namespaces/{namespace}/pods`
+- ACR credentials securely stored as encrypted secrets in Kubernetes
+- Slack webhook URL securely stored as an encrypted secret
+- `jp` (JMESPath CLI) tool available in container
+- Flux and SOPS configured for the cluster (for encrypted secret management)
+
+### Step 1: Create ACR Tokens
+
+Create repository-scoped tokens with minimal permissions for each container registry that needs to be monitored:
+
+```bash
+# Create scope map with metadata_read permission only
+az acr scope-map create \
+  --name acrsync-reader \
+  --registry hmctsprivate \
+  --actions repository/*/metadata/read
+
+# Create token from scope map
+az acr token create \
+  --name acrsync \
+  --registry hmctsprivate \
+  --scope-map acrsync-reader
+```
+
+This provides better security than using shared admin credentials - the token has only the minimum permissions required to read image metadata.
+
+### Step 2: Create and Encrypt Kubernetes Secrets
+
+ACR tokens and Slack webhooks should be stored as encrypted secrets in Kubernetes using SOPS and Azure Key Vault. This approach ensures secrets are:
+- Encrypted at rest in Git
+- Automatically decrypted by Flux during deployment
+- Rotated and managed securely
+
+**For detailed instructions on creating and encrypting secrets with SOPS**, refer to the Flux repository documentation:
+- See `docs/secrets-sops-encryption.md` in the flux-config repository
+- Steps include: creating unencrypted secret YAML, encrypting with Azure Key Vault, and committing to Git
+
+Store these values in encrypted secrets:
+- `HMCTSPRIVATE_TOKEN_PASSWORD` - ACR token password for private registry
+- `HMCTSPROD_TOKEN_PASSWORD` - ACR token password for prod registry
+- `SLACK_WEBHOOK` - Slack webhook URL for alerts
+
+### Step 3: Namespace Labels for Team Alerts
+
+The ACR-AKS Sync Monitor will route Slack alerts to team-specific channels by looking for the `slackChannel` label on Kubernetes namespaces. If a namespace has this label configured, alerts for images in that namespace will be sent to the team's designated Slack channel instead of the default monitoring channel.
+
+Namespace labels are applied via Flux.
+Teams configure their team specific labels within their App folder e.g. [civil](https://github.com/hmcts/cnp-flux-config/blob/master/apps/civil/base/kustomize.yaml#L11)
+
+Flux then uses these values to substitute into Namespace configuration at deployment time [here](https://github.com/hmcts/cnp-flux-config/blob/master/apps/base/namespace.yaml#L6).
+
+
+### Step 4: Deploy via Flux
+
+Use a Helm Release in your Flux configuration to deploy the monitoring CronJob. Reference the encrypted secrets using `envFromSecret`:
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: check-acr-sync
+  namespace: monitoring
+spec:
+  releaseName: check-acr-sync
+  chart:
+    spec:
+      chart: job
+      sourceRef:
+        kind: GitRepository
+        name: chart-job
+        namespace: flux-system
+      interval: 1m
+  interval: 5m
+  values:
+    schedule: "*/15 * * * *"
+    concurrencyPolicy: "Forbid"
+    failedJobsHistoryLimit: 3
+    successfulJobsHistoryLimit: 3
+    backoffLimit: 3
+    restartPolicy: Never
+    kind: CronJob
+    image: hmctsprod.azurecr.io/check-acr-sync:latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+    environment:
+      CLUSTER_NAME: "prod-aks"
+      SLACK_ICON: "warning"
+      ACR_MAX_RESULTS: "100"
+      SLACK_CHANNEL: "aks-monitoring"
+    envFromSecret: "acr-sync"  # References encrypted secret containing ACR and Slack credentials
+    nodeSelector:
+      agentpool: linux
+```
+
+### Step 5: Create RBAC Resources
+
+Ensure the service account has necessary permissions to list namespaces and pods:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: acr-sync-monitor
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: acr-sync-monitor
+rules:
+- apiGroups: [""]
+  resources: ["namespaces", "pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: acr-sync-monitor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: acr-sync-monitor
+subjects:
+- kind: ServiceAccount
+  name: acr-sync-monitor
+  namespace: monitoring
+```
+
+## Configuration
+
+### Environment Variables
+
+The monitoring tool is configured via environment variables. These can be set directly in the Helm Release `values` section (for non-sensitive data) or sourced from encrypted secrets via `envFromSecret` (for sensitive credentials).
+
+#### Direct Configuration (in Helm values)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `CLUSTER_NAME` | Name of the AKS cluster (for Slack messages) | `prod-aks` |
+| `SLACK_CHANNEL` | Default Slack channel for alerts | `aks-monitoring` |
+| `SLACK_ICON` | Slack emoji for bot icon | `warning` |
+| `ACR_MAX_RESULTS` | Maximum number of tags to retrieve from ACR | `100` |
+| `ACR_SYNC_DEBUG` | Enable debug logging (set to `true`) | `true` |
+
+**Example in Helm Release:**
+```yaml
+environment:
+  CLUSTER_NAME: "prod-aks"
+  SLACK_ICON: "warning"
+  ACR_MAX_RESULTS: "100"
+  SLACK_CHANNEL: "aks-monitoring"
+```
+
+#### Encrypted Secrets (via envFromSecret)
+
+| Variable | Description | Stored In |
+|----------|-------------|-----------|
+| `HMCTSPRIVATE_TOKEN_PASSWORD` | ACR token password for private registry | Encrypted secret `acr-sync` |
+| `HMCTSPROD_TOKEN_PASSWORD` | ACR token password for prod registry | Encrypted secret `acr-sync` |
+| `SLACK_WEBHOOK` | Slack webhook URL for alerts | Encrypted secret `acr-sync` |
+
+**Example in Helm Release:**
+```yaml
+envFromSecret: "acr-sync"  # References SOPS-encrypted secret containing credentials
+```
+
+The encrypted secret (`acr-sync`) is managed as a SOPS-encrypted Kubernetes Secret stored in the Flux repository. For instructions on creating and updating encrypted secrets, refer to the Flux repository documentation on SOPS encryption with Azure Key Vault.
+
+### Command-Line Arguments
+
+Alternatively, pass arguments directly to the script (not recommended in production):
+
+```bash
+./check-acr-aks-sync-rest.sh \
+  <cluster-name> \
+  <slack-webhook> \
+  <slack-channel> \
+  <slack-icon> \
+  <acr-max-results> \
+  <hmctsprivate-token> \
+  <hmctsprod-token>
+```
+
+## Understanding the Output
+
+### Successful Synchronization
+
+```
+** Namespace my-app hosts 3 unique images to check...
+ACR and AKS synced on tag myapp:prod-v1.2.3
+ACR and AKS synced on tag myapi:prod-v2.1.0
+ACR and AKS synced on tag myworker:prod-v1.0.5
+```
+
+This indicates all images in the namespace are running the latest production versions.
+
+### Drift Detection
+
+```
+** Namespace my-app hosts 2 unique images to check...
+ACR and AKS synced on tag myapp:prod-v1.2.3
+Warning: AKS cluster prod-aks is running myapi:prod-v2.0.9 instead of myapi:prod-v2.1.0 (2026-01-23T10:05:00Z).
+```
+
+An alert is sent to Slack when:
+- The deployed image tag doesn't match the latest `prod-*` tag in ACR, **AND**
+- The latest ACR tag is older than 3 minutes
+
+This 3-minute threshold filters out transient delays during image pushes and prevents alert spam during rapid deployments.
+
+### Skipped Images
+
+Images are skipped if they:
+- Don't contain `prod-` tag (e.g., `test:latest`, `myapp:staging`)
+- Match the pattern `test:prod-*` (to avoid false positives on test containers)
+- Run in system namespaces (`kube-system`, `admin`, etc.)
+- Have a status other than running (e.g., `Succeeded`, `Failed`, `Pending`)
+
+## Troubleshooting
+
+### No Images Found in Namespace
+
+**Problem**: The monitor reports `hosts 0 unique images to check...` for a namespace with running pods.
+
+**Cause**: Pods are not using images tagged with `prod-*` or all pods are in the system namespace exclusion list.
+
+**Solution**:
+- Verify the namespace is not in the `skip_namespaces` list
+- Check pod images: `kubectl get pods -n <namespace> -o jsonpath='{.items[*].spec.containers[*].image}'`
+- Ensure deployment uses `prod-*` tagged images
+
+### Authentication Errors
+
+**Problem**: `Error: cannot get acr token for repository...` or `Error: cannot get acr token.`
+
+**Cause**: Invalid or expired ACR credentials, incorrect token format, encrypted secret not properly decrypted, or network connectivity issues.
+
+**Solutions**:
+1. Verify the encrypted secret is properly deployed and Flux has decrypted it:
+   ```bash
+   kubectl get secret acr-sync -n monitoring -o yaml
+   # Check that data fields show decoded values (not still encrypted)
+   # Verify HMCTSPRIVATE_TOKEN_PASSWORD and HMCTSPROD_TOKEN_PASSWORD are present
+   ```
+2. Check Flux status to confirm secret decryption:
+   ```bash
+   flux get helmrelease check-acr-sync -n monitoring
+   flux logs --follow --all-namespaces | grep acr-sync
+   ```
+3. Verify pod has access to the secret via environment:
+   ```bash
+   kubectl exec -it <pod-name> -n monitoring -- env | grep HMCTSPRIVATE
+   ```
+4. Test ACR authentication manually with the token from the secret:
+   ```bash
+   TOKEN=$(kubectl get secret acr-sync -n monitoring -o jsonpath='{.data.HMCTSPRIVATE_TOKEN_PASSWORD}' | base64 -d)
+   curl -H "Authorization: Basic $(echo -n 'acrsync:'$TOKEN | base64)" \
+     "https://hmctsprivate.azurecr.io/oauth2/token?scope=repository:*:metadata_read&service=hmctsprivate.azurecr.io"
+   ```
+5. Verify Azure Key Vault has not been rotated or access revoked:
+   ```bash
+   # Check if Flux has any decode errors in logs
+   kubectl logs -n flux-system deployment/kustomize-controller | grep decrypt
+   ```
+
+### Kubernetes API Access Denied
+
+**Problem**: `Error: cannot get service account token.` or permission errors accessing namespaces/pods.
+
+**Cause**: Service account missing permissions, token file not mounted, or RBAC not configured correctly by Flux.
+
+**Solutions**:
+1. Verify RBAC role bindings exist and are correctly configured:
+   ```bash
+   kubectl get clusterrole acr-sync-monitor
+   kubectl get clusterrolebinding acr-sync-monitor
+   kubectl describe clusterrole acr-sync-monitor
+   ```
+2. Verify service account is correctly referenced in the HelmRelease and deployed:
+   ```bash
+   kubectl get serviceaccount acr-sync-monitor -n monitoring
+   flux get helmrelease check-acr-sync -n monitoring
+   kubectl describe helmrelease check-acr-sync -n monitoring
+   ```
+3. Check Flux deployment logs to ensure resources were created:
+   ```bash
+   flux logs --follow --all-namespaces | grep acr-sync
+   ```
+4. Verify token is mounted in the running pod:
+   ```bash
+   kubectl exec -it <pod-name> -n monitoring -- ls -la /run/secrets/kubernetes.io/serviceaccount/
+   ```
+5. Manually verify the service account has the necessary permissions:
+   ```bash
+   # Get service account token
+   TOKEN=$(kubectl get secret -n monitoring -o jsonpath='{.items[?(@.metadata.annotations.kubernetes\.io/service-account\.name=="acr-sync-monitor")].data.token}' | base64 -d)
+
+   # Test listing namespaces
+   kubectl --token=$TOKEN get namespaces
+   ```
+
+### Slack Alerts Not Sending
+
+**Problem**: Drift detected but no Slack notifications received.
+
+**Cause**: Invalid webhook URL, network connectivity, missing encrypted secret, or Slack channel not found.
+
+**Solutions**:
+1. Verify the encrypted secret exists and is properly decrypted by Flux:
+   ```bash
+   kubectl get secret acr-sync -n monitoring -o yaml
+   # Verify the data fields contain decoded values, not encrypted data
+   ```
+2. Check namespace has correct Slack channel label:
+   ```bash
+   kubectl get namespace my-app -o jsonpath='{.metadata.labels.slackChannel}'
+   ```
+3. If label is missing, alerts go to default `SLACK_CHANNEL` - verify it exists on Slack
+4. Verify Slack webhook is valid by testing manually:
+   ```bash
+   # Extract webhook from the secret
+   WEBHOOK=$(kubectl get secret acr-sync -n monitoring -o jsonpath='{.data.SLACK_WEBHOOK}' | base64 -d)
+   curl -X POST -d 'payload={"text":"Test"}' "$WEBHOOK"
+   ```
+5. Enable debug logging to see Slack API responses:
+   ```bash
+   # Update the HelmRelease to enable debug
+   kubectl set env helmrelease/check-acr-sync ACR_SYNC_DEBUG=true -n monitoring
+   kubectl logs -n monitoring -l app=check-acr-sync
+   ```
+6. Check Flux logs to verify the HelmRelease is deployed correctly:
+   ```bash
+   flux logs --follow --all-namespaces
+   ```
+
+### Excessive False Alerts
+
+**Problem**: Frequent alerts about temporary deployment lag.
+
+**Cause**: 3-minute threshold too aggressive for your deployment pipeline, image automation service (Flux/ArgoCD) is slow, or failed CronJob pods are lingering and continuously re-running.
+
+**Solutions**:
+
+#### Failed CronJob Pods Not Being Cleaned Up
+
+Failed CronJob pods can persist for days and continue sending alerts. This is often the root cause of constant, repeated alerts about the same images.
+
+1. Check for failed pods:
+   ```bash
+   kubectl get pods -n monitoring -l app=check-acr-sync --field-selector=status.phase=Failed
+   ```
+
+2. If failed pods exist, remove them manually to force Kubernetes cleanup:
+   ```bash
+   # Delete all failed pods
+   kubectl delete pods -n monitoring -l app=check-acr-sync --field-selector=status.phase=Failed
+
+   # Or delete a specific failed pod
+   kubectl delete pod <pod-name> -n monitoring
+   ```
+
+3. Verify the pods have been removed:
+   ```bash
+   kubectl get pods -n monitoring -l app=check-acr-sync
+   ```
+
+4. After cleanup, the CronJob will create fresh pods on the next scheduled run. Alerts should resume normal behavior without the constant noise from failed pods.
+
+5. To prevent this in the future, ensure the HelmRelease has appropriate `failedJobsHistoryLimit`:
+   ```yaml
+   failedJobsHistoryLimit: 3  # Keep only the 3 most recent failed jobs
+   ```
+
+#### Threshold or Scheduling Issues
+
+1. Adjust the 3-minute threshold in the script:
+   ```bash
+   # Change this line in check-acr-aks-sync-rest.sh
+   if [[ $sync_time_diff > 180 ]]  # 180 seconds = 3 minutes
+   # to:
+   if [[ $sync_time_diff > 300 ]]  # 300 seconds = 5 minutes
+   ```
+
+2. Reduce CronJob frequency to match your deployment cadence:
+   ```yaml
+   schedule: "*/15 * * * *"  # Run every 15 minutes instead of 5
+   ```
+
+3. Investigate why image automation is slow:
+   ```bash
+   # Check Flux reconciliation
+   flux get source helm
+   flux get kustomization
+   flux logs --follow
+   ```
+
+### ACR Token Errors
+
+**Problem**: `Error getting latest prod tag for repository - empty response.` or `Error getting repository - empty response.`
+
+**Cause**: ACR token doesn't have metadata_read permissions, repository doesn't exist, or encrypted secret is not properly decrypted.
+
+**Solutions**:
+1. Verify the encrypted secret is properly configured and Flux has decrypted it:
+   ```bash
+   # Check secret exists in monitoring namespace
+   kubectl get secret acr-sync -n monitoring
+
+   # Verify Flux has successfully decrypted and deployed it
+   flux get helmrelease check-acr-sync -n monitoring
+
+   # Check HelmRelease status
+   kubectl describe helmrelease check-acr-sync -n monitoring
+   ```
+2. Verify token has correct permissions:
+   ```bash
+   # Scope map should include: repository/*/metadata/read
+   az acr scope-map list --registry hmctsprivate
+   ```
+3. Verify repository exists and is accessible:
+   ```bash
+   az acr repository list --name hmctsprivate
+   ```
+4. Check repository has `prod-*` tags:
+   ```bash
+   az acr repository show-tags --name hmctsprivate --repository myapp | grep prod
+   ```
+
+### Memory or CPU Pressure
+
+**Problem**: CronJob pod gets OOMKilled or Evicted frequently.
+
+**Cause**: Large number of namespaces or repositories to check, or inefficient resource allocation.
+
+**Solutions**:
+1. Add resource requests/limits to the Job/CronJob:
+   ```yaml
+   resources:
+     requests:
+       memory: "256Mi"
+       cpu: "100m"
+     limits:
+       memory: "512Mi"
+       cpu: "500m"
+   ```
+2. Increase ACR_MAX_RESULTS carefully or reduce it if monitoring many repositories:
+   ```bash
+   # Default 100 tags per repo - reduce if memory is constrained
+   ACR_MAX_RESULTS=50
+   ```
+3. Filter namespaces more aggressively by updating `skip_namespaces`
+
+## Performance Considerations
+
+### Token Caching Strategy
+
+- ACR tokens are valid for 60 seconds
+- The script caches tokens for 45 seconds to ensure reuse across multiple images
+- When caching expires, a new token is obtained
+- This significantly reduces API calls when checking multiple images from the same registry
+
+### Namespace Iteration
+
+- System namespaces are skipped to reduce noise and API calls
+- Only namespaces with `prod-*` tagged images are processed
+- Empty namespaces (no production images) are logged but not alerted
+
+### ACR Query Optimization
+
+- Images are deduplicated before querying ACR (avoiding duplicate API calls)
+- Only the latest `prod-*` tag is retrieved per repository
+- Single `jp` call parses the entire response instead of multiple JSON queries
+
+### Recommended Scheduling
+
+| Cluster Type | Recommended Frequency | Rationale |
+|--------------|----------------------|-----------|
+| Production | Every 5 minutes | Catch deployment issues quickly |
+| Staging | Every 10-15 minutes | Balance between detection and API quota |
+| Development | Every 30 minutes | Reduced monitoring overhead |
+| Sandbox | On-demand or hourly | Minimal monitoring needed |
+
+## Best Practices
+
+1. **Use Team-Specific Channels**: Label namespaces with `slackChannel` to route alerts to responsible teams
+
+2. **Monitor Registry Credentials**: Rotate ACR tokens regularly (recommended quarterly)
+
+3. **Set Appropriate Thresholds**: The 3-minute default works for most cases, but adjust for your pipeline
+
+4. **Filter Aggressively**: Keep the `skip_namespaces` list updated to prevent monitoring irrelevant workloads
+
+5. **Review False Positives**: If alerts aren't actionable, investigate why images are slow to update
+
+6. **Document Exceptions**: If certain namespaces shouldn't be monitored, add them to the skip list with comments
+
+7. **Monitor the Monitor**: Set up alerts on the CronJob itself to detect monitoring failures
+
+## Related Documentation
+
+- [ACR Image Import Utilities](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-import-images)
+- [Azure Container Registry REST API](https://docs.microsoft.com/en-us/rest/api/containerregistry/)
+- [Kubernetes API Reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/)
+- [Flux Image Automation](https://fluxcd.io/flux/guides/image-update/)
+- [Slack Webhooks](https://api.slack.com/messaging/webhooks)
+
+## Getting Help
+
+If you encounter issues:
+
+1. Enable debug logging: `ACR_SYNC_DEBUG=true`
+2. Check pod logs: `kubectl logs <pod-name> -n admin`
+3. Verify configuration: `kubectl get secret monitoring-values -n admin`
+4. Review this troubleshooting guide
+5. Contact the platform team in Slack (#cloud-native-platform)
+6. Check the [azure-cftapps-monitoring repository](https://github.com/hmcts/azure-cftapps-monitoring) for issues

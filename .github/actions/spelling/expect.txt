@@ -100,6 +100,7 @@ nodepool
 NONLINE
 noout
 NSGs
+ocp
 oidc
 onlineplea
 openvpn
@@ -132,6 +133,7 @@ sourceregistry
 sourcerepository
 sourcetag
 spn
+spnl
 sqldb
 sqlpackage
 sshfs

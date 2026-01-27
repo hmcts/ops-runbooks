@@ -83,6 +83,8 @@ This API call is using a secret from [https://kv-ste-common.vault.azure.net/secr
 >
 > **Inform stakeholders accordingly before making the change.**
 
+![APIM unavailable](images/3_apim.png)
+
 Set the environment variables:
 
 ```bash
@@ -117,6 +119,22 @@ Now check if the same curl request to the API is working or not:
 
 - ✅ **If it's working** - We are all good!
 - ❌ **If it's not working** - We need to fix the connectivity
+
+## Step 6: Verify KeyVault Access via Logs
+
+To further confirm that APIM can successfully access the KeyVault after disabling trusted connectivity, you can check the KeyVault diagnostic logs streamed to Event Hub.
+
+### Checking KeyVault Logs in Event Hub
+
+1. Navigate to the Event Hub associated with your KeyVault diagnostic settings
+2. Check for `SecretGet` operations from the APIM managed identity
+3. Verify that the requests are successful (HTTP 200 responses)
+
+The screenshot below shows an example of successful KeyVault access logs from APIM after the trusted connectivity was disabled:
+
+![KeyVault Access Logs](images/2_apim.png)
+
+If you see successful `SecretGet` operations in the logs, it confirms that APIM can still access the KeyVault secrets through the alternative networking configuration (subnet allowlisting or private endpoint).
 
 ## Troubleshooting: Fixing Connectivity Issues
 

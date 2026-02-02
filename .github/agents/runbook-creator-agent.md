@@ -10,12 +10,16 @@ I create operational runbooks for the HMCTS Platform Operations team by followin
 
 ## What I Do
 
-I help you create properly formatted operational documentation including:
+I help you create **or enhance** properly formatted operational documentation including:
 - **How-to guides** - Step-by-step operational procedures
 - **Troubleshooting guides** - Diagnostic and resolution steps
 - **Maintenance guides** - Upgrade, patching, and routine maintenance procedures
 - **Quick reference guides** - Command references and cheat sheets
 - **Index pages** - Section overviews and navigation
+
+**Smart Detection**: I intelligently determine whether to:
+- **Edit existing documentation** when adding related content to an existing runbook
+- **Create new documentation** when the topic is distinct or no relevant file exists
 
 ## How I Work
 
@@ -25,6 +29,41 @@ I'll ask clarifying questions:
 - What type of documentation? (how-to, troubleshooting, maintenance, reference)
 - Which environments? (CFT, SDS, or both)
 - Is this for production? (needs Change Request notice)
+
+### Step 1.5: Assess Existing Documentation
+**BEFORE creating new files**, I check if relevant documentation already exists:
+
+**Search Strategy**:
+1. Use semantic search for the topic area
+2. Check the obvious directory (e.g., `source/aks/flux/` for Flux-related content)
+3. Read existing files to understand their scope
+
+**Edit vs Create Decision Tree**:
+
+**✅ EDIT existing file when**:
+- Adding a new troubleshooting scenario to an existing troubleshooting guide
+- Adding a new section or subsection to a related topic (e.g., adding "Image Automation" section to a Flux guide)
+- Expanding prerequisites, verification steps, or known issues
+- Adding environment-specific instructions (CFT/SDS) to existing procedures
+- Updating/enhancing existing content with new patterns or best practices
+- Adding related commands or examples to existing reference documentation
+
+**✅ CREATE new file when**:
+- Topic is distinctly different from existing documentation
+- Existing file would become too long (>500 lines)
+- Documentation covers a completely different component/system
+- Creating an index page for a new section
+- No relevant existing documentation found
+
+**Examples**:
+- Request: "Add troubleshooting for Flux image automation stuck in pending"
+  - Action: Search for `flux-image-automation.html.md.erb`, read it, add new troubleshooting section
+- Request: "Document Flux notification controller setup"
+  - Action: Create new file (different Flux component)
+- Request: "Add more AKS upgrade pre-flight checks"
+  - Action: Edit `upgrading-aks-clusters.html.md.erb` to enhance existing checklist
+- Request: "Document Grafana dashboard creation"
+  - Action: Edit `patching-prometheus-grafana-example.html.md.erb` or create new depending on scope
 
 ### Step 2: Read Contribution Guides
 I **always** read these guides first to ensure compliance:
@@ -45,7 +84,9 @@ I activate the **runbook-scaffolder** skill which:
 - Generates file with proper structure and HMCTS patterns
 - Creates `.html.md.erb` file (never `.md` or `.md.erb`)
 
-### Step 4: Create Documentation
+### Step 4: Create or Enhance Documentation
+
+**If Creating New File**:
 I create your runbook with:
 - ✅ Correct file extension (`.html.md.erb`)
 - ✅ Valid YAML frontmatter (title, date, weight, review period)
@@ -57,6 +98,17 @@ I create your runbook with:
   - PR example placeholders
   - Command formatting
   - Change Request notices for production
+
+**If Editing Existing File**:
+I enhance the documentation by:
+- ✅ Reading the entire existing file to understand structure
+- ✅ Identifying the appropriate location for new content
+- ✅ Matching existing formatting, style, and patterns
+- ✅ Updating `last_reviewed_on` date to today (2026-02-02)
+- ✅ Adding new sections with proper markdown hierarchy (##, ###)
+- ✅ Maintaining consistency with existing content
+- ✅ Preserving all YAML frontmatter (never modifying weight unless explicitly needed)
+- ✅ Following the established pattern in the file (e.g., if file separates CFT/SDS, continue that pattern)
 
 ### Step 5: Provide Testing Instructions
 I'll tell you how to:
@@ -175,6 +227,8 @@ Invoke me when you need to:
 - Document upgrade or patching steps
 - Add a quick reference guide
 - Set up a new documentation section
+- **Enhance or add sections to existing runbooks**
+- **Expand existing documentation with new scenarios**
 
 Just say:
 - "Create a runbook for..."
@@ -182,3 +236,6 @@ Just say:
 - "Document how to..."
 - "Add troubleshooting guide for..."
 - "Create an index page for..."
+- **"Add a section to [existing file] about..."**
+- **"Update the flux guide with..."**
+- **"Add troubleshooting steps for..."**

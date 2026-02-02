@@ -6,16 +6,18 @@ tools: ['read', 'edit', 'create_file', 'list_dir', 'grep_search', 'semantic_sear
 
 # Runbook Creator
 
-Creates properly structured operational runbooks for the HMCTS Platform Operations team following repository conventions and contribution guidelines.
+Creates **or enhances** properly structured operational runbooks for the HMCTS Platform Operations team following repository conventions and contribution guidelines.
 
 ## When to Use This Skill
 
 Use this skill when you need to:
 - Create new operational runbooks or how-to guides
+- **Edit and enhance existing documentation with new sections**
 - Generate troubleshooting documentation
 - Document upgrade, patching, or maintenance procedures
 - Create quick reference guides
 - Set up index pages for new documentation sections
+- **Add related content to existing runbooks**
 
 ## Critical: Read Contribution Guides First
 
@@ -108,7 +110,7 @@ weight: [increment by 10 from existing files]
 ...
 ```
 
-## Step-by-Step Creation Process
+## Step-by-Step Process
 
 ### Step 1: Clarify Requirements
 Ask the user:
@@ -116,6 +118,65 @@ Ask the user:
 - What type? (how-to, troubleshooting, maintenance, reference)
 - Which environments? (CFT, SDS, or both)
 - Is this a production procedure? (needs Change Request notice)
+
+### Step 1.5: Check for Existing Documentation (CRITICAL)
+
+**ALWAYS check before creating new files**:
+
+1. **Semantic Search**: Search for related content
+   ```
+   Search for: "[topic keyword]" in the codebase
+   ```
+
+2. **Directory Check**: Look in the logical directory
+   - AKS topics: `source/aks/`
+   - Flux topics: `source/aks/flux/`
+   - Jenkins: `source/jenkins/`
+   - Monitoring: `source/monitoring/`
+   - etc.
+
+3. **Read Candidates**: If relevant files found, read them fully
+
+4. **Decision Logic**:
+
+   **✅ EDIT existing file if**:
+   - Content is related/complementary to existing documentation
+   - Adding a new scenario, use case, or troubleshooting step
+   - Enhancing existing sections (prerequisites, verification, known issues)
+   - File is <500 lines and has logical room for addition
+   - New content fits naturally into existing structure
+   
+   **Examples to EDIT**:
+   - `flux-image-automation.html.md.erb` ← Add troubleshooting section
+   - `upgrading-aks-clusters.html.md.erb` ← Add new pre-flight check
+   - `patching-traefik.html.md.erb` ← Add known issue and workaround
+   - `jenkins/troubleshooting-pipeline-failures.html.md.erb` ← Add new failure scenario
+
+   **✅ CREATE new file if**:
+   - Topic is distinct/different system component
+   - Existing file would become too long (>500 lines)
+   - No relevant documentation exists
+   - Creating a new major procedure or workflow
+   - Setting up index page for new section
+   
+   **Examples to CREATE**:
+   - Flux Source Controller (different from Image Automation)
+   - New tool/component not yet documented
+   - Completely different maintenance procedure
+
+### Step 1.6: Inform User of Decision
+
+**If editing**:
+```
+I found existing documentation: [filename]
+I'll add a new [section/troubleshooting step/etc.] to enhance this file.
+```
+
+**If creating**:
+```
+No existing documentation found for this topic.
+I'll create a new runbook: [proposed filename]
+```
 
 ### Step 2: Read Contribution Guides
 Use `read` tool to load:
@@ -234,8 +295,9 @@ Apply HMCTS-specific patterns as defined in `.github/copilot-instructions.md`:
 - Command formatting with backticks or code blocks
 - Image references in subdirectories
 
-### Step 6: Create the File
+### Step 6: Create or Edit the File
 
+**If Creating New File**:
 Use `create_file` tool with:
 - Correct path: `source/[directory]/[filename].html.md.erb`
 - YAML frontmatter with current date (2026-02-02)
@@ -243,22 +305,79 @@ Use `create_file` tool with:
 - HMCTS-specific patterns
 - Appropriate weight value
 
+**If Editing Existing File**:
+Use `replace_string_in_file` or `multi_replace_string_in_file` to:
+- Read the entire file first to understand structure
+- Identify the best location for new content
+- Match existing formatting style
+- Update `last_reviewed_on` to current date (2026-02-02)
+- Add new sections with appropriate markdown hierarchy
+- Maintain consistency with file's existing patterns
+- Preserve YAML frontmatter (especially weight)
+- Keep environment separation patterns (CFT/SDS)
+
+**Editing Pattern Examples**:
+```markdown
+# Adding a troubleshooting section:
+## Troubleshooting
+
+### Issue 1: [Existing Issue]
+...
+
+### Issue 2: [NEW ISSUE YOU'RE ADDING]
+**Symptoms**: ...
+**Cause**: ...
+**Resolution**: ...
+```
+
+```markdown
+# Adding to known issues:
+## Known Issues
+
+- **Issue 1**: [Existing]
+- **[NEW ISSUE]**: Description and workaround
+```
+
+```markdown
+# Adding verification steps:
+## Verification
+- [ ] Existing check
+- [ ] [NEW CHECK YOU'RE ADDING]
+```
+
 ### Step 7: Provide Testing Instructions
 
-Tell the user:
+**If Created New File**:
 ```
 Runbook created: source/[directory]/[filename].html.md.erb
 Based on: source/Contribution-Guide/guide-examples/[template].html.md.erb
 
 Test locally:
   bundle exec middleman server
-  Visit http://localhost:4567
+  Visit http://localhost:4567/[path-to-file]
 
 Next steps:
 - Add specific cluster names/IPs
 - Update PR links
 - Test commands
 - Add screenshots to images/
+```
+
+**If Edited Existing File**:
+```
+Enhanced: source/[directory]/[filename].html.md.erb
+Added: [description of what was added]
+Updated: last_reviewed_on to 2026-02-02
+
+Test locally:
+  bundle exec middleman server
+  Visit http://localhost:4567/[path-to-file]
+  Scroll to: [section name]
+
+Next steps:
+- Review new section for accuracy
+- Test any new commands
+- Update specific examples/PR links
 ```
 
 ## Quality Checklist

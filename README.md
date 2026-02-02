@@ -151,29 +151,42 @@ For the script this should be set as an environment variable: `export GH_TOKEN=$
 
 With this complete you can now run the bundle command to check urls in the repo.
 
-## AI Agent Skills
+## AI Agent for Runbook Creation
 
-This repository includes [Agent Skills](https://agentskills.io/) to help create runbooks more efficiently. Agent Skills are a standardized format that extends AI agent capabilities with specialized knowledge.
+This repository includes a GitHub Copilot agent that helps create runbooks following our contribution guidelines.
 
-### Available Skills
+### Runbook Creator Agent
 
-- **runbook-scaffolder** - Automatically creates properly formatted runbook files following HMCTS conventions
-
-Compatible with GitHub Copilot, Claude Code, Cursor, Cline, Windsurf, and other Agent Skills-compatible tools.
+The **Runbook Creator Agent** (`.github/agents/runbook-creator-agent.md`) creates operational documentation by:
+- Reading contribution guides from `source/Contribution-Guide/`
+- Using official templates (how-to, troubleshooting, maintenance)
+- Applying HMCTS-specific patterns (clusters, environments, repos)
+- Generating properly formatted `.html.md.erb` files
 
 ### Usage Example
 
 ```
-create a runbook for troubleshooting DNS issues in AKS
+@runbook-creator create a troubleshooting guide for DNS issues in AKS
 ```
 
-The skill will generate a file with:
-- Correct `.html.md.erb` extension and YAML frontmatter
-- Standard sections (Prerequisites, Procedure, Verification, etc.)
-- HMCTS-specific patterns (cluster names, environments, PR examples)
-- Appropriate directory placement and weight
+The agent will:
+1. Ask clarifying questions (type, environments, production impact)
+2. Read appropriate template from contribution guides
+3. Create `source/network/troubleshooting-dns-issues.html.md.erb`
+4. Include proper YAML frontmatter with current date
+5. Add HMCTS patterns (cluster names, PR examples)
+6. Provide testing instructions
 
-See [`.agent/skills/README.md`](.agent/skills/README.md) for complete documentation.
+### What Gets Created
+
+- ✅ Correct `.html.md.erb` extension (not `.md`)
+- ✅ Valid YAML frontmatter (title, date, weight, review period)
+- ✅ Template-based structure from contribution guides
+- ✅ HMCTS-specific content (cluster names, repos, environments)
+- ✅ Verification and testing steps
+- ✅ Change Request notices for production procedures
+
+See [`.github/agents/README.md`](.github/agents/README.md) for complete documentation.
 
 ## Publishing
 

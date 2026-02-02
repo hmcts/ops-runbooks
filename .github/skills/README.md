@@ -1,38 +1,76 @@
-# Agent Skills for ops-runbooks
+# GitHub Copilot Skills for ops-runbooks
 
-This directory contains [Agent Skills](https://agentskills.io/) that extend AI agent capabilities with specialized knowledge for creating and maintaining HMCTS operational runbooks.
+This directory contains skills that provide specialized knowledge and templates for creating HMCTS operational runbooks.
 
-## What are Agent Skills?
+## Architecture
 
-Agent Skills are a standardized, open format for giving AI agents specialized capabilities. Each skill is a folder containing a `SKILL.md` file with:
-- **Metadata** (name, description) - loaded at startup to identify when the skill is relevant
-- **Instructions** (Markdown body) - loaded when the skill is activated
-- **Resources** (optional) - scripts, references, and assets loaded as needed
-
-This follows **progressive disclosure** to efficiently use context.
+Skills are used by agents:
+- **Agent** (`.github/agents/`) - User-facing persona that asks questions and coordinates
+- **Skill** (`.github/skills/`) - Provides templates, patterns, and domain knowledge
 
 ## Available Skills
 
-### runbook-scaffolder
+### Runbook Scaffolder
+**File**: `runbook-scaffolder/SKILL.md`
 
-**Purpose**: Creates operational runbooks following HMCTS conventions
+**Purpose**: Provides templates, patterns, and conventions for HMCTS runbook creation
 
-**Triggers**: "create runbook", "new runbook", "generate guide", "scaffolding runbook"
+**Used by**: Runbook Creator Agent (`.github/agents/runbook-creator-agent.md`)
 
-**Capabilities**:
-- Generates `.html.md.erb` files with proper YAML frontmatter
-- Creates standard sections based on runbook type
-- Includes HMCTS-specific patterns (cluster names, environments, repos)
-- Suggests appropriate directory placement
-- Sets correct weight values
+**Contains**:
+- File naming conventions (`.html.md.erb` extension rules)
+- YAML frontmatter templates
+- Contribution guide integration instructions
+- HMCTS-specific patterns:
+  - Cluster naming (cft-*, ss-*, prod-*)
+  - Environment progression (Sbox → PTL)
+  - Repository references
+  - PR example formats
+- kubectl queries and helm operations
+- Verification checklists
+- Rollback procedures
+- Command formatting examples
 
-**Use when**:
-- Creating new troubleshooting guides
-- Documenting upgrade/patching procedures
-- Writing quick reference docs
-- Setting up index pages
+**Key Features**:
+- Reads contribution guides: `source/Contribution-Guide/`
+- Uses official templates: `source/Contribution-Guide/guide-examples/`
+- Template types: how-to, troubleshooting, maintenance
+- Ensures correct file extension (`.html.md.erb` not `.md`)
+- Follows weight increment rules (by 10)
+- Includes verification and testing steps
 
-See [`runbook-scaffolder/SKILL.md`](runbook-scaffolder/SKILL.md) for full documentation.
+**Reference Files**:
+- `references/PATTERNS.md` - Common patterns and reusable snippets
+- `references/EXAMPLES.md` - Complete runbook examples
+
+## How Skills Work
+
+1. **User invokes agent**: "@runbook-creator create a guide for..."
+2. **Agent reads contribution guides**: Gets official templates and rules
+3. **Agent activates skill**: Uses runbook-scaffolder for patterns and conventions
+4. **Skill provides**: Templates, HMCTS patterns, verification checklists
+5. **Agent implements**: Creates file with proper structure
+6. **Agent returns**: Testing instructions and next steps
+
+## Contribution Guide Integration
+
+This skill ensures all runbooks follow:
+- `source/Contribution-Guide/index.html.md.erb` - Main guide
+- `source/Contribution-Guide/addingpages.html.md.erb` - File creation rules
+- `source/Contribution-Guide/guide-examples/` - Official templates
+- `source/Contribution-Guide/testing.html.md.erb` - Testing procedures
+
+## Usage
+
+Skills are activated automatically by agents. You don't call skills directly - use the agent instead:
+
+```
+@runbook-creator create a troubleshooting guide for DNS issues
+```
+
+The agent will use the runbook-scaffolder skill to provide patterns and templates.
+
+See [`.github/agents/README.md`](../agents/README.md) for complete usage instructions.
 
 ## How Skills Work
 

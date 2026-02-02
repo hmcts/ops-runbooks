@@ -216,13 +216,35 @@ bundle exec rake check_urls
 - **Git/GitHub**: Version control and hosting
 - **GitHub Pages**: Site hosting
 
-## Agent Skills
+## GitHub Copilot Agent
 
-This repository uses [Agent Skills](https://agentskills.io/) for extending AI capabilities:
+This repository includes a custom agent for creating runbooks:
 
-- **runbook-scaffolder**: Generates new runbook files with proper structure
-  - See `.agent/skills/runbook-scaffolder/SKILL.md` for details
-  - Auto-activates on "create runbook", "new runbook", "generate guide"
+### Runbook Creator Agent
+**File**: `.github/agents/runbook-creator-agent.md`
+
+**Purpose**: Creates operational runbooks following contribution guidelines
+
+**How it works**:
+1. Reads contribution guides: `source/Contribution-Guide/`
+2. Uses official templates: `source/Contribution-Guide/guide-examples/`
+3. Activates runbook-scaffolder skill for patterns
+4. Creates `.html.md.erb` files with proper structure
+5. Provides testing and customization instructions
+
+**Triggers**: "create runbook", "new runbook", "generate guide", "add page"
+
+**Features**:
+- Ensures correct file extension: `.html.md.erb` (not `.md` or `.md.erb`)
+- Follows weight increment rules (by 10)
+- Includes HMCTS-specific patterns (cluster names, environments, repos)
+- Uses contribution guide templates (how-to, troubleshooting, maintenance)
+- Adds PR example placeholders
+- Includes verification and rollback procedures
+
+**Skill Used**: `.github/skills/runbook-scaffolder/SKILL.md` - Provides templates and patterns
+
+See [`.github/agents/README.md`](.github/agents/README.md) for complete documentation.
 
 ## Anti-Patterns to Avoid
 

@@ -1,32 +1,51 @@
 ---
-name: runbook-scaffolder
-description: Creates operational runbooks for HMCTS platform team following Middleman conventions. Generates .html.md.erb files with proper YAML frontmatter, standard sections, and HMCTS-specific patterns (cluster names, environments, PR examples). Use when creating how-to guides, troubleshooting docs, upgrade procedures, patching guides, or reference documentation. Triggers on "create runbook", "new runbook", "generate guide", "scaffolding runbook".
+name: Runbook Creator
+description: Creates operational runbooks and documentation for HMCTS platform team following Middleman conventions. Generates .html.md.erb files with proper YAML frontmatter, standard sections, and HMCTS-specific patterns (cluster names, environments, PR examples). Uses contribution guides and templates. Triggers on "create runbook", "new runbook", "generate guide", "create documentation", "add page", "new operational doc".
+tools: ['read', 'edit', 'create_file', 'list_dir', 'grep_search', 'semantic_search', 'replace_string_in_file', 'multi_replace_string_in_file']
 ---
 
-# Runbook Scaffolder
+# Runbook Creator
 
-Creates properly structured operational runbooks for the HMCTS Platform Operations team following repository conventions.
+Creates properly structured operational runbooks for the HMCTS Platform Operations team following repository conventions and contribution guidelines.
 
 ## When to Use This Skill
 
 Use this skill when you need to:
 - Create new operational runbooks or how-to guides
 - Generate troubleshooting documentation
-- Document upgrade or patching procedures
+- Document upgrade, patching, or maintenance procedures
 - Create quick reference guides
-- Set up index pages for new sections
+- Set up index pages for new documentation sections
 
-## Quick Start
+## Critical: Read Contribution Guides First
 
-1. Specify the runbook topic and type
-2. Skill generates appropriate file with correct structure
-3. Customize with specific details (cluster names, PR links)
-4. Preview locally: `bundle exec middleman server`
+**ALWAYS** read the following files before creating any documentation:
+
+1. **Main Guide**: `source/Contribution-Guide/index.html.md.erb`
+   - Understand the benefits and best practices
+   
+2. **Adding Pages**: `source/Contribution-Guide/addingpages.html.md.erb`
+   - File naming conventions (`.html.md.erb` extension)
+   - YAML frontmatter requirements
+   - Weight parameter usage
+   - Core sections structure
+
+3. **Guide Templates**: `source/Contribution-Guide/guide-examples/`
+   - `how-to-guide.html.md.erb` - For operational procedures
+   - `troubleshooting-guide.html.md.erb` - For diagnostic guides
+   - `maintenance-guide.html.md.erb` - For routine maintenance tasks
+
+4. **Testing Guide**: `source/Contribution-Guide/testing.html.md.erb`
+   - How to preview changes locally
 
 ## File Conventions
 
-### Extension
-All runbook files use `.html.md.erb` extension (never `.md`)
+### Extension (CRITICAL)
+**MUST** use `.html.md.erb` extension - NOT `.md`
+
+Common mistake:
+- ❌ `filename.md.erb`
+- ✅ `filename.html.md.erb`
 
 ### Location
 Files go in `source/` directory under appropriate subdirectory:
@@ -46,7 +65,7 @@ Files go in `source/` directory under appropriate subdirectory:
 ```yaml
 ---
 title: Descriptive Action-Oriented Title
-last_reviewed_on: YYYY-MM-DD
+last_reviewed_on: 2026-02-02
 review_in: 12 months
 weight: [increment by 10 from existing files]
 ---
@@ -63,84 +82,127 @@ weight: [increment by 10 from existing files]
 ...
 ```
 
-## Runbook Types and Templates
+## Step-by-Step Creation Process
 
-### Troubleshooting Guide
+### Step 1: Clarify Requirements
+Ask the user:
+- What is the runbook topic?
+- What type? (how-to, troubleshooting, maintenance, reference)
+- Which environments? (CFT, SDS, or both)
+- Is this a production procedure? (needs Change Request notice)
 
+### Step 2: Read Contribution Guides
+Use `read` tool to load:
+- `source/Contribution-Guide/addingpages.html.md.erb`
+- Appropriate template from `source/Contribution-Guide/guide-examples/`
+
+### Step 3: Determine Location
+- Identify appropriate directory in `source/`
+- Use `list_dir` to check existing files
+- Identify next weight value (increment by 10)
+
+### Step 4: Select Template
+
+**For How-To/Operational Procedures**:
+Use template from `source/Contribution-Guide/guide-examples/how-to-guide.html.md.erb`:
 ```markdown
-# <%= current_page.data.title %>
-
-Brief description of the problem this guide solves.
+## How to [Perform Specific Task]
+Brief description
 
 ## Prerequisites
-- Required access/tools
+- Access level required
+- Necessary tools
 - Required knowledge
 
-## Symptoms
-- Observable issues
-- When this occurs
-
-## Diagnostic Steps
-
-### Step 1: Check [Component]
-```command
-kubectl get pods -A
-```
-
-### Step 2: Verify [Configuration]
-...
-
-## Common Resolutions
-
-### Resolution 1: [Fix Description]
-[Instructions]
-
-**Example PRs**:
-- [CFT example](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
-- [SDS example](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
+## How-to steps
+1. First step (include screenshots and example commands/PRs)
+2. Second step
+3. Third step
 
 ## Verification
-- [ ] Issue resolved
-- [ ] No errors in logs
-- [ ] Systems functional
+How to verify success
+- Third-party team involvement?
 
-## Prevention
-[How to avoid this issue]
+## Troubleshooting
+Common issues and resolutions
 
-## Known Issues
-
-### Issue: [Description]
-**Cause**: [Root cause]
-**Resolution**: [Fix]
-
-## Related Documentation
-- [Link to related runbook](../path/to/related.html)
+## Additional Information
+- Related tasks
+- Links to documentation
+- Best practices
 ```
 
-### Upgrade/Patching Procedure
-
+**For Troubleshooting Guides**:
+Use template from `source/Contribution-Guide/guide-examples/troubleshooting-guide.html.md.erb`:
 ```markdown
-# <%= current_page.data.title %>
-
-Description of what is being upgraded.
+## Troubleshooting [System/Application]
+Diagnostic and resolution steps
 
 ## Prerequisites
-- Cluster access
-- GitHub repo access
-- Understanding of component
+- Log access
+- Administrative access
+- Understanding of technologies
 
-## When to Use This Guide
-Use when upgrading [component] across environments.
+## Common Issues and Solutions
 
-## Planning
+### Issue 1: [Description]
+1. Diagnostic step
+2. Resolution step
+3. Verification step
 
-Check release notes: [link]
-Review renovate PRs:
-- [CFT](https://github.com/hmcts/cnp-flux-config/pulls)
-- [SDS](https://github.com/hmcts/sds-flux-config/pulls)
+### Issue 2: [Description]
+...
 
-## Environment Order
+## Escalation Procedure
+Steps if unresolved
 
+## Additional Information
+- Documentation links
+- Contact information
+```
+
+**For Maintenance/Upgrade Procedures**:
+Use template from `source/Contribution-Guide/guide-examples/maintenance-guide.html.md.erb`:
+```markdown
+## [System] Maintenance Guide
+Routine maintenance tasks
+
+## Prerequisites
+- Administrative access
+- Maintenance window
+- Backup of current state
+- Change process required?
+
+## Maintenance Tasks
+
+### Task 1: [Description]
+Frequency: [Schedule]
+1. Step one
+2. Step two
+
+### Task 2: [Description]
+...
+
+## Verification
+Success criteria
+- Third-party verification needed?
+
+## Rollback Procedure
+Revert steps if issues arise
+
+## Additional Information
+- Maintenance schedule
+- System availability impact
+- Support contacts
+```
+
+### Step 5: Add HMCTS-Specific Context
+
+**Cluster Names**:
+- CFT Format: `cft-{env}-{number}-aks` or `prod-{number}-aks`
+- SDS Format: `ss-{env}-{number}-aks`
+
+**Environment Order**:
 1. Sbox (cft-sbox-00-aks, cft-sbox-01-aks / ss-sbox-00-aks, ss-sbox-01-aks)
 2. Ptlsbox (cft-ptlsbox-00-aks / ss-ptlsbox-00-aks)
 3. ITHC (cft-ithc-00-aks, cft-ithc-01-aks / ss-ithc-00-aks, ss-ithc-01-aks)
@@ -151,286 +213,145 @@ Review renovate PRs:
 8. Production (prod-00-aks, prod-01-aks / ss-prod-00-aks, ss-prod-01-aks)
 9. PTL (cft-ptl-00-aks / ss-ptl-00-aks)
 
-<%= warning_text('A Change Request must be raised 2-3 days before Production upgrades') %>
-
-## Pre-upgrade Health Checks
-
-```command
-kubectl config current-context
-kubectl get pods -A | wc -l
-kubectl get hr -A | awk '/(Unknown|False)/'
-```
-
-## Procedure
-
-### Step 1: Update Configuration
-
-#### CFT Environments
-- [Example PR](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
-
-#### SDS Environments
-- [Example PR](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
-
-### Step 2: Monitor Deployment
-
-```command
-kubectl get hr -n [namespace] [release-name] -w
-```
-
-## Verification
-- [ ] Component running
-- [ ] No CrashLoopBackOff
-- [ ] Functionality working
-- [ ] No alerts firing
-
-## Rollback Procedure
-
-```command
-helm history [release] -n [namespace]
-helm rollback [release] [revision] -n [namespace]
-```
-
-## Known Issues
-
-### Issue: [Common Problem]
-[Description and resolution]
-
-## Related Documentation
-- [Related guide](../path/to/guide.html)
-```
-
-### Quick Reference
-
-```markdown
-# <%= current_page.data.title %>
-
-Quick reference for [tool/topic].
-
-## Prerequisites
-- Tool installed
-- Appropriate access
-
-## Common Commands
-
-### [Category]
-
-```command
-# Description
-command here
-```
-
-### [Another Category]
-
-```command
-# Description
-another command
-```
-
-## Useful Aliases
-
-```bash
-alias k='kubectl'
-alias kgp='kubectl get pods'
-```
-
-## Tips and Tricks
-
-- Tip 1
-- Tip 2
-
-## Related Documentation
-- [Link](../path.html)
-```
-
-### Index Page
-
-```erb
----
-title: Section Title
-weight: [number]
----
-
-# <%= current_page.data.title %>
-
-Brief description of this section and what runbooks it contains.
-
-## Contents
-
-- Topic area 1
-- Topic area 2
-- Topic area 3
-
-## Related Sections
-
-- [Other section](../other/index.html)
-```
-
-## HMCTS-Specific Patterns
-
-### Cluster Names
-
-**CFT Format**: `cft-{env}-{number}-aks` or `prod-{number}-aks`
-Examples: `cft-sbox-00-aks`, `prod-01-aks`
-
-**SDS Format**: `ss-{env}-{number}-aks`
-Examples: `ss-sbox-00-aks`, `ss-prod-01-aks`
-
-### Repositories
-
-**CFT**:
-- Flux: `hmcts/cnp-flux-config`
-- AKS: `hmcts/aks-cft-deploy`
-- Azure: `hmcts/azure-platform-terraform`
+**Repositories**:
+- CFT Flux: `hmcts/cnp-flux-config`
+- CFT AKS: `hmcts/aks-cft-deploy`
+- CFT Azure: `hmcts/azure-platform-terraform`
+- SDS Flux: `hmcts/sds-flux-config`
+- SDS AKS: `hmcts/aks-sds-deploy`
+- SDS Azure: `hmcts/sds-azure-platform`
 - Jenkins: `hmcts/cnp-jenkins-config`
 
-**SDS**:
-- Flux: `hmcts/sds-flux-config`
-- AKS: `hmcts/aks-sds-deploy`
-- Azure: `hmcts/sds-azure-platform`
-
-### Jenkins URLs
+**Jenkins URLs**:
 - CFT: https://build.hmcts.net/
 - SDS: https://sds-build.hmcts.net/
 - Platform: https://build.platform.hmcts.net/
 
-### Environment-Specific Sections
-
-When procedures differ between CFT and SDS:
-
+**PR Examples Format**:
 ```markdown
-## CFT Environments
-
-[CFT-specific steps]
-
-- [CFT example PR](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
-
-## SDS Environments
-
-[SDS-specific steps]
-
-- [SDS example PR](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
+Example PRs:
+- [CFT example](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
+- [SDS example](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
 ```
 
-### Change Request Notices
-
-For production changes:
-
+**Change Request Notice** (for Production):
 ```erb
 <%= warning_text('A Change Request must be raised 2-3 days before performing this in Production via <a href="https://mojcppprod.service-now.com/navpage.do">Service Now</a>') %>
 ```
 
-### Command Formatting
-
-Inline commands: \`kubectl get pods\`
-
-Command blocks:
-````
+**Command Formatting**:
+````markdown
 ```command
-kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/'
+kubectl get pods -A
 ```
 ````
 
-### Images
-
+**Images**:
 Store in `images/` or `Images/` subdirectory:
 ```markdown
-![Alt text](images/screenshot.png)
+![Description](images/screenshot.png)
 ```
 
-## Weight Management
+### Step 6: Create the File
 
-- Check existing files: `ls -l source/[directory]/`
-- Increment by 10: 10, 20, 30, 40...
-- Lower numbers appear first in navigation
-- Index pages typically use weight 1-10
+Use `create_file` tool with:
+- Correct path: `source/[directory]/[filename].html.md.erb`
+- YAML frontmatter with current date (2026-02-02)
+- Template-based content structure
+- HMCTS-specific patterns
+- Appropriate weight value
 
-## Creation Workflow
+### Step 7: Provide Testing Instructions
 
-1. **Clarify Requirements**
-   - What's the runbook topic?
-   - What type? (troubleshooting, upgrade, reference)
-   - Which environments? (CFT, SDS, both)
-   - Production procedure? (needs CR notice)
-
-2. **Determine Location**
-   - Select appropriate `source/` subdirectory
-   - Check existing files for weight values
-
-3. **Generate Structure**
-   - Create `.html.md.erb` file
-   - Add YAML frontmatter with current date
-   - Include appropriate template sections
-   - Set weight higher than existing files
-
-4. **Add HMCTS Context**
-   - Use correct cluster naming
-   - Include repo-specific PR examples
-   - Add environment progression if applicable
-   - Include CR notice if production-impacting
-
-5. **Quality Check**
-   - Extension is `.html.md.erb`
-   - YAML frontmatter complete
-   - Title is action-oriented
-   - Commands use proper formatting
-   - Internal links use relative paths
-   - Weight is appropriate
-
-## Output Format
-
-After creating a runbook, provide:
-
+Tell the user:
 ```
-✅ Runbook created successfully!
+✅ Runbook created: source/[directory]/[filename].html.md.erb
 
-📁 Location: source/[directory]/[filename].html.md.erb
-📋 Type: [Troubleshooting/Upgrade/Reference/etc]
-⚖️  Weight: [number]
-📅 Review date: [date] (12 months)
+📚 Based on template: source/Contribution-Guide/guide-examples/[template].html.md.erb
 
-🔧 How to test:
+🔧 Test locally:
 1. bundle exec middleman server
 2. Visit http://localhost:4567
 3. Navigate to [section] → [title]
 
-💡 Next steps:
+📝 Next steps:
 - Add specific cluster names/IPs
-- Update PR example links
+- Update PR example links with real PRs
 - Test all commands
 - Add screenshots to images/ directory
 ```
 
 ## Quality Checklist
 
-Before finalizing:
-- [ ] Extension is `.html.md.erb`
-- [ ] YAML frontmatter complete and valid
+Before creating, verify:
+- [ ] Read contribution guide (`source/Contribution-Guide/addingpages.html.md.erb`)
+- [ ] Read appropriate template from `guide-examples/`
+- [ ] Extension is `.html.md.erb` (NOT `.md.erb`)
+- [ ] YAML frontmatter complete with current date
 - [ ] Title is descriptive and action-oriented
-- [ ] Current date in `last_reviewed_on`
-- [ ] Weight appropriate for section
+- [ ] Weight appropriate (increment by 10)
 - [ ] Prerequisites section included
-- [ ] Commands properly formatted
+- [ ] Commands use proper formatting (backticks or code blocks)
 - [ ] PR examples use hmcts repos
-- [ ] Environment-specific sections clear
+- [ ] Environment-specific sections clear (CFT/SDS)
 - [ ] Verification steps included
-- [ ] Known issues section present
+- [ ] Troubleshooting/Known issues section
 - [ ] Related documentation linked
-- [ ] Images in images/ subdirectory
+- [ ] Images reference correct subdirectory
 - [ ] Internal links use relative paths
 
-## Examples
+## Common Patterns
 
-See `references/EXAMPLES.md` for complete examples of:
-- Troubleshooting guides
-- Upgrade procedures
-- Quick references
-- Index pages
+### Environment-Specific Sections
+When CFT and SDS differ:
+```markdown
+## CFT Environments
+[CFT-specific steps]
+- [CFT example](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
 
-## Common Patterns Reference
+## SDS Environments
+[SDS-specific steps]
+- [SDS example](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
+```
 
-See `references/PATTERNS.md` for:
-- Environment lists
-- Pre-flight checks
-- Common kubectl queries
-- Helm operations
-- PR example formats
+### Pre-flight Checks
+```markdown
+## Pre-upgrade Health Checks
+
+```command
+kubectl config current-context
+kubectl get pods -A | wc -l
+kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/'
+kubectl get hr -A | awk '/(Unknown|False)/'
+```
+```
+
+### Verification Checklist
+```markdown
+## Verification
+- [ ] Component running
+- [ ] No CrashLoopBackOff
+- [ ] Functionality working
+- [ ] No alerts firing
+```
+
+## Anti-Patterns (AVOID)
+
+- ❌ Using `.md` or `.md.erb` extension (must be `.html.md.erb`)
+- ❌ Skipping YAML frontmatter
+- ❌ Not reading contribution guides first
+- ❌ Forgetting to set `last_reviewed_on` date
+- ❌ Using absolute URLs for internal links
+- ❌ Missing verification steps
+- ❌ Not updating both CFT and SDS when applicable
+
+## Reference Files to Read
+
+Always check these before creating documentation:
+- `source/Contribution-Guide/index.html.md.erb` - Main guide
+- `source/Contribution-Guide/addingpages.html.md.erb` - Page creation rules
+- `source/Contribution-Guide/guide-examples/how-to-guide.html.md.erb` - How-to template
+- `source/Contribution-Guide/guide-examples/troubleshooting-guide.html.md.erb` - Troubleshooting template
+- `source/Contribution-Guide/guide-examples/maintenance-guide.html.md.erb` - Maintenance template
+- `source/Contribution-Guide/testing.html.md.erb` - Testing instructions
+- `source/Contribution-Guide/troubleshooting.html.md.erb` - Common file issues

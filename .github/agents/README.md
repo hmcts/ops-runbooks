@@ -1,107 +1,249 @@
-# GitHub Copilot Agents for ops-runbooks
+# GitHub Copilot Agents and Skills
 
-This directory contains custom GitHub Copilot agent definitions that help with creating and maintaining operational runbooks for HMCTS Platform Operations.
+This directory contains agents and skills that extend GitHub Copilot with specialized knowledge for HMCTS operational runbooks.
+
+## Architecture
+
+```
+.github/
+├── agents/
+│   └── runbook-creator-agent.md      # Agent that uses skills
+└── skills/
+    └── runbook-scaffolder/
+        └── SKILL.md                   # Skill with templates and patterns
+```
+
+- **Agents** - High-level personas that interact with users and use skills
+- **Skills** - Specialized capabilities with templates, patterns, and domain knowledge
 
 ## Available Agents
 
-### @runbook-scaffolder
-**Purpose**: Creates new runbook documents with proper structure and formatting.
+### Runbook Creator Agent
+**File**: `agents/runbook-creator-agent.md`
 
-**Use Cases**:
-- Generate new runbook files with correct YAML frontmatter
-- Create standardized section templates based on runbook type
-- Suggest appropriate directory placement
-- Generate index pages for new sections
+**Purpose**: Creates operational runbooks following HMCTS conventions and contribution guidelines
 
-**Example Usage**:
+**What it does**:
+- Asks clarifying questions about your documentation needs
+- Reads contribution guides from `source/Contribution-Guide/`
+- Uses the **runbook-scaffolder** skill for implementation
+- Generates `.html.md.erb` files with proper structure
+- Provides testing and customization instructions
+
+**Triggers**: "create runbook", "new runbook", "generate guide", "add page", "create documentation"
+
+**Key Features**:
+- ✅ Reads contribution guides before creating
+- ✅ Uses official templates (how-to, troubleshooting, maintenance)
+- ✅ Ensures `.html.md.erb` extension (not `.md`)
+- ✅ Follows weight increment rules
+- ✅ Includes HMCTS patterns (clusters, repos, environments)
+- ✅ Adds PR example placeholders
+- ✅ Provides testing instructions
+
+## Available Skills
+
+### Runbook Scaffolder
+**File**: `skills/runbook-scaffolder/SKILL.md`
+
+**Purpose**: Provides templates, patterns, and conventions for runbook creation
+
+**Contains**:
+- File naming conventions
+- YAML frontmatter templates
+- HMCTS-specific patterns (cluster names, environments)
+- kubectl queries and helm operations
+- PR example formats
+- Verification checklists
+- Rollback procedures
+- Command formatting examples
+
+**Used by**: Runbook Creator Agent
+
+**References**:
+- `references/PATTERNS.md` - Common patterns and templates
+- `references/EXAMPLES.md` - Complete runbook examples
+
+## How It Works
+
+1. **You invoke the agent**: "create a runbook for troubleshooting AppGateway 502 errors"
+
+2. **Agent clarifies**: Asks about type, environments, production impact
+
+3. **Agent reads guides**: 
+   - `source/Contribution-Guide/addingpages.html.md.erb`
+   - `source/Contribution-Guide/guide-examples/troubleshooting-guide.html.md.erb`
+
+4. **Agent uses skill**: Activates runbook-scaffolder for patterns and templates
+
+5. **Agent creates file**: 
+   - `source/network/troubleshooting-appgw-502.html.md.erb`
+   - Proper YAML frontmatter
+   - Template-based structure
+   - HMCTS-specific content
+
+6. **Agent provides instructions**: How to test, what to customize next
+
+## Usage Examples
+
+### Create How-To Guide
 ```
-@runbook-scaffolder create a troubleshooting guide for Prometheus alerts
-@runbook-scaffolder generate an upgrade procedure runbook for Traefik
-@runbook-scaffolder create an index page for the new Security section
+@runbook-creator create a guide for rotating SSL certificates in Application Gateway
 ```
 
-**Learn More**: See [runbook-scaffolder.md](./runbook-scaffolder.md)
+Agent will:
+- Read how-to template from contribution guides
+- Create in `source/Certificates/` or `source/network/`
+- Include prerequisites, steps, verification
+- Add change request notice if production
+- Provide testing instructions
 
-## Future Agents (Planned)
+### Create Troubleshooting Guide
+```
+@runbook-creator generate troubleshooting guide for Prometheus alerts not firing
+```
 
-### @doc-reviewer
-- Identifies runbooks past their review date
-- Checks for broken links
-- Validates command syntax
-- Flags outdated Kubernetes versions
+Agent will:
+- Read troubleshooting template
+- Create in `source/monitoring/`
+- Include symptoms, diagnostic steps, resolutions
+- Add escalation procedure
+- Reference related monitoring docs
 
-### @command-validator
-- Validates kubectl, az, terraform, helm commands
-- Checks for deprecated APIs
-- Suggests best practices
+### Create Maintenance/Upgrade Guide
+```
+@runbook-creator document the process for upgrading Dynatrace agents
+```
 
-### @pr-finder
-- Searches for relevant PR examples
-- Updates outdated PR links
-- Generates PR reference snippets
+Agent will:
+- Read maintenance template
+- Create in `source/monitoring/`
+- Include environment order, pre-checks
+- Add CFT/SDS specific sections
+- Include rollback procedure
+- Add change request notice
 
-### @cross-env-checker
-- Ensures CFT/SDS consistency
-- Identifies missing environment variants
-- Maps cluster relationships
+## Contribution Guide Integration
 
-## How to Use
+The agent **always** reads and follows:
 
-1. **Invoke an agent**: Type `@agent-name` followed by your request in GitHub Copilot Chat
-2. **Be specific**: Provide details about what you need (topic, type, environment)
-3. **Review output**: Always review generated content for accuracy
-4. **Customize**: Treat generated content as a starting point
+1. **Main Guide**: `source/Contribution-Guide/index.html.md.erb`
+   - Understand documentation benefits and best practices
 
-## Agent Architecture
+2. **Adding Pages**: `source/Contribution-Guide/addingpages.html.md.erb`
+   - File extension rules (`.html.md.erb`)
+   - Weight parameter usage
+   - YAML frontmatter requirements
+   - Core sections structure
 
-Each agent definition includes:
-- **Description**: What the agent does
-- **Capabilities**: Specific tasks it can perform
-- **Input Requirements**: What information it needs
-- **Output Format**: Templates and structures it generates
-- **Common Patterns**: Reusable patterns specific to this repo
-- **Best Practices**: Guidelines for quality output
-- **Example Usage**: Sample interactions
+3. **Templates**: `source/Contribution-Guide/guide-examples/`
+   - `how-to-guide.html.md.erb` - Operational procedures
+   - `troubleshooting-guide.html.md.erb` - Diagnostic guides
+   - `maintenance-guide.html.md.erb` - Maintenance tasks
 
-## Contributing
+4. **Testing**: `source/Contribution-Guide/testing.html.md.erb`
+   - How to preview changes locally
 
-To add or improve agents:
+## Critical Rules
 
-1. Create or update an agent definition file in this directory
-2. Follow the structure of existing agents
-3. Include comprehensive examples and patterns
-4. Test with various scenarios
-5. Update this README with the new agent
+### File Extension
+**MUST** be `.html.md.erb` - not `.md` or `.md.erb`
 
-## Workspace Context
+### YAML Frontmatter Structure
+```yaml
+---
+title: Action-Oriented Descriptive Title
+last_reviewed_on: 2026-02-02
+review_in: 12 months
+weight: [increment by 10]
+---
+```
 
-All agents have access to:
-- Repository structure and conventions
-- Existing runbooks as examples
-- HMCTS-specific patterns (cluster names, environments, repo URLs)
-- Tech docs configuration
-- Style guide and contribution guidelines
+### Content Structure
+```erb
+# <%= current_page.data.title %>
 
-## Best Practices
+[Brief description]
 
-- Always review generated content before committing
-- Customize templates to fit specific use cases
-- Keep agent definitions updated as conventions evolve
-- Provide feedback on agent performance
-- Share useful prompts with the team
+## Prerequisites
+...
+```
+
+### Weight Management
+- Increment by 10 from existing files
+- Lower numbers appear first
+- Agent checks existing files automatically
+
+## HMCTS-Specific Knowledge
+
+Both agent and skill understand:
+
+**Cluster Names**:
+- CFT: `cft-{env}-{number}-aks`, `prod-{number}-aks`
+- SDS: `ss-{env}-{number}-aks`
+
+**Environments**: Sbox → Ptlsbox → ITHC → Preview → Demo → Perftest → AAT → Production → PTL
+
+**Repositories**:
+- CFT: `cnp-flux-config`, `aks-cft-deploy`, `azure-platform-terraform`
+- SDS: `sds-flux-config`, `aks-sds-deploy`, `sds-azure-platform`
+
+**Jenkins**:
+- CFT: https://build.hmcts.net/
+- SDS: https://sds-build.hmcts.net/
+
+## Quality Checklist
+
+Agent verifies before creating:
+- [ ] Contribution guides read
+- [ ] Appropriate template selected
+- [ ] Extension is `.html.md.erb`
+- [ ] YAML frontmatter complete
+- [ ] Current date used
+- [ ] Weight incremented properly
+- [ ] Prerequisites included
+- [ ] Commands properly formatted
+- [ ] PR examples included
+- [ ] Environment sections clear
+- [ ] Verification steps present
+
+## Testing Your Runbook
+
+After creation:
+```bash
+bundle exec middleman server
+# Visit http://localhost:4567
+```
+
+Navigate to your section → your new runbook
+
+## Next Steps After Creation
+
+1. **Add specifics**: Replace placeholder cluster names and IPs
+2. **Update PRs**: Add real PR links from hmcts repos
+3. **Test commands**: Verify all commands in sandbox environment
+4. **Add screenshots**: Place in `images/` subdirectory
+5. **Cross-reference**: Link to related runbooks
+
+## Benefits
+
+- **Consistency**: All runbooks follow the same structure
+- **Compliance**: Automatically follows contribution guidelines
+- **HMCTS-Aware**: Knows cluster names, repos, environments
+- **Template-Based**: Uses official templates from contribution guide
+- **Quality**: Built-in checks prevent common mistakes
+- **Efficient**: Creates complete runbooks in seconds
 
 ## Support
 
-If an agent doesn't work as expected:
-1. Check your prompt is clear and specific
-2. Review the agent's documentation for input requirements
-3. Try rephrasing your request
-4. Check the agent definition file for examples
-5. Raise an issue or update the agent definition
+If the agent doesn't work as expected:
+1. Check your prompt is specific
+2. Provide context (type, environments)
+3. Review contribution guides
+4. Check `.github/copilot-instructions.md`
 
-## Resources
+## Related Documentation
 
-- [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
-- [Contribution Guide](../../source/Contribution-Guide/index.html.md.erb)
-- [Tech Docs Configuration](../../config/tech-docs.yml)
 - [Main README](../../README.md)
+- [Contribution Guide](../../source/Contribution-Guide/index.html.md.erb)
+- [GitHub Copilot Instructions](../copilot-instructions.md)

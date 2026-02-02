@@ -151,6 +151,30 @@ For the script this should be set as an environment variable: `export GH_TOKEN=$
 
 With this complete you can now run the bundle command to check urls in the repo.
 
+## AI Agent Skills
+
+This repository includes [Agent Skills](https://agentskills.io/) to help create runbooks more efficiently. Agent Skills are a standardized format that extends AI agent capabilities with specialized knowledge.
+
+### Available Skills
+
+- **runbook-scaffolder** - Automatically creates properly formatted runbook files following HMCTS conventions
+
+Compatible with GitHub Copilot, Claude Code, Cursor, Cline, Windsurf, and other Agent Skills-compatible tools.
+
+### Usage Example
+
+```
+create a runbook for troubleshooting DNS issues in AKS
+```
+
+The skill will generate a file with:
+- Correct `.html.md.erb` extension and YAML frontmatter
+- Standard sections (Prerequisites, Procedure, Verification, etc.)
+- HMCTS-specific patterns (cluster names, environments, PR examples)
+- Appropriate directory placement and weight
+
+See [`.agent/skills/README.md`](.agent/skills/README.md) for complete documentation.
+
 ## Publishing
 
 Run:

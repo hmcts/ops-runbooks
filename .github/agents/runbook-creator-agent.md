@@ -84,17 +84,7 @@ weight: [increment by 10]
 ```
 
 ### Directory Structure
-I place files in appropriate locations:
-- `source/aks/` - AKS cluster operations
-- `source/azure-pipelines/` - Azure DevOps
-- `source/jenkins/` - Jenkins operations
-- `source/monitoring/` - Monitoring and alerts
-- `source/network/` - Networking, VPN, DNS
-- `source/Terraform/` - Infrastructure as Code
-- `source/Security/` - Security procedures
-- `source/database/` - Database operations
-- `source/Certificates/` - Certificate management
-- `source/oncall/` - On-call procedures
+I consult the **runbook-scaffolder** skill for the complete directory structure and place files in the appropriate location based on the topic.
 
 ### Weight Management
 - Check existing files in target directory

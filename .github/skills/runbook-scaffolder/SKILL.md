@@ -49,16 +49,42 @@ Common mistake:
 
 ### Location
 Files go in `source/` directory under appropriate subdirectory:
-- `source/aks/` - AKS operations, upgrades, patching
-- `source/azure-pipelines/` - Azure DevOps issues
-- `source/jenkins/` - Jenkins operations
-- `source/monitoring/` - Monitoring, alerts, Dynatrace
-- `source/network/` - Network, VPN, DNS, AppGateway
-- `source/Terraform/` - IaC operations
-- `source/Security/` - Security procedures
-- `source/database/` - Database operations
-- `source/Certificates/` - Certificate management
-- `source/oncall/` - On-call, incident response
+
+**Complete Directory Structure**:
+- `source/Access-and-Permissions/` - Access control, RBAC, conditional access policies
+- `source/acr/` - Azure Container Registry operations and synchronization
+- `source/aks/` - AKS cluster operations, upgrades, patching, maintenance
+- `source/AppAttach/` - App attach scripts and VM configuration
+- `source/azure-pipelines/` - Azure DevOps pipeline issues and troubleshooting
+- `source/BAIS/` - BAIS-specific documentation
+- `source/BAU-Live-Services/` - Business as usual and live service operations
+- `source/Camunda/` - Camunda-specific procedures
+- `source/Certificates/` - Certificate management and renewal procedures
+- `source/Change-Requests/` - Change request procedures and templates
+- `source/Contribution-Guide/` - Documentation contribution guides and templates
+- `source/Crime/` - Crime service documentation
+- `source/database/` - Database operations, maintenance, and troubleshooting
+- `source/DLRM/` - DLRM-specific documentation
+- `source/Domain-Services/` - Domain services procedures
+- `source/Elastic-Search-and-Logstash/` - Elasticsearch and Logstash operations
+- `source/FinOps/` - Financial operations and cost management
+- `source/FSLogix-Application-Masking/` - FSLogix configuration
+- `source/heritage/` - Legacy system documentation
+- `source/Java-Upgrade/` - Java upgrade procedures
+- `source/jenkins/` - Jenkins operations and troubleshooting
+- `source/monitoring/` - Monitoring, alerts, observability, and Dynatrace
+- `source/network/` - Networking, VPN, DNS, connectivity, and AppGateway
+- `source/neuvector/` - NeuVector security operations
+- `source/onboarding/` - Onboarding procedures and guides
+- `source/oncall/` - On-call procedures and incident response
+- `source/Patching/` - Patching procedures and schedules
+- `source/PlatOps-Toolkit/` - Platform operations toolkit
+- `source/SAS-Token/` - SAS token management
+- `source/Security/` - Security procedures and policies
+- `source/Services/` - Service-specific documentation
+- `source/Terraform/` - Infrastructure as Code and Terraform operations
+- `source/Testing-Changes/` - Testing procedures and validation
+- `source/vendor-support/` - Vendor support procedures
 
 ### Required YAML Frontmatter
 

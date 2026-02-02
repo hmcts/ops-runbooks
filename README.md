@@ -153,40 +153,18 @@ With this complete you can now run the bundle command to check urls in the repo.
 
 ## AI Agent for Runbook Creation
 
-This repository includes a GitHub Copilot agent that helps create runbooks following our contribution guidelines.
+This repository includes a GitHub Copilot agent that assits in creating runbooks/guides following our contribution guidelines.
 
-### Runbook Creator Agent
-
-The **Runbook Creator Agent** (`.github/agents/runbook-creator-agent.md`) creates operational documentation by:
-- Reading contribution guides from `source/Contribution-Guide/`
-- Using official templates (how-to, troubleshooting, maintenance)
-- Applying HMCTS-specific patterns (clusters, environments, repos)
-- Generating properly formatted `.html.md.erb` files
-
-### Usage Example
+### Usage
 
 ```
 @runbook-creator create a troubleshooting guide for DNS issues in AKS
 ```
 
-The agent will:
-1. Ask clarifying questions (type, environments, production impact)
-2. Read appropriate template from contribution guides
-3. Create `source/network/troubleshooting-dns-issues.html.md.erb`
-4. Include proper YAML frontmatter with current date
-5. Add HMCTS patterns (cluster names, PR examples)
-6. Provide testing instructions
+The Runbook Creator Agent reads contribution guides, applies HMCTS-specific patterns, and generates properly formatted `.html.md.erb` files with correct YAML frontmatter, verification steps, and testing instructions.
 
-### What Gets Created
 
-- ✅ Correct `.html.md.erb` extension (not `.md`)
-- ✅ Valid YAML frontmatter (title, date, weight, review period)
-- ✅ Template-based structure from contribution guides
-- ✅ HMCTS-specific content (cluster names, repos, environments)
-- ✅ Verification and testing steps
-- ✅ Change Request notices for production procedures
-
-See [`.github/agents/README.md`](.github/agents/README.md) for complete documentation.
+See [`.github/agents/runbook-creator-agent.md`](.github/agents/runbook-creator-agent.md) for complete documentation.
 
 ## Publishing
 

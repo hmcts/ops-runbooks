@@ -224,59 +224,15 @@ Revert steps if issues arise
 
 ### Step 5: Add HMCTS-Specific Context
 
-**Cluster Names**:
-- CFT Format: `cft-{env}-{number}-aks` or `prod-{number}-aks`
-- SDS Format: `ss-{env}-{number}-aks`
-
-**Environment Order**:
-1. Sbox (cft-sbox-00-aks, cft-sbox-01-aks / ss-sbox-00-aks, ss-sbox-01-aks)
-2. Ptlsbox (cft-ptlsbox-00-aks / ss-ptlsbox-00-aks)
-3. ITHC (cft-ithc-00-aks, cft-ithc-01-aks / ss-ithc-00-aks, ss-ithc-01-aks)
-4. Preview (cft-preview-00-aks / ss-dev-01-aks)
-5. Demo (cft-demo-00-aks, cft-demo-01-aks / ss-demo-00-aks, ss-demo-01-aks)
-6. Perftest (cft-perftest-00-aks, cft-perftest-01-aks / ss-test-00-aks, ss-test-01-aks)
-7. AAT (cft-aat-00-aks, cft-aat-01-aks / ss-stg-00-aks, ss-stg-01-aks)
-8. Production (prod-00-aks, prod-01-aks / ss-prod-00-aks, ss-prod-01-aks)
-9. PTL (cft-ptl-00-aks / ss-ptl-00-aks)
-
-**Repositories**:
-- CFT Flux: `hmcts/cnp-flux-config`
-- CFT AKS: `hmcts/aks-cft-deploy`
-- CFT Azure: `hmcts/azure-platform-terraform`
-- SDS Flux: `hmcts/sds-flux-config`
-- SDS AKS: `hmcts/aks-sds-deploy`
-- SDS Azure: `hmcts/sds-azure-platform`
-- Jenkins: `hmcts/cnp-jenkins-config`
-
-**Jenkins URLs**:
-- CFT: https://build.hmcts.net/
-- SDS: https://sds-build.hmcts.net/
-- Platform: https://build.platform.hmcts.net/
-
-**PR Examples Format**:
-```markdown
-Example PRs:
-- [CFT example](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
-- [SDS example](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
-```
-
-**Change Request Notice** (for Production):
-```erb
-<%= warning_text('A Change Request must be raised 2-3 days before performing this in Production via <a href="https://mojcppprod.service-now.com/navpage.do">Service Now</a>') %>
-```
-
-**Command Formatting**:
-````markdown
-```command
-kubectl get pods -A
-```
-````
-
-**Images**:
-Store in `images/` or `Images/` subdirectory:
-```markdown
-![Description](images/screenshot.png)
-```
+Apply HMCTS-specific patterns as defined in `.github/copilot-instructions.md`:
+- Cluster naming conventions (CFT: `cft-*-aks`, SDS: `ss-*-aks`)
+- Environment progression order
+- Repository references (cnp-flux-config, sds-flux-config, etc.)
+- Jenkins URLs
+- PR example formats
+- Change Request notices for production procedures
+- Command formatting with backticks or code blocks
+- Image references in subdirectories
 
 ### Step 6: Create the File
 
@@ -291,20 +247,18 @@ Use `create_file` tool with:
 
 Tell the user:
 ```
-✅ Runbook created: source/[directory]/[filename].html.md.erb
+Runbook created: source/[directory]/[filename].html.md.erb
+Based on: source/Contribution-Guide/guide-examples/[template].html.md.erb
 
-📚 Based on template: source/Contribution-Guide/guide-examples/[template].html.md.erb
+Test locally:
+  bundle exec middleman server
+  Visit http://localhost:4567
 
-🔧 Test locally:
-1. bundle exec middleman server
-2. Visit http://localhost:4567
-3. Navigate to [section] → [title]
-
-📝 Next steps:
+Next steps:
 - Add specific cluster names/IPs
-- Update PR example links with real PRs
-- Test all commands
-- Add screenshots to images/ directory
+- Update PR links
+- Test commands
+- Add screenshots to images/
 ```
 
 ## Quality Checklist
@@ -329,7 +283,6 @@ Before creating, verify:
 ## Common Patterns
 
 ### Environment-Specific Sections
-When CFT and SDS differ:
 ```markdown
 ## CFT Environments
 [CFT-specific steps]
@@ -343,13 +296,10 @@ When CFT and SDS differ:
 ### Pre-flight Checks
 ```markdown
 ## Pre-upgrade Health Checks
-
-```command
 kubectl config current-context
 kubectl get pods -A | wc -l
 kubectl get pods -A | awk '!/(Running|Succeeded|Completed)/'
 kubectl get hr -A | awk '/(Unknown|False)/'
-```
 ```
 
 ### Verification Checklist

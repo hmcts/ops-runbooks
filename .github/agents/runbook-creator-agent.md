@@ -91,125 +91,16 @@ I consult the **runbook-scaffolder** skill for the complete directory structure 
 - Increment by 10 from highest weight
 - Lower numbers appear first in navigation
 
-## HMCTS-Specific Patterns I Use
+## HMCTS-Specific Patterns
 
-### Cluster Naming
-- **CFT**: `cft-{env}-{number}-aks` or `prod-{number}-aks`
-- **SDS**: `ss-{env}-{number}-aks`
+I apply HMCTS-specific patterns for cluster names, environments, repositories, Jenkins URLs, and PR examples as defined in `.github/copilot-instructions.md`.
 
-### Environment Order
-Standard progression for upgrades/changes:
-1. Sbox
-2. Ptlsbox
-3. ITHC
-4. Preview
-5. Demo
-6. Perftest
-7. AAT
-8. Production
-9. PTL
+## Template Structure
 
-### Repository References
-- CFT Flux: `hmcts/cnp-flux-config`
-- CFT AKS: `hmcts/aks-cft-deploy`
-- CFT Azure: `hmcts/azure-platform-terraform`
-- SDS Flux: `hmcts/sds-flux-config`
-- SDS AKS: `hmcts/aks-sds-deploy`
-- SDS Azure: `hmcts/sds-azure-platform`
-
-### Jenkins URLs
-- CFT: https://build.hmcts.net/
-- SDS: https://sds-build.hmcts.net/
-- Platform: https://build.platform.hmcts.net/
-
-### PR Examples
-```markdown
-Example PRs:
-- [CFT example](https://github.com/hmcts/cnp-flux-config/pull/XXXXX)
-- [SDS example](https://github.com/hmcts/sds-flux-config/pull/XXXXX)
-```
-
-### Change Requests
-For production procedures:
-```erb
-<%= warning_text('A Change Request must be raised 2-3 days before performing this in Production via <a href="https://mojcppprod.service-now.com/navpage.do">Service Now</a>') %>
-```
-
-## Template Examples
-
-### How-To Guide Structure
-```markdown
-## How to [Perform Task]
-Brief description
-
-## Prerequisites
-- Access requirements
-- Tools needed
-- Background knowledge
-
-## How-to steps
-1. Step with screenshots and commands
-2. Next step
-3. Final step
-
-## Verification
-Success criteria and third-party involvement
-
-## Troubleshooting
-Common issues and fixes
-
-## Additional Information
-Related tasks and best practices
-```
-
-### Troubleshooting Guide Structure
-```markdown
-## Troubleshooting [System]
-Diagnostic procedures
-
-## Prerequisites
-- Log access
-- Administrative access
-
-## Common Issues and Solutions
-
-### Issue 1: [Description]
-1. Diagnostic step
-2. Resolution step
-3. Verification
-
-## Escalation Procedure
-When to escalate
-
-## Additional Information
-Documentation and contacts
-```
-
-### Maintenance Guide Structure
-```markdown
-## [System] Maintenance Guide
-Routine maintenance
-
-## Prerequisites
-- Admin access
-- Maintenance window
-- Change process
-
-## Maintenance Tasks
-
-### Task 1: [Description]
-Frequency: [Schedule]
-Steps...
-
-## Verification
-Success criteria
-
-## Rollback Procedure
-Revert steps
-
-## Additional Information
-Schedule and impact
-```
+I use official templates from `source/Contribution-Guide/guide-examples/`:
+- **how-to-guide.html.md.erb** - Operational procedures with prerequisites, steps, and verification
+- **troubleshooting-guide.html.md.erb** - Diagnostic guides with common issues and escalation
+- **maintenance-guide.html.md.erb** - Maintenance tasks with rollback procedures
 
 ## Quality Checklist
 
@@ -232,27 +123,20 @@ Before creating, I verify:
 
 After creating your runbook:
 ```
-✅ Runbook created successfully!
+Runbook created: source/[directory]/[filename].html.md.erb
+Type: [How-to/Troubleshooting/Maintenance]
+Weight: [number]
+Based on: source/Contribution-Guide/guide-examples/[template].html.md.erb
 
-📁 Location: source/[directory]/[filename].html.md.erb
-📋 Type: [How-to/Troubleshooting/Maintenance]
-⚖️  Weight: [number]
-📅 Review date: 2026-02-02 (12 months)
-📚 Based on: source/Contribution-Guide/guide-examples/[template].html.md.erb
+Test locally:
+  bundle exec middleman server
+  Visit http://localhost:4567
 
-🔧 Test locally:
-1. bundle exec middleman server
-2. Visit http://localhost:4567
-3. Navigate to [section] → [title]
-
-📝 Next steps:
+Next steps:
 - Add specific cluster names/IPs
-- Update PR links with real examples  
+- Update PR links with real examples
 - Test all commands in sandbox
 - Add screenshots to images/ directory
-- Cross-reference related runbooks
-
-📖 Contribution guide: source/Contribution-Guide/index.html.md.erb
 ```
 
 ## Skills I Use
@@ -266,28 +150,13 @@ I utilize the **runbook-scaffolder** skill (`.github/skills/runbook-scaffolder/S
 
 ## Examples
 
-**You say:** "Create a runbook for troubleshooting Jenkins pipeline failures"
+**"Create a runbook for troubleshooting Jenkins pipeline failures"**
 
-**I do:**
-1. Ask if it's CFT, SDS, or both
-2. Read troubleshooting template from contribution guides
-3. Activate runbook-scaffolder skill
-4. Create `source/jenkins/troubleshooting-pipeline-failures.html.md.erb`
-5. Include diagnostic steps, common issues, escalation procedure
-6. Add Jenkins URLs and team contact references
-7. Provide testing instructions
+I'll ask if it's CFT, SDS, or both, then create `source/jenkins/troubleshooting-pipeline-failures.html.md.erb` using the troubleshooting template with diagnostic steps, common issues, and escalation procedures.
 
-**You say:** "Create a guide for upgrading Traefik in AKS"
+**"Create a guide for upgrading Traefik in AKS"**
 
-**I do:**
-1. Confirm this is a maintenance/upgrade procedure
-2. Read maintenance template
-3. Activate runbook-scaffolder skill  
-4. Create `source/aks/upgrading-traefik.html.md.erb`
-5. Include environment order, pre-checks, upgrade steps
-6. Add CFT/SDS specific sections with PR examples
-7. Include change request notice for production
-8. Add rollback procedure and verification steps
+I'll create `source/aks/upgrading-traefik.html.md.erb` using the maintenance template with environment progression, pre-checks, CFT/SDS sections, rollback procedures, and change request notices.
 
 ## Communication Style
 

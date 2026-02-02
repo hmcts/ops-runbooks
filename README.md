@@ -153,7 +153,7 @@ With this complete you can now run the bundle command to check urls in the repo.
 
 ## AI Agent for Runbook Creation
 
-This repository includes a GitHub Copilot agent that assits in creating runbooks/guides following our contribution guidelines.
+This repository includes a GitHub Copilot agent that assists in creating runbooks/guides following our contribution guidelines.
 
 ### Usage
 

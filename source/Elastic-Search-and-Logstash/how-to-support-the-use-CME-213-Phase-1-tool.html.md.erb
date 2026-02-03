@@ -77,7 +77,25 @@ Connect to ccd-data-store DB from Bastion server and run this query:
 SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 ```
 
-7) Check the index count prior to running the tool
+7) Ensure there are no cases currently waiting to be picked up by logstash
+
+This command will return a count for all teams with unmarked cases. 
+```
+select case_type_id, jurisdiction, count(*) from case_data cd where marked_by_logstash = 'false' group by cd.case_type_id, jurisdiction order by jurisdiction asc, case_type_id asc;
+```
+The following commands can be changed to target specific case_type_id or jurisdiction if needed.
+
+```
+select case_type_id, jurisdiction, count(*) from case_data cd where marked_by_logstash = 'false' and jurisdiction = 'Your_Jusrisdiction_Here' group by cd.case_type_id, jurisdiction order by jurisdiction asc, case_type_id asc;
+```
+
+```
+select case_type_id, jurisdiction, count(*) from case_data cd where marked_by_logstash = 'false' and case_type_id = 'Your_Case_Type_ID_Here' group by cd.case_type_id, jurisdiction order by jurisdiction asc, case_type_id asc;
+```
+
+Any of these commands should return 0 results for the case_type_id or jurisdiction you are reindexing.
+
+8) Check the index count prior to running the tool
 
 Run the below command on the Elastic search VM to get the current index count.
 
@@ -85,7 +103,23 @@ Run the below command on the Elastic search VM to get the current index count.
 curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <Your index name>
 ```
 
-8) Inform the service team to start the CME 213 Phase 1 tool
+9) Block writing to main index ahead of cloning
+
+```
+curl -X PUT "localhost:9200/<Your index name>/_settings?pretty" -H 'Content-Type: application/json' -d' {"settings": {"index.blocks.write": true}}'
+```
+
+10) Clone the index for backup incase of rollback
+
+Make sure this clones name ends in the same number as the index you are cloning.
+
+```
+curl -X POST "localhost:9200/<Your index name>/_clone/cloned-<Your index name>?pretty"
+```
+
+After this command, please check both indexes exist by running the command from step 7 again.
+
+11) Inform the service team to start the CME 213 Phase 1 tool
 
 The service team will need to run the CME 213 Phase 1 tool to start the reindexing process.
 
@@ -95,7 +129,7 @@ It will retain the original index as a backup.
 Once the tool is complete it should have used the reindexing API to copy the data from the original index to the new index along with assigning the alias to the new index.
 
 
-9) Check the reindexing tool was successful
+12) Check the reindexing tool was successful
 
 Once the service team has confirmed that the CME 213 Phase 1 tool has finished running check the index count to ensure it matches the original, the new index will be created with a +1 to the index name. 
 For example if the original index was `nfd_cases-000001` the new index will be `nfd_cases-000002`.
@@ -110,7 +144,7 @@ If the index count isnt up to what is expected but no error was shown in step 17
 curl -X GET "localhost:9200/_refresh?pretty"
 ```
 
-10) Ensure you revert the logstash instance changes made in step 5
+13) Ensure you revert the logstash instance changes made in step 5
 
 ### Post Implementation steps
 
@@ -135,13 +169,7 @@ curl -X DELETE localhost:9200/<your original index name>;
 
 If after running the tool issues are noticed the following steps should be followed:
 
-1) Delete the new index that was created as part of the re index
-
-```
-curl -X DELETE localhost:9200/<Your new index name>;
-```
-
-2) Set the index alias of our original index
+1) Set the index alias of our original index
 
 Check with service team what the alias should be if unsure.
 
@@ -153,6 +181,12 @@ Run this command to verify the alias has been set correctly
 
 ```
 curl -X GET "localhost:9200/_alias/<your index alias>?pretty"
+```
+
+2) Delete the new index that was created as part of the re index
+
+```
+curl -X DELETE localhost:9200/<Your new index name>;
 ```
 
 3) Service teams to verify if the rollback has been successful

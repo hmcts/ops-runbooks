@@ -26,3 +26,8 @@ Request the access package [from MyAccess](https://myaccess.microsoft.com/@CJSCo
 ![RBAC access request](images/rbac1.png)
 
 You will not need to wait for approval. You only need to provide a brief justification for audit purposes.
+
+## Troubleshooting
+
+If you have been granted access via an access package but your existing scripts or CLI sessions still report missing permissions, sign out and back in before raising an support request. For Azure CLI this means running `az logout` followed by `az login` (or restarting the terminal session). Refreshing the authentication tokens usually resolves the issue immediately.
+

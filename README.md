@@ -151,6 +151,21 @@ For the script this should be set as an environment variable: `export GH_TOKEN=$
 
 With this complete you can now run the bundle command to check urls in the repo.
 
+## AI Agent for Runbook Creation
+
+This repository includes a GitHub Copilot agent that assists in creating runbooks/guides following our contribution guidelines.
+
+### Usage
+
+```
+@runbook-creator create a troubleshooting guide for DNS issues in AKS
+```
+
+The Runbook Creator Agent reads contribution guides, applies HMCTS-specific patterns, and generates properly formatted `.html.md.erb` files with correct YAML frontmatter, verification steps, and testing instructions.
+
+
+See [`.github/agents/runbook-creator-agent.md`](.github/agents/runbook-creator-agent.md) for complete documentation.
+
 ## Publishing
 
 Run:

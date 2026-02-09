@@ -1,7 +1,7 @@
 ---
 title: Crime Account Access
 weight: 30
-last_reviewed_on: 2026-01-15
+last_reviewed_on: 2026-02-09
 review_in: 12 months
 ---
 
@@ -47,3 +47,26 @@ Are you a returning user (i.e. have you previously worked on this project for th
 ## Self Service Onboarding Instructions
 
 Once the tickets are created the user can now self service their access request following this [guide](https://hmcts.github.io/cjs-common-platform/onboarding/#onboarding) 
+
+## Azure DevOps Access
+
+We are moving away from Jenkins for running pipelines in Crime towards using Azure DevOps (ADO). This guide details how to get access to the CPP organisation in Azure DevOps.
+
+### Access Requirements
+
+To access the CPP organisation in Azure DevOps, you need to be a member of the **CPP Developer SC** group.
+
+Adding yourself to this group allows you to self-service your access to the project in Azure DevOps.
+
+### How to Request Access
+
+1. **Ensure you have the SC Access Package**:
+   The **CPP Developer SC** group is part of the checks in `hmcts/azure-access` that ensure a user has requested the SC access package before they can be added.
+   
+   If you haven't already, request the SC access package via the [Entitlement Packages](https://github.com/hmcts/azure-access-packages).
+
+2. **Join the CPP Developer SC Group**:
+   Once you have the SC access package, you can request to be added to the **CPP Developer SC** group.
+   This is typically done by raising a Pull Request (PR) against the [hmcts/azure-access](https://github.com/hmcts/azure-access) repository to add your username to the group.
+
+<%= warning_text('Please request this access ahead of the move from Jenkins.') %>

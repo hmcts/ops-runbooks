@@ -98,7 +98,11 @@ Once you are happy that KEDA is working across this environment you can deploy t
 
 #### Azure DevOps/Jenkins
 
-Check that the helm releases for `azure-devops-agent` in the `azure-devops` namespace and `jenkins-webhook-relay` in the `jenkins` namespace have successfully upgraded.
+Verify that the `azure-devops-agent` in the `azure-devops` namespace and `jenkins-webhook-relay` in the `jenkins` namespace Helm releases are still healthy after the KEDA upgrade (Helm status deployed, no failed revisions).
+
+Run: `helm -n <NAMESPACE> status <HELM CHART NAME>` and `helm -n <NAMESPACE> history <HELM CHART NAME>`.
+
+Confirm their KEDA ScaledJobs are reconciling.
 
 The scaledJobs created by these Helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.
 

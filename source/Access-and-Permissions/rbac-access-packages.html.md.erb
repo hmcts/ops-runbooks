@@ -7,13 +7,23 @@ review_in: 12 months
 
 # <%= current_page.data.title %>
 
+## Important
+
 As part of the HMCTS Disaster Recovery review, direct permissions pose a risk in cyber-attack scenarios. Direct RBAC access for human users on persistent data resources has been removed.
+
+To reduce this security risk and ensure auditable history, privileged access should only be granted via Access Packages. Manually adding users to privileged Entra ID groups is not supported and such memberships may be removed during reviews.
 
 ## How to get Azure privileged roles
 
 In order to get access to any environments (except Sandbox), you must be assigned to an Entra group that has been granted the necessary RBAC role on the target subscription, resource group, or resource.
 
+Being a member of an *Eligible* Entra group does not grant standing access.
+
+Privileged access is requested and managed via Access Packages and is granted on a temporary basis. Access expires automatically, ensuring permissions are time-bound and auditable.
+
 For example, if you require Contributor access to the DTS-SHAREDSERVICES-DEMO subscription, you will need to be added to the Entra group named `DTS Contributors Eligible (sub: dts-sharedservices-demo)`.
+
+Owner access follows the same process. You must be added to the appropriate *Owner Eligible* Entra group and activate access temporarily using PIM via an access package.
 
 You can verify whether you are already a member of this group by checking [this repository](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml).
 

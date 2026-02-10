@@ -17,7 +17,9 @@ To reduce this security risk and ensure auditability, privileged access should o
 
 In order to get access to any environments (except Sandbox), you must be assigned to an Entra group that has been granted the necessary RBAC role on the target subscription, resource group, or resource.
 
-Being a member of an *Eligible* Entra group does not grant standing access. Access is only active while a Privileged Identity Management (PIM) activation is in place and will automatically expire. This ensures privileged permissions are time-bound and auditable.
+Being a member of an *Eligible* Entra group does not grant standing access.
+
+Privileged access is requested and managed via Access Packages and is granted on a temporary basis. Access expires automatically, ensuring permissions are time-bound and auditable.
 
 For example, if you require Contributor access to the DTS-SHAREDSERVICES-DEMO subscription, you will need to be added to the Entra group named `DTS Contributors Eligible (sub: dts-sharedservices-demo)`.
 

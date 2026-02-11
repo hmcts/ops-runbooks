@@ -23,11 +23,11 @@ Privileged access is requested and managed via Access Packages and is granted on
 
 For example, if you require Contributor access to the DTS-SHAREDSERVICES-DEMO subscription, you will need to be added to the Entra group named `DTS Contributors Eligible (sub: dts-sharedservices-demo)`.
 
-Owner access follows the same process. You must be added to the appropriate *Owner Eligible* Entra group and activate access temporarily using PIM via an access package.
+This group confirms you are eligible for Contributor access to the DTS-SHAREDSERVICES-DEMO subscription.
+
+Owner access follows the same process. You must be added to the appropriate `Owner Eligible` Entra group and activate access temporarily using PIM via an access package.
 
 You can verify whether you are already a member of this group by checking [this repository](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml).
-
-This group confirms you are eligible for Contributor access to the DTS-SHAREDSERVICES-DEMO subscription.
 
 ## How to request access
 
@@ -40,4 +40,3 @@ You will not need to wait for approval. You only need to provide a brief justifi
 ## Troubleshooting
 
 If you have been granted access via an access package but your existing scripts or CLI sessions still report missing permissions, sign out and back in before raising an support request. For Azure CLI this means running `az logout` followed by `az login` (or restarting the terminal session). Refreshing the authentication tokens usually resolves the issue immediately.
-

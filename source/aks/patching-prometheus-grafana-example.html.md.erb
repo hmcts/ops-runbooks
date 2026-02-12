@@ -1,111 +1,143 @@
 ---
 title: Prometheus/Grafana Patching Example
 weight: 30
-last_reviewed_on: 2025-02-26
+last_reviewed_on: 2026-02-12
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
 
-This document covers a high level patching example for Prometheus/Grafana.
+This document is a guide to patching Prometheus/Grafana stack on AKS.
 
-Prometheus/Grafana patches should be tested in sbox to avoid downtime.
+**_Prometheus/Grafana patches should be tested in sbox first to avoid downtime in other environments._**
 
 It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
+Prometheus provide an [Upgrade document](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/UPGRADE.md) for each version they release which should help to understand the changes in major versions
 
-Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.
+There should be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes however there can be many release notes included depending on how long it has been since the last patch and how many versions of the Prometheus chart have been released in that time.
 
-## Updating - start with sandbox
+For example when patching from `79.11.0 → 81.6.3` there were [59](https://github.com/hmcts/cnp-flux-config/pull/42763) new versions of the chart released.
 
-In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
+**Be mindful that the PR in this instance didnt include the CRD update so it is not simply a case of merging this PR.**
 
+## Patching Sandbox
+
+In order to allow patching of sbox only, a new directory can be created for the updated crd URLs:
+
+```text
+apps/monitoring/kube-prometheus-stack-crds-upgrade-v81/kustomization.yaml
 ```
-apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomization.yaml
-```
-&
 
+which is a copy of the existing file with updated version numbers.
+
+```text
+apps/monitoring/kube-prometheus-stack-crds-upgrade-v81/kustomize.yaml
 ```
-apps/admin/kube-prometheus-stack-crds-upgrade-v56/kustomize.yaml
+
+which contains:
+
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: prometheus-crd
+  namespace: flux-system
+spec:
+  path: ./apps/monitoring/kube-prometheus-stack-crds-upgrade-v56
 ```
 
 [See example PR containing these files](https://github.com/hmcts/sds-flux-config/pull/4243/files)
 
-This enables us to target specific environments at this new crd version.
+Using this method allows us to target specific environments with the new CRD deployment.
 
-We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
+To use these files we can patch the desired cluster with this new directory in the base kustomization file e.g.: `clusters/sbox/base/kustomization.yaml`
 
-Eg: `clusters/sbox/base/kustomization.yaml`
+![](Images/cluster-patch-kustomisation.png)
 
-![](Images/patching_apps_4.png)
+```yaml
+- path: ../../../apps/monitoring/kube-prometheus-stack-crds-upgrade-v81/kustomize.yaml
+```
 
-With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/sds-flux-config/pull/4243/files)
-
-Example:
+With the new crds version now available, a patch can be added to the [sbox 00 & 01 config](https://github.com/hmcts/sds-flux-config/pull/4243/changes#diff-9f5692cf7d29df5fe317d6947c2669799f194f4ba44122272ce6a12345d64461R8) files to update the version of the chart for sbox only, example:
 
 ```yaml
 chart:
 spec:
   chart: kube-prometheus-stack
-  # Update kube-prometheus-stack-crds/kustomization.yaml when updating this
-  version: 56.6.2
+  version: 81.6.3
   sourceRef:
     kind: HelmRepository
     name: prometheus
     namespace: monitoring
 ```
 
-Update the cluster kustomization file pointing to the new crd directory created earlier.
+When ready, raise a pull request for review, [example PR](https://github.com/hmcts/sds-flux-config/pull/4243/files)
 
-Raise a pull request to upgrade the version.
-
-See [Example PR](https://github.com/hmcts/sds-flux-config/pull/4243/files)
-
-There are checks that take place when you raise a PR to validate the kustomization is valid.
-
-These can be found in the `tests` folder
+CI Checks will be carried out to make sure the changes you've made are valid and will apply successfully when merged (these can be found in the [tests](https://github.com/hmcts/cnp-flux-config/tree/master/tests) folder).
 
 Review the pipeline checks for errors. If there are no errors and the PR has been approved, merge the PR.
 
-## Checks to see if upgrade worked correctly
+## Verify Flux has applied the changes successfully
 
-Check the pods have come back up:
+### Check Pods are online
+
+Using kubectl, check the pods are online and have a short uptime, denoting a newly created pod
 
 ```bash
 kubectl get pods -n monitoring | grep kube-prometheus-stack
 ```
 
-The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.
+output:
 
-Check pods have the correct chart version:
-
-```bash
-kubectl describe pod {pod-name} -n monitoring | grep helm.sh/chart=kube-prometheus-stack
-
+```text
+kube-prometheus-stack-operator-6944864b75-2d5nb   1/1     Running     0          19m
 ```
 
-![](Images/patching_apps_5.png)
+### Check Pod versions
 
-Also, you can check on the Helm release to see if it has got correct version in the log.
+To confirm that the update took place you can check the new pods have the correct chart version:
+
+```bash
+kubectl get pod {pod-name} -o yaml -n monitoring | grep -E "app.kubernetes.io/version|chart"
+```
+
+which should return the relevant fields
+
+```text
+    app.kubernetes.io/version: 81.6.3
+    chart: kube-prometheus-stack-81.6.3
+```
+
+Also, you can check on the Helm release to see if it has got the correct version in the output.
 
 ```bash
 kubectl get hr -n monitoring
 ```
 
-![](Images/patching_apps_6.png)
+which will return all HelmReleases in the `monitoring` namespace, look for the `kube-prometheus-stack` which should show the chart version now deployed:
 
-Review pods for any new errors:
-
-```bash
-kubectl logs {pod-name} -n monitoring -f
+```text
+kube-prometheus-stack                  14d   True    Helm upgrade succeeded for release monitoring/kube-prometheus-stack.v2 with chart kube-prometheus-stack@81.6.3
 ```
 
-Prometheus does have a UI which should be checked, i.e. Grafana.
+### Review pod logs for errors
+
+Check pods for any obvious errors
+
+```bash
+kubectl logs {pod-name} -n monitoring
+```
+
+### UI Check
+
+Prometheus also has a UI which should be checked, i.e. Grafana.
 
 Ensure the CFT and SDS dashboards are accessible (requires VPN access):
-- [sds-grafana.sandbox.platform.hmcts.net/](https://sds-grafana.sandbox.platform.hmcts.net/)
-- [grafana.sandbox.platform.hmcts.net/](https://grafana.sandbox.platform.hmcts.net/)
 
-You could also delete the prometheus HRs to make sure they come back up.
+- [SDS Grafana](https://sds-grafana.sandbox.platform.hmcts.net/)
+- [CFT Grafana](https://grafana.sandbox.platform.hmcts.net/)
+
+### Optional - Delete HR to check it comes back online cleanly
 
 The example commands below are for both CFT/SDS using prometheus:
 
@@ -117,20 +149,26 @@ kubectl get hr -n monitoring
 kubectl delete hr kube-prometheus-stack -n monitoring
 ```
 
-```bash
-kubectl delete hr kube-prometheus-stack -n monitoring
-```
+As the pods come online, you will need to go through the checks again to ensure everything is working as expected.
 
-Ensure to monitor the status for the HRs and pods to ensure they come back successfully.
+- Pods are up and running
+- Logs show no errors
+- Versions are all correct
+
+## Other non-prod environments
+
+Carry out the same changes as described in this guide for all [non-production environments](https://hmcts.github.io/cloud-native-platform/environments/) in both SDS and CFT.
+
+  *This should only be carried out out if sbox was successful in both SDS and CFT clusters*
 
 ## Prod environments
 
-For Prod, there will be a renovate PR that can be merged in order to update:
+In the Flux repos there will be a renovate PR that can be merged but please check if the changes include the CRD updates as described in this guide:
 
 - [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4132/files)
 - [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/28760/files)
 
-Once the renovate PR has been merged, remove the previous patches you did for sbox:
+Once the renovate PR has been merged, remove the previous patches from non-prod environments
 
 - [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4247/files)
 - [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069/files)

@@ -172,3 +172,30 @@ Once the renovate PR has been merged, remove the previous patches from non-prod 
 
 - [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4247/files)
 - [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069/files)
+
+## Troubleshooting
+
+### Node contention
+
+As part of the deployment of Prometheus it will deploy an exporter pod. This pod runs as part of a Daemonset and as such there will be one pod per node within the AKS cluster.
+
+Even if the update works in Sandbox and many clusters it is possible to run into issues in any given cluster simply because a node is at its limit in terms of pods deployed there.
+
+If you see errors in the operator logs similar to these:
+
+```log
+ts=2026-02-12T16:10:09.539206544Z level=error caller=/usr/local/go/src/net/http/server.go:3677 msg="http: TLS handshake error from 10.48.80.180:38594: remote error: tls: bad certificate"
+ts=2026-02-12T16:11:52.004166363Z level=error caller=/usr/local/go/src/net/http/server.go:3677 msg="http: TLS handshake error from 10.48.80.180:54058: EOF"
+```
+
+Then it is likely that not all exporter pods are online. The errors are confusing because they point to System nodes and IPs that are not shown by:
+
+```bash
+kubectl get nodes -o wide
+```
+
+There are 2 options to resolve this:
+
+- Wait, when all pods are eventually deployed and running the logs will no longer show the error
+- Kill a pod on the affected node to create space for the Prometheus exporter pod to schedule.
+    - The pod that you kill should be of low benefit/impact, the best option would be a completed cronjob pod

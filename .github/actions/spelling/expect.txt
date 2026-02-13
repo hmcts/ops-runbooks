@@ -37,6 +37,7 @@ coreutils
 customisations
 CVP
 Dac
+Daemonset
 datacentre
 Datlassian
 DBfor

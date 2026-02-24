@@ -16,7 +16,8 @@ weight: 35
 - You will need to remove the resource locks via portal on the resource group if indicated by the corresponding azure pipeline.
 - You will need to remove the cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal.
 - Check the value of `ACTIVE_CRON_CLUSTER` in the `XXX-flux-config` repository, and ensure that it is `false` in the
-cluster you are going to rebuild, and `true` in the other cluster. If you need to change this value, you will need to raise a PR in the corresponding flux repo to update this value before you start rebuilding the cluster.
+cluster you are going to rebuild, and `true` in the other cluster. See an example [cnp-flux-config.preview](https://github.com/hmcts/cnp-flux-config/blob/a8bbc8209cc49e0746af4d9f6b90f4fbed060ae3/apps/flux-system/preview/00/kustomize.yaml#L18).
+If you need to change this value, you will need to raise a PR in the corresponding flux repo to update this value before you start rebuilding the cluster.
 
 
 To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:
@@ -179,7 +180,7 @@ kubectl get svc -A | grep LoadBalancer
 # see a list of nodes in the cluster and their internal IP addresses
 kubectl get nodes -o wide
 
-# to unstall the traefik2 HR
+# to uninstall the traefik2 HR
 helm uninstall traefik2 -n admin
 
 # to delete the node with the IP address assigned to the LoadBalancer service

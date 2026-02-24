@@ -10,12 +10,19 @@ weight: 35
 ## Re-building a cluster
 
 <%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
-When re-building a cluster, remove the given cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
+### Pre-requisites
+
+- Ensure you have activated `PIM Azure Contributor` role via PIM for the subscription of the cluster you want to rebuild, and that you have permissions to delete the cluster in Azure Portal.
+- You will need to remove the resource locks via portal on the resource group if indicated by the corresponding azure pipeline.
+- You will need to remove the cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal.
+- Check the value of `ACTIVE_CRON_CLUSTER` in the `XXX-flux-config` repository, and ensure that it is `false` in the
+cluster you are going to rebuild, and `true` in the other cluster. If you need to change this value, you will need to raise a PR in the corresponding flux repo to update this value before you start rebuilding the cluster.
+
 
 To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:
 
-- [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
-- [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
+- [aks-cft-deploy Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+- [aks-sds-deploy Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 
 Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.
 
@@ -25,11 +32,13 @@ Click on **Run** to start the pipeline.
 
 ### Before deployment of a cluster
 
-- Merge PR to remove a cluster from Application Gateway
+- Merge PR to remove a cluster from Application Gateway, e.g [remove SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1073/changes)
+- Merge PR(s) to toggle `ACTIVE_CRON_CLUSTER` value in the flux repo, e.g. [SDS Prod 00 example](https://github.com/hmcts/sds-flux-config/blob/b9fb5fc636a2658d33b5329de6a8f98015ae546e/apps/flux-system/prod/00/kustomize.yaml#L18)
+00 to `false` and 01 to `true` if you are rebuilding 00 cluster, and vice versa if you are rebuilding 01 cluster.
 
 #### After deployment of a cluster
 
-- Add the cluster back into Application Gateway once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
+- Add the cluster back into Application Gateway once you have confirmed deployment has been successful. [add SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1074/changes).
 
 ## Environment Specific
 
@@ -149,3 +158,31 @@ kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releas
 ```
 
 <%= warning_text('A Flux config to apply the CRDs was previously [tested](https://github.com/hmcts/cnp-flux-config/pull/14312) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7') %>
+
+### Traefix HelmRelease stuck in `Unknown` status
+
+When check the `traefik2` HelmRelease, it is stuck in `Unknown` status with the below error:
+
+```
+2026-02-20T14:42:20.743329203Z: beginning wait for 7 resources with timeout of 5m0s
+2026-02-20T14:42:20.75259956Z: Service does not have load balancer ingress IP address: admin/traefik
+2026-02-20T14:47:18.753667495Z: Service does not have load balancer ingress IP address: admin/traefik (148 duplicate lines omitted)
+```
+
+This is due to Traefik service not having an ingress IP address assigned, somehow the IP address is assigned to a node.
+To fix this, you can uninstall the `traefik2` HR, identify the node, remove the node from the cluster, and then install the HelmRelease.
+
+```bash
+# find out the LoadBalancer 'traefik' IP addresses
+kubectl get svc -A | grep LoadBalancer
+
+# see a list of nodes in the cluster and their internal IP addresses
+kubectl get nodes -o wide
+
+# to unstall the traefik2 HR
+helm uninstall traefik2 -n admin
+
+# to delete the node with the IP address assigned to the LoadBalancer service
+kubectl delete node <node-name>
+
+```

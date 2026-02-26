@@ -1,7 +1,7 @@
 ---
 title: Azure Update Manager - Operations Guide
 weight: 255
-last_reviewed_on: 2025-04-01
+last_reviewed_on: 2026-02-26
 review_in: 12 months
 ---
 # <%= current_page.data.title %>
@@ -21,7 +21,7 @@ review_in: 12 months
 Azure Update Manager is a unified service, tightly integrated into the Azure Portal, simplifying the patching of Windows and Linux operating systems.
 
 **BEWARE**
-*Azure Update Manager (AUM) is a different service to the similarly named service, Update Management in Azure Automation. This can create confusion when searching for help within the Azure documentation.*
+HMCTS is using Azure Update Manager (AUM) within multiple Azure platforms and where possible these instructions will be as general as possible.  However, there may be some differences in the way AUM is managed across the platforms, so be sure to check the repositories being used.  
 
 - **Azure Update Manager [documentation](https://learn.microsoft.com/en-us/azure/update-manager/)**
 
@@ -36,10 +36,15 @@ HMCTS adopted AUM in February 2024 and many VMs are already protected. Additiona
 
 Azure policy has been used to set VM **Update Settings**, enabling periodic assessment for all VMs within the management group.
 
-[Github Azure-Policy](https://github.com/hmcts/azure-policy)
-
+CNP - [Github Azure-Policy](https://github.com/hmcts/azure-policy)
+azure-policy/assignments/mgmt-groups/mg-HMCTS/
 - Windows VMs - assign.aum_Windows_scan.json
-- Linux VMs - assign.aum_Windows_scan.json
+- Linux VMs - assign.assign.aum_Linux_scan.json
+
+CP - [Github Azure-Policy](https://github.com/hmcts/cpp-azure-policy)
+assignments/nonlive/subscriptions/subscription-XYZ/
+- Linux VMs - assign.aum_scan_ubuntu24_vms.json
+- Linux VMSS - assign.aum_scan_ubuntu24_vmss.json
 
 ## Updating OS
 

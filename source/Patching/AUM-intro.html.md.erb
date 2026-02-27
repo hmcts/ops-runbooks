@@ -9,7 +9,7 @@ review_in: 12 months
 **Contents**
 
 - [Intro](#intro)
-- [Pre-requirements](#pre-requirements)
+- [Pre-requirements](#pre-requisites)
 - [Scripting AUM](#scripting-aum)
 - [Enabling VM OS Scans](#enabling-vm-os-scans)
 - [Updating OS](#updating-os)
@@ -20,15 +20,20 @@ Azure Update Manager is a unified service, tightly integrated into the Azure Por
 
 HMCTS is using Azure Update Manager (AUM) within multiple Azure platforms, so be sure to check the repositories being used are correct for your platform.  
 
-- **Azure Update Manager [documentation](https://learn.microsoft.com/en-us/azure/update-manager/)**
+- If you are changing schedules, VMs targeted or scanning policy → use this guide + repos
+- If you are doing one-off manual patching, use [Link](https://hmcts.github.io/ops-runbooks/Patching/AUM-clickops.html)
+- For troubleshooting AUM, use [Link](https://hmcts.github.io/ops-runbooks/Patching/AUM-troubleshooting.html)
+- **Microsoft's Azure Update Manager [documentation](https://learn.microsoft.com/en-us/azure/update-manager/)**
 
 - **Support matrix for Azure Update Manager**
   - Only supported configurations will receive patches [Supported Operating Systems](https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os#supported-operating-systems).
 
-## Pre-requirements
-AUM requires an assessment of the VM's OS before anything else can happen, which can be triggered manually in the Azure Portal. This is also a very useful troubleshooting step, as it proves AUM operates and ths process is benign.  
+Please beware and do not confuse Azure Update Manager with the legacy and similarly named Update Management (Azure Automation).
 
-Find the VM in the Azure portal, select Updates, from the Operations menu. Then click "Check for updates" and confirm to trigger the update. Wait 10 minutes, to an hour for the results to be returned. An error message will be displayed, if the process fails for any reason.
+## Pre-requisites
+AUM requires an assessment of the VM's OS before anything else can happen, which can be triggered manually in the Azure Portal. This is also a very useful troubleshooting step, as it proves AUM operates and this process is benign to the VM's OS.  
+
+Find the VM in the Azure portal, select Updates, from the Operations menu. Then click "Check for updates" and confirm to trigger the assessment. Wait 10 minutes, to 1 hour for the results to be returned. An error message will be displayed, if the process fails for any reason.
 
 # Scripting AUM
 
@@ -43,7 +48,7 @@ Specific instructions are in the README.md file of each repository.
 CNP (Via Management Groups) - [GitHub Azure-Policy](https://github.com/hmcts/azure-policy)
 azure-policy/assignments/mgmt-groups/mg-HMCTS/
 - Windows VMs - assign.aum_Windows_scan.json
-- Linux VMs - assign.assign.aum_Linux_scan.json
+- Linux VMs - assign.aum_Linux_scan.json
 
 CP (Via Subscriptions) - [GitHub Azure-Policy](https://github.com/hmcts/cpp-azure-policy)
 assignments/environment/subscriptions/subscription-XYZ/

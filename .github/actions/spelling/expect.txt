@@ -34,11 +34,13 @@ clusterrole
 clusterrolebinding
 containerised
 coreutils
+COSMOSDB
 customisations
 CVP
 Dac
 Daemonset
 datacentre
+datasources
 Datlassian
 DBfor
 dbsetup
@@ -50,6 +52,7 @@ dgwzf
 dnat
 dockerfiles
 dsl
+dtsse
 eba
 EDB
 emoji
@@ -63,6 +66,7 @@ geolocationfile
 GEOLOCATIONUPDATES
 Glust
 gluster
+grafana
 Hashicorp
 hashivault
 hcp
@@ -155,6 +159,7 @@ totp
 TTLs
 Tunnelblick
 Txx
+UIDs
 userassignedidentities
 utilisation
 Verma

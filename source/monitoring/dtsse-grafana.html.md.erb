@@ -1,0 +1,279 @@
+---
+title: DTSSE Grafana Installation And Management
+last_reviewed_on: 2026-03-09
+review_in: 6 months
+weight: 41
+---
+
+# <%= current_page.data.title %>
+
+This page covers the DTSSE Managed Grafana instance, its PostgreSQL backend, the dashboard data ingestion job, and the main repos involved in day-to-day management.
+
+## Repositories and code paths
+
+Use these repos for different parts of the stack:
+
+| Area | Repo | Main code paths | Notes |
+| --- | --- | --- | --- |
+| Managed Grafana infrastructure | [hmcts/grafana-infrastructure](https://github.com/hmcts/grafana-infrastructure) | `components/grafana/main.tf`, `components/grafana/grafana.tf`, `components/grafana/postgres.tf`, `components/grafana/action-group.tf`, `components/grafana/data.tf`, `components/grafana/variables.tf`, `environments/aat/aat.tfvars`, `environments/prod/prod.tfvars`, `azure-pipelines.yml` | This is the current source of truth for the DTSSE Managed Grafana stack. |
+| Grafana folders, dashboards, datasources, and library panels | [hmcts/grafana-infrastructure](https://github.com/hmcts/grafana-infrastructure) | `components/grafana-config/main.tf`, `components/grafana-config/folders-from-json.tf`, `components/grafana-config/dashboards-from-json.tf`, `components/grafana-config/datasources-from-json.tf`, `components/grafana-config/panels-from-json.tf`, `components/grafana-config/config/aat/`, `components/grafana-config/config/prod/`, `azure-pipelines.yml` | This is the dashboard-as-code control plane for DTSSE Managed Grafana. |
+| Dashboard data ingestion app | [hmcts/dtsse-dashboard-ingestion](https://github.com/hmcts/dtsse-dashboard-ingestion) | `src/main/run.ts`, `src/main/executor.ts`, `src/main/query/interdependent.ts`, `src/main/interdependent/jenkins.metrics.ts`, `src/main/jenkins/cosmos.ts`, `azure-pipelines.yaml` | Reads data from external systems and writes normalized rows into the DTSSE dashboard PostgreSQL database. |
+| Runtime deployment of ingestion job | [hmcts/cnp-flux-config](https://github.com/hmcts/cnp-flux-config) | `apps/dtsse/dtsse-dashboard-ingestion/`, `apps/dtsse/aat/base/kustomization.yaml`, `apps/dtsse/prod/base/kustomization.yaml`, `apps/dtsse/automation/kustomization.yaml` | Deploys the ingestion workload to AKS. |
+| Shared Helm chart for the ingestion job | [hmcts/hmcts-charts](https://github.com/hmcts/hmcts-charts) | `stable/dtsse-dashboard-ingestion/Chart.yaml`, `stable/dtsse-dashboard-ingestion/values.yaml` | Defines the reusable CronJob/chart defaults. |
+
+## Grafana instance and PostgreSQL
+
+The Managed Grafana instance is created in `grafana-infrastructure` by `azurerm_dashboard_grafana.main` in [`components/grafana/grafana.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/grafana.tf). The same component also assigns the Azure roles `Grafana Viewer`, `Grafana Editor`, and `Grafana Admin` to Azure AD groups.
+
+The PostgreSQL database that backs the dashboard data is created from [`components/grafana/postgres.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/postgres.tf) using the shared `terraform-module-postgresql-flexible` module. The connection string is written to Key Vault as the `db-url` secret and is consumed later by the ingestion job.
+
+The rest of the DTSSE Grafana support resources are created alongside it in the same repo:
+
+- Resource group: [`components/grafana/main.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/main.tf)
+- Key Vault and App Insights connection-string secret: [`components/grafana/main.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/main.tf)
+- Application Insights instance: [`components/grafana/main.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/main.tf)
+- Alert action group and Key Vault secret for its name: [`components/grafana/action-group.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/action-group.tf)
+
+The main environment-specific settings are:
+
+- AAT: [`environments/aat/aat.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/aat/aat.tfvars)
+- Production: [`environments/prod/prod.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/prod/prod.tfvars)
+
+One naming detail to remember: production is still named `dtsse-grafana10-prod` even though the deployed `grafana_major_version` is now `11`.
+
+## Grafana major version upgrades
+
+The Grafana major version is controlled by `grafana_major_version` in the environment tfvars files:
+
+- AAT: [`environments/aat/aat.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/aat/aat.tfvars)
+- Production: [`environments/prod/prod.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/prod/prod.tfvars)
+
+To perform a major upgrade:
+
+1. Change `grafana_major_version` in AAT first.
+2. Raise a PR in [`azure-pipelines.yml`](https://github.com/hmcts/grafana-infrastructure/blob/main/azure-pipelines.yml) and review the Terraform plan for `aat`.
+3. Merge the change and validate the AAT instance, including the token-management and Grafana configuration stages in the same pipeline.
+4. Repeat the same process for `prod`.
+
+Useful related code:
+
+- Token validation and rotation are handled by `ManageGrafanaToken` in [`azure-pipelines.yml`](https://github.com/hmcts/grafana-infrastructure/blob/main/azure-pipelines.yml).
+- The token scripts are [`scripts/manage_grafana_service_account.sh`](https://github.com/hmcts/grafana-infrastructure/blob/main/scripts/manage_grafana_service_account.sh) and [`scripts/validate_grafana_token.sh`](https://github.com/hmcts/grafana-infrastructure/blob/main/scripts/validate_grafana_token.sh).
+
+## PostgreSQL firewall setup
+
+The PostgreSQL access model is environment-specific:
+
+- In production, [`environments/prod/prod.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/prod/prod.tfvars) sets `public_access = true`.
+- In AAT, [`environments/aat/aat.tfvars`](https://github.com/hmcts/grafana-infrastructure/blob/main/environments/aat/aat.tfvars) sets `public_access = false`.
+
+When `public_access = true`, [`components/grafana/postgres.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/postgres.tf) creates two firewall rules, `grafana1000` and `grafana1001`, using the Managed Grafana outbound IP addresses. This is the current production pattern.
+
+When `public_access = false`, no firewall rules are created. AAT instead relies on the delegated PostgreSQL subnet looked up in [`components/grafana/data.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/data.tf).
+
+If database connectivity breaks after a Grafana change, check:
+
+- The current value of `public_access`
+- The Grafana outbound IP list on the Managed Grafana resource
+- The generated `azurerm_postgresql_firewall_rule` entries
+- The `db-url` Key Vault secret written by Terraform
+
+## Access control via `azure-access`
+
+Access is split between Terraform role assignments and Azure AD group membership:
+
+- `grafana-infrastructure` decides which Azure AD groups receive Grafana roles in [`components/grafana/variables.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/variables.tf) and binds them in [`components/grafana/grafana.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana/grafana.tf).
+- `azure-access` manages Azure AD group membership declaratively from [`users/groups.yml`](https://github.com/hmcts/azure-access/blob/master/users/groups.yml) and [`users/prod_users.yml`](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml).
+
+Current default role mapping in `grafana-infrastructure` is:
+
+- Viewers: `DTS CFT Developers`, `DTS SDS Developers`, `DTS SE - Grafana Readers`
+- Editors: `DTS Grafana Editors`
+- Admins: `DTS Platform Operations`
+
+Operational notes:
+
+- `DTS Grafana Editors` is explicitly defined in [`azure-access/users/groups.yml`](https://github.com/hmcts/azure-access/blob/master/users/groups.yml).
+- `DTS SE - Grafana Readers` is managed in [`azure-access/users/prod_users.yml`](https://github.com/hmcts/azure-access/blob/master/users/prod_users.yml). That group is consumed directly by the Grafana Terraform role assignments.
+- For `justice.gov.uk` users, follow the guest invite prerequisites in [`azure-access/README.md`](https://github.com/hmcts/azure-access/blob/master/README.md) before adding group membership.
+
+Grafana access is controlled by the Grafana role assignments in Terraform and by Azure AD group membership in `azure-access`. It is not governed by a separate Grafana-specific access-package flow in this implementation.
+
+## Dashboard configuration repo and creating new dashboards
+
+Dashboard configuration is managed in [`hmcts/grafana-infrastructure`](https://github.com/hmcts/grafana-infrastructure) under `components/grafana-config`.
+
+The control points are:
+
+- [`components/grafana-config/folders-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/folders-from-json.tf)
+  Creates Grafana folders from `config/<environment>/folders-json/*.json`.
+- [`components/grafana-config/dashboards-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/dashboards-from-json.tf)
+  Creates Grafana dashboards from `config/<environment>/dashboard-json/**/*.json`.
+- [`components/grafana-config/datasources-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/datasources-from-json.tf)
+  Creates datasources from `config/<environment>/datasources-json/*.json`.
+- [`components/grafana-config/panels-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/panels-from-json.tf)
+  Creates library panels from `config/<environment>/panel-json/**/*.json`.
+- [`azure-pipelines.yml`](https://github.com/hmcts/grafana-infrastructure/blob/main/azure-pipelines.yml)
+  Runs the `Configure Grafana Resources` stage, retrieves `grafana-url` and `grafana-auth` from Key Vault, and applies the `grafana-config` Terraform component.
+
+Environment content is stored here:
+
+- AAT: [`components/grafana-config/config/aat/`](https://github.com/hmcts/grafana-infrastructure/tree/main/components/grafana-config/config/aat)
+- Production: [`components/grafana-config/config/prod/`](https://github.com/hmcts/grafana-infrastructure/tree/main/components/grafana-config/config/prod)
+
+Current structure:
+
+- `folders-json/` defines Grafana folders and UIDs.
+- `dashboard-json/<folder>/` stores exported dashboard JSON grouped by Grafana folder.
+- `datasources-json/` stores datasource definitions such as `azure-monitor.json` and `postgresql-dashboard.json`.
+- `panel-json/<category>/` stores reusable library panels.
+
+This is the authoritative dashboard-as-code implementation for DTSSE Managed Grafana. `cnp-flux-config` still contains dashboard-as-code patterns for the platform monitoring stack, but it is not the control plane for DTSSE Managed Grafana.
+
+### Creating a new dashboard
+
+Use this workflow:
+
+1. Create or update the dashboard in the Managed Grafana UI in AAT.
+2. Export the dashboard JSON from Grafana.
+3. Decide which folder it belongs to. If the folder does not exist yet, add a folder definition under `components/grafana-config/config/aat/folders-json/` and `components/grafana-config/config/prod/folders-json/`.
+4. If you are introducing a new folder path, add the matching folder UID mapping for that path in [`components/grafana-config/dashboards-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/dashboards-from-json.tf). The dashboard JSON path and the Terraform `folder_mappings` entry must stay aligned.
+5. Commit the dashboard JSON to `components/grafana-config/config/aat/dashboard-json/<folder>/`.
+6. Raise a PR in [`grafana-infrastructure`](https://github.com/hmcts/grafana-infrastructure) and review the Terraform plan for `aat`.
+7. Merge the change and validate the dashboard in AAT.
+8. Promote the same JSON to `components/grafana-config/config/prod/dashboard-json/<folder>/`, then repeat the same PR and merge flow for `prod`.
+
+If the dashboard needs a new datasource or reusable panel, add the supporting JSON in the same repo:
+
+- Datasource: `components/grafana-config/config/<environment>/datasources-json/`
+- Library panel: `components/grafana-config/config/<environment>/panel-json/`
+
+If you introduce a new library-panel category, also update [`components/grafana-config/panels-from-json.tf`](https://github.com/hmcts/grafana-infrastructure/blob/main/components/grafana-config/panels-from-json.tf) so the new category is included in `panel_folder_mappings`.
+
+The Grafana service-account token is already managed in Key Vault and can be used for API export/import:
+
+- Token secret: `grafana-auth`
+- Token name secret: `grafana-auth-name`
+- Key Vault: `dtsse-aat` or `dtsse-prod`
+
+Example export flow:
+
+```bash
+export GRAFANA_NAME=dtsse-grafana-aat
+export GRAFANA_RG=dtsse-aat
+export GRAFANA_KV=dtsse-aat
+export GRAFANA_UID=<dashboard_uid>
+
+export GRAFANA_URL=$(az grafana show -n "$GRAFANA_NAME" -g "$GRAFANA_RG" --query properties.endpoint -o tsv)
+export GRAFANA_TOKEN=$(az keyvault secret show --vault-name "$GRAFANA_KV" --name grafana-auth --query value -o tsv)
+
+curl -sS \
+  -H "Authorization: Bearer $GRAFANA_TOKEN" \
+  "$GRAFANA_URL/api/dashboards/uid/$GRAFANA_UID" \
+  -o "$GRAFANA_UID.json"
+```
+
+Import is the same pattern using `POST /api/dashboards/db`, but the standard DTSSE path is to commit the JSON into `grafana-infrastructure` and let the pipeline apply it.
+
+## How Jenkins publishes data to Cosmos
+
+The write-side lives in [`hmcts/cnp-jenkins-library`](https://github.com/hmcts/cnp-jenkins-library), not in the Grafana infra repo.
+
+The Jenkins-side Cosmos credentials are configured in [`cnp-flux-config/apps/jenkins/jenkins/jenkins.yaml`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins.yaml), where Jenkins defines:
+
+- `COSMOSDB_TOKEN_KEY`
+- The `azureCosmosDB` credential with id `cosmos-connection`
+- The Cosmos endpoint `https://${pipeline-metrics-account-name}.documents.azure.com:443/`
+
+Key code paths:
+
+- [`src/uk/gov/hmcts/contino/MetricsPublisher.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/contino/MetricsPublisher.groovy)
+  Writes build/stage events into the `pipeline-metrics` Cosmos container.
+- [`src/uk/gov/hmcts/pipeline/CVEPublisher.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/pipeline/CVEPublisher.groovy)
+  Writes dependency scan output into `cve-reports`.
+- [`src/uk/gov/hmcts/contino/DocumentPublisher.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/contino/DocumentPublisher.groovy)
+  Publishes JSON documents into a chosen Cosmos container.
+- [`vars/publishPerformanceReports.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/vars/publishPerformanceReports.groovy)
+  Uses the document publisher for Gatling/performance reports, which land in `performance-metrics`.
+- [`src/uk/gov/hmcts/contino/CosmosDbTargetResolver.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/contino/CosmosDbTargetResolver.groovy)
+  Chooses the target Cosmos database. Default is `jenkins`; repos tagged with the `jenkins-sds` topic go to `sds-jenkins`.
+
+## How the data ingestion job works
+
+The DTSSE ingestion app is [`hmcts/dtsse-dashboard-ingestion`](https://github.com/hmcts/dtsse-dashboard-ingestion), and it is deployed by Flux as the `dtsse-dashboard-ingestion` HelmRelease.
+
+Deployment/runtime:
+
+- Base HelmRelease: [`cnp-flux-config/apps/dtsse/dtsse-dashboard-ingestion/dtsse-dashboard-ingestion.yaml`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/dtsse/dtsse-dashboard-ingestion/dtsse-dashboard-ingestion.yaml)
+- AAT overlay: [`cnp-flux-config/apps/dtsse/dtsse-dashboard-ingestion/aat/00.yaml`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/dtsse/dtsse-dashboard-ingestion/aat/00.yaml)
+- Production overlays: [`cnp-flux-config/apps/dtsse/dtsse-dashboard-ingestion/prod/00.yaml`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/dtsse/dtsse-dashboard-ingestion/prod/00.yaml) and `prod/01.yaml`
+- Shared chart defaults: [`hmcts-charts/stable/dtsse-dashboard-ingestion/values.yaml`](https://github.com/hmcts/hmcts-charts/blob/master/stable/dtsse-dashboard-ingestion/values.yaml)
+
+Current schedules are:
+
+- AAT: hourly
+- Production: two staggered CronJobs running every ten minutes
+
+Secrets injected into the job include:
+
+- `db-url`
+- `cosmos-key`
+- `cosmos-db-name`
+- `jenkins-databases`
+- `github-token`
+- `sonar-token`
+- `jira-token`
+- `snow-username`
+- `snow-password`
+
+Application flow:
+
+1. [`src/main/run.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/run.ts) loads every query file in `src/main/query`.
+2. [`src/main/executor.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/executor.ts) runs database migrations first, then executes the queries.
+3. [`src/main/query/interdependent.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/query/interdependent.ts) runs the ordered datasets that depend on one another.
+4. [`src/main/interdependent/jenkins.metrics.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/interdependent/jenkins.metrics.ts) reads Jenkins metrics from Cosmos, validates them, and writes normalized records into PostgreSQL.
+5. [`src/main/jenkins/cosmos.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/jenkins/cosmos.ts) reads from the Cosmos containers `pipeline-metrics`, `cve-reports`, `performance-metrics`, and `app-helm-chart-metrics`.
+6. [`src/main/config.ts`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/config.ts) resolves all secrets from environment variables or Key Vault-mounted properties.
+
+The job is therefore a **read from Cosmos and APIs, write to PostgreSQL** pipeline. Grafana then reads from PostgreSQL.
+
+## How to migrate a repo to another team
+
+There are two different meanings of “move to another team” here.
+
+### 1. Move a repository to another reporting team in Grafana
+
+The dashboard database stores repository ownership in `github.repository.team_id`.
+
+Use the dedicated Azure DevOps pipeline from [`dtsse-dashboard-ingestion/azure-pipelines.yaml`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/azure-pipelines.yaml):
+
+- Pipeline purpose: `Update Team ID for GitHub Repository`
+- Inputs:
+  - GitHub repo URL(s)
+  - Target `team_id`
+  - Environment (`aat` or `prod`)
+
+The pipeline fetches `db-url` from Key Vault and runs [`src/main/admin/github.update-team-id.sh`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/src/main/admin/github.update-team-id.sh), which updates `github.repository.team_id` directly in PostgreSQL.
+
+The valid `team_id` values are listed in [`dtsse-dashboard-ingestion/README.md`](https://github.com/hmcts/dtsse-dashboard-ingestion/blob/master/README.md).
+
+### 2. Move Flux ownership of the DTSSE namespace or workload
+
+If the operational ownership of the namespace changes in `cnp-flux-config`, the main control points are:
+
+- [`apps/dtsse/base/kustomize.yaml`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/dtsse/base/kustomize.yaml)
+  Update `TEAM_AAD_GROUP_ID` and, if needed, the Slack channel.
+- [`CODEOWNERS`](https://github.com/hmcts/cnp-flux-config/blob/master/CODEOWNERS)
+  Update the `apps/dtsse/` owner entry.
+- Any namespace/environment kustomizations under `apps/dtsse/`
+  Update references if the namespace itself is being restructured.
+
+Useful background docs in `cnp-flux-config`:
+
+- [`docs/repo-setup.md`](https://github.com/hmcts/cnp-flux-config/blob/master/docs/repo-setup.md)
+- [`docs/app-deployment-v2.md`](https://github.com/hmcts/cnp-flux-config/blob/master/docs/app-deployment-v2.md)
+
+If you are creating a new namespace rather than reusing `dtsse`, the helper scripts are:
+
+- [`bin/v2/add-namespace.sh`](https://github.com/hmcts/cnp-flux-config/blob/master/bin/v2/add-namespace.sh)
+- [`bin/v2/add-namespace-to-env.sh`](https://github.com/hmcts/cnp-flux-config/blob/master/bin/v2/add-namespace-to-env.sh)

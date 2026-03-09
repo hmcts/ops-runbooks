@@ -42,9 +42,10 @@ Click on **Run** similar to above but now with Action set to Apply to start the 
 - Merge PR(s) to toggle `ACTIVE_CRON_CLUSTER` value in the flux repo, e.g. [SDS Prod 00 example](https://github.com/hmcts/sds-flux-config/blob/b9fb5fc636a2658d33b5329de6a8f98015ae546e/apps/flux-system/prod/00/kustomize.yaml#L18)
 00 to `false` and 01 to `true` if you are rebuilding 00 cluster, and vice versa if you are rebuilding 01 cluster.
 - Raise PR to upgrade the AKS version of the required cluster, see [this example](https://github.com/hmcts/aks-cft-deploy/pull/815)
+- Run the ADO pipeline as mentioned above to see a plan for the env
 - Delete the AKS cluster that was removed from the Application Gateway
 - Merge the PR to upgrade the AKS version of the required cluster
-- Run the ADO pipeline as mentioned above
+- Run an apply of the deploy pipeline to  rebuild the cluster
 - Add the cluster back into Application Gateway once you have confirmed deployment has been successful, for example [add SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1074/changes)
 
 

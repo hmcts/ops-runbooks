@@ -13,6 +13,7 @@ weight: 35
 
 - Ensure you have activated `PIM Azure Contributor` role via PIM for the subscription of the cluster you want to rebuild, and that you have permissions to delete the cluster in Azure Portal.
 - You will need to remove the resource locks via portal on the resource group if indicated by the corresponding azure pipeline. It can be best practice to do this before deleting the cluster, to avoid any potential issues with the pipeline.
+- Make Dynatrace aware in `#dynatrace-help-admins` since this has a disruptive effect on their monitoring services, with advance notice they can create maintenance windows during the change.
 - Announce in the relevant slack channels `#cloud-native-announce` and `#sds-cloud-native` several days before the change to give plenty of advance notice.
 
 ## Common Steps and Pipeline Use
@@ -26,7 +27,6 @@ To re-build the cluster you need to run the pipeline in a given environment, and
 Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Plan first to see expected actions, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.
 
 Click on **Run** similar to above but now with Action set to Apply to start the pipeline and build.
-Make Dynatrace aware in `#dynatrace-help-admins` since this has a disruptive effect on their monitoring services, with advance notice they can create maintenance windows during the change.
 
 <%= warning_text('If not targeting a certain environment in pipeline runs, ensure that no Terraform AKS patch updates are happening, as they will cause a node pool upgrade and downtime, i,e 1.3.1 -> 1.3.2') %>
 

@@ -9,27 +9,50 @@ weight: 35
 
 ## Re-building a cluster
 
-<%= warning_text('Re-building a cluster is only done when absolutely necessary.') %>
-When re-building a cluster, remove the given cluster from application gateway if there is a 00 and 01 setup, and then delete the cluster manually in portal. You will have to remove the lock on resource group if applied.
+### Pre-requisites
+
+- Ensure you have activated `PIM Azure Contributor` role via PIM for the subscription of the cluster you want to rebuild, and that you have permissions to delete the cluster in Azure Portal.
+- You will need to remove the resource locks via portal on the resource group if indicated by the corresponding azure pipeline. It can be best practice to do this before deleting the cluster, to avoid any potential issues with the pipeline.
+- Make Dynatrace aware in `#dynatrace-help-admins` since this has a disruptive effect on their monitoring services, with advance notice they can create maintenance windows during the change.
+- Announce in the relevant slack channels `#cloud-native-announce` and `#sds-cloud-native` several days before the change to give plenty of advance notice.
+
+## Common Steps and Pipeline Use
+
 
 To re-build the cluster you need to run the pipeline in a given environment, and for the given cluster you deleted:
 
-- [CFT Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
-- [SDS Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
+- [aks-cft-deploy Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=766)
+- [aks-sds-deploy Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=482)
 
-Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Apply, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.
+Click on **Run pipeline** (blue button) in top right of Azure DevOps. Ensure that Action is set to Plan first to see expected actions, Cluster is set to whichever one you want to build and that the environment is selected from the drop down menu.
 
-Click on **Run** to start the pipeline.
+Click on **Run** similar to above but now with Action set to Apply to start the pipeline and build.
 
-## Common Steps
+<%= warning_text('If not targeting a certain environment in pipeline runs, ensure that no Terraform AKS patch updates are happening, as they will cause a node pool upgrade and downtime, i,e 1.3.1 -> 1.3.2') %>
 
-### Before deployment of a cluster
 
-- Merge PR to remove a cluster from Application Gateway
 
-#### After deployment of a cluster
+### Rebuilding a cluster
 
-- Add the cluster back into Application Gateway once you have confirmed deployment has been successful. [PR example here](https://github.com/hmcts/azure-platform-terraform/pull/595).
+
+(If performing an AKS Upgrade)
+
+- Merge PR to remove a cluster from Application Gateway, e.g [remove SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1073/changes).
+- Check that the relevant Application Gateways backend pools correctly only point to 1 target instead of 2.
+- Merge PR(s) to toggle `ACTIVE_CRON_CLUSTER` value in the flux repo, e.g. [SDS Prod 00 example](https://github.com/hmcts/sds-flux-config/blob/b9fb5fc636a2658d33b5329de6a8f98015ae546e/apps/flux-system/prod/00/kustomize.yaml#L18)
+00 to `false` and 01 to `true` if you are rebuilding 00 cluster, and vice versa if you are rebuilding 01 cluster.
+- Raise PR to upgrade the AKS version of the required cluster, see [this example](https://github.com/hmcts/aks-cft-deploy/pull/815)
+- Run the ADO pipeline as mentioned above to see a plan for the env
+- Delete the AKS cluster that was removed from the Application Gateway
+- Merge the PR to upgrade the AKS version of the required cluster
+- Run an apply of the deploy pipeline to  rebuild the cluster
+- Add the cluster back into Application Gateway once you have confirmed deployment has been successful, for example [add SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1074/changes)
+
+
+(If you just need to rebuild the cluster, without an AKS version upgrade)
+
+- Run the ADO pipeline as mentioned above to build the AKS cluster as it's defined in code
+- Add the cluster back into Application Gateway once you have confirmed deployment has been successful, for example [add SDS Prod 01](https://github.com/hmcts/sds-azure-platform/pull/1074/changes)
 
 ## Environment Specific
 
@@ -113,7 +136,27 @@ Once the swap over is fully complete then you can delete the old cluster
 
 - Check all pods are deployed and running. Compare with pods status reference taken pre-deployment
 
+### PTL
+
+Rebuilding PTL is very disruptive and must be done in a change request out of hours with enough time to fix issues as they arise. It is not in any HA setup, so causes complete downtime for Jenkins and all developer workflows, as well as ceasing all image automation across the relevant platform whilst it's down.
+
+Announce with plenty of advance notice, and coordinate with [upcoming releases](https://tools.hmcts.net/confluence/spaces/RSTR/pages/299860569/DTS+Release+Management) to minimise disruption and risk.
+
+It follows this subset of the steps, since there is no Application Gateway in front of the cluster.
+
+- Raise PR to upgrade the AKS version of the required cluster, see [this example](https://github.com/hmcts/aks-cft-deploy/pull/726)
+- Delete the AKS cluster that was removed from the Application Gateway
+- Merge the PR to upgrade the AKS version of the required cluster
+- Run the ADO deploy pipeline as mentioned above
+
 ## Known issues
+
+### Diagnostic Settings already exist
+
+If you have to re-run a failed stage for some reason you may see this error in the pipeline, they can simply be deleted from the portal and will be re-added by your terraform run.
+
+### Bootstrap fails with error
+`ERROR: Unable to install flux`. Most likely needs a re-run of the Bootstrap stage if the error before this is related to cert-manager pod not being ready in time.
 
 ### Neuvector
 
@@ -149,3 +192,31 @@ kubectl apply -f https://github.com/Dynatrace/dynatrace-oneagent-operator/releas
 ```
 
 <%= warning_text('A Flux config to apply the CRDs was previously [tested](https://github.com/hmcts/cnp-flux-config/pull/14312) but rolled back due to issues in prod.  Change will need to be revisited with the Production AKS cluster now upgraded to v1.21.7') %>
+
+### Traefik HelmRelease stuck in `Unknown` status
+
+When check the `traefik2` HelmRelease, it is stuck in `Unknown` status with the below error:
+
+```
+2026-02-20T14:42:20.743329203Z: beginning wait for 7 resources with timeout of 5m0s
+2026-02-20T14:42:20.75259956Z: Service does not have load balancer ingress IP address: admin/traefik
+2026-02-20T14:47:18.753667495Z: Service does not have load balancer ingress IP address: admin/traefik (148 duplicate lines omitted)
+```
+
+This is due to Traefik service not having an ingress IP address assigned, somehow the IP address is assigned to a node.
+To fix this, you can uninstall the `traefik2` HR, identify the node, remove the node from the cluster, and then install the HelmRelease.
+
+```bash
+# find out the LoadBalancer 'traefik' IP addresses
+kubectl get svc -A | grep LoadBalancer
+
+# see a list of nodes in the cluster and their internal IP addresses
+kubectl get nodes -o wide
+
+# to uninstall the traefik2 HR
+helm uninstall traefik2 -n admin
+
+# to delete the node with the IP address assigned to the LoadBalancer service
+kubectl delete node <node-name>
+
+```

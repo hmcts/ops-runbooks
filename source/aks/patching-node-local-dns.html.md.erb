@@ -11,47 +11,62 @@ This document covers a high level patching example for the nodelocaldns app.
 
 ## Patching
 
-Review [Releases](https://github.com/kubernetes/dns/releases) page to check for breaking changes.
+Review the [Releases](https://github.com/kubernetes/dns/releases) page to check for breaking changes.
 
-Please note that the nodelocaldns app is NOT deployed in SDS, so you will only need to patch it in CFT.
+Please note that the nodelocaldns app is **NOT deployed in SDS**, so you will only need to patch it in CFT.
 
-[Example PR for upgrading version](https://github.com/hmcts/cnp-flux-config/pull/38801) in CFT.
+An [example PR for upgrading the version](https://github.com/hmcts/cnp-flux-config/pull/38801) in CFT.
+
+---
 
 ## Accessing the AKS Cluster
 
 To run the verification commands below, you must first connect to the AKS cluster using `kubectl`.
 
-1. Log in to Azure:
+### 1. Log in to Azure
+    ```
+    az login
+    ```
 
-`az login`
+### 2. Retrieve the AKS cluster credentials
 
-2. Retrieve the AKS cluster credentials, for example:
+For example:
+    ```
+    az aks get-credentials --resource-group <RESOURCE_GROUP_NAME> --name <CLUSTER_NAME>
+    ```
 
-`az aks get-credentials --resource-group cft-sbox-00-rg --name cft-sbox-00-aks --subscription DCD-CFTAPPS-SBOX`
+This command configures `kubectl` so it can communicate with the cluster.
 
-This command configures `kubectl` so it can communicate with the cluster. A list of the respective clusters can be found [here](https://hmcts.github.io/cloud-native-platform/troubleshooting/#troubleshooting-cft):
+A list of the respective clusters can be found [here](https://hmcts.github.io/cloud-native-platform/troubleshooting/#troubleshooting-cft).
 
-3. Verify connectivity:
-
-`kubectl get nodes`
+### 3. Verify connectivity
+    ```
+    kubectl get nodes
+    ```
 
 If the command returns a list of nodes, you are successfully connected to the cluster.
 
+---
+
 ## Checks to see if upgrade worked correctly
 
-After patching PR  is raised, approved, and merged:
+After the patching PR is raised, approved, and merged:
 
-1. Run the following to see the pods in the `kube-system` namespace.
+### 1. Check that the node-local-dns pods are running
 
+Run the following command to list the pods in the `kube-system` namespace:
+    ```
+    kubectl get pods -n kube-system
+    ```
 
-`kubectl get pods -n kube-system`
+Identify the `node-local-dns-XXXX` pod from the list.
 
+### 2. Describe the node-local-dns pod
 
-2. Describe the node-local-dns pod in the `kube-system` namespace to see if the version has been updated:
-
-
-`kubectl describe pods <pod-name>  -n kube-system`
-
+Run:
+    ```
+    kubectl describe pod <pod-name> -n kube-system
+    ```
 
 Look for the **Image** field in the output to confirm the running version.
 

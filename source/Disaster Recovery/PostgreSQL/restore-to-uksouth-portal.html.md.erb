@@ -91,7 +91,7 @@ The following [documentation](https://learn.microsoft.com/en-us/azure/backup/res
     - `psql "host=<host> port=<port> user=<username> dbname=postgres sslmode=require" -v ON_ERROR_STOP=0 -f roles.sql`
 5. With roles restore create empty target database(s).
     - Each dump file `*_database_*.sql` is named for a database e.g. this file would contain the `rhubarb` data `c4c64b98-971e-44fc-8df8-8f4427b417a2_database_rhubarb.sql`
-    - You will need to create a table in the database for each dump file
+    - You will need to create a database for each dump file
       - The following can be ignored as they are defaults from Azure
         - azure_maintenance
         - azure_sys

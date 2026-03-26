@@ -1,0 +1,40 @@
+---
+title: Start Here - PostgreSQL DR Fast Path
+last_reviewed_on: 2026-03-25
+review_in: 6 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Use this page during an active DR event to choose the fastest safe recovery path.
+
+## DR objective
+
+Restore PostgreSQL data to UK South as fast as possible with auditable steps.
+
+## Decision guide
+
+1. If the Azure DevOps restore pipeline is available and credentials are working, use [Restore to UK South using Automation (CNP and CRIME)](restore-to-uksouth-automation.html).
+2. If Azure DevOps is unavailable, service connection access is blocked, or automation fails repeatedly at stage startup, use [Restore to UK South using Azure Portal (Manual)](restore-to-uksouth-portal.html).
+3. If vault restore has already completed but DB replay failed, re-run only the DB phase using `restoreMode=database-only` and the existing container, _note if any data has been loaded then a clean up is required to mitigate duplicate data in `database-only` mode._
+
+## Critical checks before pressing restore
+
+- Confirm source environment and source server naming.
+  - You will need the source Postgresql instance name and resource group for the pipeline inputs
+- Confirm restore point (latest or explicit point-in-time).
+  - You can choose to restore the latest available backup or a specific point in time using the `recoveryPointId`
+- Confirm restore storage and SKU settings (optional)
+  - The automation will create a new Postgresql instance matching the source but depending on the criticality of the server higher storage and SKU settings can speed up restore times.
+
+## Fast links
+
+- Automation guide: [Restore to UK South using Automation (CNP and CRIME)](restore-to-uksouth-automation.html)
+- Manual guide: [Restore to UK South using Azure Portal (Manual)](restore-to-uksouth-portal.html)
+- Deep technical references and known limits: [Findings, Lessons Learned and Deep Technical Links](findings-lessons-and-links.html)
+
+## Existing related runbooks
+
+- [Restoring a deleted postgres flexible server](../../database/Restoring-a-deleted-postgres-flexible-server.html)
+- [Databases](../../database/index.html)

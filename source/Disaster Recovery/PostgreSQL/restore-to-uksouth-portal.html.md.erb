@@ -1,0 +1,120 @@
+---
+title: Restore to UK South using Azure Portal (Manual)
+last_reviewed_on: 2026-03-25
+review_in: 6 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+Use this path when automation is not available or cannot be used safely during an incident.
+
+## When to use this path
+
+- Azure DevOps pipelines are unavailable.
+- Azure DevOps private agent pool is unavailable (AKS offline)
+- Service connection or agent pool issues block automation.
+- You need manual control over each stage.
+
+### Notes for manual path
+
+- Do not run `_schema.sql` on Flexible Server when `database.sql` already includes schema.
+    - To check the database file contains schema you can run:
+      - `pg_restore --list <db-file>.sql | head -50`
+      - If schema is included the results should contain
+
+        ```
+        ; TABLE public.pgbench_accounts
+        ; SEQUENCE public.pgbench_accounts_aid_seq
+        ; INDEX pgbench_accounts_pkey
+        ; FUNCTION ...
+        ```
+
+- `_tablespace.sql` is not applicable to Flexible Server.
+- Role replay on managed PostgreSQL often needs filtering of superuser-only attributes.
+
+## Restore Guide
+
+### Step 1: Create a new storage container for restoration
+
+1. You will need Storage account access to complete this step, one of:
+    - Owner, Contributor, Storage Account Contributor, Storage Account Blob Contributor
+2. Access the vault storage account for the platform:
+    - CNP: `cnpvaultrestorationprod`
+    - CPP: `sacppvaultrestoreprd`
+3. Navigate to `data storage` and `containers`
+4. Finally select `Add Container` to create a new container for the restore
+    - Please use a relevant name, the automation uses: Source instance name + time(mmhh) + date(ddmmyy) + buildId e.g. `plumv14flexiblesandbox + 5613 + 200326 + 1055121`
+
+### Step 2: Trigger vault restore to storage
+
+1. Open [Azure Portal](https://portal.azure.com/).
+2. Navigate to the Backup Vault `cnp-backup-vault`.
+3. Select `Backup Instances` on the left menu and check that the filters are set to `datasource type == Azure Database for PostgreSQL Flexible server`
+4. From the filtered list find the PostgreSQL instance name you want to restore
+5. On the new page, a list of restore points will appear (if any are available) and you can view details by selecting `view`.
+6. Select the `...` and click restore on the restore point you want to use.
+7. This will trigger the restore options and you can now enter the necessary information
+    - Restore Point - should be selected for you if you used the `...` option but if not you can select the relevant restore point here.
+    - Restore parameters
+      - Target storage account: CNP: `cnpvaultrestorationprod`, CPP: `SACPPVAULTRESTOREPRD`
+      - Target Container: Name of container created in step 1.
+8. Once selected you can complete this step and resturn to the restore menu
+9. A validate option will now appear, it is important to select `validate` to ensure access is possible for the Backup Vault managed Id.
+10. If validation is successful, continue to the review+restore page, review the settings and trigger restore when ready.
+
+When complete all dump files from the backup will be restored to the Storage Account Container and are now available to restore to a PostgreSQL instance.
+
+### Step 3: Prepare target PostgreSQL server in UK South
+
+1. To restore the dump files first there needs to be a target server
+2. If building manually you can use the Azure [documentation](https://learn.microsoft.com/en-us/azure/postgresql/configure-maintain/quickstart-create-server#create-server-using-azure-portal) to complete this step.
+    - You will need to have access to the subscription and resource group that you want to build in
+3. When you have a target server, ensure any private networking, subnet and DNS are correct.
+    - If a private endpoint is being used, make sure the F5 VPN is available first otherwise you cannot access the PostgreSQL server
+    - The virtual network used for the new PostgreSQL instance must be peered to the hub to allow F5 VPN access
+4. Ensure required extensions/server parameters are aligned for workload needs.
+    - The source server may have specific extensions enabled, these may be required to restore full functionality beyond the data restoration.
+5. When built, confirm access via the credentials used for the build (via F5 VPN if necessary)
+
+### Step 4: Restore blobs to database
+
+The following [documentation](https://learn.microsoft.com/en-us/azure/backup/restore-azure-database-postgresql-flex#restore-the-backup-files-from-storage-container-to-a-new-or-existing-postgresql--flexible-server) exists from Microsoft. This provides a complete guide alongside the below.
+
+1. You will need the following access:
+    - Storage Account Blob Contributor, Storage Account Blob Reader
+2. Access the storage account container and download all `*_database_*.sql` files from the container.
+3. Download `*_roles.sql` if role replay is required (recommended when possible).
+    - The roles file needs to be cleaned of super user config before use
+      - ```sed -i '/azure_superuser/d; /azure_pg_admin/d; /azuresu/d; /^CREATE ROLE replication/d; /^ALTER ROLE replication/d; /^ALTER ROLE/ {s/NOSUPERUSER//; s/NOBYPASSRLS//;}' roles.sql```
+4. When ready, restore the roles.sql file before any database files:
+    - `psql "host=<host> port=<port> user=<username> dbname=postgres sslmode=require" -v ON_ERROR_STOP=0 -f roles.sql`
+5. With roles restore create empty target database(s).
+    - Each dump file `*_database_*.sql` is named for a database e.g. this file would contain the `rhubarb` data `c4c64b98-971e-44fc-8df8-8f4427b417a2_database_rhubarb.sql`
+    - You will need to create a table in the database for each dump file
+      - The following can be ignored as they are defaults from Azure
+        - azure_maintenance
+        - azure_sys
+        - postgres
+        - templateX (there may be more than one starting at 0 - `template0`)
+6. With each database ready you can restore the data with `pg_restore` using admin account and `--no-owner`.
+
+Example command:
+
+```bash
+pg_restore -h <postgres-server-url> -p <port> -U <username> -d <database-name> --no-owner -v <db-file-name>
+```
+
+## Validation and handover
+
+1. Validate data exists in the databases.
+2. Validate row counts or key data checks for priority tables.
+3. Validate application connectivity and critical read/write checks.
+4. Record restore point, timings and any deviations.
+5. Hand over to service/application teams for functional validation.
+
+## References
+
+- Microsoft guide: [Restore Azure PostgreSQL Flexible server backups as files](https://learn.microsoft.com/en-us/azure/backup/restore-azure-database-postgresql-flex)
+- Existing runbook: [Restoring a deleted postgres flexible server](../../database/Restoring-a-deleted-postgres-flexible-server.html)
+- Deep technical references and known limitations: [Findings, Lessons Learned and Deep Technical Links](findings-lessons-and-links.html)

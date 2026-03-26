@@ -11,7 +11,6 @@ This document covers the process that was undertaken to build out the new stagin
 
 For more general documentation on the new Atlassian setups, see [Atlassian Infrastructure](atlassian-infrastructure.html)
 
-
 ## How was staging built?
 
 Staging was built to be a clone of production, including data, the previous "PRP" environment was found to be unreliable for testing and required more accurate data.
@@ -32,7 +31,7 @@ ItemName=<ItemName> # eg"PRDATL01DGST03.cp.cjs.hmcts.net"
 VaultName="BK-PRD-ATL-INT-01"
 SourceResourceGroup="RG-PRD-ATL-INT-01"
 SourceSubscription="79898897-729c-41a0-a5ca-53c764839d95"
-TargetResouceGroup="atlassian-nonprod-rg"
+TargetResourceGroup="atlassian-nonprod-rg"
 TargetSubscription="b7d2bd5f-b744-4acc-9c73-e068cec2e8d8"
 StorageAccountName="atlassiannonprod"
 TargetVNetName="atlassian-int-nonprod-vnet"
@@ -54,15 +53,15 @@ az backup restore restore-disks \
     --rp-name $RecoverypointName \
     --storage-account $StorageAccountName \
     --restore-to-staging-storage-account true \
-    --target-resource-group $TargetResouceGroup \
+    --target-resource-group $TargetResourceGroup \
     --target-subscription-id $TargetSubscription \
     --target-vm-name $TargetVmName \
     --target-vnet-name $TargetVNetName \
     --target-subnet-name $TargetSubnetName \
-    --target-vnet-resource-group $TargetResouceGroup \
+    --target-vnet-resource-group $TargetResourceGroup \
     --container-name $ContainerName \
     --subscription $SourceSubscription \
-    --storage-account-resource-group $TargetResouceGroup
+    --storage-account-resource-group $TargetResourceGroup
 ```
 
 Above script will trigger the restore of the VM from the backup and will create a new VM in the staging environment.  You can able to see progress of the restore in the backup vault.
@@ -80,7 +79,7 @@ az account set --subscription b7d2bd5f-b744-4acc-9c73-e068cec2e8d8
 TargetSubscription="b7d2bd5f-b744-4acc-9c73-e068cec2e8d8"
 KeyvaultName="atlasssian-nonprod-kv"
 SecretName="public-key"
-TargetResouceGroup="atlassian-nonprod-rg"
+TargetResourceGroup="atlassian-nonprod-rg"
 
 PublicKey=$(az keyvault secret show \
   --vault-name $KeyvaultName \
@@ -91,7 +90,7 @@ PublicKey=$(az keyvault secret show \
 username="atlassian-admin"
 
 az vm user update \
-  --resource-group $TargetResouceGroup \
+  --resource-group $TargetResourceGroup \
   --name $TargetVmName \
   --username $username \
   --ssh-key-value $PublicKey \
@@ -102,14 +101,13 @@ This is the time it has taken to restore the VMs last time when we did it:
 
 <img src=images/AtlassianVMRestore.png  width="600">
 
-
 ### Restore the databases
 
 We then have to restore the databases from the production to the staging environment.  We have used the backup and restore from vault feature within Azure
 
 Backup Vault containing [backups from prod](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/RG-PRD-ATL-01/providers/Microsoft.DataProtection/BackupVaults/ATL-Backup-Vault/overview)
 
-Restored the latest backup via the portal to target server atlassian-nonprod-server 
+Restored the latest backup via the portal to target server atlassian-nonprod-server
 
 Jobs can be [viewed here](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/79898897-729c-41a0-a5ca-53c764839d95/resourceGroups/RG-PRD-ATL-01/providers/Microsoft.DataProtection/BackupVaults/ATL-Backup-Vault/backupJobs)
 
@@ -124,7 +122,6 @@ Once the VMs are restored and you have access to the VMs, you can import the VMs
 [Pull Request](https://github.com/hmcts/atlassian-infrastructure/pull/48)
 
 Terraform already has the automation script which would make config changes on the VMs.  Please note that the script is only triggered when there is any change on the script so please make sure to make any change on the script to trigger the script.
-
 
 ### Post Deployment Steps
 
@@ -157,14 +154,13 @@ This query will take a few minutes to complete.
 
 This solution was determined from Atlassian support via [Jira Gadgets fail to load in Confluence with a "Error rendering macro 'gadget'" error](https://confluence.atlassian.com/confkb/jira-gadgets-fail-to-load-in-confluence-with-a-error-rendering-macro-gadget-error-1188421715.html)
 
-
 **6.** Change colours of the environment to differentiate between Live and Staging
 
 ### Creating Manual Backups
 
 When we are cutting over to the new production environment, we need to take manual backups of the VMs.  We have used the following script to take the manual backups:
 
-```bash   
+```bash
 VaultName="BK-PRD-ATL-INT-01"
 ResourceGroup="RG-PRD-ATL-INT-01"
 Subscription="79898897-729c-41a0-a5ca-53c764839d95"
@@ -202,4 +198,3 @@ Below is the time it has taken to take the backups last time when we did it:
 Once the VMs are backed up, we are then able to use the latest backup to restore the VMs to the new production environment.
 
 <img src=images/AtlassianVMBackupRestore.png  width="600">
-

@@ -84,7 +84,7 @@ DR performance guidance:
 ## If something fails
 
 1. If Stage 1 fails (server/container provisioning), fix infra/permissions and rerun full mode.
-    - No cleanup is carried out so if this stage fails during either container or PostgreSQL instance creation you will need to remove the resouces that get created but failed to complete.
+    - No cleanup is carried out so if this stage fails during either container or PostgreSQL instance creation you will need to remove the resources that get created but failed to complete.
 2. If Stage 1 completes and stage 2 fails to start you can supply the `existingRestoreContainer` and `restoredServerName` names as pipeline parameters and select `database-only` to skip Stage 1.
 3. During stage 2, if backup vault restore completes but DB replay failed, check whether `pg_restore` actually started before rerunning:
    - **Safe to rerun `database-only`**: the failure happened before any database was written (e.g. connection refused, credentials error, listing blobs). No databases will exist on the target server — or only empty shells. Rerun with `restoreMode=database-only` and supply `existingRestoreContainer` parameters.

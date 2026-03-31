@@ -16,35 +16,20 @@ Use this path when automation is not available or cannot be used safely during a
 - Service connection or agent pool issues block automation.
 - You need manual control over each stage.
 
-### Notes for manual path
-
-- Do not run `_schema.sql` on Flexible Server when `database.sql` already includes schema.
-    - To check the database file contains schema you can run:
-      - `pg_restore --list <db-file>.sql | head -50`
-      - If schema is included the results should contain
-
-        ```
-        ; TABLE public.pgbench_accounts
-        ; SEQUENCE public.pgbench_accounts_aid_seq
-        ; INDEX pgbench_accounts_pkey
-        ; FUNCTION ...
-        ```
-
-- `_tablespace.sql` is not applicable to Flexible Server.
-- Role replay on managed PostgreSQL often needs filtering of superuser-only attributes.
-
 ## Restore Guide
 
 ### Step 1: Create a new storage container for restoration
 
 1. You will need Storage account access to complete this step, one of:
     - Owner, Contributor, Storage Account Contributor, Storage Account Blob Contributor
+    - See [Requesting RBAC access via Access Packages](../../Access-and-Permissions/rbac-access-packages.html) for how to request elevated access if you don't have the required role already.
+    - Note that some PIM activation and Access Package requests might require approval making this process impossible with a single person. In a DR scenario this is unlikely to be a blocker as it will be triggered by the business with multiple technical staff involved, but be aware of the risk in out-of-hours situations.
 2. Access the vault storage account for the platform:
     - CNP: `cnpvaultrestorationprod`
     - CPP: `sacppvaultrestoreprd`
 3. Navigate to `data storage` and `containers`
 4. Finally select `Add Container` to create a new container for the restore
-    - Please use a relevant name, the automation uses: Source instance name + time(mmhh) + date(ddmmyy) + buildId e.g. `plumv14flexiblesandbox + 5613 + 200326 + 1055121`
+    - Use this naming convention for manual restores: `<instance-name>-<mmhh>-<ddmmyy>-manual-restore` e.g. `plumv14flexiblesandbox-5613-200326-manual-restore`
 
 ### Step 2: Trigger vault restore to storage
 
@@ -81,14 +66,29 @@ When complete all dump files from the backup will be restored to the Storage Acc
 
 The following [documentation](https://learn.microsoft.com/en-us/azure/backup/restore-azure-database-postgresql-flex#restore-the-backup-files-from-storage-container-to-a-new-or-existing-postgresql--flexible-server) exists from Microsoft. This provides a complete guide alongside the below.
 
+<%= warning_text('Do not restore <code>_schema.sql</code> on Flexible Server — the <code>*_database_*.sql</code> dump files already include schema. Running <code>_schema.sql</code> separately will cause duplicate object errors. To verify a dump file includes schema, run: <code>pg_restore --list &lt;db-file&gt;.sql | head -50</code> and look for TABLE, SEQUENCE, INDEX or FUNCTION entries.') %>
+
+<%= warning_text('<code>_tablespace.sql</code> is not applicable to Flexible Server and should not be restored.') %>
+
 1. You will need the following access:
     - Storage Account Blob Contributor, Storage Account Blob Reader
 2. Access the storage account container and download all `*_database_*.sql` files from the container.
 3. Download `*_roles.sql` if role replay is required (recommended when possible).
-    - The roles file needs to be cleaned of super user config before use
-      - ```sed -i '/azure_superuser/d; /azure_pg_admin/d; /azuresu/d; /^CREATE ROLE replication/d; /^ALTER ROLE replication/d; /^ALTER ROLE/ {s/NOSUPERUSER//; s/NOBYPASSRLS//;}' roles.sql```
+
+   <%= warning_text('Role replay on managed PostgreSQL requires filtering of superuser-only attributes before use, otherwise the restore will fail with permission errors.') %>
+
+    - Clean the roles file before use:
+
+    ```bash
+    sed -i '/azure_superuser/d; /azure_pg_admin/d; /azuresu/d; /^CREATE ROLE replication/d; /^ALTER ROLE replication/d; /^ALTER ROLE/ {s/NOSUPERUSER//; s/NOBYPASSRLS//;}' roles.sql
+    ```
+
 4. When ready, restore the roles.sql file before any database files:
-    - `psql "host=<host> port=<port> user=<username> dbname=postgres sslmode=require" -v ON_ERROR_STOP=0 -f roles.sql`
+
+    ```bash
+    psql "host=<host> port=<port> user=<username> dbname=postgres sslmode=require" -v ON_ERROR_STOP=0 -f roles.sql
+    ```
+
 5. With roles restore create empty target database(s).
     - Each dump file `*_database_*.sql` is named for a database e.g. this file would contain the `rhubarb` data `c4c64b98-971e-44fc-8df8-8f4427b417a2_database_rhubarb.sql`
     - You will need to create a database for each dump file
@@ -107,8 +107,19 @@ pg_restore -h <postgres-server-url> -p <port> -U <username> -d <database-name> -
 
 ## Validation and handover
 
-1. Validate data exists in the databases.
-2. Validate row counts or key data checks for priority tables.
+1. Validate data exists in the databases by listing the databases
+
+   ```bash
+   psql "host=<host> port=5432 user=hmctsAdmin dbname=postgres sslmode=require" -c "\l"
+   ```
+
+2. Validate row counts or key data checks for priority tables:
+
+   ```bash
+   psql "host=<host> port=5432 user=hmctsAdmin dbname=<dbname> sslmode=require" \
+     -c "SELECT schemaname, tablename, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 20;"
+   ```
+
 3. Validate application connectivity and critical read/write checks.
 4. Record restore point, timings and any deviations.
 5. Hand over to service/application teams for functional validation.

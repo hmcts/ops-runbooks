@@ -86,18 +86,25 @@ DR performance guidance:
 1. If Stage 1 fails (server/container provisioning), fix infra/permissions and rerun full mode.
     - No cleanup is carried out so if this stage fails during either container or PostgreSQL instance creation you will need to remove the resources that get created but failed to complete.
 2. If Stage 1 completes and stage 2 fails to start you can supply the `existingRestoreContainer` and `restoredServerName` names as pipeline parameters and select `database-only` to skip Stage 1.
-3. During stage 2, if backup vault restore completes but DB replay failed, check whether `pg_restore` actually started before rerunning:
-   - **Safe to rerun `database-only`**: the failure happened before any database was written (e.g. connection refused, credentials error, listing blobs). No databases will exist on the target server — or only empty shells. Rerun with `restoreMode=database-only` and supply `existingRestoreContainer` parameters.
-   - **Not safe to rerun without cleanup**: if `pg_restore` started writing data, the target databases will contain partial data. A straight `database-only` rerun will fail with duplicate-key or constraint errors. You must first manually drop the partially-restored databases:
+3. During stage 2, if backup vault restore completes but DB replay failed, first check the pipeline logs to understand where the failure occurred:
+
+  - `Restore job status: Failed`: vault-to-storage phase failed, no postgres work started yet.
+  - `Restoring database: <name>`: entered per-database loop.
+  - `Creating target database <name>` or `already exists`: database creation attempted, restore imminent.
+  - `pg_restore: processing data for table`: **data was being written at point of failure**.
+  - `pg_restore failed`: failure after potential data write.
+
+   If you see `pg_restore: processing data for table` in the logs, data was partially written and **the drop step below is required** before re-running. If the failure shows only connection or credential errors with no `pg_restore:` lines, the postgres phase had not started and you can re-run directly — though the drop step is harmless either way.
+
+   - Drop any partially-restored databases before re-running in `database-only` mode. Using `DROP DATABASE IF EXISTS` is safe regardless:
 
       ```sql
       -- connect to the target restore server as hmctsAdmin
-      \l                          -- list databases to identify partials
-      DROP DATABASE <db_name>;    -- repeat for each partially-written DB
+      \l                                         -- list databases to identify targets
+      DROP DATABASE IF EXISTS <db_name>;         -- repeat for each DB being restored
       ```
 
-     Once dropped, rerun with `restoreMode=database-only` and `existingRestoreContainer`.
-   - **How to tell which case you're in**: check the pipeline logs for lines beginning `pg_restore:` or `COPY` output — if these appear, data was written. If the failure log shows only connection or credential messages, no data was written.
+     Then rerun with `restoreMode=database-only` and supply `existingRestoreContainer`.
 3. If extension role errors appear, check known allow-list handling and role filtering guidance.
 
 ## Fast verification points

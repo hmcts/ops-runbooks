@@ -12,7 +12,7 @@ We use the [dynatrace-operator helm chart](https://docs.dynatrace.com/docs/short
 
 Before patching, you need to [check the latest available version](https://github.com/Dynatrace/dynatrace-operator/releases/). Make sure to read through the [release notes](https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator) between the current version and latest, to see if there are any breaking changes, or pre-reqs before an upgrade.
 
-For example, when upgrading from 0.12 -> 0.15, there is a note in [0.13 about containerd version required](https://docs.dynatrace.com/docs/whats-new/release-notes/dynatrace-operator/dto-fix-0-13-0). To check this, you can run:
+For example, when upgrading between versions, check the [Dynatrace Operator release notes](https://docs.dynatrace.com/docs/whats-new/release-notes#dynatrace-operator) for any specific requirements (such as containerd version compatibility). To check your node versions, you can run:
 
 ```bash
 kubectl get nodes -A -o wide

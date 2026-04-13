@@ -207,7 +207,9 @@ Before proceeding with the cluster switchover in PROD, request SRE resources to 
 - Web Application Firewall (WAF)
 - Other components that are typically shuttered during production releases
 
-Follow the standard release shuttering procedures and coordinate with the SRE team to ensure all necessary components are shuttered before proceeding with the switchover.
+**Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://tools.hmcts.net/confluence/spaces/HSS/pages/1580172783/Run+PGBASEBACKUP+on+Sunday+in+PROD)
+
+> **Note:** Request an SRE resource to perform the shuttering steps rather than executing them yourself. The shuttering procedures are documented in the reference above for awareness and future reference, but this work should be coordinated with and performed by the SRE team.
 
 ### 2. (ALL) Scale Down Source Cluster Workloads
 

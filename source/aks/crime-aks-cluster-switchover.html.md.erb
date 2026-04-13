@@ -34,11 +34,44 @@ az aks show --name <cluster_name> --resource-group <resource_group> --query "oid
 
 The OIDC issuer URL format: `https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}`
 
-**Repo:** [TF](https://github.com/hmcts/pip-shared-infrastructures/blob/master/tf-crime-connection-mi.tf)
+**Update the Key Vault Secret:**
 
-Alternatively, contact the relevant service team and provide the issuer's URL via email.
+Update the `crime-oidc-issuer-config` secret in the appropriate Key Vault:
+- **STE, SIT, PRP:** `pip-bootstrap-stg-kv`
+- **PRD:** `pip-bootstrap-prod-kv`
 
-> **Note:** OIDC federation is required in SIT, NFT, PRP, and PRD environments. When upgrading AKS clusters in environments like PRP and PRD, both the old and new clusters are federated to the Managed Identity on the DTS side. This allows you to keep the old cluster running while testing the new one. Deactivate the old cluster after the new one has been verified and tested.
+The secret value is a JSON object containing an array of connections. Each connection includes:
+- `name`: Environment identifier (e.g., "SIT", "PRP", "PRD-NEW")
+- `issuer`: The OIDC issuer URL obtained from the command above
+- `subject`: The service account in format `system:serviceaccount:<namespace>:<service-account-name>`
+
+Example format:
+```json
+{
+    "connections": [
+        {
+            "name": "SIT",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/059790e1-cb17-43e5-b0b2-8bc4d39736de/",
+            "subject": "system:serviceaccount:ns-sit-ccm-01:stagingpubhub-service-wildfly-app"
+        },
+        {
+            "name": "PRP",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/77f54315-6dde-4fe7-9e17-74762c3eb096/e0137a4c-dadb-43a4-b3fb-881df89ddda8/",
+            "subject": "system:serviceaccount:ns-prp-ccm-01:stagingpubhub-service-wildfly-app"
+        }
+    ]
+}
+```
+
+**Reference:** The Key Vault configuration is managed in [pip-shared-infrastructures/main.tf](https://github.com/hmcts/pip-shared-infrastructures/blob/master/main.tf#L51-L54)
+
+**Apply the Changes:**
+
+After updating the Key Vault secret, re-run the Jenkins master job to apply the configuration:
+
+[pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
+
+> **Note:** OIDC federation is required in SIT, NFT, PRP, and PRD environments. When upgrading AKS clusters in environments like PRP and PRD, add both the old and new cluster issuer URLs to the connections array. This allows you to keep the old cluster running while testing the new one. Remove the old cluster's entry after the new one has been verified and tested.
 
 ## Preparation
 
@@ -167,7 +200,16 @@ For PRP and PRD, run the pipelines against your feature branch and verify the Te
 > | **(not dev)** | All environments **except DEV** |
 > | **(not dev, not sit)** | All environments **except DEV and SIT** |
 
-### 1. (ALL) Scale Down Source Cluster Workloads
+### 1. (PROD) Request Environment Shuttering
+
+Before proceeding with the cluster switchover in PROD, request SRE resources to shutter the environment. This includes:
+
+- Web Application Firewall (WAF)
+- Other components that are typically shuttered during production releases
+
+Follow the standard release shuttering procedures and coordinate with the SRE team to ensure all necessary components are shuttered before proceeding with the switchover.
+
+### 2. (ALL) Scale Down Source Cluster Workloads
 
 Set replicas to 0 for all workload namespaces on the source cluster. Target namespaces follow the format `ns-<env>-<function>-01` (e.g., `ns-dev-ccm-01`, `ns-dev-idam-01`). You need to scale both **deployments** and **statefulsets**:
 
@@ -176,7 +218,7 @@ kubectl scale deploy -n <namespace> --replicas=0 --all
 kubectl scale statefulset -n <namespace> --replicas=0 --all
 ```
 
-### 2. Deploy Workloads on Destination Cluster
+### 3. Deploy Workloads on Destination Cluster
 
 Retrieve the latest release branch (ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://tools.hmcts.net/confluence/spaces/HSS/pages/1694702148/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document).
 
@@ -184,7 +226,9 @@ Retrieve the latest release branch (ask in the group channel or contact a named 
 
 - **Pipeline:** [Deploy Stack #333](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
 
-### 3. (PROD) Deploy Reporting Cronjobs
+For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.
+
+### 4. (PROD) Deploy Reporting Cronjobs
 
 Retrieve the latest release branch (ask in the group channel or contact a named person).
 
@@ -192,7 +236,7 @@ Retrieve the latest release branch (ask in the group channel or contact a named 
 
 - **Pipeline:** [Deploy Reporting #225](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=225)
 
-### 4. (ALL) Update Global DNS
+### 5. (ALL) Update Global DNS
 
 Update DNS to point to the new cluster.
 
@@ -201,7 +245,7 @@ Update DNS to point to the new cluster.
 - **Pipeline:** [Network Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=54)
   - **Environment:** mdv (or mpd)
 
-### 5. (ALL) Restart HAProxy Service
+### 6. (ALL) Restart HAProxy Service
 
 SSH into the HAProxy servers for the respective environment and restart the service.
 
@@ -213,7 +257,7 @@ systemctl restart haproxy.service
 tail -f /var/log/haproxy-traffic.log
 ```
 
-### 6. (ALL) Basic Connectivity Testing
+### 7. (ALL) Basic Connectivity Testing
 
 Test connectivity from your workstation (over VPN):
 
@@ -229,7 +273,7 @@ curl https://sitccm01-api-lb.sit.cpp.nonlive:443/usersgroups-service/internal/me
 
 Both should return `pong`.
 
-### 7. (ALL) Update Redirect URIs for Kiali/Grafana
+### 8. (ALL) Update Redirect URIs for Kiali/Grafana
 
 1. Search for `mdv-k8s-monitor` Application in the Azure portal
 2. Navigate to **Authentication**
@@ -237,11 +281,11 @@ Both should return `pong`.
    - Kiali: `https://kiali.mgmt.cs01cl02.nft.nl.cjscp.org.uk/kiali/`
    - Grafana: `https://grafana.mgmt.cs01cl02.nft.nl.cjscp.org.uk/login/azuread`
 
-### 8. (ALL, not dev, not sit) Update Dynatrace
+### 9. (ALL, not dev, not sit) Update Dynatrace
 
 Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration) guide.
 
-### 9. (ALL, not dev) Update Key Vault Networking
+### 10. (ALL, not dev) Update Key Vault Networking
 
 Configure the Key Vault to allow access from the new cluster VNET.
 
@@ -259,7 +303,7 @@ Configure the Key Vault to allow access from the new cluster VNET.
 5. Verify the cluster VNET and subnet appear under Virtual networks section
 6. **After updating the new VNET details, delete the old VNET details**
 
-### 10. (PROD) Apply Progression Scaling CronJob (If Applicable)
+### 11. (PROD) Apply Progression Scaling CronJob (If Applicable)
 
 > **Note:** Check if this is still relevant. If the job is not on the source cluster, don't apply it. Delete the cron from the old cluster to prevent it from scaling up services if the cluster isn't destroyed.
 
@@ -326,29 +370,37 @@ spec:
           serviceAccountName: jenkins-admin
 ```
 
-### 11. (DEV) Update mi-ado-agent Managed Identity
+### 12. (DEV) Update mi-ado-agent Managed Identity
 
 Update the `mi-ado-agent` Managed Identity with the OIDC URL of the new DEV cluster on the HMCTS.net Subscription. **The URL must contain a trailing slash.**
 
 **Portal location:** [Federated Credentials](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ef8dd153-3fba-47a4-be65-15775bcde240/resourceGroups/CORE/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-ado-agent/federatedcredentials)
 
-**Create two federated credentials:**
+**Update the existing federated credentials** with the new cluster's OIDC URL:
 
 #### Credential 1: ADO Agent
 
+- **Name:** `ado-agent-aks-devX` (where X is the cluster number: 1 or 2)
 - **Federated credential scenario:** Configure a Kubernetes Service Account
-- **Cluster Issuer URL:** `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/0dccffda-21f3-4db3-bca7-9f8392cf3587/` (get new value for your cluster)
+- **Cluster Issuer URL:** Update with the new cluster's OIDC URL:
+  ```bash
+  az aks show --name <new_cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+  ```
+  Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/0dccffda-21f3-4db3-bca7-9f8392cf3587/`
 - **Namespace:** `ado-agent`
 - **Service Account:** `ado-agent`
-- **Name:** `ado-agent-aks-devX` (where X is the cluster number: 1 or 2)
 
 #### Credential 2: KEDA Operator
 
+- **Name:** `keda-operator-aks-devX` (where X is the cluster number: 1 or 2)
+- **Cluster Issuer URL:** Update with the same OIDC URL from the new cluster
 - **Namespace:** `keda`
 - **Service Account:** `keda-operator`
 - **Format:** `system:serviceaccount:keda:keda-operator`
 
-### 12. (DEV) Update Jenkins Configuration for AKS Agents
+> **Note:** When switching between clusters (e.g., dev1 to dev2), you only need to update the **Cluster Issuer URL** in the existing federated credentials. The namespace and service account values remain the same.
+
+### 13. (DEV) Update Jenkins Configuration for AKS Agents
 
 Configure Jenkins to spin up agents on the new AKS cluster.
 
@@ -386,7 +438,7 @@ kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token
 
 > **Note:** There is an issue with the Jenkins plugin where even if the test is successful, Jenkins may fail to spin up agents on AKS. Test by running a verify/validation job to see if it can spin up agents in the Jenkins namespace. If it fails, in the Kubernetes section for the cluster, simply copy and paste the same certificate and apply—this seems to fix the issue.
 
-### 13. Enable Cost Analysis
+### 14. Enable Cost Analysis
 
 Cost analysis is required until Terraform support is available.
 
@@ -400,7 +452,7 @@ Verify the pod is running:
 kubectl get deploy cost-analysis-agent -n kube-system
 ```
 
-### 14. Lock Inactive Cluster
+### 15. Lock Inactive Cluster
 
 Post cluster switchover, lock down the old cluster access so it becomes inactive.
 
@@ -440,7 +492,7 @@ Empty the following group in the aks repo: `aks_cluster_admins_aad_group_ids`
 
 After updating the var files, get them reviewed and run `terraform plan/apply` on the inactive cluster. After performing all the above steps, verify access is restricted by performing `az login`.
 
-### 15. Destroy Old Cluster (After a Few Days)
+### 16. Destroy Old Cluster (After a Few Days)
 
 When running the `aks-config-destroy` pipeline, some namespaces will get stuck in the finalizer stage. Use the following command to delete those namespaces:
 
@@ -450,7 +502,7 @@ for ns in $(kubectl get ns --field-selector status.phase=Terminating -o jsonpath
 done
 ```
 
-### 16. Merge Release Branch to Main (After All Environments Switched)
+### 17. Merge Release Branch to Main (After All Environments Switched)
 
 Once all environments (DEV, SIT, NFT, PRP, PRD) have been successfully switched to the new clusters and the old clusters are destroyed:
 

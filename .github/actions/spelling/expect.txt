@@ -189,6 +189,7 @@ sqlpackage
 srequiredrunasnonroot
 sshfs
 stagingdarts
+stagingpubhub
 statefile
 statefulset
 ste

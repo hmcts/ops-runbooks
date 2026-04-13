@@ -1,0 +1,579 @@
+---
+title: Crime AKS Cluster Switchover
+last_reviewed_on: 2026-04-10
+review_in: 12 months
+weight: 45
+---
+
+# <%= current_page.data.title %>
+
+> **Source Document:** This runbook is derived from the original [AKS Failover: steps for kubernetes cluster switchover](https://tools.hmcts.net/confluence/spaces/EI/pages/1700662555/AKS+Failover+steps+for+kubernetes+cluster+switch+over#AKSFailover:stepsforkubernetesclusterswitchover-Prerequisites) Confluence page.
+
+This guide provides step-by-step instructions for switching over Crime AKS clusters between environments (e.g., from K8-DEV-CS01-CL01 to K8-DEV-CS01-CL02).
+
+## Prerequisites
+
+### Approval and Scheduling
+
+- Obtain approval for the switchover work for non-live environments
+- For PRP and PRD: **Raise a Request for Change (RFC) in Halo**
+- Schedule the switchover during designated maintenance windows
+- Create the new AKS cluster one day before go-live date (except PRP/PRD which require RFCs)
+
+### Access to DTS Services
+
+Authenticate the new cluster to access DTS services integrated with the Crime platform.
+
+Some Kubernetes workloads (e.g., pods) require access to DTS services. Currently, the PIP service requires OIDC federation. You must update the OIDC issuer's URL in the Federated Identity Credential in Azure Entra ID.
+
+**Get the OIDC issuer URL:**
+
+```bash
+az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+```
+
+The OIDC issuer URL format: `https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}`
+
+**Update the Key Vault Secret:**
+
+Update the `crime-oidc-issuer-config` secret in the appropriate Key Vault:
+- **STE, SIT, PRP:** `pip-bootstrap-stg-kv`
+- **PRD:** `pip-bootstrap-prod-kv`
+
+The secret value is a JSON object containing an array of connections. Each connection includes:
+- `name`: Environment identifier (e.g., "SIT", "PRP", "PRD-NEW")
+- `issuer`: The OIDC issuer URL obtained from the command above
+- `subject`: The service account in format `system:serviceaccount:<namespace>:<service-account-name>`
+
+Example format:
+```json
+{
+    "connections": [
+        {
+            "name": "SIT",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/059790e1-cb17-43e5-b0b2-8bc4d39736de/",
+            "subject": "system:serviceaccount:ns-sit-ccm-01:stagingpubhub-service-wildfly-app"
+        },
+        {
+            "name": "PRP",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/77f54315-6dde-4fe7-9e17-74762c3eb096/e0137a4c-dadb-43a4-b3fb-881df89ddda8/",
+            "subject": "system:serviceaccount:ns-prp-ccm-01:stagingpubhub-service-wildfly-app"
+        }
+    ]
+}
+```
+
+**Reference:** The Key Vault configuration is managed in [pip-shared-infrastructures/main.tf](https://github.com/hmcts/pip-shared-infrastructures/blob/master/main.tf#L51-L54)
+
+**Apply the Changes:**
+
+After updating the Key Vault secret, re-run the Jenkins master job to apply the configuration:
+
+[pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
+
+> **Note:** OIDC federation is required in SIT, NFT, PRP, and PRD environments. When upgrading AKS clusters in environments like PRP and PRD, add both the old and new cluster issuer URLs to the connections array. This allows you to keep the old cluster running while testing the new one. Remove the old cluster's entry after the new one has been verified and tested.
+
+## Preparation
+
+Before beginning the switchover process, prepare the [cpp-terraform-azurerm-aks](https://github.com/hmcts/cpp-terraform-azurerm-aks) and [cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config) repositories.
+
+### AKS Repository
+
+**Purpose:** Contains code to build the cluster and all related resources (Virtual Network, subnets, private endpoints, etc.)
+
+#### 1. Create Release Branch
+
+> **Recommended:** Create a release branch to isolate all switchover changes across environments. This allows gradual rollout (DEV → SIT → NFT → PRP → PRD) and a final merge to `main` only after all environments are verified.
+
+Clone the repository (if not already cloned) and create a release branch:
+
+```bash
+git clone https://github.com/hmcts/cpp-terraform-azurerm-aks.git
+cd cpp-terraform-azurerm-aks
+git switch main && git pull --rebase
+git switch -c release/<aks-version>
+# Example: release/1.34
+```
+
+Then create your environment-specific branch from this release branch:
+
+```bash
+git switch -c [jira-ref]/[env]-aks-<new-version>-upgrade
+# Example: EI-2230/dev-aks-1.34-upgrade
+```
+
+#### 2. Modify the Relevant .tfvars File
+
+Update the Kubernetes version parameters:
+
+```hcl
+kubernetes_version   = "1.28.3"  # --> "1.30.3"
+orchestrator_version = "1.28.3"  # --> "1.30.3"
+```
+
+- Change any other references required for your upgrade
+- **Example PR:** [cpp-terraform-azurerm-aks/pull/121](https://github.com/hmcts/cpp-terraform-azurerm-aks/pull/121/files)
+- If creating a new `env.tfvars`, refer to the Network and Azure Components documentation
+
+### AKS Config Repository
+
+**Purpose:** Contains application code to deploy vital system components (Istio, Prometheus, Gatekeeper, etc.) to the AKS cluster.
+
+#### 1. Understand the Branching Strategy
+
+- **Module Repository** ([cpp-module-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-module-terraform-azurerm-aks-config)): Uses tags to mark specific, immutable versions corresponding to AKS versions (e.g., v1.28.3)
+- **Root Repository** ([cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config)): Uses branches to manage environment-specific configurations (e.g., main, aks-1.28.3)
+
+#### 2. Create Release Branch
+
+> **Recommended:** Use the same release branch strategy as the AKS repository for consistency.
+
+Clone the repository (if not already cloned) and create a release branch:
+
+```bash
+git clone https://github.com/hmcts/cpp-terraform-azurerm-aks-config.git
+cd cpp-terraform-azurerm-aks-config
+git switch main && git pull --rebase
+git switch -c release/<aks-version>
+# Example: release/1.34
+```
+
+Then create your environment-specific branch from this release branch:
+
+```bash
+git switch -c [jira-ref]/[env]-aks-<new-version>-upgrade
+# Example: EI-2230/dev-aks-1.34-upgrade
+```
+
+#### 3. Review tfvars File
+
+Ensure your environment's `.tfvars` code is correct and up to date:
+
+- Double-check all versions are updated
+- Verify the `user_rbac` map is updated with groups (this allows users to access the cluster; if empty, no one can access it)
+- In `main.tf`, ensure the module source points to `main`:
+
+```hcl
+module "aks_base_config" {
+  source = "git::https://github.com/hmcts/cpp-module-terraform-azurerm-aks-config.git?ref=main"
+}
+```
+
+**Example PR:** [cpp-terraform-azurerm-aks-config/pull/217](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/pull/217/files)
+
+### Build Cluster via Pipelines
+
+Once branches are up to date, raise Pull Requests and run the ADO pipelines for aks and aks-config.
+
+#### 1. Raise Pull Requests
+
+- Verify everything is correct
+- Raise a pull request and get it peer-reviewed
+
+#### 2. Run the ADO Pipelines
+
+**AKS Pipeline** (run this first):
+
+- **Pipeline:** [AKS Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=44)
+- **Branch:** Your feature branch (e.g., `EI-2230/dev-aks-1.30.3-upgrade`)
+- **Environment:** Select the cluster you are building
+
+**AKS Config Pipeline** (run after AKS pipeline succeeds):
+
+- **Pipeline:** [AKS Config Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=46)
+- **Branch:** Your feature branch (e.g., `EI-2230/dev-aks-1.30.3-upgrade`)
+- **Environment:** Select the cluster you are building
+
+For PRP and PRD, run the pipelines against your feature branch and verify the Terraform plan looks sound and error-free.
+
+## Cluster Switchover Steps
+
+> **Understanding Environment Labels**
+> 
+> Each step below is tagged with an environment label indicating where it should be performed:
+> 
+> | Label | Description |
+> |-------|-------------|
+> | **(ALL)** | Required for **all environments** (DEV, SIT, NFT, PRP, PRD) |
+> | **(DEV)** | **DEV environment only** |
+> | **(PROD)** | **PROD environment only** |
+> | **(not dev)** | All environments **except DEV** |
+> | **(not dev, not sit)** | All environments **except DEV and SIT** |
+
+### 1. (PROD) Request Environment Shuttering
+
+Before proceeding with the cluster switchover in PROD, request SRE resources to shutter the environment. This includes:
+
+- Web Application Firewall (WAF)
+- Other components that are typically shuttered during production releases
+
+**Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://tools.hmcts.net/confluence/spaces/HSS/pages/1580172783/Run+PGBASEBACKUP+on+Sunday+in+PROD)
+
+> **Note:** Request an SRE resource to perform the shuttering steps rather than executing them yourself. The shuttering procedures are documented in the reference above for awareness and future reference, but this work should be coordinated with and performed by the SRE team.
+
+### 2. (ALL) Scale Down Source Cluster Workloads
+
+Set replicas to 0 for all workload namespaces on the source cluster. Target namespaces follow the format `ns-<env>-<function>-01` (e.g., `ns-dev-ccm-01`, `ns-dev-idam-01`). You need to scale both **deployments** and **statefulsets**:
+
+```bash
+kubectl scale deploy -n <namespace> --replicas=0 --all
+kubectl scale statefulset -n <namespace> --replicas=0 --all
+```
+
+### 3. Deploy Workloads on Destination Cluster
+
+Retrieve the latest release branch (ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://tools.hmcts.net/confluence/spaces/HSS/pages/1694702148/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document).
+
+**Deploy workloads:**
+
+- **Pipeline:** [Deploy Stack #333](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
+
+For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.
+
+### 4. (PROD) Deploy Reporting Cronjobs
+
+Retrieve the latest release branch (ask in the group channel or contact a named person).
+
+**Deploy reporting cronjobs:**
+
+- **Pipeline:** [Deploy Reporting #225](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=225)
+
+### 5. (ALL) Update Global DNS
+
+Update DNS to point to the new cluster.
+
+- **Repo:** [cpp-terraform-network](https://github.com/hmcts/cpp-terraform-network)
+- **Example PR:** [Commit](https://github.com/hmcts/cpp-terraform-network/commit/8014ee1d57307a587d5c09f525247c6bc6b2e648)
+- **Pipeline:** [Network Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=54)
+  - **Environment:** mdv (or mpd)
+
+### 6. (ALL) Restart HAProxy Service
+
+SSH into the HAProxy servers for the respective environment and restart the service.
+
+**Example for DEV:**
+- Servers: `DEVCCM01ACTLB01.cpp.nonlive` and `DEVCCM01ACTLB02.cpp.nonlive`
+
+```bash
+systemctl restart haproxy.service
+tail -f /var/log/haproxy-traffic.log
+```
+
+### 7. (ALL) Basic Connectivity Testing
+
+Test connectivity from your workstation (over VPN):
+
+```bash
+curl https://sitccm01.ingress01.sit.nl.cjscp.org.uk:443/usersgroups-service/internal/metrics/ping
+```
+
+Test from a server in the specific environment (e.g., `ENVCCM01ACTAP##.cpp.nonlive`):
+
+```bash
+curl https://sitccm01-api-lb.sit.cpp.nonlive:443/usersgroups-service/internal/metrics/ping
+```
+
+Both should return `pong`.
+
+### 8. (ALL) Update Redirect URIs for Kiali/Grafana
+
+1. Search for `mdv-k8s-monitor` Application in the Azure portal
+2. Navigate to **Authentication**
+3. Add Web Redirect URIs:
+   - Kiali: `https://kiali.mgmt.cs01cl02.nft.nl.cjscp.org.uk/kiali/`
+   - Grafana: `https://grafana.mgmt.cs01cl02.nft.nl.cjscp.org.uk/login/azuread`
+
+### 9. (ALL, not dev, not sit) Update Dynatrace
+
+Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration) guide.
+
+### 10. (ALL, not dev) Update Key Vault Networking
+
+Configure the Key Vault to allow access from the new cluster VNET.
+
+1. Go to **Key Vault** → `KV-<ENV>-CCP01` in the Azure portal
+2. Click **Networking** tab and check the firewall access policy
+
+**If "Allow public access from all networks":** No change required
+
+**If "Allow public access from specific virtual networks and IP addresses":**
+
+1. Click **Add virtual network** → **Add existing virtual network**
+2. Select the new cluster VNET & subnet (select only APP Subnet)
+3. Click **Enable**
+4. Click **Save/Apply**
+5. Verify the cluster VNET and subnet appear under Virtual networks section
+6. **After updating the new VNET details, delete the old VNET details**
+
+### 11. (PROD) Apply Progression Scaling CronJob (If Applicable)
+
+> **Note:** Check if this is still relevant. If the job is not on the source cluster, don't apply it. Delete the cron from the old cluster to prevent it from scaling up services if the cluster isn't destroyed.
+
+```yaml
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-up-progression
+  namespace: kube-system
+spec:
+  schedule: "5 5 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: cleanup
+              image: crmpdrepo01.azurecr.io/hmcts/jenkins-agent-java11:v1.0.4-jdk11
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - kubectl patch hpa progression-service-wildfly-app -p '{"spec":{"minReplicas":30}}' -n ns-prd-ccm-01
+              resources:
+                requests:
+                  memory: "64Mi"
+                limits:
+                  memory: "128Mi"
+          restartPolicy: Never
+          serviceAccountName: jenkins-admin
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-down-progression
+  namespace: kube-system
+spec:
+  schedule: "5 22 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: cleanup
+              image: crmpdrepo01.azurecr.io/hmcts/jenkins-agent-java11:v1.0.4-jdk11
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - kubectl patch hpa progression-service-wildfly-app -p '{"spec":{"minReplicas":8}}' -n ns-prd-ccm-01
+              resources:
+                requests:
+                  memory: "64Mi"
+                limits:
+                  memory: "128Mi"
+          restartPolicy: Never
+          serviceAccountName: jenkins-admin
+```
+
+### 12. (DEV) Update mi-ado-agent Managed Identity
+
+Update the `mi-ado-agent` Managed Identity with the OIDC URL of the new DEV cluster on the HMCTS.net Subscription. **The URL must contain a trailing slash.**
+
+**Portal location:** [Federated Credentials](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ef8dd153-3fba-47a4-be65-15775bcde240/resourceGroups/CORE/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-ado-agent/federatedcredentials)
+
+**Update the existing federated credentials** with the new cluster's OIDC URL:
+
+#### Credential 1: ADO Agent
+
+- **Name:** `ado-agent-aks-devX` (where X is the cluster number: 1 or 2)
+- **Federated credential scenario:** Configure a Kubernetes Service Account
+- **Cluster Issuer URL:** Update with the new cluster's OIDC URL:
+  ```bash
+  az aks show --name <new_cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+  ```
+  Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/0dccffda-21f3-4db3-bca7-9f8392cf3587/`
+- **Namespace:** `ado-agent`
+- **Service Account:** `ado-agent`
+
+#### Credential 2: KEDA Operator
+
+- **Name:** `keda-operator-aks-devX` (where X is the cluster number: 1 or 2)
+- **Cluster Issuer URL:** Update with the same OIDC URL from the new cluster
+- **Namespace:** `keda`
+- **Service Account:** `keda-operator`
+- **Format:** `system:serviceaccount:keda:keda-operator`
+
+> **Note:** When switching between clusters (e.g., dev1 to dev2), you only need to update the **Cluster Issuer URL** in the existing federated credentials. The namespace and service account values remain the same.
+
+### 13. (DEV) Update Jenkins Configuration for AKS Agents
+
+Configure Jenkins to spin up agents on the new AKS cluster.
+
+1. Go to **Manage Jenkins** → **Configure System**
+2. Navigate to: [https://build.mdv.cpp.nonlive/configure](https://build.mdv.cpp.nonlive/configure)
+3. Find the **Kubernetes** section → Identify your cluster configuration (figure out from name)
+
+**Update the following:**
+
+**Kubernetes URL:**
+
+```bash
+kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+```
+
+**Certificate key:**
+
+```bash
+kubectl get secrets/jenkins-admin-token -n kube-system -o jsonpath="{.data['ca\.crt']}" | base64 -d
+```
+
+4. Keep a note of the **Credentials name**
+5. Open another tab: [https://build.mdv.cpp.nonlive/credentials/](https://build.mdv.cpp.nonlive/credentials/)
+6. Identify your credentials → Open it and click **Update**
+
+**Update Secret:**
+
+```bash
+kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token | base64decode}}'
+```
+
+7. Go back to the other tab where you updated URL and certificate
+8. Click **Test Connection** (should be successful if URL, certificate, and token are correct)
+9. Click **Apply** and **Save**
+
+> **Note:** There is an issue with the Jenkins plugin where even if the test is successful, Jenkins may fail to spin up agents on AKS. Test by running a verify/validation job to see if it can spin up agents in the Jenkins namespace. If it fails, in the Kubernetes section for the cluster, simply copy and paste the same certificate and apply—this seems to fix the issue.
+
+### 14. Enable Cost Analysis
+
+Cost analysis is required until Terraform support is available.
+
+```bash
+az aks update --resource-group <cluster-rg> --name <cluster> --enable-cost-analysis
+```
+
+Verify the pod is running:
+
+```bash
+kubectl get deploy cost-analysis-agent -n kube-system
+```
+
+### 15. Lock Inactive Cluster
+
+Post cluster switchover, lock down the old cluster access so it becomes inactive.
+
+#### Step 1: Update user_rbac in aks-config Repo
+
+Update `user_rbac` in the var file for the inactive cluster to an empty list for the following groups:
+
+- `aks_reader_members_ids`
+- `aks_contributor_members_ids`
+- `aks_cluster_admin_members_ids`
+
+**Reference:** [cpp-terraform-azurerm-aks-config/pull/134](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/pull/134)
+
+**Steps:**
+
+1. Create a branch from the release branch:
+   ```bash
+   cd cpp-terraform-azurerm-aks-config
+   git fetch origin
+   git checkout release/<aks-version>  # e.g., release/1.34
+   git pull origin release/<aks-version>
+   git switch -c [jira-ref]/lock-inactive-[cluster-name]-[env]
+   ```
+2. Update inactive cluster vars by clearing the list for `user_rbac` variable
+3. Merge the changes to the **release branch** (e.g., `release/1.34`) and apply (ensure the plan shows only changes with respect to user resource)
+
+#### Step 2: Remove Vault Entries
+
+Remove the vault entry for the following service accounts to restrict deployments via Jenkins. Update `aks_cluster_name` to the cluster that will be inactive:
+
+- `secret/terraform/${var.environment}/${var.aks_cluster_name}/jenkins_deploy_clusterrole_kubeconfig`
+- `secret/terraform/${var.environment}/${var.aks_cluster_name}/jenkins_admin_clusterrole_kubeconfig`
+
+#### Step 3: Restrict DevOps User Access
+
+Empty the following group in the aks repo: `aks_cluster_admins_aad_group_ids`
+
+After updating the var files, get them reviewed and run `terraform plan/apply` on the inactive cluster. After performing all the above steps, verify access is restricted by performing `az login`.
+
+### 16. Destroy Old Cluster (After a Few Days)
+
+When running the `aks-config-destroy` pipeline, some namespaces will get stuck in the finalizer stage. Use the following command to delete those namespaces:
+
+```bash
+for ns in $(kubectl get ns --field-selector status.phase=Terminating -o jsonpath='{.items[*].metadata.name}'); do 
+  kubectl get ns $ns -ojson | jq '.spec.finalizers = []' | kubectl replace --raw "/api/v1/namespaces/$ns/finalize" -f -
+done
+```
+
+### 17. Merge Release Branch to Main (After All Environments Switched)
+
+Once all environments (DEV, SIT, NFT, PRP, PRD) have been successfully switched to the new clusters and the old clusters are destroyed:
+
+**1. Merge the release branch to `main` for both repositories:**
+
+For **cpp-terraform-azurerm-aks**:
+```bash
+cd cpp-terraform-azurerm-aks
+git checkout main
+git pull origin main
+git merge release/<aks-version>
+git push origin main
+```
+
+For **cpp-terraform-azurerm-aks-config**:
+```bash
+cd cpp-terraform-azurerm-aks-config
+git checkout main
+git pull origin main
+git merge release/<aks-version>
+git push origin main
+```
+
+**2. Tag the release:**
+```bash
+git tag -a v<aks-version> -m "AKS cluster switchover to version <aks-version>"
+git push origin v<aks-version>
+```
+
+**3. Clean up the release branch** (optional):
+```bash
+git push origin --delete release/<aks-version>
+```
+
+> **Benefits of this approach:**
+> - All switchover changes are now in `main` for future reference
+> - The release is properly tagged for audit trail
+> - Future cluster builds use the updated configuration
+> - Provides clear separation between in-progress switchovers and stable main branch
+
+## Troubleshooting
+
+### When Building Cluster
+
+**Issue:** Key Vault Data Access Administrator Error
+
+When running the AKS Config pipeline, you may encounter an error related to the Key Vault Data Access Administrator role (which was in preview state when older clusters were built).
+
+**Error Message:**
+
+```
+Error: Provider produced inconsistent final plan
+
+When expanding the plan for
+module.aks_base_config.kubectl_manifest.store_azure_info1 to include new
+values learned so far during apply, provider
+"registry.terraform.io/gavinbunney/kubectl" produced an invalid new value
+for .yaml_body_parsed: was cty.StringVal("apiVersion: v1\ndata:\n
+AvereContributor:
+/providers/Microsoft.Authorization/roleDefinitions/4f8fab4f-1852-4a58-a46a-8eaf358af14a\n
+...
+```
+
+**Solution:**
+
+Delete the `role-definition` ConfigMap from the `azure-info` namespace and rerun the Terraform pipeline:
+
+```bash
+kubectl delete cm role-definition -n azure-info
+```
+
+Then rerun the aks-config pipeline.

@@ -1,0 +1,1405 @@
+---
+title: Crime AKS System Component Post-Upgrade Verification
+last_reviewed_on: 2026-04-09
+review_in: 12 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+This guide documents the verification steps required after upgrading Crime AKS system components. These checks ensure that all components are correctly configured before rolling out to additional environments.
+
+## Overview
+
+After upgrading system components via Terraform module updates in `cpp-module-terraform-azurerm-aks-config`, perform these verification steps to validate the configuration and functionality.
+
+## System Components Covered
+
+This guide covers verification for the following system components:
+
+- **[KEDA](#keda-verification)** - Event-driven autoscaling (includes ADO agent federation)
+- **[cert-manager](#cert-manager-verification)** - Certificate lifecycle management (includes VNet peering)
+- **[SonarQube](#sonarqube-verification)** - Code quality and security
+- **[Prometheus](#prometheus-verification)** - Metrics and monitoring (includes custom metrics adapter)
+- **[Istio](#istio-verification)** - Service mesh sidecar injection and routing
+- **[Azure Service Operator (ASO)](#azure-service-operator-aso-verification)** - Azure resource provisioning validation
+- **[Gatekeeper](#gatekeeper-verification)** - Policy enforcement and admission control
+- **[Kiali](#kiali-verification)** - Service mesh observability and monitoring
+- **[pgAdmin](#pgadmin-verification)** - PostgreSQL database management (DEV switchover and above)
+- **[Dynatrace](#dynatrace-verification)** - Application performance monitoring (NFT and above)
+
+**[Additional Integration Checks](#additional-integration-checks)** - Deploy, priming, and Validation tests
+
+## Prerequisites
+
+### Required Before Starting
+
+- **Non-active Crime AKS cluster deployed** (K8-DEV-CS01-CL01 or K8-DEV-CS01-CL02) with:
+  - System components installed via Terraform (`cpp-module-terraform-azurerm-aks-config`)
+  - Helm charts deployed to the cluster
+  - All Terraform configurations applied
+  - For NFT/Production testing: NFT non-active cluster must be created first
+
+### Access Requirements
+
+- **Cluster Access**:
+  - Access to Crime AKS clusters (DEV, NFT)
+  - `kubectl` configured with cluster credentials
+  - Appropriate RBAC permissions for verification tasks
+
+- **Azure Access**:
+  - Azure CLI installed (`az login` completed)
+  - Azure Portal access for:
+      - VNet peering verification/creation
+      - PostgreSQL Flexible Server cloning (DEV only)
+      - Managed Identity federated credential updates
+      - Private DNS zone record updates (`dev.nl.cjscp.org.uk`)
+  - Access to HMCTS tenant (hmcts.net) for managed identity configuration
+
+- **DevOps Access**:
+  - Azure DevOps access with permissions to:
+      - Variable groups (clone and modify)
+      - Pipeline execution and monitoring
+  - GitHub access with write permissions to context repositories
+
+- **Secrets and Configuration**:
+  - HashiCorp Vault access (`secret.mnl.nl.cjscp.org.uk:8200`)
+      - Paths: `secret/mgmt/*`, `secret/dev/*`
+
+- **Documentation and Coordination**:
+  - Confluence access for:
+      - [EA Environment Management](https://tools.hmcts.net/confluence/spaces/EA/pages/1394672908/EA+Environment+management)
+      - [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration)
+      - [How to access Postgres Databases with PGAdmin](https://tools.hmcts.net/confluence/spaces/EI/pages/1698008521/How+to+access+Postgres+Databases+with+PGAdmin)
+  - QA team contact for release identification and test credentials
+
+---
+
+## KEDA Verification
+
+### 1. ADO Federation Credential for KEDA Agent Scaling
+
+<%= warning_text('This configuration is only required for STE and DEV clusters. This is not a verification check but a one-time setup that must be done when a cluster is newly created or re-created, as the OIDC URL changes.') %>
+
+After cluster creation/recreation, update federated credentials to allow KEDA to scale Azure DevOps agents.
+
+#### 1.1 Get OIDC URL from Cluster
+
+The OIDC URL is stored in the `azure-info` ConfigMap:
+
+```bash
+# Get OIDC URL for the cluster
+kubectl get configmap azure-info -n azure-info -o jsonpath='{.data.oidc_url}'
+
+# Example output:
+# https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/12345678-1234-1234-1234-123456789abc/
+```
+
+#### 1.2 Update Managed Identity Federation Credentials
+
+Navigate to **hmcts.net tenant** → **Managed Identities** → `mi-ado-agent` → **Federated credentials**.
+
+Update the OIDC URL (do NOT change the subjects) for these two credentials:
+
+1. **k8-dev-cs01-cl01-ado** - For KEDA operator
+   - Subject: `system:serviceaccount:keda:keda-operator`
+   - Update: Issuer URL only
+
+2. **k8-dev-cs01-cl01-ado-agent** - For ADO agents
+   - Subject: `system:serviceaccount:ado-agent:ado-agent`
+   - Update: Issuer URL only
+
+#### 1.3 Configure Agent with Cluster-Specific Identifier
+
+For testing, configure ONE agent with a cluster-specific identifier to prevent jobs from scheduling on the non-active test cluster.
+
+Example configuration in `vars/dev-cs01cl01.tfvars`:
+
+```hcl
+ado-agents_config = {
+  enable           = true
+  namespace        = "ado-agent"
+  sa_name          = "ado-agent"
+  azpurl           = "https://dev.azure.com/hmcts-cpp"
+  poolname         = "MDV-ADO-AGENT-AKS-01"
+  secretname       = "azdevops"
+  secretkey        = "AZP_TOKEN"
+  managed-identity = "52cd0539-fbf7-4e98-9b26-ee6cb4f89688"
+  tenant-id        = "531ff96d-0ae9-462a-8d2d-bec7c0b42082"
+  subscription-id  = "ef8dd153-3fba-47a4-be65-15775bcde240"
+  agents = [
+    {
+      agent_name                 = "azdevops-agent-centos8-j17"
+      image_name                 = "ado-agent-centos8-j17"
+      image_tag                  = "v0.0.24-jdk17"
+      identifier                 = "centos8-j17-cl01"  # Cluster-specific: -cl01 or -cl02
+      requests_mem               = "8Gi"
+      requests_cpu               = "1.5"
+      limits_mem                 = "8.5Gi"
+      limits_cpu                 = "2"
+      scaled_min_job             = "1"
+      scaled_max_job             = "30"
+      pollinginterval            = "10"
+      successfuljobshistorylimit = "0"
+      failedjobshistorylimit     = "0"
+      enable_istio_proxy         = true
+      init_container_config      = []
+      run_as_user                = 1000
+    }
+  ]
+}
+```
+
+**Note**: The `identifier` field includes the cluster number (e.g., `centos8-j17-cl01` for CL01, `centos8-j17-cl02` for CL02). This ensures active jobs are not scheduled on the test cluster.
+
+#### 1.4 Verify Configuration
+
+```bash
+# Check KEDA operator logs for errors
+kubectl logs -n keda -l app.kubernetes.io/name=keda-operator --tail=50
+
+# Verify at least one ADO agent pod is running
+kubectl get pods -n ado-agent
+
+# Expected: At least 1 pod in Running state
+
+# Check ScaledJob configuration
+kubectl get scaledjobs -n ado-agent
+```
+
+---
+
+## cert-manager Verification
+
+### 2. VNet Peering to Vault Network
+
+<%= warning_text('On cluster re-creates, the peering may be left in a disconnected state and Terraform may not recognize it. Manual verification is required.') %>
+
+Verify that the cluster VNet has peering configured to the vault network (VN-MNL-INT-01) for certificate and secret access.
+
+#### 2.1 Check Peering Status
+
+```bash
+# List all peerings from cluster VNet
+az network vnet peering list \
+  --resource-group <CLUSTER_VNET_RG> \
+  --vnet-name <CLUSTER_VNET_NAME> \
+  --output table
+
+# Check specific peering to vault network
+# Example: VP-VN-MNL-INT-01-VN-DEV-CS01-CL01
+az network vnet peering show \
+  --resource-group RG-DEV-CS01-CL01 \
+  --vnet-name VN-DEV-CS01-CL01 \
+  --name VP-VN-MNL-INT-01-VN-DEV-CS01-CL01
+```
+
+**Expected Output**:
+
+```
+Name                                    PeeringState    ProvisioningState
+--------------------------------------  --------------  -------------------
+VP-VN-MNL-INT-01-VN-DEV-CS01-CL01      Connected       Succeeded
+```
+
+**If PeeringState is "Disconnected"**: Manually recreate the peering in Azure Portal or via Azure CLI.
+
+#### 2.2 Verify Vault Connectivity
+
+Test that pods can reach the vault endpoint:
+
+```bash
+# Test DNS resolution
+kubectl exec -n cert-manager deployment/cert-manager -- nslookup secret.mnl.nl.cjscp.org.uk
+
+# Test HTTPS connectivity to vault
+kubectl exec -n cert-manager deployment/cert-manager -- \
+  curl -I https://secret.mnl.nl.cjscp.org.uk:8200/v1/sys/health
+
+# Expected: HTTP 200 response
+```
+
+**Vault Path**: `https://secret.mnl.nl.cjscp.org.uk:8200`
+
+### 3. cert-manager Configuration Verification
+
+Verify that cert-manager has the correct node selectors, replicas, and resource configurations.
+
+#### 3.1 Required cert-manager Customizations
+
+When upgrading cert-manager, apply these custom changes to the upstream manifest.
+
+**File Locations**: 
+- Terraform: `cpp-module-terraform-azurerm-aks-config/cert-manager.tf`
+- Manifest: `cpp-module-terraform-azurerm-aks-config/manifests/cert-manager/cert-manager.yaml`
+
+**Steps to Apply Custom Changes**:
+
+1. **Download** the new upstream manifest from [cert-manager releases](https://github.com/cert-manager/cert-manager/releases)
+
+2. **Apply template variables** for Docker images
+
+   Update `cert-manager.tf` to template the Docker image references:
+
+   ```hcl
+   content = templatefile("${path.module}/manifests/cert-manager/cert-manager.yaml", {
+     docker_image_certmanager_cainjector = var.docker_image_certmanager_cainjector
+     docker_tag_certmanager              = var.certmanager_version
+     docker_image_certmanager_controller = var.docker_image_certmanager_controller
+     docker_image_certmanager_webhook    = var.docker_image_certmanager_webhook
+   })
+   ```
+
+   Then in the manifest file, replace each image reference with template variables:
+
+   ```yaml
+   # For each component, find the image: line and replace with:
+   image: "${docker_image_certmanager_cainjector}:${docker_tag_certmanager}"
+   image: "${docker_image_certmanager_controller}:${docker_tag_certmanager}"
+   image: "${docker_image_certmanager_webhook}:${docker_tag_certmanager}"
+   ```
+
+3. **Apply custom changes** to the manifest file `manifests/cert-manager/cert-manager.yaml`:
+
+   **a. Change replicas** (search for `name: cert-manager-cainjector`, then find `replicas:`):
+   
+   ```yaml
+   # cert-manager-cainjector Deployment
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: cert-manager-cainjector
+   spec:
+     replicas: 2  # Change from 1
+   ```
+
+   ```yaml
+   # cert-manager Deployment (controller)
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: cert-manager
+   spec:
+     replicas: 2  # Change from 1
+   ```
+
+   ```yaml
+   # cert-manager-webhook Deployment
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: cert-manager-webhook
+   spec:
+     replicas: 3  # Change from 1
+   ```
+
+   **b. Change nodeSelector** (for all three deployments, search for `nodeSelector:`):
+   
+   ```yaml
+   # FIND:
+   nodeSelector:
+     kubernetes.io/os: "linux"
+   
+   # REPLACE WITH:
+   nodeSelector:
+     agentpool: sysagentpool
+   ```
+
+   **c. Add tolerations** (add BEFORE each `nodeSelector:` block in all three deployments):
+   
+   ```yaml
+   # ADD these lines BEFORE nodeSelector:
+   tolerations:
+     - key: "CriticalAddonsOnly"
+       operator: "Exists"
+       effect: "NoSchedule"
+   nodeSelector:
+     agentpool: sysagentpool
+   ```
+
+   **d. Add resources** (cert-manager-webhook deployment only, in the container spec):
+   
+   Search for the cert-manager-webhook container and add resources after the `env:` section:
+
+   ```yaml
+   containers:
+     - name: cert-manager-webhook
+       image: "${docker_image_certmanager_webhook}:${docker_tag_certmanager}"
+       imagePullPolicy: IfNotPresent
+       args:
+         - --v=2
+         # ... other args
+       env:
+         - name: POD_NAMESPACE
+           valueFrom:
+             fieldRef:
+               fieldPath: metadata.namespace
+       resources:  # ADD this section
+         requests:
+           cpu: 1000m
+   ```
+
+#### 3.2 Verify cert-manager Configuration
+
+After applying the customizations, verify the configuration:
+
+```bash
+# Check replicas
+kubectl get deployment cert-manager-cainjector -n cert-manager
+# Expected: 2/2 READY
+
+kubectl get deployment cert-manager -n cert-manager  
+# Expected: 2/2 READY
+
+kubectl get deployment cert-manager-webhook -n cert-manager
+# Expected: 3/3 READY
+
+# Check node selector for cainjector
+kubectl get deployment cert-manager-cainjector -n cert-manager \
+  -o jsonpath='{.spec.template.spec.nodeSelector}' | jq
+
+# Expected: {"agentpool": "sysagentpool"}
+
+# Check tolerations for cainjector
+kubectl get deployment cert-manager-cainjector -n cert-manager \
+  -o jsonpath='{.spec.template.spec.tolerations}' | jq
+
+# Expected: Includes CriticalAddonsOnly toleration
+
+# Check webhook resources
+kubectl get deployment cert-manager-webhook -n cert-manager \
+  -o jsonpath='{.spec.template.spec.containers[0].resources}' | jq
+
+# Expected: {"requests": {"cpu": "1000m"}}
+
+# Verify pods are on correct node pool
+kubectl get pods -n cert-manager -o wide
+
+# Expected: All pods on aks-sysagentpool-* nodes
+```
+
+---
+
+## SonarQube Verification
+
+### 4. SonarQube Validation Configuration
+
+<%= warning_text('For testing upgrades in DEV clusters: Clone the PostgreSQL Flexible Server instance as DEV clusters (CL01 and CL02) share a database. Schema changes in the upgrade are non-breaking but cloning allows testing in isolation.') %>
+
+Configure SonarQube testing to validate code quality checks are working on the upgraded cluster.
+
+#### 4.1 Get Cluster-Specific SonarQube URL
+
+Retrieve the VirtualService to get the cluster-specific URL:
+
+```bash
+# Get VirtualService hosts
+kubectl get virtualservice -n sonarqube sonarqube-sonarqube -o jsonpath='{.spec.hosts}'
+
+# Example output:
+# ["sonarqube.mgmt01.dev.nl.cjscp.org.uk","sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk"]
+```
+
+Use the **cluster-specific** URL (e.g., `sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk` for CL01).
+
+#### 4.2 Clone PostgreSQL Flex Server for Testing (DEV Only)
+
+For upgrade testing without impacting the live CL02 cluster:
+
+1. **Clone the PSF instance** in Azure Portal:
+   - Source: `psf-dev-ccm-sonarqube`
+   - New name: `psf-dev-ccm-sonarqube-<TICKET-ID>` (e.g., `psf-dev-ccm-sonarqube-dtspo-30530`)
+
+2. **Update Terraform config** in `cpp-terraform-azurerm-aks-config/vars/dev-cs01cl01.tfvars`:
+
+   ```hcl
+   sonarqube_config = {
+     enable                 = true
+     # TODO <TICKET-ID>: Revert to psf-dev-ccm-sonarqube at time of switchover
+     jdbcUrl                = "jdbc:postgresql://psf-dev-ccm-sonarqube-<TICKET-ID>.postgres.database.azure.com/sonarqube?sslmode=require&socketTimeout=1500"
+     sonarVaultPath         = "/secret/dev/aks_sonarube_config"
+     sonarqubeUrl           = "sonarqube.mgmt01.dev.nl.cjscp.org.uk"
+     hosts                  = "sonarqube.mgmt01.dev.nl.cjscp.org.uk;sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk"
+     community_build_number = "26.3.0.120487"
+   }
+   ```
+
+**Important**: Remember to revert `jdbcUrl` back to `psf-dev-ccm-sonarqube` before production switchover.
+
+#### 4.3 Clone Variable Group
+
+Clone the variable group to run validation pipeline for a context repository pointing at the test SonarQube on the non-active test cluster.
+
+1. Navigate to **Azure DevOps** → **Library** → **Variable Groups**
+2. Clone `cpp-nonlive-sonarqube-aks` to `cpp-nonlive-sonarqube-aks-testing`
+
+#### 4.4 Update Testing Variable Group
+
+Update the following variables in `cpp-nonlive-sonarqube-aks-testing`:
+
+| Variable | Value |
+|----------|-------|
+| `SONARQUBE_URL` | `https://sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk` (cluster-specific) |
+| `ADMIN_TOKEN` | Get from `secret/mgmt/sonaraks_admin_token` in vault |
+
+#### 4.5 Verify SonarQube Access
+
+```bash
+# Check SonarQube pod is running
+kubectl get pods -n sonarqube
+
+# Check service and endpoints
+kubectl get svc,endpoints -n sonarqube
+
+# Check virtual service for Istio routing
+kubectl get virtualservice -n sonarqube -o yaml
+
+# Test access from within cluster
+kubectl exec -n istio-ingress-mgmt deployment/istio-ingressgateway-mgmt -- \
+  curl -I https://sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk
+```
+
+#### 4.6 Test SonarQube Login (Browser)
+
+1. Open browser: `https://sonarqube.mgmt.cs01cl01.dev.nl.cjscp.org.uk`
+2. Username: `admin`
+3. Password: Get from vault path `secret/mgmt/sonaraks_admin_password`
+
+**Expected**: Successful login to SonarQube dashboard
+
+---
+
+## Prometheus Verification
+
+### 5. Prometheus Adapter - Custom Metrics HPA Validation
+
+<%= warning_text('Custom metrics based on Istio request rates are only used in NFT and above environments. In STE/DEV, we must manually patch an HPA to simulate and test this functionality.') %>
+
+Test Prometheus Adapter's custom metrics capability by patching and validating autoscaling for a test service.
+
+#### 5.1 Patch HPA for usersgroups-service
+
+Apply custom metrics configuration to test HPA with Istio request metrics:
+
+```bash
+kubectl patch hpa usersgroups-service-wildfly-app \
+  -n ns-ste-ccm-91 \
+  --context K8-DEV-CS01-CL01-admin \
+  --type='json' \
+  -p='[
+  {"op": "replace", "path": "/spec/maxReplicas", "value": 10},
+  {"op": "replace", "path": "/spec/metrics/0/resource/target/averageUtilization", "value": 60},
+  {"op": "add", "path": "/spec/metrics/-", "value": {
+    "type": "Object",
+    "object": {
+      "describedObject": {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "name": "usersgroups-service-wildfly-app"
+      },
+      "metric": {
+        "name": "istio_requests_per_second"
+      },
+      "target": {
+        "type": "AverageValue",
+        "averageValue": "2",
+        "value": "1"
+      }
+    }
+  }}
+]'
+```
+
+#### 5.2 Verify HPA Configuration
+
+```bash
+# Check HPA status
+kubectl get hpa usersgroups-service-wildfly-app -n ns-ste-ccm-91
+
+# Describe HPA to see metrics
+kubectl describe hpa usersgroups-service-wildfly-app -n ns-ste-ccm-91
+```
+
+#### 5.3 Generate Load to Test Scaling
+
+Generate requests to trigger autoscaling:
+
+```bash
+# Generate load from another pod in the namespace
+seq 1000 | xargs -P 10 -I {} kubectl exec -n ns-ste-ccm-91 \
+  defence-service-wildfly-app-7d8d8c75cf-29zlf \
+  -- curl -s http://localhost:8080/usersgroups-service/internal/metrics/ping
+```
+
+#### 5.4 Verify Custom Metrics API
+
+Check that KEDA's custom metrics API can see the Istio request metrics:
+
+```bash
+# Query custom metrics API for Istio requests
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ns-ste-ccm-91/services/usersgroups-service-wildfly-app/istio_requests_per_second" | jq '.'
+```
+
+**Expected Output**:
+
+```json
+{
+  "kind": "MetricValueList",
+  "apiVersion": "custom.metrics.k8s.io/v1beta1",
+  "metadata": {},
+  "items": [
+    {
+      "describedObject": {
+        "kind": "Service",
+        "namespace": "ns-ste-ccm-91",
+        "name": "usersgroups-service-wildfly-app",
+        "apiVersion": "v1"
+      },
+      "metricName": "istio_requests_per_second",
+      "value": "X"  // Should be incrementing, not 0
+    }
+  ]
+}
+```
+
+**Note**: The `value` should show an incrementing number (not 0) if metrics are flowing correctly.
+
+#### 5.5 Monitor Pod Scaling
+
+Watch the pods scale based on the metrics:
+
+```bash
+# Watch pods in the namespace
+kubectl get pods -n ns-ste-ccm-91 -l app=usersgroups --watch
+
+# Check HPA events
+kubectl get events -n ns-ste-ccm-91 --field-selector involvedObject.name=usersgroups-service-wildfly-app
+```
+
+---
+
+### 6. Prometheus Service Name Updates
+
+If the Prometheus Helm chart name is updated with a custom suffix (e.g., `-v3`), update all Kubernetes service references where Prometheus is consumed.
+
+#### 6.1 Identify Service Name Changes
+
+```bash
+# Check current Prometheus services
+kubectl get svc -n prometheus
+
+# Expected services after upgrade:
+# kube-prometheus-stack-v3-prometheus       (Prometheus server)
+# kube-prometheus-stack-v3-alertmanager     (Alertmanager)
+# kube-prometheus-stack-v3-operator         (Prometheus operator)
+# kube-prometheus-stack-v3-kube-state-metrics
+```
+
+#### 6.2 Update Consuming Services in aks-config Module
+
+Search for Prometheus service references in the `cpp-module-terraform-azurerm-aks-config` repository:
+
+```bash
+# Search for old service names
+grep -r "prometheus-server" .
+grep -r "prometheus-kube-prometheus-prometheus" .
+grep -r "kube-prometheus-stack-prometheus" .
+```
+
+**Common files to update**:
+- `prometheus.tf` - Prometheus configurations
+- `istio.tf` - Istio telemetry integration
+- `alerts.tf` - Alert rules and configurations
+- Any custom ServiceMonitor or PrometheusRule manifests
+
+#### 6.3 Verify Connectivity
+
+```bash
+# Test connectivity to Prometheus server
+kubectl exec -n cert-manager deployment/cert-manager -- \
+  curl -I http://kube-prometheus-stack-v3-prometheus.prometheus.svc.cluster.local:9090
+
+# Check Prometheus targets
+kubectl port-forward -n prometheus svc/kube-prometheus-stack-v3-prometheus 9090:9090
+# Open browser: http://localhost:9090/targets
+
+# Verify metrics are being collected
+kubectl port-forward -n prometheus svc/kube-prometheus-stack-v3-prometheus 9090:9090
+# Open browser: http://localhost:9090/graph
+# Query: up{job="kubernetes-pods"}
+```
+
+#### 6.4 Verify Prometheus Adapter for Custom Metrics
+
+Test that the Prometheus adapter is exposing custom metrics for Istio request rates:
+
+```bash
+# Check Prometheus adapter pods are running
+kubectl get pods -n prometheus -l app.kubernetes.io/name=prometheus-adapter
+
+# Query custom metrics API for Istio requests per second
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ns-ste-ccm-91/services/usersgroups-service-wildfly-app/istio_requests_per_second" | jq '.'
+
+# List all available custom metrics
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq '.resources[].name' | grep istio
+
+# Check adapter logs for errors
+kubectl logs -n prometheus -l app.kubernetes.io/name=prometheus-adapter --tail=50
+```
+
+**Expected Output** (custom metrics API):
+
+```json
+{
+  "kind": "MetricValueList",
+  "apiVersion": "custom.metrics.k8s.io/v1beta1",
+  "metadata": {},
+  "items": [
+    {
+      "describedObject": {
+        "kind": "Service",
+        "namespace": "ns-ste-ccm-91",
+        "name": "usersgroups-service-wildfly-app",
+        "apiVersion": "v1"
+      },
+      "metricName": "istio_requests_per_second",
+      "value": "X"  // Should be incrementing, not 0
+    }
+  ]
+}
+```
+
+**Note**: The `value` should show an incrementing number (not 0) if metrics are flowing correctly.
+
+---
+
+## Istio Verification
+
+### 7. Istio Sidecar Injection and Routing Validation
+
+Verify that Istio sidecar injection is working correctly and validate both internal and external routing through the service mesh.
+
+#### 7.1 Verify Sidecar Injection Status
+
+Check that Istio sidecars are automatically injected into application pods:
+
+```bash
+# Check namespace label for sidecar injection
+kubectl get namespace ns-ste-ccm-91 -o jsonpath='{.metadata.labels.istio-injection}'
+
+# Expected: enabled
+
+# Verify pods have Istio sidecar (should show 2 containers: app + istio-proxy)
+kubectl get pods -n ns-ste-ccm-91 -l app=usersgroups
+
+# Expected: READY shows 2/2 (application + sidecar)
+
+# Check sidecar container is present
+kubectl get pod <pod-name> -n ns-ste-ccm-91 -o jsonpath='{.spec.containers[*].name}'
+
+# Expected: Should include 'istio-proxy'
+```
+
+#### 7.2 Test Internal Path-Based Routing via Sidecar Proxy
+
+**Context**: The Istio sidecar binds to port 8080 on localhost within each pod. Applications use this binding to communicate with other services in the namespace via path-based routing through internal VirtualServices.
+
+```bash
+# Test internal routing from any pod in the namespace
+kubectl exec -n ns-ste-ccm-91 <pod-name> -- \
+  curl -s http://127.0.0.1:8080/usersgroups-service/internal/metrics/ping
+
+# Expected: pong
+```
+
+#### 7.3 Test External Ingress Access
+
+Validate external ingress traffic flow to verify cert-manager certificates, Istio gateway, and end-to-end connectivity:
+
+```bash
+# Test from your laptop (external access)
+curl -s https://steccm91.ingress01.dev.nl.cjscp.org.uk/usersgroups-service/internal/metrics/ping
+
+# Expected: pong
+```
+
+**What this validates** (end-to-end traffic flow):
+
+| Component | Validation |
+|-----------|------------|
+| **Ingress Controller** | Traffic reaches the Istio ingress gateway |
+| **cert-manager** | TLS certificates are correctly provisioned and configured |
+| **Istio Gateway** | External traffic is routed to the internal VirtualService |
+| **Internal Routing** | Path-based routing via sidecar proxy (localhost:8080) |
+
+---
+
+## Azure Service Operator (ASO) Verification
+
+### 8. ASO Azure Resource Provisioning
+
+Verify that Azure Service Operator can successfully create and manage Azure resources.
+
+#### 8.1 Check Existing ASO Resources
+
+Verify that ASO-managed resources are in a healthy state:
+
+```bash
+# Check UserAssignedIdentity resources
+kubectl get userassignedidentities -A
+
+# Expected: All resources should show STATUS as "Succeeded"
+
+# Check RoleAssignment resources
+kubectl get roleassignments -A
+
+# Expected: All resources should show STATUS as "Succeeded"
+
+# Check FederatedIdentityCredential resources
+kubectl get federatedidentitycredentials -A
+
+# Expected: All resources should show READY as "True"
+```
+
+#### 8.2 Verify Resource Details
+
+Check detailed status of ASO resources:
+
+```bash
+# Describe a UserAssignedIdentity to check provisioning state
+kubectl describe userassignedidentity <identity-name> -n <namespace>
+
+# Look for:
+# - Status: Succeeded
+# - Provisioning State: Succeeded
+# - No error messages in Events
+
+# Describe a FederatedIdentityCredential
+kubectl describe federatedidentitycredential <credential-name> -n <namespace>
+
+# Look for:
+# - Ready: True
+# - No error conditions
+```
+
+#### 8.3 Test ASO Resource Lifecycle
+
+Validate ASO can create and delete resources by testing with a context release:
+
+```bash
+# Step 1: Delete a release for one context (this deletes ASO resources)
+# In cpp-aks-deploy pipeline, delete the Helm release for a test context
+# Example: Delete release for cpp-context-staging-bulkscan in STE environment
+
+# Step 2: Verify ASO resources are deleted
+kubectl get userassignedidentities -n <context-namespace>
+kubectl get roleassignments -n <context-namespace>
+kubectl get federatedidentitycredentials -n <context-namespace>
+
+# Expected: Resources for that context should be removed
+
+# Step 3: Re-run cpp-aks-deploy pipeline for the context
+# This will deploy the application and recreate the ASO resources
+
+# Step 4: Verify resources are recreated successfully after deploying the application
+kubectl get userassignedidentities -n <context-namespace>
+kubectl get roleassignments -n <context-namespace>
+kubectl get federatedidentitycredentials -n <context-namespace>
+
+# Expected:
+# - UserAssignedIdentities: STATUS = "Succeeded"
+# - RoleAssignments: STATUS = "Succeeded"
+# - FederatedIdentityCredentials: READY = "True"
+```
+
+#### 8.4 Check ASO Operator Health
+
+Verify the ASO operator itself is running correctly:
+
+```bash
+# Check ASO controller pod status
+kubectl get pods -n azureserviceoperator-system
+
+# Expected: All pods in Running state
+
+# Check ASO operator logs for errors
+kubectl logs -n azureserviceoperator-system -l control-plane=controller-manager --tail=50
+
+# Expected: No error messages related to resource provisioning
+
+# Verify ASO can communicate with Azure
+kubectl logs -n azureserviceoperator-system -l control-plane=controller-manager --tail=100 | grep -i "error\|failed"
+
+# Expected: No Azure authentication or API errors
+```
+
+**Common Issues**:
+
+- **UserAssignedIdentity stuck in "Provisioning"**: Check ASO operator logs for Azure API errors
+- **RoleAssignment fails**: Verify the service principal has sufficient permissions to create role assignments
+- **FederatedIdentityCredential not Ready**: Check OIDC issuer URL is correct and accessible
+
+---
+
+## Gatekeeper Verification
+
+### 9. Gatekeeper Policy Enforcement
+
+Verify that Gatekeeper admission controller is correctly enforcing policies, specifically image whitelisting and security contexts.
+
+#### 9.1 Check Gatekeeper Installation
+
+Verify Gatekeeper components are running:
+
+```bash
+# Check Gatekeeper pods
+kubectl get pods -n gatekeeper-system
+
+# Expected:
+# - gatekeeper-audit pods running
+# - gatekeeper-controller-manager pods running
+
+# Check Gatekeeper constraints
+kubectl get constraints -A
+
+# Expected output:
+# k8srequiredrunasnonroot.constraints.gatekeeper.sh/enforce-runasnonroot-unless-istio   deny   0
+# k8swhitelistedimages.constraints.gatekeeper.sh/k8senforcewhitelistedimages           deny   0
+```
+
+#### 9.2 Test Image Whitelisting Policy
+
+Test that Gatekeeper blocks deployments with non-whitelisted images:
+
+```bash
+# Create a test deployment with non-whitelisted image (nginx from Docker Hub)
+kubectl create deployment nginx-test --image=nginx:1.14.2 -n default
+
+# Expected: Deployment created but pods will fail to create
+
+# Check deployment events
+kubectl describe deployment nginx-test -n default
+
+# Expected error in events:
+# Error creating: admission webhook "validation.gatekeeper.sh" denied the request:
+# [k8senforcewhitelistedimages] pod "nginx-test-xxx" has invalid image "nginx:1.14.2".
+# Please, contact your DevOps. Follow the whitelisted images
+# {"crmdvrepo01.azurecr.io/", "crmpdrepo01.azurecr.io/", "mcr.microsoft.com/"}
+
+# Check ReplicaSet events for more details
+kubectl get events -n default --field-selector involvedObject.kind=ReplicaSet | grep nginx-test
+
+# Clean up test deployment
+kubectl delete deployment nginx-test -n default
+```
+
+**Example of expected blocking behavior**:
+
+```
+93s   Warning   FailedCreate   replicaset/nginx-test-xxx   Error creating: admission webhook "validation.gatekeeper.sh" denied the request:
+      [k8senforcewhitelistedimages] pod "nginx-test-xxx" has invalid image "nginx:1.14.2".
+      Please, contact your DevOps. Follow the whitelisted images {"crmdvrepo01.azurecr.io/", "crmpdrepo01.azurecr.io/", "mcr.microsoft.com/"}
+```
+
+#### 9.3 Verify Gatekeeper Audit Results
+
+Check if Gatekeeper audit has detected any violations:
+
+```bash
+# Check constraint status for violations
+kubectl get k8swhitelistedimages k8senforcewhitelistedimages -o yaml | grep -A 10 "totalViolations"
+
+# Expected: Should show any existing violations in the cluster
+
+# List all violations
+kubectl get k8swhitelistedimages k8senforcewhitelistedimages -o jsonpath='{.status.violations}' | jq
+```
+
+---
+
+## Kiali Verification
+
+### 10. Kiali Service Mesh Observability
+
+Verify that Kiali is accessible and can communicate with Istio and Prometheus.
+
+#### 10.1 Access Kiali Dashboard
+
+Access the cluster-specific Kiali URL:
+
+```bash
+# Get the cluster-specific Kiali URL from VirtualService
+kubectl get virtualservice -n kiali-operator -o jsonpath='{.items[*].spec.hosts}'
+
+# Example output for CL01 test cluster:
+# ["kiali.mgmt01.dev.nl.cjscp.org.uk","kiali.mgmt.cs01cl01.dev.nl.cjscp.org.uk"]
+```
+
+**Access Kiali**:
+- Open browser to cluster-specific URL: `https://kiali.mgmt.cs01cl01.dev.nl.cjscp.org.uk` (for CL01)
+- Login using: **hmctsnonlive.onmicrosoft.com** account credentials
+- After successful login, you will be redirected to the Kiali console
+
+#### 10.2 Verify Kiali Health and Component Connectivity
+
+Check that Kiali can communicate with all Istio components:
+
+**Navigate to Mesh Overview**: Go to `https://kiali.mgmt.cs01cl01.dev.nl.cjscp.org.uk/kiali/console/mesh` and check the mesh status page.
+
+**Expected healthy state**:
+- **Green status indicators** for all components:
+  - Kiali can talk to Istio
+  - Kiali can talk to Prometheus
+- **Green tick (✓)** next to **Kubernetes** near the Kiali logo (top-left)
+- All service mesh components shown in green
+
+**Indicators of issues**:
+- **Red status** on any component indicates connectivity or configuration problems
+- Check component-specific errors displayed on the mesh page
+
+#### 10.3 Verify Kiali Pods and Services
+
+```bash
+# Check Kiali operator pods
+kubectl get pods -n kiali-operator
+
+# Expected: kiali-operator pod in Running state
+
+# Check Kiali instance (if deployed in separate namespace)
+kubectl get kiali -A
+
+# Check Kiali service
+kubctl get svc -n kiali-operator
+
+# Verify VirtualService configuration
+kubectl get virtualservice -n kiali-operator -o yaml
+```
+
+#### 10.4 Common Issues
+
+- **Red Prometheus indicator**: Check Prometheus service name and connectivity (see Section 6)
+- **Red istiod indicator**: Verify Istio control plane is running (`kubectl get pods -n istio-system`)
+- **Login fails**: Verify Azure AD authentication configuration for hmctsnonlive.onmicrosoft.com
+  - Check app registration **mdv-k8s-monitor** for any expired secrets
+- **Green tick missing next to Kubernetes**: Check Kiali's access to Kubernetes API
+
+---
+
+## pgAdmin Verification
+
+### 11. pgAdmin PostgreSQL Database Management
+
+<%= warning_text('pgAdmin can only be tested after DEV switchover as the DNS always points to the active cluster. Login is OAuth-based using hmctsnonlive.onmicrosoft.com accounts.') %>
+
+Verify pgAdmin is accessible and properly configured to manage PostgreSQL databases.
+
+#### 11.1 Access pgAdmin
+
+Access pgAdmin through the management ingress:
+
+- **URL**: `https://pgadmin.mgmt01.<environment>.nl.cjscp.org.uk` (e.g., `pgadmin.mgmt01.dev.nl.cjscp.org.uk`)
+- **Authentication**: OAuth via hmctsnonlive.onmicrosoft.com
+
+#### 11.2 Verify Server List Population
+
+Test pgAdmin functionality including OAuth login and server list generation:
+
+1. **Test Login** - verify OAuth authentication via hmctsnonlive.onmicrosoft.com works
+2. **Check Server List** - verify servers auto-populate from `server_list_sync.py` custom script
+3. **Verify server_list_sync.py** - confirm the custom server list generation script is working correctly
+4. **Test Connectivity** - expand a server to verify database connections
+
+For detailed instructions on authentication, server configuration, and the `server_list_sync.py` script, see:
+
+**Reference**: [How to access Postgres Databases with PGAdmin](https://tools.hmcts.net/confluence/spaces/EI/pages/1698008521/How+to+access+Postgres+Databases+with+PGAdmin)
+
+---
+
+## Dynatrace Verification
+
+### 12. Dynatrace Application Performance Monitoring
+
+<%= warning_text('Dynatrace is NOT enabled in DEV, SIT, or LAB environments. NFT is the first non-live environment where Dynatrace can be validated. Test on the NFT non-active cluster before proceeding to PRD/PRP/PRX.') %>
+
+Verify that Dynatrace is properly deployed and monitoring the cluster and workloads.
+
+#### 12.1 Prerequisites
+
+**Important**: You must create the NFT non-active cluster first before performing Dynatrace validation.
+
+Refer to the integration guide: [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration)
+
+#### 12.2 Verify Dynatrace Pods
+
+Check that all Dynatrace components are running:
+
+```bash
+# Check all Dynatrace pods
+kubectl get pods -n dynatrace
+
+# Expected pods:
+# - dynatrace-operator (deployment)
+# - dynatrace-webhook (deployment)
+# - dynatrace-oneagent-csi-driver (DaemonSet)
+# - dynatrace-oneagent (DaemonSet - runs on each node)
+
+# All pods should be in Running state
+```
+
+#### 12.3 Verify DynaKube Custom Resource
+
+Check the DynaKube CR status:
+
+```bash
+# Check DynaKube CR
+kubectl get dynakube -n dynatrace
+
+# Expected: Phase should be "Running"
+
+# Get detailed status
+kubectl describe dynakube -n dynatrace
+```
+
+#### 12.4 Verify OneAgent Injection
+
+Verify OneAgent init containers are injected into application pods via CSI driver:
+
+```bash
+# Check for OneAgent CSI driver pods (DaemonSet)
+kubectl get pods -n dynatrace -l app.kubernetes.io/name=csi-driver
+
+# Verify init container injection in an application pod
+kubectl describe pod <pod-name> -n <namespace> | grep -A 5 "Init Containers:"
+
+# Expected: Application pods should have oneagent init container
+# injected for Dynatrace metrics collection
+```
+
+#### 12.5 Verify Dynatrace Console
+
+Check that the cluster and workloads appear in the Dynatrace console:
+
+1. **Login to Dynatrace** console for the HMCTS tenant
+2. **Navigate to Infrastructure** → **Kubernetes**
+3. **Verify cluster appears** in the list with the correct name (use whatever name was configured when adding the cluster to Dynatrace)
+
+#### 12.6 Verify Metrics and Observability
+
+In Dynatrace console, verify metrics are visible for:
+
+**Cluster Level**:
+- Cluster resource utilization (CPU, memory)
+- Cluster health and status
+- Kubernetes events
+
+**Node Level**:
+- Individual node metrics
+- Node resource usage
+- Node health status
+
+**Process Level**:
+- Application processes detected
+- Process resource consumption
+- Process dependencies
+
+**Workload Level**:
+- Pod metrics and status
+- Container resource usage
+- Service-to-service communication
+
+**Namespace Events**:
+- Kubernetes events captured
+- Pod lifecycle events
+- Deployment and scaling events
+
+**Note**: In NFT, avoid modifying existing dashboards as it may interfere with NFT testing. Dashboard validation should be performed after switchover.
+
+---
+
+## Additional Integration Checks
+
+These checks validate the overall system functionality by testing component integration and cluster readiness.
+
+### 13. Component Node Pool and Security Context Verification
+
+Verify that all system components are scheduled on the correct node pools with proper security contexts.
+
+#### 13.1 Check Component Node Pool Placement
+
+System components should run on the **sysagentpool** node pool:
+
+```bash
+# Check all system component namespaces
+for ns in cert-manager gatekeeper-system keda azureserviceoperator-system \
+          dynatrace istio-system kiali-operator sonarqube pgadmin prometheus; do
+  echo "=== Namespace: $ns ==="
+  kubectl get pods -n $ns -o wide 2>/dev/null | grep -E "NAME|Running"
+  echo ""
+done
+
+# Verify nodes have correct labels
+kubectl get nodes -L agentpool
+
+# Expected: aks-sysagentpool-* and aks-wrkagentpool-* nodes
+```
+
+#### 13.2 Verify Security Context (runAsNonRoot)
+
+Check that pods have proper security contexts configured:
+
+```bash
+# Check security context across system namespaces
+for ns in cert-manager gatekeeper-system keda azureserviceoperator-system; do
+  echo "=== Namespace: $ns ==="
+  kubectl get pods -n $ns --no-headers 2>/dev/null | awk '{print $1}' | while read pod; do
+    echo "Pod: $pod"
+    kubectl get pod $pod -n $ns \
+      -o jsonpath='{range .spec.containers[*]}Container: {.name} | runAsNonRoot: {.securityContext.runAsNonRoot}{"\n"}{end}' 2>/dev/null
+    kubectl get pod $pod -n $ns \
+      -o jsonpath='Pod-level runAsNonRoot: {.spec.securityContext.runAsNonRoot}{"\n"}' 2>/dev/null
+    echo ""
+  done
+  echo ""
+done
+```
+
+### 14. Deploy STE Environment
+
+Deploy a test STE (System Test Environment) namespace to validate end-to-end deployment capabilities.
+
+#### 14.1 Get STE Allocation
+
+Request an STE allocation for testing:
+
+**Reference**: [EA Environment Management](https://tools.hmcts.net/confluence/spaces/EA/pages/1394672908/EA+Environment+management)
+
+Note the allocated stack number (e.g., `steccm91`).
+
+#### 14.2 Identify Latest Release
+
+Find the latest release branch for the CPP Pipeline:
+
+1. **Check with QA team** for the recommended STE release branch
+2. **Pipeline**: [CPP-AKS-Deploy Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333&_a=summary)
+3. **Branch format**: `dev/<version>_ste` (e.g., `dev/2604_ste`)
+
+#### 14.3 Run CPP-AKS-Deploy Pipeline
+
+Execute the deployment pipeline with the following parameters:
+
+**Pipeline**: [CPP-AKS-Deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333&_a=summary)
+
+**Parameters**:
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| **Branch** | `dev/<version>_ste` | Example: `dev/2604_ste` |
+| **Environment** | `ste` | Fixed value |
+| **Stack** | `steccm<number>` | Example: `steccm91` (use your allocated number) |
+| **Event Grid** | (default) | Leave as default |
+| **Cluster** | `k8-dev-cs01-cl01` OR `k8-dev-cs01-cl02` | Non-active cluster you are testing |
+| **deploy-service** | ✓ Ticked | Required |
+| **deploy_idam** | ✓ Ticked | Required |
+| **Create DB** | ✓ Ticked | Required |
+| **create_replica_configmap** | ✓ Ticked | Required |
+
+**Expected outcome**: Pipeline completes successfully and STE namespace is deployed to the non-active cluster.
+
+#### 14.4 Update DNS Records
+
+After deployment, update DNS to route traffic to the non-active cluster.
+
+**Private DNS Zone**: `dev.nl.cjscp.org.uk`
+
+Add three CNAME records (replace `steccm91` with your stack number and `cs01cl01` with your cluster):
+
+```bash
+# Record 1: CDNS Web
+Name: steccm91-cdns.web01
+Type: CNAME
+Value: web.cs01cl01.dev.nl.cjscp.org.uk.
+TTL: 300
+
+# Record 2: Frontend Web
+Name: steccm91-frontend.web01
+Type: CNAME
+Value: web.cs01cl01.dev.nl.cjscp.org.uk.
+TTL: 300
+
+# Record 3: Ingress
+Name: steccm91.ingress01
+Type: CNAME
+Value: ingress.cs01cl01.dev.nl.cjscp.org.uk.
+TTL: 300
+```
+
+**Verification**:
+
+1. Access `https://steccm91-frontend.web01.dev.nl.cjscp.org.uk`
+username: erica@test.hmcts.net, password: Check with QA team for latest credentials
+2. Verify all pods are running:
+   ```bash
+   kubectl get pods -n ns-ste-ccm-<number>
+   ```
+
+**Note**: Remember to **revert the DNS records** after testing is complete to restore traffic to the active cluster.
+
+### 15. Priming Pipeline
+
+The priming pipeline sets up databases with stub data, creates users, and runs validation checks to ensure the environment is ready for testing.
+
+**Pipeline**: [CPP-AKS-Priming](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=207&_a=summary)
+
+**What Priming Does**:
+- Populates databases with stub/test data
+- Creates test users and credentials
+- Sets up initial configuration
+- Runs validation checks on cluster components
+- Verifies database connectivity and schema
+
+**Pipeline Parameters**:
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Environment | `ste` | Fixed value |
+| Stack | `steccm<number>` | Example: `steccm91` (use your allocated stack number) |
+| Cluster | `K8-DEV-CS01-CL01` OR `K8-DEV-CS01-CL02` | Non-active cluster you are testing |
+| quick_clear | ✓ Ticked | Required |
+| priming_enable | ✓ Ticked | Required |
+| priming_image_tag | (release version) | Check with QA team for the latest release version |
+| sitdb_restore_dataset_flag | ✓ Ticked | Required |
+| restore_dataset_db | `postgres-postgresql` | Fixed value |
+
+**Verification**:
+
+1. Check pipeline run completes successfully with green status
+2. Review pipeline logs for any warnings or errors
+
+**Expected Outcome**: Priming pipeline completes successfully with all validation checks passing.
+
+### 16. Validation Pipeline
+
+The validation pipeline performs comprehensive system tests by deploying a validation namespace on the non-active cluster and running integration tests. This validates Istio internal routing and SonarQube connectivity.
+
+**Auto-Trigger**: The validation pipeline is automatically triggered when commits are pushed to `team/*` or `main` branches.
+
+#### 16.1 Create Feature Branch
+
+Create a team branch for testing:
+
+```bash
+# Example branch name
+git checkout -b team/DTSPO-30530
+```
+
+#### 16.2 Update Application Version
+
+Update the version in `pom.xml` to include the ticket ID:
+
+**File**: `pom.xml` (e.g., [cpp-context-staging-bulkscan/pom.xml](https://github.com/hmcts/cpp-context-staging-bulkscan/blob/main/pom.xml))
+
+```xml
+<!-- FIND: -->
+<version>17.103.43-SNAPSHOT</version>
+
+<!-- REPLACE WITH: -->
+<version>17.103.43-DTSPO-30530-SNAPSHOT</version>
+```
+
+This creates a unique version for testing on the non-active cluster.
+
+#### 16.3 Update Pipeline Configuration
+
+Update the context repository's `azure-pipelines.yaml` to target the non-active cluster and test SonarQube instance.
+
+**File**: `azure-pipelines.yaml` (e.g., [cpp-context-staging-bulkscan/azure-pipelines.yaml](https://github.com/hmcts/cpp-context-staging-bulkscan/blob/main/azure-pipelines.yaml))
+
+**Change 1: Update Agent Pool Identifier**
+
+```yaml
+# FIND:
+pool:
+  name: "MDV-ADO-AGENT-AKS-01"
+  demands:
+    - identifier -equals centos8-j17
+
+# REPLACE WITH (for CL01 test cluster):
+pool:
+  name: "MDV-ADO-AGENT-AKS-01"
+  demands:
+    - identifier -equals centos8-j17-cl01
+```
+
+**Note**: The `identifier` must match the unique identifier deployed during ADO agent setup in Section 1 (e.g., `centos8-j17-cl01` for CL01, `centos8-j17-cl02` for CL02).
+
+**Change 2: Update Variable Group for Test SonarQube**
+
+```yaml
+# FIND:
+variables:
+- ${{ if eq(parameters.sonarQubeType, 'sonarQubeAKS') }}:
+  - group: cpp-nonlive-sonarqube-aks
+
+# REPLACE WITH:
+variables:
+- ${{ if eq(parameters.sonarQubeType, 'sonarQubeAKS') }}:
+  - group: cpp-nonlive-sonarqube-aks-testing  # Use testing variable group
+```
+
+**Optional: Update Template Branch (if testing template changes)**
+
+```yaml
+resources:
+  repositories:
+    - repository: cppAzureDevOpsTemplates
+      type: github
+      name: hmcts/cpp-azure-devops-templates
+      endpoint: 'hmcts'
+      ref: '<FEATURE-BRANCH>'  # Feature branch with variable group changes (if needed)
+```
+
+#### 16.4 Merge and Trigger Pipeline
+
+```bash
+# Commit changes
+git add pom.xml azure-pipelines.yaml
+git commit -m "DTSPO-30530: Update for non-active cluster validation"
+
+# Push to team branch (this auto-triggers the pipeline)
+git push origin team/DTSPO-30530
+```
+
+#### 16.5 Monitor Pipeline Execution
+
+**Pipeline**: [cpp-context-staging-bulkscan (definitionId=319)](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=319)
+
+The pipeline will:
+
+1. Deploy validation namespace on the non-active cluster
+2. Build and deploy the application
+3. Run integration tests
+4. Validate Istio internal routing (localhost:8080)
+5. Test SonarQube connectivity and code quality scanning
+
+**Verification**:
+
+1. Check pipeline completes successfully with green status
+2. Verify validation namespace is deployed:
+   ```bash
+   kubectl get ns | grep validation
+   ```
+3. Check pods are running:
+   ```bash
+   kubectl get pods -n <validation-namespace>
+   ```
+4. Review test results in Azure DevOps pipeline logs
+
+**What This Validates**:
+
+- **Istio Internal Routing**: Tests service-to-service communication via sidecar proxy (localhost:8080)
+- **SonarQube Integration**: Validates code quality scanning on the non-active cluster
+- **Component Integration**: Verifies all system components work together
+- **Cluster Readiness**: Confirms the cluster is ready for dev switchover
+
+**Expected Outcome**: All validation tests pass, confirming the cluster is ready for switchover.
+

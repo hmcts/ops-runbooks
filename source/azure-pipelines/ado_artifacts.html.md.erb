@@ -1,0 +1,69 @@
+---
+title: ADO Artifacts - Token Renewal
+last_reviewed_on: 2026-04-17
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+This guide covers how to renew the Azure DevOps Artifacts token used by GitHub Actions for package management.
+
+## Prerequisites
+
+- Access to the `github-bot-owner-sso-*` account credentials
+- A TOTP authenticator app (e.g. Microsoft Authenticator, Google Authenticator) configured for the account
+- Access to [Azure DevOps](https://dev.azure.com/)
+- Permission to update GitHub organisation-level Actions secrets
+
+## How-to steps
+
+### 1. Sign in with the bot account
+
+Log in using the `github-bot-owner-sso-*` account, you can find the secrets in `rpe-prod` key vault. Use your TOTP authenticator app to generate a one-time password when prompted for MFA.
+
+<%= warning_text('If you have not already set up TOTP for this account, you will need to enrol your authenticator app first using other secrets in the vault.') %>
+
+### 2. Navigate to Personal Access Tokens
+
+Once signed in to Azure DevOps as the bot user:
+
+1. Click on **User Settings** (gear icon, top right)
+2. Select **Personal access tokens** (this is where you will be able to see current and expired PATS)
+
+### 3. Create a new token
+
+1. Click **+ New Token**
+2. Set the following scopes: **Packaging**: `Read & Write`
+3. Set an appropriate expiry
+4. Click **Create**
+
+<%= warning_text('Copy the token immediately — you will not be able to view it again after creation.') %>
+
+### 4. Update the GitHub Actions secret
+
+1. Go to the HMCTS GitHub organisation settings
+2. Navigate to **Secrets and variables** > **Actions**
+3. Update the secret `AZURE_DEVOPS_ARTIFACT_TOKEN` with the new token value
+
+## Verification
+
+- Trigger a workflow that uses ADO Artifacts and confirm it completes successfully
+- Check that package restore/publish steps no longer fail with authentication errors
+
+## Troubleshooting
+
+### All correct but still failing
+
+Ensure that the bot account has correct permissions to the hmcts-lib feed in ADO artifacts, it needs the `Feed Publisher (Contributor)` role.
+
+### Overwrite
+
+In case of GitHub org level secrets not working (this has happened) you can set this secret as required at a repository level, the workflow will pick it from there with no code changes. 
+### Token still showing as expired
+
+Ensure you updated the correct secret (`AZURE_DEVOPS_ARTIFACT_TOKEN`) at the **organisation** level, not at an individual repository level.
+
+### MFA issues with bot account
+
+If you cannot generate a TOTP code, check with the team who manages the `github-bot-owner-sso-*` account to re-enrol your authenticator app.

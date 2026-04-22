@@ -1,6 +1,6 @@
 ---
 title: Guide to Switch from One MacBook to Another
-last_reviewed_on: 2026-01-14
+last_reviewed_on: 2026-04-22
 review_in: 12 months
 weight: 15
 ---
@@ -101,6 +101,26 @@ SSH keys and configuration are essential for accessing Git repositories and VMs:
 ```
 
 **Important**: Ensure you copy everything in the `~/.ssh/` directory to avoid SSH authentication issues when accessing Crime VMs and other infrastructure.
+
+### Workaround: Set Local DNS Without Waiting for Full Admin
+
+If DNS resolution is failing while validating your SSH setup, you can use the local DNS resolver on your MacBook:
+
+```bash
+# Check which sudo commands are allowed on your account
+sudo -l
+
+# Point Wi-Fi DNS to localhost
+sudo /usr/sbin/networksetup -setdnsservers Wi-Fi 127.0.0.1
+```
+
+Confirm the DNS change by querying a known domain:
+
+```bash
+dig github.com
+```
+
+If DNS is working, the `dig` output should include an answer section with an IP address.
 
 ## Step 7: Crime Setup (If Applicable)
 

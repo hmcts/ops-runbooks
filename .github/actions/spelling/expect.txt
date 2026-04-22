@@ -129,6 +129,7 @@ mynodepool
 myregistry
 myworker
 ndata
+networksetup
 nodelocaldns
 nodepool
 NONLINE
@@ -172,6 +173,7 @@ secretkey
 secretname
 senforcewhitelistedimages
 serviceaccount
+setdnsservers
 sftpmig
 sitdb
 sku

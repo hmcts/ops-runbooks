@@ -53,7 +53,7 @@ The versions installed depend on the version of the App within the upstream Neuv
 - [Neuvector CRD manifests](https://github.com/neuvector/manifests/tree/main/kubernetes)
 - [Version of the app being installed](https://github.com/neuvector/neuvector-helm/blob/master/charts/crd/Chart.yaml#L4)
 
-The currently installed CRDs can be found in the [Flux apps folder for Neuvector](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/crds/kustomization.yaml)
+The currently installed CRDs can be found in the [Flux apps folder for Neuvector](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector-crds/kustomization.yaml)
 
 Pay close attention to the version shown in the URLs `/5.2.0/` which denotes the app version.
 
@@ -63,7 +63,7 @@ If the version is changing, you can install the latest versions per AKS cluster 
 
 You will also need to copy the existing [`base/kustomize.yaml`](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/base/kustomize.yaml) file into this new directory so you can point to your newly created file.
 
-Update the path to point to your new directory `path: ./apps/neuvector/crds` -> `path: ./apps/neuvector/<some name>`
+Update the path to point to your new directory `path: ./apps/neuvector/neuvector-crds` -> `path: ./apps/neuvector/<some name>`
 
 With these files now in place you can patch any specific AKS cluster by adding a patch to the clusters [base kustomization](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) file:
 
@@ -173,7 +173,7 @@ Production patching mainly involves removing some of the above configuration and
 
 ### Remove non-production patching files  and update the chart version in the main deployment file
 
-Copy the contents of the temporary CRD kustomization.yaml file to the `apps/neuvector/crds/kustomization.yaml` file e.g.
+Copy the contents of the temporary CRD kustomization.yaml file to the `apps/neuvector/neuvector-crds/kustomization.yaml` file e.g.
 
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1

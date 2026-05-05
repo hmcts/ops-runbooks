@@ -27,6 +27,8 @@ Then compare the latest version available with the current version that the [HMC
 
 If the latest release is ahead then we need to patch the HMCTS Neuvector chart with an updated dependency.
 
+We should also check for any Renovate PRs that have been raised and merge these in where no breaking changes are contained.
+
 Using Git you need to:
 
 - Clone the [HMCTS Neuvector chart](https://github.com/hmcts/chart-neuvector) repo
@@ -34,60 +36,83 @@ Using Git you need to:
 - Update the [HMCTS Neuvector dependency version](https://github.com/hmcts/chart-neuvector/blob/master/neuvector-azure-keyvault/Chart.yaml#L9-L12) to have the latest upstream release version e.g. v2.7.3 -> v2.7.4
 - Commit and push your changes and raise a PR for review
 
-Once reviewed and merged you need to draft a new release with the latest code.
+Once reviewed and merged you need to check for any renovate PRs and merge these in where no breaking changes are contained.
+Then draft a new release with the latest code.
 You can find steps [here on how to draft a release](../../Testing-Changes/drafting-a-release.html#create-a-pre-release-with-your-branch-as-the-source-and-a-new-tag)
 
-The instructions on that page are specific to draft releases, in this case you can create a new `latest release` by using the next version number available and setting `set as the latest release` before selecting `Publish release`.
-
+The instructions on that page are specific to draft releases, Initially when creating the new release it is worth marking as "pre-release" as we will be testing on non-production before moving to production.
+Once tested we can edit this release and mark it as latest release before patching the production environments.
 This will trigger the [Azure DevOps pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=799) to run and validate and release a new version.
 
 ## Non-Production Patching
 
-### Check for additional upstream changes
+### Updating the chart version and CRDs in non-production
 
 **_This section is only necessary for non-production environment patching_**
 
-Part of the Neuvector setup involves the installation of CRDs (custom resource definitions) and these may need to be updated as well.
-The versions installed depend on the version of the App within the upstream Neuvector chart that is now being installed
+Part of the Neuvector setup involves the installation of CRDs (custom resource definitions) and these will need to be updated as well.
+With recent updates to how CRDs are handled we can now just match the version of the CRD to the Neuvector application version, So if we are on Neuvector 2.8.12 then the CRD will be on that version also.
 
-- [Neuvector CRD manifests](https://github.com/neuvector/manifests/tree/main/kubernetes)
-- [Version of the app being installed](https://github.com/neuvector/neuvector-helm/blob/master/charts/crd/Chart.yaml#L4)
+We can update the CRDs and app in non-production on a per environment basis by updating the following files.
 
-The currently installed CRDs can be found in the [Flux apps folder for Neuvector](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector-crds/kustomization.yaml)
+To update the app to use our new release of chart-neuvector we need to add the following lines to [the environment level yaml file](https://github.com/hmcts/sds-flux-config/blob/983f9cc35ac8b11dfcd111b19c6e3eee734b7dd0/apps/neuvector/neuvector/ithc/ithc.yaml#L7)
 
-Pay close attention to the version shown in the URLs `/5.2.0/` which denotes the app version.
-
-If the version is changing, you can install the latest versions per AKS cluster by creating a new folder in the Neuvector directory with a new `kustomize.yaml` file and add the latest manifest links to this file:
-
-![neuvectorCRDs](Images/NeuvectorUpdatedCRDs.png)
-
-You will also need to copy the existing [`base/kustomize.yaml`](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/base/kustomize.yaml) file into this new directory so you can point to your newly created file.
-
-Update the path to point to your new directory `path: ./apps/neuvector/neuvector-crds` -> `path: ./apps/neuvector/<some name>`
-
-With these files now in place you can patch any specific AKS cluster by adding a patch to the clusters [base kustomization](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) file:
-
-```yaml
-  - path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
+```
+  chart:
+    spec:
+      chart: neuvector-azure-keyvault
+      version: x.x.x
 ```
 
+By adding this block under the "spec:" on line 7 we can override the chart on that environment to use our new release.
+
+We also need to update the CRDs for that environment, to do this we need to update the patching file in the [environment specific crd folder.](https://github.com/hmcts/sds-flux-config/tree/master/apps/neuvector/neuvector-crds/ithc)
+In the [patching file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector-crds/ithc/patching.yaml) we need to update the version to match our new neuvector version.
+We then add this as a patch to the [kustomization file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector-crds/ithc/kustomization.yaml) for that environment under the patches section.
+
+Once both these changes have been made raise a PR to have them applied to the non-production environment. It is recommended you do these one at a time to allow for easier troubleshooting.
+
 ---
 
-**_This is a [PR example](https://github.com/hmcts/sds-flux-config/pull/4301/files) showing the files and locations involved in this example._**
+**_This is a [PR example](https://github.com/hmcts/sds-flux-config/pull/8377) showing the files and locations involved in this example._**
 
 ---
 
-### Update the chart version
+### Check health of deployment and log in to the UI
 
 #### Check pod health
 
 Make sure that you are connected to the correct AKS cluster in your local setup (kubectl), then check the pods of the service are all healthy:
 
+You can check local cluster with this command:
+
+```bash
+kubectl config current-context
+```
+
+Then check the pods in the neuvector namespace with this command:
+
 ```bash
 kubectl get pods -n neuvector
 ```
 
+You can also check the status of the Helm Release which will show the version of chart-neuvector that has been installed:
+
+```bash
+kubectl get hr -n neuvector
+```
+
+Output should look something like this:
+
+```bash
+NAME            AGE    READY   STATUS
+fluentbit-log   427d   True    Helm upgrade succeeded
+neuvector       84d    True    Helm upgrade succeeded for release neuvector/neuvector.v6 with chart neuvector-azure-keyvault@1.5.4
+```
+
 If all pods are healthy you can move on.
+
+#### Log on to neuvector UI
 
 Neuvector has a UI that should be checked to make sure its working and you can log in.
 In the case of Neuvector you can find a clusters UI address in the specific [values files](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/00.yaml#L65). It should look something like:
@@ -117,31 +142,7 @@ kubectl logs <pod name> -n neuvector
 
 You may also need to ask `platform-operations` on Slack for input if the logs have nothing useful.
 
-#### Upgrade chart version
-
-If the everything appears to be working normally then you can now move onto the chart upgrade.
-
-Updating the chart version requires a change to the values file for the AKS cluster being updated.
-This is an override to the main deployment file which contains the older [version file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98).
-
-For example, to patch ITHC only you would added the following lines to this [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
-
-```yaml
-spec:
-  chart:
-    spec:
-      version: 1.5.4
-```
-
-The `chart.spec.version: 1.5.4` lines will override the equivalent lines in the main deployment file. Commit, push and create a PR with this change. Once reviewed and merged this will deploy the newly created HMCTS Chart version you created earlier into ITHC.
-
 To check if its being installed you can view the description of one of the pods (pods that have a very short age have just been deployed so use one of these to test).
-
----
-
-**_This is a [PR example](https://github.com/hmcts/sds-flux-config/pull/4306/files) showing the files and locations involved in this example._**
-
----
 
 ```bash
 kubectl -n neuvector describe pod neuvector-controller-pod-<hash>
@@ -153,48 +154,15 @@ Within the description you will find the `image` tag and it should contain the l
 Image: hmctspublic.azurecr.io/imported/neuvector/controller:5.3.0
 ```
 
-You can also check the status of the Helm Release which will show the version of the HMCTS chart that has been installed:
-
-```bash
-kubectl -n neuvector get hr
-```
-
-```bash
-NAME            AGE    READY   STATUS
-fluentbit-log   427d   True    Helm upgrade succeeded
-neuvector       84d    True    Helm upgrade succeeded for release neuvector/neuvector.v6 with chart neuvector-azure-keyvault@1.5.4
-```
-
-This process can be used to update all non-production environments were Neuvector is currently installed.
+This process can be used to update all non-production environments were Neuvector is currently installed and should be done per environment to allow for testing and confidence in the upgraded version before moving to production.
 
 ## Production Patching
 
 Production patching mainly involves removing some of the above configuration and updating the primary deployment files.
 
-### Remove non-production patching files  and update the chart version in the main deployment file
+### Remove non-production overrides and update the main deployment file
 
-Copy the contents of the temporary CRD kustomization.yaml file to the `apps/neuvector/neuvector-crds/kustomization.yaml` file e.g.
-
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/crd-k8s-1.19.yaml
-  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/waf-crd-k8s-1.19.yaml
-  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/dlp-crd-k8s-1.19.yaml
-  - https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml
-```
-
-This will ensure these get added to all clusters now including Production (they should already be in non-production any way).
-
-Remove any files and patches created for the non-production CRD updates completed as part of the `Check for additional upstream changes` section. This involves:
-
-- Removing the CRD patch from the [cluster base kustomization.yaml file(s)](https://github.com/hmcts/sds-flux-config/blob/master/clusters/ithc/base/kustomization.yaml) e.g. `- path: ../../../apps/neuvector/patching-crds/kustomize.yaml`
-- Removing the temporary CRD folder and its kustomize.yaml and kustomization.yaml files
-
----
-
-Now you can remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
+Remove the environment level overrides for the chart [version](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/ithc/ithc.yaml):
 
 ```yaml
 spec:
@@ -203,7 +171,8 @@ spec:
       version: 1.5.4
 ```
 
-Once all non-production temporary changes have been removed you can now update the chart version in the main deployment [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98) to the latest version of the HMCTS chart (the one you just removed from the environment level files).
+Once non-production temporary changes have been removed you can now update the chart version in the main deployment [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector/neuvector.yaml#L98) to the latest version of the HMCTS chart (the one you just removed from the environment level files).
+We also need to update the neuvector-crds yaml file to match the version we set for our non-production environments, this is the [file](https://github.com/hmcts/sds-flux-config/blob/master/apps/neuvector/neuvector-crds/neuvector-crds.yaml) we need to update.
 
 Push, commit and merge this change for it to get deployed to Production.
 

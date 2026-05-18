@@ -1,0 +1,35 @@
+---
+title: LEDS FTPS Gateway
+last_reviewed_on: 2026-05-18
+review_in: 12 months
+weight: 125
+---
+
+# <%= current_page.data.title %>
+
+## Description
+
+LEDS FTPS Gateway is the FTPS-based file transfer service used to receive files over FTPS and forward them on to one or more downstream SFTP targets.
+
+The service is deployed on Azure Container Apps. The runtime uses ProFTPD for the FTPS endpoint and `lftp` for the background forwarding loop.
+
+At a high level the flow is:
+
+```text
+FTPS client -> FTPS endpoint -> ProFTPD -> local upload directory -> lftp forwarding loop -> downstream SFTP target(s)
+```
+
+## Documentation
+
+The detailed operational guidance for this service is maintained in the [file-transfer-hub](https://github.com/hmcts/file-transfer-hub) repository rather than duplicated here.
+
+- Use the [Root README](https://github.com/hmcts/file-transfer-hub/blob/main/README.md) for the service overview, deployment notes, environment behaviour, Key Vault requirements and forward target configuration
+- Use [Troubleshooting guide](https://github.com/hmcts/file-transfer-hub/blob/main/docs/Troubleshooting.md) for log access, KQL queries and common failure modes
+- Use [Monitoring and alerting](https://github.com/hmcts/file-transfer-hub/blob/main/docs/MonitoringAndAlerting.md) for alert behaviour, recipients and maintenance mode
+- Use [Networking](https://github.com/hmcts/file-transfer-hub/blob/main/docs/Networking.md) for FTPS ports, ingress and downstream routing
+- Use [Certificates](https://github.com/hmcts/file-transfer-hub/blob/main/docs/certificates.md) for certificate renewal and Acmebot
+- Use [File handling](https://github.com/hmcts/file-transfer-hub/blob/main/docs/FileHandling.md) for upload flow, forwarding behaviour and duplicate-file considerations
+
+Related HMCTS guidance is also available in [Let's Encrypt certificates](../Certificates/letsencrypt.html).
+
+There is also a guide to this service in Confluence under `Show and Tell - 2026 Sessions`, in the 14 May session. With the slides as a PDF, saved with the video and transcript.

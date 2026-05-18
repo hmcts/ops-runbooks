@@ -83,6 +83,7 @@ ffff
 ffffffff
 ffffffffffff
 fileservice
+FTPD
 gavinbunney
 geolocationfile
 GEOLOCATIONUPDATES
@@ -109,9 +110,11 @@ journalctl
 kalyan
 keyfile
 kiali
+KQL
 kubctl
 ldhx
 leaderelection
+lftp
 lhr
 libragob
 libragobrestore

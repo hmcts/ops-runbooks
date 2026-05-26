@@ -125,16 +125,6 @@ while true; do
 done
 ```
 
-**Troubleshooting:**
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Import timeout (>15 min wait) | SAS token expired | Regenerate SAS token and restart |
-| "One of the SAS URIs could not be used" | SAS token timing issue | Ensure SAS start time 15+ min in past, end time 1+ hour in future |
-| Storage account firewall error | Firewall/private link enabled | Disable firewall on storage account during import |
-| RDB version incompatible | Source newer than target | Upgrade target Redis version |
-| Individual key >2GB | Oversized keys | Split large keys into smaller keys before export |
-
 **Automation Options:**
 
 ```powershell

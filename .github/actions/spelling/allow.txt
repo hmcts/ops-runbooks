@@ -783,3 +783,7 @@ PUBLICLAW
 serviceaccounts
 hashivault
 vmagent
+DBSIZE
+rdb
+redisenterprise
+sas

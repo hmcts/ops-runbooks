@@ -13,24 +13,22 @@ This guide covers migrating data from Azure Cache for Redis to Azure Managed Red
 
 **When to use:** When you need to migrate data between Redis instances. The destination (Azure Managed Redis) supports all tiers; source must have Premium SKU if using Azure Cache for Redis export feature.
 
-**Pros:** Works with all Azure Managed Redis tiers, uses Portal-based interface, provides automated import/export process  
-**Cons:** Cache becomes unavailable during import, existing data is deleted on import, requires a storage account
-
 **How it works:** Export from any Redis → Upload to Azure Storage → Import to Azure Managed Redis
 
 **Key Features:**
+
 - **All tiers supported** - Works with Basic, Standard, Premium, and all Azure Managed Redis tiers
+
 - **Export stays available** - Source Redis remains accessible during export
+
 - **Import causes downtime** - Target cache unavailable during import
+
 - **Destructive import** - All existing data in target cache is deleted before import
 
-**Prerequisites:**
-- Azure Storage Account with container
-- RDB file uploaded to Azure Storage (block blob or page blob)
-
 **Source Requirements:**
+
 - **Azure Cache for Redis:** Must have Premium SKU (Basic/Standard tiers do not support export)
-- **External Redis** (AWS, GCP, self-hosted): Any version, generate RDB file manually
+
 - **Azure Managed Redis:** All tiers support export
 
 **Target Requirements:**
@@ -100,7 +98,7 @@ redis-cli -h $NEW_HOST -p 10000 --tls \
   GET "your-test-key"
 ```
 
-<img src="images/redis-key.png" style="width:600px;">
+<img src="images/redis-key.png" style="width:700px;">
 
 
 #### Step: Confirm No Downtime on Source Redis
@@ -135,5 +133,7 @@ az redisenterprise database import --resource-group <rg> --cluster-name <cache> 
 ```
 
 **Documentation:** 
+
 - [Import and Export data in Azure Managed Redis](https://learn.microsoft.com/en-us/azure/redis/how-to-import-export-data)
+
 - [Azure Storage SAS tokens](https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview)

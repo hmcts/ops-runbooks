@@ -11,7 +11,7 @@ This guide covers migrating data from Azure Cache for Redis to Azure Managed Red
 
 ### Import/Export Tool - All Tiers Supported
 
-**When to use:** When you need data migration that works with all tiers (Basic, Standard, Premium) without source Redis export limitations
+**When to use:** When you need to migrate data between Redis instances. The destination (Azure Managed Redis) supports all tiers; source must have Premium SKU if using Azure Cache for Redis export feature.
 
 **Pros:** Works with all Azure Managed Redis tiers, uses Portal-based interface, provides automated import/export process  
 **Cons:** Cache becomes unavailable during import, existing data is deleted on import, requires a storage account
@@ -27,9 +27,16 @@ This guide covers migrating data from Azure Cache for Redis to Azure Managed Red
 
 **Prerequisites:**
 - Azure Storage Account with container
-- Blob uploaded to Azure Storage
-- **Source Redis cache must have Premium SKU** (Basic/Standard tiers do not support export)
-- Target Azure Managed Redis must be same size or larger
+- RDB file uploaded to Azure Storage (block blob or page blob)
+
+**Source Requirements:**
+- **Azure Cache for Redis:** Must have Premium SKU (Basic/Standard tiers do not support export)
+- **External Redis** (AWS, GCP, self-hosted): Any version, generate RDB file manually
+- **Azure Managed Redis:** All tiers support export
+
+**Target Requirements:**
+- Azure Managed Redis (any tier)
+- Must be same size or larger than source cache
 
 #### Step: Export Data from Source Redis (Azure Portal)
 
@@ -43,10 +50,6 @@ This guide covers migrating data from Azure Cache for Redis to Azure Managed Red
 6. Click **Export** to start export
 
 <img src="images/redis-export.png" style="width:600px;">
-
-
-<img src="images/redis-cache-import.png" style="width:600px;">
-
 
 **Export duration:** Varies by cache size and data volume
 

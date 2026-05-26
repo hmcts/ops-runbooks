@@ -73,18 +73,10 @@ This guide covers migrating data from Azure Cache for Redis to Azure Managed Red
 
 <img src="images/redis-cache-import.png" style="width:600px;">
 
-
 **Important Warnings:**
 - **Cache becomes UNAVAILABLE during import** - Applications cannot connect
 - **All existing data DELETED** - Target cache is wiped before import begins
 - **No rollback** - Once started, the import cannot be undone
-
-#### Step: Monitor Import Progress
-
-1. Watch Azure Portal **Notifications** (bell icon, top-right)
-2. Check **Activity Log** for import status
-3. Wait for "Import completed successfully" notification
-4. Cache becomes **available** when import completes
 
 #### Step: Validate Data Imported
 

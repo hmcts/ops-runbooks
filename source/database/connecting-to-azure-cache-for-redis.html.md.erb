@@ -1,40 +1,74 @@
 ---
-title: Connecting to Azure Cache for Redis
-last_reviewed_on: 2025-06-18
-review_in: 12 months
+title: Connecting to Azure Cache for Redis and Azure Managed Redis
+last_reviewed_on: 2026-05-26
+review_in: 6 months
 weight: 50
 ---
 
 # <%= current_page.data.title %>
 
-Quick guide on how to connect to Azure Cache for Redis using the redis-cli command line tool:
+> **Note:** This runbook covers both legacy Azure Cache for Redis and Azure Managed Redis during the transition period. HMCTS is migrating to Azure Managed Redis. This documentation will be updated once migration is complete.
 
-Within Azure Cache for Redis Azure portal service - search for the required service (for example adoption-web-session-storage-prod).
+## Overview
 
-select private endpoint > enable public network access
+Quick guide on how to connect to Redis services using the redis-cli command line tool. Connection methods differ between legacy Azure Cache for Redis and Azure Managed Redis.
 
-Firewall > find my ip address and add it.
+## Azure Cache for Redis (Legacy)
 
-Disable VPN and open local terminal session.
-
-Get details from the azure portal such as properties and access keys, etc.
+### Test Connection
 
 Test connection from your local terminal session:
 
-```cmd
+```bash
 telnet <service>.redis.cache.windows.net 6380
 
-For example:
+# Example:
 telnet adoption-web-session-storage-prod.redis.cache.windows.net 6380
 ```
 
+### Access Redis CLI
+
 Run the following command from your local terminal session to access the Redis CLI:
 
-```cmd
+```bash
 redis-cli --tls -u 'rediss://%%access key@<service>.redis.cache.windows.net:6380'
 
-For example:
+# Example:
 redis-cli --tls -u 'rediss://%%access key@adoption-web-session-storage-prod.redis.cache.windows.net:6380'
 ```
 
-When finished disable the public network access.
+**Alternative format using separate flags:**
+
+```bash
+redis-cli -h <service>.redis.cache.windows.net -p 6380 --tls -a "<access-key>"
+
+# Example:
+redis-cli -h adoption-web-session-storage-prod.redis.cache.windows.net -p 6380 --tls -a "your-access-key-here"
+```
+
+## Azure Managed Redis
+
+### Test Connection
+
+Test connection from your local terminal session:
+
+```bash
+telnet <service>.<region>.redis.azure.net 10000
+
+# Example:
+telnet adoption-web-session-storage-prod.uksouth.redis.azure.net 10000
+```
+
+### Access Redis CLI
+
+Run the following command from your local terminal session to access the Redis CLI:
+
+```bash
+redis-cli -h <service>.<region>.redis.azure.net -p 10000 --tls \
+  --user default -a "<access-key>"
+
+# Example:
+redis-cli -h adoption-web-session-storage-prod.uksouth.redis.azure.net -p 10000 --tls \
+  --user default -a "your-access-key-here"
+```
+

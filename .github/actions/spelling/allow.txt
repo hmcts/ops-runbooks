@@ -781,7 +781,8 @@ acdf
 faa
 PUBLICLAW
 serviceaccounts
-hashivault 
+hashivault
+vmagent
 DBSIZE
 rdb
 redisenterprise

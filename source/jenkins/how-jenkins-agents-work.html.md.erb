@@ -1,0 +1,71 @@
+---
+title: How Jenkins agents work
+last_reviewed_on: 2026-05-12
+review_in: 12 months
+weight: 25
+---
+
+# <%= current_page.data.title %>
+
+Jenkins is configured to spin up agents to run pipelines.
+
+These agents can be virtual machines or kubernetes pods.
+
+There are various agent templates that are used to define the specs and configuration of the agents that are spun up.
+
+## Creating new agent templates
+
+These templates are managed via code in [cnp-flux-config](https://github.com/hmcts/cnp-flux-config/blob/46aa4074eb82564113556e6f94ca75558674b34c/apps/jenkins/jenkins/ptl-intsvc/jenkins-azure-vm-agent.yaml#L74).
+
+To create a new agent template, you can copy an existing one from this file and modify it as required.
+
+## Authentication
+
+Agents use managed identities to authenticate to Azure.
+
+Previously, all agents used the same managed identity to authenticate to Azure and had access to all environments. 
+
+This was a security risk so now we have separate agent templates for each environment with different managed identities that only have access to the relevant environment.
+
+Each identity has permissions to perform the necessary actions for the pipeline to work, such as:
+
+- Pulling images from ACR
+- Deploying to AKS
+- Updating private DNS records
+- Deploying terraform resources
+- Publishing metrics to Cosmos DB
+
+When teams submit pull requests, Jenkins will spin up an agent to run the pipeline against preview, AAT or staging.
+
+Any terraform plan stages against prod in a pull request pipeline will use a prod agent to ensure the correct permissions are in place before switching back to the appropriate agent for the rest of the pipeline.
+
+When the PR is merged and a pipeline is triggered for master, it will run on the appropriate agent for the target environment, i.e. AAT for AAT, prod for prod.
+
+In demo, ithc and perftest environments, a dedicated agent for each of those environments will be used as the pipelines only target a single environment.
+
+Nightly pipelines do not require access to Azure except for publishing metrics to Cosmos DB so they will continue to use the PTL identity for authentication.
+
+Identities are created in the following repos:
+
+- https://github.com/hmcts/cft-jenkins-infrastructure
+- https://github.com/hmcts/sds-jenkins-infrastructure
+
+## Pipeline runtime
+
+If an agent is not available when a pipeline is triggered, Jenkins will queue the pipeline until an agent becomes available.
+
+Usually this takes less than a minute but it may take longer if there are a lot of pipelines in the queue.
+
+If the queue is growing without pipelines being picked up, it may indicate an issue with the Jenkins agents and should be investigated.
+
+Look at the log files under `Manage Jenkins > System Log > Azure VM Agent (Auto)` for any errors related to the agents.
+
+The log is not configured by default to reduce log volumes but you can add the appropriate loggers as needed:
+
+- com.microsoft.azure.vmagent
+- com.microsoft.azure.vmagent.AzureVMAgent
+
+Further troubleshooting steps can be found in the [builds starting slowly](builds-starting-slowly.html) runbook.
+
+For more information about the stages in the pipeline, refer to [The HMCTS Way](https://hmcts.github.io/cloud-native-platform/common-pipeline/common-pipeline.html)
+

@@ -1,0 +1,24 @@
+---
+title: Terraform Comment
+last_reviewed_on: 2026-05-22
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+We use a tool called tfcmt to comment on Terraform pull requests with the results of `terraform plan` and `terraform validate` to give reviewers more context on the changes being proposed.
+
+To do this, we use a GitHub fine grained access token.
+
+The token must have the following permissions:
+
+- Issues: Read and write
+
+The token needs to be created under the organisation - you can create a token for the user or for any organizations the user is a member of.
+
+To renew this token, login as the owner account from the [guide](github-pats.html).
+
+Go to `Settings` > `Developer settings` > `Personal access tokens` and find the token named `tfcmt`.
+
+Click `Regenerate` and then update the value in the `github-api-token` secret in the `infra-vault-nonprod` Azure Key Vault with the new token value.

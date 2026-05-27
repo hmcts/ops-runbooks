@@ -13,19 +13,48 @@ These agents can be virtual machines or kubernetes pods.
 
 There are various agent templates that are used to define the specs and configuration of the agents that are spun up.
 
+Agent templates are defined here:
+
+- [CNP Flux (PTL)](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins-azure-vm-agent.yaml)
+- [CNP Flux (PTL Sandbox)](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins-azure-vm-agent.yaml)
+- [SDS Flux Config (PTL)](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptl/jenkins-azure-vm-agent.yaml)
+- [SDS Flux Config (PTL Sandbox)](https://github.com/hmcts/sds-flux-config/blob/master/apps/jenkins/jenkins/ptlsbox/jenkins-azure-vm-agent.yaml)
+
+
 ## Creating new agent templates
 
-These templates are managed via code in [cnp-flux-config](https://github.com/hmcts/cnp-flux-config/blob/46aa4074eb82564113556e6f94ca75558674b34c/apps/jenkins/jenkins/ptl-intsvc/jenkins-azure-vm-agent.yaml#L74).
+These templates are managed via code in [sds-flux-config](https://github.com/hmcts/cnp-flux-config) and [cnp-flux-config](https://github.com/hmcts/sds-flux-config) repositories as shown above.
 
-To create a new agent template, you can copy an existing one from this file and modify it as required.
+To create a new agent template, you can copy an existing one from files listed above and modify it as required.
+
+Example agent template config:
+
+```
+- templateName: "cnp-jenkins-builders-sbox"
+  templateDesc: "Jenkins build agents for CFT sandbox environment"
+  labels: "ubuntu-sbox"
+  maxVirtualMachinesLimit: 10
+  usageMode: "EXCLUSIVE"
+  virtualMachineSize: "Standard_D4ds_v5"
+  imageReference:
+    galleryImageDefinition: "jenkins-ubuntu-v2"
+    galleryImageVersion: "<version>"
+    galleryName: "hmcts"
+    galleryResourceGroup: "<resource-group>"
+    gallerySubscriptionId: "<subscription-id>"
+# yaml anchor to duplicate content across document without actual copy paste
+<<: *vm_template_values_anchor
+```
 
 ## Authentication
 
+### Managed identities
+
 Agents use managed identities to authenticate to Azure.
 
-Previously, all agents used the same managed identity to authenticate to Azure and had access to all environments. 
-
-This was a security risk so now we have separate agent templates for each environment with different managed identities that only have access to the relevant environment.
+> **Note:** Previously, all agents used the same managed identity to authenticate to Azure and had access to all environments.   
+This was a security risk so now we have separate agent templates for each environment with different managed identities that only have access to the relevant environment.  
+Broad access on those legacy managed indentities will be phased out.
 
 Each identity has permissions to perform the necessary actions for the pipeline to work, such as:
 
@@ -33,22 +62,94 @@ Each identity has permissions to perform the necessary actions for the pipeline 
 - Deploying to AKS
 - Updating private DNS records
 - Deploying terraform resources
-- Publishing metrics to Cosmos DB
+- Publishing metrics to Cosmos DB (there are two Cosmos DBs - Sandbox and Prod)
 
-When teams submit pull requests, Jenkins will spin up an agent to run the pipeline against preview, AAT or staging.
+When teams submit pull requests, Jenkins will spin up an agent to run the pipeline against the required environment.
 
 Any terraform plan stages against prod in a pull request pipeline will use a prod agent to ensure the correct permissions are in place before switching back to the appropriate agent for the rest of the pipeline.
 
-When the PR is merged and a pipeline is triggered for master, it will run on the appropriate agent for the target environment, i.e. AAT for AAT, prod for prod.
+When the PR is merged and a pipeline is triggered for master, it will run on the appropriate agent for the target environment, i.e. AAT for AAT, PROD for PROD.
 
-In demo, ithc and perftest environments, a dedicated agent for each of those environments will be used as the pipelines only target a single environment.
+In environments such as Demo, ITHC and Perftest, a dedicated agent for each of those environments will be used as the pipelines only target a single environment.
+
+Civil team use their own agents but these are using the same MIs as the standard CFT agents.
+
+Diagrams below show mappings between environments, Jenkins agents, MIs, Key Vaults and roles associated with the MIs:
+
+
+- CFT Mappings
+
+<img src=images/cft-jenkins-agents-mis.png />
+
+- SDS Mappings
+
+<img src=images/sds-jenkins-agents-mis.png />
+
+
+- Civil Mappings
+
+<img src=images/civil-jenkins-agents-mis.png />
+
+### Creating managed identities
+
+Managed identities are created in following repositories:
+
+- [CFT Jenkins Infrastructure](https://github.com/hmcts/cft-jenkins-infrastructure/blob/main/components/jenkins-agent-identities/main.tf)
+- [SDS Jenkins Infrastructure](https://github.com/hmcts/sds-jenkins-infrastructure/blob/master/components/jenkins-agent-identities/main.tf)
+
+Based on configuration for each environment:
+
+- [CFT Jenkins Infrastructure / Jenkins Agent Identities](https://github.com/hmcts/cft-jenkins-infrastructure/tree/main/environments/jenkins-agent-identities)
+- [SDS Jenkins Infrastructure / Jenkins Agent Identities](https://github.com/hmcts/sds-jenkins-infrastructure/tree/master/environments/jenkins-agent-identities)
+
+Example *.tfvars:
+
+```
+env                                  = "sbox"
+subscription_id                      = "<subscription-id>"
+private_dns_subscription_id          = "<priv-dns-subscription-id>"
+private_dns_resource_group_name      = "<priv-dns-rg-name>"
+managed_identity_name                = "jenkins-sbox-mi"
+managed_identity_resource_group_name = "managed-identities-sbox-rg"
+create_identity                      = true
+cosmos_subscription_id               = "<sandbox-cosmos-db-sub-id>"
+```
+
+### Nightly pipelines
 
 Nightly pipelines do not require access to Azure except for publishing metrics to Cosmos DB so they will continue to use the PTL identity for authentication.
 
-Identities are created in the following repos:
+### Key Vault access
 
-- https://github.com/hmcts/cft-jenkins-infrastructure
-- https://github.com/hmcts/sds-jenkins-infrastructure
+> **Note:** Key Vault access has already been configured for all active repositories and pipelines — see the [list](https://tools.hmcts.net/jira/browse/DTSPO-29659).  
+Any new pipelines must have KV access granted as described below.
+
+Most Jenkins pipelines read secrets from a team's Key Vault during execution, so each agent must have access to the relevant Key Vault in its target environment.
+
+If a team manages their Key Vault using [cnp-module-key-vault](https://github.com/hmcts/cnp-module-key-vault/blob/669ec444b10ebea166f06bf9dc008f20ead5d82f/jenkins-access.tf#L2), access can be granted by looking up the appropriate [Jenkins managed identity](https://github.com/hmcts/cmc-shared-infrastructure/blob/master/key-vault.tf#L1) and [passing its principal ID to the module](https://github.com/hmcts/cmc-shared-infrastructure/blob/master/key-vault.tf#L13).
+
+Example:
+
+```
+data "azurerm_user_assigned_identity" "jenkins" {
+  name                = "jenkins-${var.env}-mi"
+  resource_group_name = "managed-identities-${var.env}-rg"
+}
+
+module "example-vault" {
+  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=master"
+  name                    = "example-${var.env}"
+  product                 = var.product
+  env                     = var.env
+  tenant_id               = var.tenant_id
+  object_id               = var.jenkins_AAD_objectId
+  jenkins_object_id       = data.azurerm_user_assigned_identity.jenkins.principal_id
+  resource_group_name     = azurerm_resource_group.rg.name
+  product_group_object_id = "<object-id>"
+  common_tags             = local.tags
+  create_managed_identity = true
+}
+```
 
 ## Pipeline runtime
 

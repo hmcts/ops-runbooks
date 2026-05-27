@@ -1,0 +1,52 @@
+block-beta
+  columns 5
+
+  TITLE["CFT"]:5
+
+  H1["Environment"] H2["Jenkins Agent\n(Agent template)"] H3["Managed Identity"] H4["Key Vault Access"] H5["Roles"]
+
+  R1E["PTL Sandbox"] R1A["cnp-jenkins-builders-sbox"] R1M["jenkins-cftsbox-intsvc-mi"] R1K["No"] R1R["- aks-infra-cftsbox-intsvc-rg Virtual Machine Contributor\n- aks-infra-cftsbox-intsvc-rg Network Contributor\n- Azure Compute Gallery Reader\n- DTS-CFTSBOX-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R2E["PTL"] R2A["cnp-jenkins-ubuntu"] R2M["jenkins-cftptl-intsvc-mi"] R2K["No"] R2R["- aks-infra-cftptl-intsvc-rg Virtual Machine Contributor\n- aks-infra-cftptl-intsvc-rg Network Contributor\n- Azure Compute Gallery Reader\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R3E["Sandbox"] R3A["cnp-jenkins-builders-sbox"] R3M["jenkins-sbox-mi"] R3K["Sandbox only"] R3R["- DCD-CFT-Sandbox Contributor\n- DCD-CFT-Sandbox Azure Kubernetes Service Cluster Admin Contributor\n- Sandbox-pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTSBOX-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R4E["Preview"] R4A["cnp-jenkins-ubuntu-preview"] R4M["jenkins-preview-mi"] R4K["Preview only"] R4R["- DCD-CNP-DEV Contributor\n- DCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R5E["AAT"] R5A["cnp-jenkins-ubuntu-aat"] R5M["jenkins-aat-mi"] R5K["AAT only"] R5R["- DCD-CNP-DEV Contributor\n- DCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R6E["ITHC"] R6A["cnp-jenkins-builders-ithc"] R6M["jenkins-ithc-mi"] R6K["ITHC only"] R6R["- DCD-CNP-QA Contributor\n- DCD-CNP-QA Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R7E["Perftest"] R7A["cnp-jenkins-builders-perftest"] R7M["jenkins-perftest-mi"] R7K["Perftest only"] R7R["- DCD-CNP-QA Contributor\n- DCD-CNP-QA Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R8E["Demo"] R8A["cnp-jenkins-builders-demo"] R8M["jenkins-demo-mi"] R8K["Demo only"] R8R["- DCD-CNP-DEV Contributor\n- DCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R9E["Production"] R9A["cnp-jenkins-builders-prod"] R9M["jenkins-prod-mi"] R9K["Production only"] R9R["- DCD-CNP-Prod Contributor\n- DCD-CNP-Prod Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- DTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  style TITLE fill:#1F3864,color:#fff
+  style H1 fill:#4472C4,color:#fff
+  style H2 fill:#4472C4,color:#fff
+  style H3 fill:#4472C4,color:#fff
+  style H4 fill:#4472C4,color:#fff
+  style H5 fill:#4472C4,color:#fff
+
+  style R1K fill:#FFE0E0,stroke:#CC0000,color:#000000
+  style R2K fill:#FFE0E0,stroke:#CC0000,color:#000000
+
+  style R3K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R4K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R5K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R6K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R7K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R8K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R9K fill:#E0FFE0,stroke:#009900,color:#000000
+
+  style R1R text-align:left
+  style R2R text-align:left
+  style R3R text-align:left
+  style R4R text-align:left
+  style R5R text-align:left
+  style R6R text-align:left
+  style R7R text-align:left
+  style R8R text-align:left
+  style R9R text-align:left

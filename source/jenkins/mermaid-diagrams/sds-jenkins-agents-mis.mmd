@@ -1,0 +1,52 @@
+block-beta
+  columns 5
+
+  TITLE["SDS"]:5
+
+  H1["Environment"] H2["Jenkins Agent\n(Agent template)"] H3["Managed Identity"] H4["Key Vault Access"] H5["Roles"]
+
+  R1E["PTL Sandbox"] R1A["cnp-jenkins-builders-sbox"] R1M["jenkins-ptlsbox-mi"] R1K["No"] R1R["- DTS-SHAREDSERVICESPTL-SBOX:vm-agents-rg Virtual Machine Contributor\n- DTS-SHAREDSERVICESPTL-SBOX:vm-agents-rg Network Contributor\n- Azure Compute Gallery Reader\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R2E["PTL"] R2A["cnp-jenkins-builders"] R2M["jenkins-ptl-mi"] R2K["No"] R2R["- DTS-SHAREDSERVICESPTL:vm-agents-rg Virtual Machine Contributor\n- DTS-SHAREDSERVICESPTL:vm-agents-rg Network Contributor\n- Azure Compute Gallery Reader\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R3E["Sandbox"] R3A["cnp-jenkins-builders-sbox"] R3M["jenkins-sbox-mi"] R3K["Sandbox only"] R3R["- DTS-SHAREDSERVICES-SBOX Contributor\n- DTS-SHAREDSERVICES-SBOX Azure Kubernetes Service Cluster Admin Contributor\n- Sandbox-pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R4E["Dev"] R4A["cnp-jenkins-builders-dev"] R4M["jenkins-dev-mi"] R4K["Dev only"] R4R["- DTS-SHAREDSERVICES-DEV Contributor\n- DTS-SHAREDSERVICES-DEV Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R5E["STG"] R5A["cnp-jenkins-builders-stg"] R5M["jenkins-stg-mi"] R5K["AAT only"] R5R["- DTS-SHAREDSERVICES-STG Contributor\n- DTS-SHAREDSERVICES-STG Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R6E["ITHC"] R6A["cnp-jenkins-builders-ithc"] R6M["jenkins-ithc-mi"] R6K["ITHC only"] R6R["- DTS-SHAREDSERVICES-ITHC Contributor\n- DTS-SHAREDSERVICES-ITHC Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R7E["Test"] R7A["cnp-jenkins-builders-test"] R7M["jenkins-test-mi"] R7K["Test only"] R7R["- DTS-SHAREDSERVICES-TEST Contributor\n- DTS-SHAREDSERVICES-TEST Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R8E["Demo"] R8A["cnp-jenkins-builders-demo"] R8M["jenkins-demo-mi"] R8K["Demo only"] R8R["- DTS-SHAREDSERVICES-DEMO Contributor\n- DTS-SHAREDSERVICES-DEMO Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  R9E["Production"] R9A["cnp-jenkins-builders-prod"] R9M["jenkins-prod-mi"] R9K["Production only"] R9R["- DTS-SHAREDSERVICES-PROD Contributor\n- DTS-SHAREDSERVICES-PROD Azure Kubernetes Service Cluster Admin Contributor\n- Pipeline-metrics Cosmos DB Data Contributor\n- Reform-CFT-Mgmt:reformMgmtRG Private DNS Zone Contributor"]
+
+  style TITLE fill:#1F3864,color:#fff
+  style H1 fill:#4472C4,color:#fff
+  style H2 fill:#4472C4,color:#fff
+  style H3 fill:#4472C4,color:#fff
+  style H4 fill:#4472C4,color:#fff
+  style H5 fill:#4472C4,color:#fff
+
+  style R1K fill:#FFE0E0,stroke:#CC0000,color:#000000
+  style R2K fill:#FFE0E0,stroke:#CC0000,color:#000000
+
+  style R3K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R4K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R5K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R6K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R7K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R8K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R9K fill:#E0FFE0,stroke:#009900,color:#000000
+
+  style R1R text-align:left
+  style R2R text-align:left
+  style R3R text-align:left
+  style R4R text-align:left
+  style R5R text-align:left
+  style R6R text-align:left
+  style R7R text-align:left
+  style R8R text-align:left
+  style R9R text-align:left

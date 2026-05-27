@@ -79,3 +79,8 @@ Once connected to Redis, you can verify the connection and check for keys:
 # Check for all keys
 KEYS *
 ```
+
+You can also connect using a password like this
+```bash
+redis-cli -c -h plum-recipe-backend-<ENVIRONMENT>.uksouth.redis.azure.net -p 10000--tls -a "<password>"
+```

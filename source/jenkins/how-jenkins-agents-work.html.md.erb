@@ -54,7 +54,7 @@ Agents use managed identities to authenticate to Azure.
 
 > **Note:** Previously, all agents used the same managed identity to authenticate to Azure and had access to all environments.   
 This was a security risk so now we have separate agent templates for each environment with different managed identities that only have access to the relevant environment.  
-Broad access on those legacy managed indentities will be phased out.
+Broad access on those legacy managed identities will be phased out.
 
 Each identity has permissions to perform the necessary actions for the pipeline to work, such as:
 

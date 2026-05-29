@@ -7,133 +7,135 @@ review_in: 6 months
 
 # <%= current_page.data.title %>
 
-This guide covers migrating data from Azure Cache for Redis to Azure Managed Redis using the Import/Export tool.
+Azure Cache for Redis is reaching end of life and Microsoft is moving everyone to Azure Managed Redis. This runbook provides the procedure to migrate Redis data using the automated pipeline.
 
-### Import/Export Tool - All Tiers Supported
+## Prerequisites
 
-**When to use:** When you need to migrate data between Redis instances. The destination (Azure Managed Redis) supports all tiers; source must have Premium SKU if using Azure Cache for Redis export feature.
+Before starting the migration:
 
-**How it works:** Export from any Redis → Upload to Azure Storage → Import to Azure Managed Redis
+- [ ] Verify variable group `redis-migration-secrets` exists in Azure DevOps
+- [ ] Confirm `SOURCE_REDIS_KEY` and `TARGET_REDIS_KEY` are populated
+- [ ] Ensure AKS cluster has network access to both Redis instances
+- [ ] Record source Redis hostname and target Redis hostname
+- [ ] Communicate downtime window to application teams (target Redis will be flushed)
 
-**Key Features:**
+## Migration Procedure
 
-- **All tiers supported** - Works with Basic, Standard, Premium, and all Azure Managed Redis tiers
+### Step 1: Prepare Variable Group
 
-- **Export stays available** - Source Redis remains accessible during export
+1. Navigate to Azure DevOps → Library → Variable Groups
+2. Locate or create `redis-migration-secrets`
+3. Add the following variables:
+   - `SOURCE_REDIS_KEY` - Azure Cache for Redis access key
+   - `TARGET_REDIS_KEY` - Azure Managed Redis access key
+4. Mark both variables as secret
 
-- **Import causes downtime** - Target cache unavailable during import
+### Step 2: Run Migration Pipeline
 
-- **Destructive import** - All existing data in target cache is deleted before import
+1. Go to the [Migration pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=XXX)
+2. Click **Run pipeline**
+3. Enter the required parameters:
+   - `aksClusterName` - AKS cluster name (default: `cft-sbox-00-aks`)
+   - `sourceRedisHost` - Azure Cache for Redis hostname (e.g., `myredis.redis.cache.windows.net`)
+   - `targetRedisHost` - Azure Managed Redis hostname (e.g., `myredis.uksouth.redis.azure.net`)
+4. Click **Run**
 
-**Source Requirements:**
+### Step 3: Monitor Pipeline Execution
 
-- **Azure Cache for Redis:** Must have Premium SKU (Basic/Standard tiers do not support export)
+Watch the pipeline output for:
 
-- **Azure Managed Redis:** All tiers support export
+1. **Connection verification** - PING tests to both Redis instances
+2. **Expiry removal** - PERSIST commands applied to source keys
+3. **Target flush** - FLUSHALL executed on target Redis
+4. **Key migration** - Each key migrated with progress counter
+5. **Verification** - GET commands confirm keys across all shards
+6. **Summary** - Final count: `Complete: X/X keys verified in target`
 
-**Target Requirements:**
-- Azure Managed Redis (any tier)
-- Must be same size or larger than source cache
+Expected runtime: 1-5 minutes depending on key count.
 
-#### Step: Export Data from Source Redis (Azure Portal)
+### Step 4: Verify Migration
 
-**If source is Azure Cache for Redis or Azure Managed Redis:**
-
-1. Navigate to **Azure Portal** → Your Redis instance
-2. Select **Export data** from Resource menu (left sidebar)
-3. In the working pane, select **Choose Storage Container**
-4. Select storage account → Select or create container
-5. Type a **Blob name prefix** (e.g., `migration-backup`)
-6. Click **Export** to start export
-
-<img src="images/redis-export.png" style="width:600px;">
-
-**Export duration:** Varies by cache size and data volume
-
-#### Step: Verify Export Completed
-
-1. Go to **Azure Portal** → **Storage Account** → **Containers**
-2. Navigate to your container
-3. Verify RDB file exists: `migration-backup-<timestamp>.rdb.gz`
-4. Note the exact blob name for import step
-
-#### Step: Import Data into Azure Managed Redis (Azure Portal)
-
-1. Navigate to **Azure Portal** → Your **Azure Managed Redis** instance
-2. Select **Import data** from Resource menu (left sidebar)
-3. Click **Choose Blob(s)**
-4. Select the storage account containing your RDB file
-5. Select the container
-6. Select one or more blobs to import (checkbox left of blob name)
-7. Click **Select**
-8. Click **Import** to begin import
-
-<img src="images/redis-cache-import.png" style="width:600px;">
-
-**Important Warnings:**
-- **Cache becomes UNAVAILABLE during import** - Applications cannot connect
-- **All existing data DELETED** - Target cache is wiped before import begins
-- **No rollback** - Once started, the import cannot be undone
-
-#### Step: Validate Data Imported
+Connect to the target Redis instance and verify keys:
 
 ```bash
-# Check key count on new Redis
-redis-cli -h $NEW_HOST -p 10000 --tls \
-  --user default -a $NEW_KEY \
-  DBSIZE
+# Connect to target Redis
+redis-cli -h <TARGET_HOST> -p 10000 --tls -a "<TARGET_REDIS_KEY>"
+
+# Check key count
+DBSIZE
+
+# List keys on current shard
+KEYS *
+
+# Verify cluster topology
+CLUSTER NODES
+
+# Test specific keys (works across all shards)
+GET session:abc123
+GET user:john:profile
 ```
 
-To inspect the actual keys in the destination instance:
+**Expected behavior:**
+- `KEYS *` shows only keys on current shard (2-3 shards typically)
+- `GET` commands work across all shards (may show MOVED redirect, then return value)
+- Total key count matches source Redis count
 
-```bash
-# Connect and list all keys
-redis-cli -h $NEW_HOST -p 10000 --tls \
-  --user default -a $NEW_KEY \
-  KEYS "*"
+### Step 5: Post-Migration Actions
 
-# Get a specific key value to verify data integrity
-redis-cli -h $NEW_HOST -p 10000 --tls \
-  --user default -a $NEW_KEY \
-  GET "your-test-key"
-```
+1. Update application configuration to point to new Azure Managed Redis endpoint
+2. Test application functionality with new Redis instance
+3. Monitor application logs for Redis connection errors
+4. Keep source Redis instance running until cutover is confirmed
+5. Document migration completion date and key count
 
-<img src="images/redis-key.png" style="width:700px;">
+## Troubleshooting
 
+### Issue: Pipeline fails with "PING failed"
 
-#### Step: Confirm No Downtime on Source Redis
+**Cause:** Network connectivity issue between AKS and Redis instances
 
-You can verify that there is no downtime on the source Redis instance by continuously pinging it using the following script:
+**Resolution:**
+1. Verify firewall rules allow AKS subnet access
+2. Check Redis instance is not behind private endpoint without proper DNS
+3. Confirm Redis keys are correct in variable group
 
-```bash
-while true; do 
-  redis-cli -h crumble-recipe-backend-session-storage-sandbox.redis.cache.windows.net \
-    -p 6380 --tls -a "key" \
-    PING && echo "$(date): CONNECTED" || echo "$(date): DISCONNECTED"
-  sleep 2
-done
-```
+### Issue: Only some keys visible after migration
 
-**Automation Options:**
+**Cause:** Normal clustered Redis behavior
 
-```powershell
-# PowerShell Export
-Export-AzRedisEnterpriseCache -ResourceGroupName <rg> -Name <cache> -StorageContainerUri <uri>
+**Resolution:**
+1. Use `CLUSTER NODES` to see shard distribution
+2. Use `GET` commands to verify individual keys (works across shards)
+3. Avoid relying on `KEYS *` for clustered Redis validation
 
-# PowerShell Import
-Import-AzRedisEnterpriseCache -ResourceGroupName <rg> -Name <cache> -StorageContainerUri <uri>
-```
+### Issue: Keys disappearing after migration
 
-```bash
-# Azure CLI Export
-az redisenterprise database export --resource-group <rg> --cluster-name <cache> --sas-uri <uri>
+**Cause:** Redis eviction policy removing keys due to memory pressure
 
-# Azure CLI Import
-az redisenterprise database import --resource-group <rg> --cluster-name <cache> --sas-uri <uri>
-```
+**Resolution:**
+1. Navigate to Azure Portal → Redis → Advanced settings
+2. Check current eviction policy (likely "Volatile LRU")
+3. Change to "No eviction" for testing or increase cache size
+4. Re-run migration pipeline
 
-**Documentation:** 
+### Issue: Migration shows fewer keys than expected
 
-- [Import and Export data in Azure Managed Redis](https://learn.microsoft.com/en-us/azure/redis/how-to-import-export-data)
+**Cause:** Keys may have expired or been evicted from source
 
-- [Azure Storage SAS tokens](https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview)
+**Resolution:**
+1. Check source Redis key count: `redis-cli -h SOURCE_HOST DBSIZE`
+2. Review source Redis eviction policy and memory usage
+3. Confirm TTL on keys: `redis-cli -h SOURCE_HOST TTL <key>`
+4. Re-run migration if source keys are valid
+
+## Technical Details
+
+**Migration Method:** Uses GET/SET instead of DUMP/RESTORE because the DUMP/RESTORE format is incompatible between Redis 6.x and 7.x major versions.
+
+**Clustered Redis:** Azure Managed Redis uses clustering where keys are distributed across multiple shards. The `KEYS *` command only shows keys on the current shard, but GET/SET operations work across all shards with the `-c` flag.
+
+**Key Types:** Currently supports string keys only. For other data types, the migration logic would need to be extended.
+
+**Source Code:** [https://github.com/hmcts/azure-redis-migration](https://github.com/hmcts/azure-redis-migration)
+
+---

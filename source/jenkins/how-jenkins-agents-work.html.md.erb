@@ -23,7 +23,7 @@ Agent templates are defined here:
 
 ## Creating new agent templates
 
-These templates are managed via code in [sds-flux-config](https://github.com/hmcts/cnp-flux-config) and [cnp-flux-config](https://github.com/hmcts/sds-flux-config) repositories as shown above.
+These templates are managed via code in [sds-flux-config](https://github.com/hmcts/sds-flux-config) and [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) repositories as shown above.
 
 To create a new agent template, you can copy an existing one from files listed above and modify it as required.
 
@@ -121,10 +121,62 @@ Nightly pipelines do not require access to Azure except for publishing metrics t
 
 ### Key Vault access
 
-> **Note:** Key Vault access has already been configured for all active repositories and pipelines — see the [list](https://tools.hmcts.net/jira/browse/DTSPO-29659).  
+> **Note:** Key Vault access has already been configured for most active repositories and pipelines — see the [list](https://tools.hmcts.net/jira/browse/DTSPO-29659); additional access to overriden Key Vaults e.g. `Preview MI -> AAT KV` is currently being rolled out.  
 Any new pipelines must have KV access granted as described below.
 
-Most Jenkins pipelines read secrets from a team's Key Vault during execution, so each agent must have access to the relevant Key Vault in its target environment.
+Most Jenkins pipelines read secrets from a team's Key Vault during execution, so each agent must have access to the relevant Key Vault in its target environment.  
+
+Within the pipeline [config it is also possible to override](https://github.com/hmcts/cnp-jenkins-library/blob/master/README.md#overriding-vault-environment) the corresponding Key Vault environment to be accessed.  
+For example a `Preview` pipeline might be overriden to use `AAT` key vault.  
+In such case the corresponding Key Vault will need to additionally grant access to the source MI, this is currently the case for
+`jenkins-preview-mi` which has `Get and List Secret` permission on a large number of `AAT Key Vaults` as listed below.
+
+<details>
+
+  <summary>Click for a full list (as of 29th May 2026) of AAT KVs that grant access to jenkins-preview-mi</summary>
+
+  - adoption-aat</br>
+  - am-aat</br>
+  - bulk-scan-aat</br>
+  - ccpay-aat</br>
+  - civil-cui-aat</br>
+  - cmc-aat</br>
+  - disposer-aat</br>
+  - div-aat</br>
+  - draft-store-aat</br>
+  - em-icp-aat</br>
+  - enforcement-aat</br>
+  - et-aat</br>
+  - et-cos-aat</br>
+  - ethos-shared-aat</br>
+  - fact-aat</br>
+  - fact-kv-aat</br>
+  - fees-register-aat</br>
+  - finrem-aat</br>
+  - fis-kv-aat</br>
+  - fpl-aat</br>
+  - hmc-aat</br>
+  - ia-aat</br>
+  - idam-idam-aat</br>
+  - lau-aat</br>
+  - nfdiv-aat</br>
+  - pcq-aat</br>
+  - pcs-aat</br>
+  - plumsi-aat</br>
+  - prl-aat</br>
+  - probate-aat</br>
+  - pt-kv-aat</br>
+  - rd-aat</br>
+  - reform-scan-aat</br>
+  - rpa-aat</br>
+  - rpe-send-letter-aat</br>
+  - rpx-aat</br>
+  - sptribs-aat</br>
+  - sscs-aat</br>
+  - wa-aat</br>
+
+</details>
+</br>  
 
 If a team manages their Key Vault using [cnp-module-key-vault](https://github.com/hmcts/cnp-module-key-vault/blob/669ec444b10ebea166f06bf9dc008f20ead5d82f/jenkins-access.tf#L2), access can be granted by looking up the appropriate [Jenkins managed identity](https://github.com/hmcts/cmc-shared-infrastructure/blob/master/key-vault.tf#L1) and [passing its principal ID to the module](https://github.com/hmcts/cmc-shared-infrastructure/blob/master/key-vault.tf#L13).
 

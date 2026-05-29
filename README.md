@@ -38,6 +38,25 @@ bundle install
 
 To make changes edit the source files in the `source` folder.
 
+### Mermaid diagrams
+
+Ideally create diagrams [using Mermaid](https://mermaid.ai/open-source/intro/).  
+Mermaid is a diagramming framework that allows many diagram types to be stored in a clean, easily readable code.  
+This is much cleaner and readable than a typical XML that you might get from e.g. `draw.io`.
+It also allows us to use Coding agents to aid with the diagramming tasks such as applying formatting, layout etc. to speed it up.
+Another advantage is that this code can then be used to automatically 
+generate PNG drawings to include within the documentation.
+You can get [Mermaid preview extension in VSCode](https://marketplace.visualstudio.com/items?itemName=vstirbu.vscode-mermaid-preview) to preview the diagram (no need to create an account) as you are writing it.
+
+Currently you can generate some diagrams within the Jenkins documentation using this method, simply run:
+
+```bash
+make jenkins-mermaid-pngs
+```
+
+This should pull down latest [mermaid-cli Docker image](https://github.com/mermaid-js/mermaid-cli) and execute the command to export diagrams into PNG files.  
+When adding new diagrams, consider expanding on this.
+
 ### Single page output
 
 Although a single page of HTML is generated the markdown is spread across

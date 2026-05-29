@@ -1,0 +1,65 @@
+block-beta
+  columns 5
+
+  TITLE["CIVIL"]:5
+
+  H1["Environment"] H2["Jenkins Agent\n(Agent template)"] H3["Managed Identity"] H4["Key Vault Access"] H5["Roles"]
+
+  R1E["Preview"] R1A["cnp-jenkins-ubuntu-civil-preview"] R1M["jenkins-preview-mi"] R1K["Civil Preview\nCivil AAT*"] R1R["DCD-CNP-DEV Contributor\nDCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R2E["AAT"] R2A["cnp-jenkins-ubuntu-civil-aat"] R2M["jenkins-aat-mi"] R2K["Civil AAT only"] R2R["DCD-CNP-DEV Contributor\nDCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R3E["Demo"] R3A["cnp-jenkins-ubuntu-civil-demo"] R3M["jenkins-demo-mi"] R3K["Civil Demo only"] R3R["DCD-CNP-DEV Contributor\nDCD-CNP-DEV Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R4E["ITHC"] R4A["cnp-jenkins-ubuntu-civil-ithc"] R4M["jenkins-ithc-mi"] R4K["Civil ITHC only"] R4R["DCD-CNP-QA Contributor\nDCD-CNP-QA Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R5E["Perftest"] R5A["cnp-jenkins-ubuntu-civil-perftest"] R5M["jenkins-perftest-mi"] R5K["Civil Perftest only"] R5R["DCD-CNP-QA Contributor\nDCD-CNP-QA Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R6E["Production"] R6A["cnp-jenkins-ubuntu-civil-prod"] R6M["jenkins-prod-mi"] R6K["Production only"] R6R["DCD-CNP-Prod Contributor\nDCD-CNP-Prod Azure Kubernetes Service Cluster Admin Contributor\nPipeline-metrics Cosmos DB Data Contributor\nDTS-CFTPTL-INTSVC:core-infra-intsvc-rg Private DNS Zone Contributor"]
+
+  R7["* Within a pipeline, Key Vault access can be overridden to a different environment.\nFor example: Preview pipeline might access the AAT Key Vault.\nIn such cases, the MI must also have access to that target Key Vault."]:5
+
+
+  style TITLE fill:#b1effc,stroke:#000000,color:#000000
+  style H1 fill:#b1effc,stroke:#000000,color:#000000
+  style H2 fill:#b1effc,stroke:#000000,color:#000000
+  style H3 fill:#b1effc,stroke:#000000,color:#000000
+  style H4 fill:#b1effc,stroke:#000000,color:#000000
+  style H5 fill:#b1effc,stroke:#000000,color:#000000
+
+  style R1K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R2K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R3K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R4K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R5K fill:#E0FFE0,stroke:#009900,color:#000000
+  style R6K fill:#E0FFE0,stroke:#009900,color:#000000
+
+  style R1E fill:#fff,stroke:#000000,color:#000000
+  style R2E fill:#fff,stroke:#000000,color:#000000
+  style R3E fill:#fff,stroke:#000000,color:#000000
+  style R4E fill:#fff,stroke:#000000,color:#000000
+  style R5E fill:#fff,stroke:#000000,color:#000000
+  style R6E fill:#fff,stroke:#000000,color:#000000
+
+  style R1A fill:#fff,stroke:#000000,color:#000000
+  style R2A fill:#fff,stroke:#000000,color:#000000
+  style R3A fill:#fff,stroke:#000000,color:#000000
+  style R4A fill:#fff,stroke:#000000,color:#000000
+  style R5A fill:#fff,stroke:#000000,color:#000000
+  style R6A fill:#fff,stroke:#000000,color:#000000
+
+  style R1M fill:#fff,stroke:#000000,color:#000000
+  style R2M fill:#fff,stroke:#000000,color:#000000
+  style R3M fill:#fff,stroke:#000000,color:#000000
+  style R4M fill:#fff,stroke:#000000,color:#000000
+  style R5M fill:#fff,stroke:#000000,color:#000000
+  style R6M fill:#fff,stroke:#000000,color:#000000
+
+  style R1R fill:#fff,color:#000000,text-align:left
+  style R2R fill:#fff,color:#000000,text-align:left
+  style R3R fill:#fff,color:#000000,text-align:left
+  style R4R fill:#fff,color:#000000,text-align:left
+  style R5R fill:#fff,color:#000000,text-align:left
+  style R6R fill:#fff,color:#000000,text-align:left
+
+  style R7 fill:#FFF4CC,stroke:#000000,color:#000000,text-align:left

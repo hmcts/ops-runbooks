@@ -48,6 +48,28 @@ Example agent template config:
 
 ## Authentication
 
+
+### PostgreSQL admin caveat
+
+Switching to new [Jenkins library](https://github.com/hmcts/cnp-jenkins-library) version with new 
+per-environment agent MI management (as described in sections below) in an application repository can cause the Azure AD admin to change within the Postgres database from the `legacy PTL` MI to `jenkins-<env>-mi`.
+
+This can cause problems where the **old PTL role still owns database objects**. Azure cannot remove that role, and Terraform apply can fail with:
+
+```
+role ... cannot be dropped because some objects depend on it.
+```
+
+Workaround:
+
+- Add a second admin user to the Postgres database.
+- Keep the PTL admin in place temporarily.
+- Use the updated Postgres module migration path to add the environment Jenkins MI as an additional admin first.
+- Reassign ownership and/or drop old ownership dependencies from the legacy PTL role.
+- Remove the legacy PTL admin only after ownership cleanup is complete.
+
+Here is an [example where this workaround was applied](https://github.com/hmcts/send-letter-service/pull/2774/changes).
+
 ### Managed identities
 
 Agents use managed identities to authenticate to Azure.

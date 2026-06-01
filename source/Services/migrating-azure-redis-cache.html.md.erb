@@ -7,7 +7,7 @@ review_in: 6 months
 
 # <%= current_page.data.title %>
 
-Azure Cache for Redis is reaching end of life and Microsoft is moving everyone to Azure Managed Redis. This runbook provides the procedure to migrate Redis data using the automated pipeline.
+Azure Cache for Redis is reaching end of life and Microsoft is moving everyone to Azure Managed Redis. This runbook provides the procedure to migrate Redis data using the automated pipeline. More information can be found in the repo https://github.com/hmcts/azure-redis-migration
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ Before starting the migration:
 
 ### Step 2: Run Migration Pipeline
 
-1. Go to the [Migration pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=XXX)
+1. Go to the [Migration pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
 2. Click **Run pipeline**
 3. Enter the required parameters:
    - `aksClusterName` - AKS cluster name (default: `cft-sbox-00-aks`)
@@ -137,5 +137,3 @@ GET user:john:profile
 **Key Types:** Currently supports string keys only. For other data types, the migration logic would need to be extended.
 
 **Source Code:** [https://github.com/hmcts/azure-redis-migration](https://github.com/hmcts/azure-redis-migration)
-
----

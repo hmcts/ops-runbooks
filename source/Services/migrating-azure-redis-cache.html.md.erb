@@ -76,8 +76,8 @@ GET user:john:profile
 ```
 
 **Expected behavior:**
-- `KEYS *` shows only keys on current shard (2-3 shards typically)
-- `GET` commands work across all shards (may show MOVED redirect, then return value)
+- `SCAN` iterates keys on the current shard (2-3 shards typically)
+- `GET` commands work across all shards (with `redis-cli -c`; may show `MOVED` redirects without it)
 - Total key count matches source Redis count
 
 ### Step 5: Post-Migration Actions

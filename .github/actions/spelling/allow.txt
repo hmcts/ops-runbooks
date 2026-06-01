@@ -506,6 +506,7 @@ prodbastion
 projectacronym
 Protips
 PSDT
+psqldb
 PSUPS
 ptl
 PTL

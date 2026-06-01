@@ -1,0 +1,60 @@
+---
+title: Backstage Patching Example
+weight: 30
+last_reviewed_on: 2026-06-01
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for Backstage patching and a few useful pointers.
+
+
+### Patching
+
+Review the [Backstage Releases](https://github.com/backstage/backstage/releases) page to check for breaking changes. Take important note of DB Schema changes/migrations, as this will run automatically if you upgrade.
+Use the [Backstage tool for upgrades](https://backstage.io/docs/getting-started/keeping-backstage-updated/) once you've locally cloned the repository, you can also start the app locally (with guest login) to see if this has errors. See the README in backstage-portal for how.
+
+Code for backstage is in [backstage-portal](https://github.com/hmcts/backstage-portal)
+Code for infrastructure (mostly postgresql db) is in [backstage-infra](https://github.com/hmcts/backstage-infra)
+Deployment is managed via [flux-config](https://github.com/hmcts/cnp-flux-config/tree/master/apps/backstage)
+
+
+Once you raise a PR to backstage-portal, you will get a PR image created. You can [manually apply this to ptlsbox](https://github.com/hmcts/cnp-flux-config/pull/45207).
+You can then check the pod health and events in the namespace to confirm this is working correctly before merging the PR.
+
+
+Checking pods are being deployed healthily on the new version:
+
+```bash
+watch kubectl get pods -n backstage
+```
+
+Checking events in the namespace in case of failures or errors:
+
+```bash
+kubectl get events --sort-by=".lastTimestamp" -n backstage
+```
+
+If all goes well, you can check this is deployed successfully using the following commands:
+
+```bash
+kubectl get pods -n backstage
+```
+
+You should then visit the URL to test that SSO is working, and that features such as templates, catalog, docs etc work as before too.
+
+PTLSbox: https://backstage-sandbox.hmcts.net/
+PTL: https://backstage.hmcts.net/
+
+
+If PTLSbox is working correctly, you can then merge the PR to backstage-portal, and this will trigger the deployment to PTL. A new prod-* tagged image is created, and flux will automatically update. You can then repeat the same checks as above to confirm this is working correctly on PTL too.
+
+
+### Troubleshooting
+
+If you see errors in the pods starting up any plugins, you can connect to the required database to view schema, tables, data etc. Whilst also connected to the F5, run the following for whichever database within the instance you need.
+
+``` 
+psql "host=hmcts-backstage-ptl.postgres.database.azure.com dbname=backstage_plugin_auth user=pgadmin password=$(az keyvault secret show --vault-name cftptl-intsvc --name backstage-psqldb-password --query value -o tsv) sslmode=require"
+```

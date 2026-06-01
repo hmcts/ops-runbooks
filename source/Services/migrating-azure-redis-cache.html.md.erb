@@ -15,9 +15,10 @@ Before starting the migration:
 
 - [ ] Verify variable group `redis-migration-secrets` exists in Azure DevOps
 - [ ] Confirm `SOURCE_REDIS_KEY` and `TARGET_REDIS_KEY` are populated
-- [ ] Ensure AKS cluster has network access to both Redis instances
+- [ ] Ensure self-hosted agents have network access to both Redis instances
 - [ ] Record source Redis hostname and target Redis hostname
 - [ ] Communicate downtime window to application teams (target Redis will be flushed)
+- [ ] Verify target Redis endpoint and port (typically 10000 for Azure Managed Redis)
 
 ## Migration Procedure
 
@@ -34,11 +35,12 @@ Before starting the migration:
 
 1. Go to the [Migration pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
 2. Click **Run pipeline**
-3. Enter the required parameters:
-   - `aksClusterName` - AKS cluster name (default: `cft-sbox-00-aks`)
+3. Select the **environment** from the dropdown:
+   - `sbox`, `demo`, `ithc`, `perftest`, `aat`, or `prod`
+4. Enter the required parameters:
    - `sourceRedisHost` - Azure Cache for Redis hostname (e.g., `myredis.redis.cache.windows.net`)
    - `targetRedisHost` - Azure Managed Redis hostname (e.g., `myredis.uksouth.redis.azure.net`)
-4. Click **Run**
+5. Click **Run**
 
 ### Step 3: Monitor Pipeline Execution
 
@@ -51,53 +53,31 @@ Watch the pipeline output for:
 5. **Verification** - GET commands confirm keys across all shards
 6. **Summary** - Final count: `Complete: X/X keys verified in target`
 
-Expected runtime: 1-5 minutes depending on key count.
-
 ### Step 4: Verify Migration
 
 Connect to the target Redis instance and verify keys:
 
 ```bash
-# Connect to target Redis
-redis-cli -h <TARGET_HOST> -p 10000 --tls -a "<TARGET_REDIS_KEY>"
+# Connect to target Redis (use -c for cluster mode)
+redis-cli -h <TARGET_HOST> -p 10000 --tls -c -a "<TARGET_REDIS_KEY>" --no-auth-warning
 
-# Check key count
-DBSIZE
-
-# List keys on current shard
-KEYS *
-
-# Verify cluster topology
+# Check cluster topology
 CLUSTER NODES
 
-# Test specific keys (works across all shards)
+# List keys on current shard (only shows keys on one node)
+KEYS *
+
+# Test specific keys (automatically redirects to correct node)
 GET session:abc123
 GET user:john:profile
 ```
 
 **Expected behavior:**
-- `SCAN` iterates keys on the current shard (2-3 shards typically)
-- `GET` commands work across all shards (with `redis-cli -c`; may show `MOVED` redirects without it)
-- Total key count matches source Redis count
-
-### Step 5: Post-Migration Actions
-
-1. Update application configuration to point to new Azure Managed Redis endpoint
-2. Test application functionality with new Redis instance
-3. Monitor application logs for Redis connection errors
-4. Keep source Redis instance running until cutover is confirmed
-5. Document migration completion date and key count
+- `KEYS *` only shows keys on the current shard (cluster has 2 nodes typically)
+- `GET` commands work across all shards automatically with `-c` flag
+- Without `-c` flag, you'll see `MOVED` errors for keys on other nodes
 
 ## Troubleshooting
-
-### Issue: Pipeline fails with "PING failed"
-
-**Cause:** Network connectivity issue between AKS and Redis instances
-
-**Resolution:**
-1. Verify firewall rules allow AKS subnet access
-2. Check Redis instance is not behind private endpoint without proper DNS
-3. Confirm Redis keys are correct in variable group
 
 ### Issue: Only some keys visible after migration
 
@@ -107,26 +87,6 @@ GET user:john:profile
 1. Use `CLUSTER NODES` to see shard distribution
 2. Use `GET` commands to verify individual keys (works across shards)
 3. Avoid relying on `KEYS *` for clustered Redis validation
-
-### Issue: Keys disappearing after migration
-
-**Cause:** Redis eviction policy removing keys due to memory pressure
-
-**Resolution:**
-1. Navigate to Azure Portal → Redis → Advanced settings
-2. Check current eviction policy (likely "Volatile LRU")
-3. Change to "No eviction" for testing or increase cache size
-4. Re-run migration pipeline
-
-### Issue: Migration shows fewer keys than expected
-
-**Cause:** Keys may have expired or been evicted from source
-
-**Resolution:**
-1. Check source Redis key count: `redis-cli -h SOURCE_HOST DBSIZE`
-2. Review source Redis eviction policy and memory usage
-3. Confirm TTL on keys: `redis-cli -h SOURCE_HOST TTL <key>`
-4. Re-run migration if source keys are valid
 
 ## Technical Details
 

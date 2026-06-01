@@ -787,3 +787,4 @@ DBSIZE
 rdb
 redisenterprise
 sas
+FLUSHALL

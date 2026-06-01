@@ -76,8 +76,8 @@ GET user:john:profile
 ```
 
 **Expected behavior:**
-- `KEYS *` shows only keys on current shard (2-3 shards typically)
-- `GET` commands work across all shards (may show MOVED redirect, then return value)
+- `SCAN` iterates keys on the current shard (2-3 shards typically)
+- `GET` commands work across all shards (with `redis-cli -c`; may show `MOVED` redirects without it)
 - Total key count matches source Redis count
 
 ### Step 5: Post-Migration Actions
@@ -132,7 +132,7 @@ GET user:john:profile
 
 **Migration Method:** Uses GET/SET instead of DUMP/RESTORE because the DUMP/RESTORE format is incompatible between Redis 6.x and 7.x major versions.
 
-**Clustered Redis:** Azure Managed Redis uses clustering where keys are distributed across multiple shards. The `KEYS *` command only shows keys on the current shard, but GET/SET operations work across all shards with the `-c` flag.
+**Clustered Redis:** Azure Managed Redis uses clustering where keys are distributed across multiple shards. `redis-cli` only follows `MOVED`/`ASK` redirects when run with `-c`, so use `redis-cli -c` when validating keys across shards.
 
 **Key Types:** Currently supports string keys only. For other data types, the migration logic would need to be extended.
 

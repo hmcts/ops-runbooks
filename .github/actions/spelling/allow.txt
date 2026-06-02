@@ -655,6 +655,7 @@ uks
 uksouth
 ukssa
 uninstaller
+unshuttering
 unsubscribe
 untick
 updateinfo

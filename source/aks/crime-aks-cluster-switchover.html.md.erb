@@ -218,7 +218,7 @@ Before proceeding with the cluster switchover in PROD, request SRE resources to 
 
 **Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://tools.hmcts.net/confluence/spaces/HSS/pages/1580172783/Run+PGBASEBACKUP+on+Sunday+in+PROD)
 
-> **Note:** Request an SRE resource to perform the shuttering steps rather than executing them yourself. The shuttering procedures are documented in the reference above for awareness and future reference, but this work should be coordinated with and performed by the SRE team.
+> **Note:** From the referenced document, perform **steps 1 to 7** for shuttering and **steps 10 to 15** for unshuttering. Other steps in that document are related to backups and can be ignored for the cluster switchover process.
 
 ### 2. (SIT, NFT, PRP, PRD, PRX) Scale Down Source Cluster Workloads
 
@@ -324,7 +324,9 @@ Configure the Key Vault to allow access from the new cluster VNET.
 
 ### 10. (PRD) Apply Progression Scaling CronJob (If Applicable)
 
-> **Note:** Check if this is still relevant. If the job is not on the source cluster, don't apply it. Delete the cron from the old cluster to prevent it from scaling up services if the cluster isn't destroyed.
+> **Note:** This step is applicable as of 2 June 2026. If the job is not on the source cluster, don't apply it.
+
+> **Important:** Delete the cron from the old cluster to prevent it from scaling up services if the cluster isn't destroyed immediately.
 
 ```yaml
 ---

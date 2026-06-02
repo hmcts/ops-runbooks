@@ -18,7 +18,7 @@ to pull cases which have had updates in CCD from the database into Elasticsearch
 found in the [Elasticsearch LLD](https://tools.hmcts.net/confluence/display/RCCD/CCD+ElasticSearch+and+new+search+API+Design+LLD).
 
 Service teams configure the different case types within their jurisdictions in their CCD Definition Files, where they define the fields that make up their
-case type. An Elasticsearch [index](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/documents-indices.html) for a case type contains a [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping.html)
+case type. An Elasticsearch [index](https://www.elastic.co/blog/what-is-an-elasticsearch-index) for a case type contains a [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping.html)
 which declares each of the case fields in the case type (as per the Definition File), along with their types e.g. a field which is defined as a [CCD Date type](https://tools.hmcts.net/confluence/pages/viewpage.action?spaceKey=RCCD&title=CCD+Supported+Field+Types#CCDSupportedFieldTypes-ccdTypeDate)
 in the Definition File is mapped to an appropriate date format in Elasticsearch, so that it can be searched against in logical ways for its type.
 The mapping for each CCD field type to appropriate Elasticsearch type is defined [in the Definition Store](https://github.com/hmcts/ccd-definition-store-api/blob/9db6d9f5a228c1994ebd30f1fa0bef00021b1851/elastic-search-support/src/main/resources/application.yml#L69).

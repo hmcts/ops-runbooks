@@ -1,72 +1,85 @@
 ---
 title: Migrating Azure Redis Data to Azure Managed Redis
 weight: 10
-last_reviewed_on: 2026-05-13
+last_reviewed_on: 2026-06-02
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
 
-Azure Cache for Redis is reaching end of life and Microsoft is moving everyone to Azure Managed Redis. This runbook provides the procedure to migrate Redis data using the automated pipeline. More information can be found in the repo https://github.com/hmcts/azure-redis-migration
+Azure Cache for Redis is reaching end of life and Microsoft is moving everyone to Azure Managed Redis. This runbook provides instructions for **service teams** to migrate their Redis data using the automated self-service pipeline. More information can be found in the repo https://github.com/hmcts/azure-redis-migration
+
+## Before You Begin
+
+**Who should use this runbook:** Service teams who own applications using Azure Cache for Redis
+
+**What you'll need:**
+- Access to your Azure Key Vault containing Redis connection strings
+- Hostnames for both source (Azure Cache) and target (Azure Managed Redis) instances
+- Ability to run Azure DevOps pipelines
+- Downtime window coordinated with your team (target Redis will be flushed)
 
 ## Prerequisites
 
-Before starting the migration:
+**Before running the migration:**
 
-- [ ] Verify variable group `redis-migration-secrets` exists in Azure DevOps
-- [ ] Confirm `SOURCE_REDIS_KEY` and `TARGET_REDIS_KEY` are populated
-- [ ] Ensure self-hosted agents have network access to both Redis instances
-- [ ] Record source Redis hostname and target Redis hostname
-- [ ] Communicate downtime window to application teams (target Redis will be flushed)
-- [ ] Verify target Redis endpoint and port (typically 10000 for Azure Managed Redis)
+1. **Add your Azure Cache for Redis connection string to Key Vault:**
+   - Go to: Azure Portal → Your Azure Cache for Redis → Access keys
+   - Copy the **Primary connection string** (format: `host:port,password=xxx,ssl=True,abortConnect=False`)
+   - Add it as a secret in your Azure Key Vault
+   - The target (Azure Managed Redis) connection string should already be in Key Vault
 
-## Migration Procedure
+2. **Have this information ready:**
+   - Source Redis hostname
+   - Target Redis hostname  
+   - Key Vault name
+   - Secret names for both connection strings
 
-### Step 1: Prepare Variable Group
+> **Need help?** You might need to give service connection access to read from Key Vault. Contact PlatOps (#platops-help) for assistance.
 
-1. Navigate to Azure DevOps → Library → Variable Groups
-2. Locate or create `redis-migration-secrets`
-3. Add the following variables:
-   - `SOURCE_REDIS_KEY` - Azure Cache for Redis access key
-   - `TARGET_REDIS_KEY` - Azure Managed Redis access key
-4. Mark both variables as secret
+## Migration Steps
 
-### Step 2: Run Migration Pipeline
+### Step 1: Run the Migration Pipeline
 
-1. Go to the [Migration pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
-2. Click **Run pipeline**
-3. Select the **environment** from the dropdown:
-   - `sbox`, `demo`, `ithc`, `perftest`, `aat`, or `prod`
-4. Enter the required parameters:
-   - `sourceRedisHost` - Azure Cache for Redis hostname 
-   - `targetRedisHost` - Azure Managed Redis hostname 
-5. Click **Run**
+1. Navigate to the [Azure Redis Migration Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
+2. Click **Run pipeline** (top right)
+3. Fill in the parameters:
 
-### Step 3: Monitor Pipeline Execution
+ <img src="images/redis-pipeline.png" style="width:600px;">
 
-Watch the pipeline output for:
+4. Click **Run** to start the migration
 
-1. **Connection verification** - PING tests to both Redis instances
-2. **Expiry removal** - PERSIST commands applied to source keys
-3. **Target flush** - FLUSHALL executed on target Redis
-4. **Key migration** - Each key migrated with progress counter
-5. **Verification** - GET commands confirm keys across all shards
-6. **Summary** - Final count: `Complete: X/X keys verified in target`
+### Step 2: Monitor the Migration
 
-Expected runtime: 1-5 minutes depending on key count.
+Watch the pipeline as it runs. You'll see:
+
+✅ **Fetching secrets** - Connection strings retrieved from Key Vault  
+✅ **Testing connectivity** - PING tests to source and target Redis  
+✅ **Preparing keys** - Removing expiry from source keys  
+✅ **Flushing target** - Clearing target Redis  
+✅ **Migrating keys** - Progress counter showing each key copied  
+✅ **Verifying** - Confirming all keys exist in target  
+✅ **Complete** - Final summary: `Complete: X/X keys verified in target`
 
 **Example output:**
 
 <img src="images/migrating-azure-cache.png" style="width:600px;">
 
 
-### Step 4: Verify Migration
+### Step 3: Verify the Migration
 
-Connect to the target Redis instance and verify keys:
+After the pipeline completes successfully, verify your data:
+
+**Option 1: Test your application**
+- Update your application to point to the new Redis endpoint
+- Test that your application works correctly with the migrated data
+
+**Option 2: Manual verification with redis-cli**
 
 ```bash
 # Connect to target Redis (use -c for cluster mode)
-redis-cli -h <TARGET_HOST> -p 10000 --tls -c -a "<TARGET_REDIS_KEY>" --no-auth-warning
+# YOUR_PASSWORD = just the password from the connection string (URL-decoded)
+redis-cli -h <TARGET_HOST> -p 10000 --tls -c -a "YOUR_PASSWORD" --no-auth-warning
 
 # Check cluster topology
 CLUSTER NODES
@@ -84,23 +97,26 @@ GET user:john:profile
 - `GET` commands work across all shards automatically with `-c` flag
 - Without `-c` flag, you'll see `MOVED` errors for keys on other nodes
 
-## Troubleshooting
-
-### Issue: Only some keys visible after migration
-
-**Cause:** Normal clustered Redis behavior
-
-**Resolution:**
-1. Use `CLUSTER NODES` to see shard distribution
-2. Use `GET` commands to verify individual keys (works across shards)
-3. Avoid relying on `KEYS *` for clustered Redis validation
-
 ## Technical Details
 
-**Migration Method:** Uses GET/SET instead of DUMP/RESTORE because the DUMP/RESTORE format is incompatible between Redis 6.x and 7.x major versions.
+### How the migration works
 
-**Clustered Redis:** Azure Managed Redis uses clustering where keys are distributed across multiple shards. `redis-cli` only follows `MOVED`/`ASK` redirects when run with `-c`, so use `redis-cli -c` when validating keys across shards.
+**Migration Method:** Uses GET/SET commands instead of DUMP/RESTORE (incompatible between Redis 6.x and 7.x)
 
-**Key Types:** Currently supports string keys only. For other data types, the migration logic would need to be extended.
+**What happens:**
+1. Connects to both Redis instances
+2. Removes expiry from source keys (prevents eviction during migration)
+3. Flushes target Redis
+4. Copies each key using GET (source) → SET (target)
+5. Restores TTL values on migrated keys
+6. Verifies all keys across cluster shards
 
-**Source Code:** [https://github.com/hmcts/azure-redis-migration](https://github.com/hmcts/azure-redis-migration)
+### Limitations
+
+**Supported data types:**
+- String keys (fully supported)
+- Lists, Sets, Hashes, Sorted Sets, Streams (not currently supported)
+- Binary data with special characters
+
+**Data size limits:**
+- Bypasses Azure's 512 MB RDB file import limit

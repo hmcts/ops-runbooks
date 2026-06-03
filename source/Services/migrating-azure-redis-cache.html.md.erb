@@ -27,7 +27,8 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
    - Go to: Azure Portal → Your Azure Cache for Redis → Access keys
    - Copy the **Primary connection string** (format: `host:port,password=xxx,ssl=True,abortConnect=False`)
    - Add it as a secret in your Azure Key Vault
-   - The target (Azure Managed Redis) connection string should already be in Key Vault
+   - You only need to add the **source** connection string
+   - The **target** (Azure Managed Redis) connection string should already be in Key Vault
 
 2. **Have this information ready:**
    - Source Redis hostname

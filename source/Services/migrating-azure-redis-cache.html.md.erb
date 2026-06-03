@@ -14,10 +14,10 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 **Who should use this runbook:** Service teams who own applications using Azure Cache for Redis
 
 **What you'll need:**
+
 - Access to your Azure Key Vault containing Redis connection strings
 - Hostnames for both source (Azure Cache) and target (Azure Managed Redis) instances
 - Ability to run Azure DevOps pipelines
-- Downtime window coordinated with your team (target Redis will be flushed)
 
 ## Prerequisites
 
@@ -35,14 +35,14 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
    - Key Vault name
    - Secret names for both connection strings
 
-> **Need help?** You might need to give service connection access to read from Key Vault. Contact PlatOps (#platops-help) for assistance.
+> **Need help?** You might need to give service connection access to read/list permission to secrets from Key Vault. Contact PlatOps (#platops-help) for assistance.
 
 ## Migration Steps
 
 ### Step 1: Run the Migration Pipeline
 
 1. Navigate to the [Azure Redis Migration Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
-2. Click **Run pipeline** (top right)
+2. Click **Run pipeline**
 3. Fill in the parameters:
 
  <img src="images/redis-pipeline.png" style="width:600px;">
@@ -119,4 +119,5 @@ GET user:john:profile
 - Binary data with special characters
 
 **Data size limits:**
+
 - Bypasses Azure's 512 MB RDB file import limit

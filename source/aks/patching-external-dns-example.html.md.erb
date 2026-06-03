@@ -1,0 +1,80 @@
+---
+title: ExternalDNS Patching Example
+weight: 30
+last_reviewed_on: 2026-06-03
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This document covers a high level patching example for ExternalDNS. Please see [Patching AKS Apps](patching-aks-apps.html)
+for a lower level example with more information.
+
+## How We Use ExternalDNS
+
+[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes exposed Kubernetes Services and Ingresses
+with DNS providers, in our case Azure DNS.
+
+We use ExternalDNS in the **dev** and **preview** environments to automatically set up domains for PR-related ad-hoc
+environments. When an application team raises a PR, an ephemeral environment is spun up and ExternalDNS creates the DNS
+records needed to reach it, then cleans them up when the PR environment is torn down.
+
+It is therefore only installed on the following AKS clusters:
+
+- **SDS dev**: `ss-dev-00-aks`
+- **CFT preview**: `cft-preview-00-aks`
+
+The DNS zones used for these ad-hoc environments are:
+
+- [dev.platform.hmcts.net](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Network/privateDnsZones/dev.platform.hmcts.net/resourceOverviewId)
+- [preview.platform.hmcts.net](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/1baf5470-1c3e-40d3-a6f7-74bfbce4b348/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Network/privateDnsZones/preview.platform.hmcts.net/resourceOverviewId)
+
+## Patching
+
+Review the [ExternalDNS Releases](https://github.com/kubernetes-sigs/external-dns/releases) and the
+[Helm chart releases](https://artifacthub.io/packages/helm/external-dns/external-dns) pages to check for breaking changes
+before updating.
+
+As ExternalDNS is only deployed to dev and preview, you can patch one environment at a time. Patch and test in **dev** first,
+then move on to **preview**.
+
+### SDS
+
+Create a PR in sds-flux-config to patch ExternalDNS in SDS: [example PR](https://github.com/hmcts/sds-flux-config/pull/8517).
+
+### CFT
+
+Create a PR in cnp-flux-config to patch ExternalDNS in CFT: [example PR](https://github.com/hmcts/cnp-flux-config/pull/45213).
+
+## Post Patching Checks
+
+ExternalDNS is deployed into the `admin` namespace (the Helm release is named `external-dns` and the deployment is
+`external-dns-external-dns-chart`).
+
+First confirm the Helm release has updated to the new version:
+
+```bash
+kubectl get hr external-dns -n admin
+```
+
+Check the ExternalDNS pods are running and healthy:
+
+```bash
+kubectl get pods -n admin -l app.kubernetes.io/name=external-dns-chart
+```
+
+Tail the logs to confirm the sync loop is reconciling without errors:
+
+```bash
+kubectl logs -n admin deploy/external-dns-external-dns-chart -f
+```
+
+You should see the sync loop running on its interval and reporting that records are up to date (or creating/updating
+records as needed) with no authentication or permission errors.
+
+Once you are happy that ExternalDNS is working in dev, repeat the patch and the checks for preview.
+
+## Related Documentation
+
+- [Patching AKS Apps](patching-aks-apps.html)
+- ExternalDNS is also referenced in [Rebuilding AKS Clusters](rebuilding-aks-clusters.html) when cleaning up DNS records.

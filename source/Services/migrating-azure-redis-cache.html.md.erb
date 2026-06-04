@@ -15,28 +15,9 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 
 **What you'll need:**
 
-- Access to your Azure Key Vault containing Redis connection strings
-- Hostnames for both source (Azure Cache) and target (Azure Managed Redis) instances
+- Source Redis hostname and resource group
+- Target Redis hostname and resource group
 - Ability to run Azure DevOps pipelines
-
-## Prerequisites
-
-**Before running the migration:**
-
-1. **Add your Azure Cache for Redis connection string to Key Vault:**
-   - Go to: Azure Portal → Your Azure Cache for Redis → Access keys
-   - Copy the **Primary connection string** (format: `host:port,password=xxx,ssl=True,abortConnect=False`)
-   - Add it as a secret in your Azure Key Vault
-   - You only need to add the **source** connection string
-   - The **target** (Azure Managed Redis) connection string should already be in Key Vault
-
-2. **Have this information ready:**
-   - Source Redis hostname
-   - Target Redis hostname  
-   - Key Vault name
-   - Secret names for both connection strings
-
-> **Need help?** You might need to give service connection access to read/list permission to secrets from Key Vault. Contact PlatOps (#platops-help) for assistance.
 
 ## Migration Steps
 
@@ -50,11 +31,21 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 
 4. Click **Run** to start the migration
 
+**Pipeline inputs expected by the current implementation:**
+
+- `environment`
+- `sourceRedisHost`
+- `sourceRedisResourceGroup`
+- `targetRedisHost`
+- `targetRedisResourceGroup`
+
+> If you need to migrate a Redis resource in a different subscription that is not already configured in the pipeline, contact PlatOps before running the migration.
+
 ### Step 2: Monitor the Migration
 
 Watch the pipeline as it runs. You'll see:
 
-✅ **Fetching secrets** - Connection strings retrieved from Key Vault  
+✅ **Retrieving keys** - Access keys fetched using Azure CLI  
 ✅ **Testing connectivity** - PING tests to source and target Redis  
 ✅ **Preparing keys** - Removing expiry from source keys  
 ✅ **Flushing target** - Clearing target Redis  
@@ -66,31 +57,26 @@ Watch the pipeline as it runs. You'll see:
 
 <img src="images/migrating-azure-cache.png" style="width:600px;">
 
-
 ### Step 3: Verify the Migration
 
-After the pipeline completes successfully, verify your data:
+After the pipeline completes successfully, verify your data.
 
-**Option 1: Test your application**
-- Update your application to point to the new Redis endpoint
-- Test that your application works correctly with the migrated data
-
-**Option 2: Manual verification with redis-cli**
+**Option: Verify with `redis-cli`**
 
 ```bash
-# Connect to target Redis (use -c for cluster mode)
-# YOUR_PASSWORD = just the password from the connection string (URL-decoded)
-redis-cli -h <TARGET_HOST> -p 10000 --tls -c -a "YOUR_PASSWORD" --no-auth-warning
+# Connect to target Redis
+redis-cli -h migration-test-new.uksouth.redis.azure.net -p 10000 --tls -a "Access_Key"
 
-# Check cluster topology
-CLUSTER NODES
-
-# List keys on current shard (only shows keys on one node)
+# List keys on the current shard only
 KEYS *
 
-# Test specific keys (automatically redirects to correct node)
-GET session:abc123
-GET user:john:profile
+# View cluster topology
+CLUSTER NODES
+
+# If you do not see a key with KEYS *, it may be on another shard.
+# Use GET to retrieve individual keys.
+GET cart:john:items
+GET user:jane:profile
 ```
 
 **Expected behavior:**
@@ -98,7 +84,7 @@ GET user:john:profile
 - `GET` commands work across all shards automatically with `-c` flag
 - Without `-c` flag, you'll see `MOVED` errors for keys on other nodes
 
-## Technical Details
+<img src="images/verification-azure-redis-migration.png" style="width:600px;">
 
 ### How the migration works
 

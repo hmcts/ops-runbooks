@@ -14,46 +14,54 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 **Who should use this runbook:** Service teams who own applications using Azure Cache for Redis
 
 **What you'll need:**
-- Access to your Azure Key Vault containing Redis connection strings
-- Hostnames for both source (Azure Cache) and target (Azure Managed Redis) instances
+
+- Source Redis hostname and resource group
+- Target Redis hostname and resource group
 - Ability to run Azure DevOps pipelines
-- Downtime window coordinated with your team (target Redis will be flushed)
 
-## Prerequisites
+** Currently Supported Subscriptions:**
 
-**Before running the migration:**
+- DCD-CFTAPPS-SBOX
+- DCD-CFTAPPS-DEMO
+- DCD-CFTAPPS-ITHC
+- DCD-CFTAPPS-TEST
+- DCD-CFTAPPS-STG
+- DCD-CFTAPPS-PROD
 
-1. **Add your Azure Cache for Redis connection string to Key Vault:**
-   - Go to: Azure Portal → Your Azure Cache for Redis → Access keys
-   - Copy the **Primary connection string** (format: `host:port,password=xxx,ssl=True,abortConnect=False`)
-   - Add it as a secret in your Azure Key Vault
-   - The target (Azure Managed Redis) connection string should already be in Key Vault
+These are the standard environments wired into the pipeline service connections. If your Redis resource is in any other subscription, or needs a different private endpoint or DNS setup, contact PlatOps before running the migration.
 
-2. **Have this information ready:**
-   - Source Redis hostname
-   - Target Redis hostname  
-   - Key Vault name
-   - Secret names for both connection strings
-
-> **Need help?** You might need to give service connection access to read from Key Vault. Contact PlatOps (#platops-help) for assistance.
+##Notes for Platops team
+ - We intentionally did not include all the service connection as we did not know which team will need migration
+ - Please liaise with Service Team and find out which service connection need adding on the pipeline and add that
+ - We have already added all the DCD-CFTAPPS-<env> service connections which you can use it as examples
 
 ## Migration Steps
 
 ### Step 1: Run the Migration Pipeline
 
 1. Navigate to the [Azure Redis Migration Pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1226&_a=summary)
-2. Click **Run pipeline** (top right)
+2. Click **Run pipeline**
 3. Fill in the parameters:
 
  <img src="images/redis-pipeline.png" style="width:600px;">
 
 4. Click **Run** to start the migration
 
+**Pipeline inputs expected by the current implementation:**
+
+- `environment`
+- `sourceRedisHost`
+- `sourceRedisResourceGroup`
+- `targetRedisHost`
+- `targetRedisResourceGroup`
+
+> If you need to migrate a Redis resource outside the covered environments above, contact PlatOps before running the migration.
+
 ### Step 2: Monitor the Migration
 
 Watch the pipeline as it runs. You'll see:
 
-✅ **Fetching secrets** - Connection strings retrieved from Key Vault  
+✅ **Retrieving keys** - Access keys fetched using Azure CLI  
 ✅ **Testing connectivity** - PING tests to source and target Redis  
 ✅ **Preparing keys** - Removing expiry from source keys  
 ✅ **Flushing target** - Clearing target Redis  
@@ -65,39 +73,31 @@ Watch the pipeline as it runs. You'll see:
 
 <img src="images/migrating-azure-cache.png" style="width:600px;">
 
-
 ### Step 3: Verify the Migration
 
-After the pipeline completes successfully, verify your data:
+After the pipeline completes successfully, verify your data.
 
-**Option 1: Test your application**
-- Update your application to point to the new Redis endpoint
-- Test that your application works correctly with the migrated data
-
-**Option 2: Manual verification with redis-cli**
+**Option: Verify with `redis-cli`**
 
 ```bash
-# Connect to target Redis (use -c for cluster mode)
-# YOUR_PASSWORD = just the password from the connection string (URL-decoded)
-redis-cli -h <TARGET_HOST> -p 10000 --tls -c -a "YOUR_PASSWORD" --no-auth-warning
+# Connect to target Redis (use -c if the target is clustered)
+redis-cli -h migration-test-new.uksouth.redis.azure.net -p 10000 --tls -c -a "Access_Key"
 
-# Check cluster topology
-CLUSTER NODES
-
-# List keys on current shard (only shows keys on one node)
+# List keys on the current shard only
 KEYS *
 
-# Test specific keys (automatically redirects to correct node)
-GET session:abc123
-GET user:john:profile
+# If you do not see a key with KEYS *, it may be on another shard.
+# Use GET to retrieve individual keys.
+GET <key>
+
 ```
 
 **Expected behavior:**
-- `KEYS *` only shows keys on the current shard (cluster has 2 nodes typically)
-- `GET` commands work across all shards automatically with `-c` flag
-- Without `-c` flag, you'll see `MOVED` errors for keys on other nodes
+- `KEYS *` only shows keys on the current shard
+- `GET <key>` works across shards when `redis-cli -c` is used
+- Without `-c`, you may see `MOVED` errors for keys on other nodes
 
-## Technical Details
+<img src="images/verification-azure-redis-migration.png" style="width:600px;">
 
 ### How the migration works
 
@@ -119,4 +119,5 @@ GET user:john:profile
 - Binary data with special characters
 
 **Data size limits:**
+
 - Bypasses Azure's 512 MB RDB file import limit

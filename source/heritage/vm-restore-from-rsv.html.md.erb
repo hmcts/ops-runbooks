@@ -42,7 +42,7 @@ For CNP and CPP platforms, a self-service Azure Pipeline is available in the [`a
 
 | Parameter | Required | Default | Notes |
 |-----------|----------|---------|-------|
-| `restoreMethod` | Yes | `method-c` | `method-a` / `method-b` / `method-c` / `method-d` |
+| `restoreMethod` | Yes | `replace-existing` | `create-new-vm` / `restore-disks-only` / `replace-existing` / `file-recovery` |
 | `sourceVmName` | Yes | — | Friendly VM hostname (matches RSV container name) |
 | `sourceResourceGroup` | Yes | — | Resource group of the source VM |
 | `vaultName` | Yes | — | RSV name |
@@ -58,7 +58,7 @@ For CNP and CPP platforms, a self-service Azure Pipeline is available in the [`a
 
 1. **Stage 1 — Preflight:** Authenticates via service connection, lists available recovery points, selects the appropriate one, and prints the restore command that *would* run. No changes made — safe to run at any time.
 2. **Stage 2 — Restore:** Blocked by the `vm-restore-platops-approval` ADO environment gate. A PlatOps team member must approve before the restore executes. Sets `dryRun=false` to run a real restore.
-3. **Stage 3 — Validate:** Confirms the VM or disks exist post-restore. Skipped if `dryRun=true` or `restoreMethod=method-d`.
+3. **Stage 3 — Validate:** Confirms the VM or disks exist post-restore. Skipped if `dryRun=true` or `restoreMethod=file-recovery`.
 
 A `restore-metrics.json` artifact is published on every run (including dry runs) containing method, source VM, selected recovery point, job ID, status, and duration in minutes.
 

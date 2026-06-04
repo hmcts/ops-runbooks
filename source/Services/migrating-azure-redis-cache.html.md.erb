@@ -19,6 +19,17 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 - Target Redis hostname and resource group
 - Ability to run Azure DevOps pipelines
 
+** Currently Supported Subscriptions:**
+
+- DCD-CFTAPPS-SBOX
+- DCD-CFTAPPS-DEMO
+- DCD-CFTAPPS-ITHC
+- DCD-CFTAPPS-TEST
+- DCD-CFTAPPS-STG
+- DCD-CFTAPPS-PROD
+
+These are the standard environments wired into the pipeline service connections. If your Redis resource is in any other subscription, or needs a different private endpoint or DNS setup, contact PlatOps before running the migration.
+
 ## Migration Steps
 
 ### Step 1: Run the Migration Pipeline
@@ -39,7 +50,7 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 - `targetRedisHost`
 - `targetRedisResourceGroup`
 
-> If you need to migrate a Redis resource in a different subscription that is not already configured in the pipeline, contact PlatOps before running the migration.
+> If you need to migrate a Redis resource outside the covered environments above, contact PlatOps before running the migration.
 
 ### Step 2: Monitor the Migration
 

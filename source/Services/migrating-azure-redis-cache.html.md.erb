@@ -30,6 +30,11 @@ Azure Cache for Redis is reaching end of life and Microsoft is moving everyone t
 
 These are the standard environments wired into the pipeline service connections. If your Redis resource is in any other subscription, or needs a different private endpoint or DNS setup, contact PlatOps before running the migration.
 
+**What PlatOps needs to do for unsupported subscriptions:**
+
+- Confirm which source and target subscriptions should be used
+- Refactor pipeline to incldue the new subscription(s) in the service connection and parameter options
+
 ## Migration Steps
 
 ### Step 1: Run the Migration Pipeline

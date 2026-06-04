@@ -65,23 +65,22 @@ After the pipeline completes successfully, verify your data.
 
 ```bash
 # Connect to target Redis
-redis-cli -h migration-test-new.uksouth.redis.azure.net -p 10000 --tls -a "Access_Key"
+redis-cli -h migration-test-new.uksouth.redis.azure.net -p 10000 --tls -c -a "Access_Key"
 
 # List keys on the current shard only
 KEYS *
 
-# View cluster topology
-CLUSTER NODES
-
 # If you do not see a key with KEYS *, it may be on another shard.
 # Use GET to retrieve individual keys.
-GET cart:john:items
-GET user:jane:profile
+GET <key>
+
+# View cluster topology
+CLUSTER NODES
 ```
 
 **Expected behavior:**
 - `KEYS *` only shows keys on the current shard (cluster has 2 nodes typically)
-- `GET` commands work across all shards automatically with `-c` flag
+- `GET` commands work across all shards 
 - Without `-c` flag, you'll see `MOVED` errors for keys on other nodes
 
 <img src="images/verification-azure-redis-migration.png" style="width:600px;">

@@ -1,7 +1,7 @@
 ---
 title: KEDA Patching Example
 weight: 30
-last_reviewed_on: 2026-05-01
+last_reviewed_on: 2026-06-11
 review_in: 12 months
 ---
 
@@ -22,7 +22,9 @@ KEDA is used to auto scale pods on a cluster. A couple of examples of this are:
 
 ## Patching
 
-Review [KEDA Releases](https://github.com/kedacore/charts/releases) page to check for breaking changes.
+Review the [KEDA Releases](https://github.com/kedacore/keda/releases) and the
+[Helm chart releases](https://artifacthub.io/packages/helm/kedacore/keda) pages to check for breaking changes before updating.
+
 
 ### No Production
 
@@ -48,26 +50,85 @@ Create a PR in sds-flux-config to patch KEDA in SDS: [example PR](https://github
 
 Create a PR in cnp-flux-config to patch KEDA in CFT: [example PR](https://github.com/hmcts/cnp-flux-config/pull/25236).
 
-### Post Patching Checks
+## Post Patching Checks
 
-To make sure KEDA is working we check the resource type `scaledjobs` are working correctly.
+All the checks in this section are now automated by keda-patching-checks AI agent skill that is available in
+the [skills repository](https://github.com/hmcts/platops-agent-skills). Please read the README file of the skill
+before first usage.
 
-There are 3 services we can use to check if KEDA is working correctly:
+Work through these checks in order: first confirm KEDA itself has upgraded and is healthy, then confirm the
+workloads that depend on it (`ScaledJobs`) are still reconciling.
 
-- Azure DevOps agents
-- Jenkins agents
-- [Recipe Receiver](https://github.com/hmcts/recipe-receiver)
+### 1. Check the Helm release
 
-The most useful of these is `Recipe Receiver` because it is deployed across more clusters than the other options.
+KEDA is deployed into the `keda` namespace (the Helm release is named `keda`). Confirm the release has reconciled
+to the version you applied via Flux:
+
+```bash
+kubectl get hr keda -n keda
+```
+
+The `STATUS` column should show the upgrade succeeded with the new version, for example:
+`Helm upgrade succeeded for release keda/keda.v2 with chart keda@2.20.0`.
+
+### 2. Check the KEDA pods
+
+KEDA runs its own long-lived pods. The chart deploys three of them, so confirm they
+are all `Running`:
+
+```bash
+kubectl get pods -n keda -l app.kubernetes.io/part-of=keda-operator
+```
+
+You should see one pod for each of the following components:
+
+- `keda-operator` - watches `ScaledObjects`/`ScaledJobs` and performs the scaling
+- `keda-operator-metrics-apiserver` - serves external metrics to the Kubernetes metrics API
+- `keda-admission-webhooks` - validates KEDA resources
+
+If a pod is not healthy, check its logs, for example:
+
+```bash
+kubectl logs -n keda -l app.kubernetes.io/name=keda-operator -f
+```
+
+### 3. Check the workloads that use KEDA
+
+Once KEDA itself is healthy, confirm the `ScaledJobs` that depend on it are still reconciling.
+
+<%= warning_text('When checking a <code>ScaledJob</code>, the <code>READY</code> column is the health signal, not <code>ACTIVE</code>. <code>READY=True</code> means KEDA has validated the <code>ScaledJob</code> and it is ready to scale — that is a pass. The <code>ACTIVE</code> column only tells you whether KEDA is scaling <em>right now</em>: <code>ACTIVE=True</code> means there is queued work at that instant, and <code>ACTIVE=False</code> simply means the trigger is idle (no queued jobs/messages). <code>ACTIVE=False</code> is normal and is NOT a failure. Equally, not seeing brand-new pods or recent <code>KEDAJobsCreated</code> events at the moment you check is expected when the queue is idle. Only treat a <code>ScaledJob</code> as failed when <code>READY</code> is not <code>True</code> (or it is missing on a cluster where it is expected).') %>
+
+There are three workloads we use for this:
+
+- **Recipe Receiver** - deployed across most (but not all) clusters, so the best general check
+- **Azure DevOps agents** - Linux agents run widely in SDS; on CFT they are only on the integration service (`intsvc`) clusters. Windows agents are `intsvc`-only on both estates
+- **Jenkins webhook relay** - only on the integration service (`intsvc`) clusters
 
 #### Recipe Receiver
 
 Recipe Receiver is an app created for Platform Operations and deployed to both CFT and SDS AKS clusters but under different namespaces:
 
-- CFT - [plum-recipe-receiver](https://github.com/hmcts/cnp-flux-config/tree/master/apps/cnp/plum-recipe-receiver)
-- SDS - [toffee-recipe-receiver](https://github.com/hmcts/sds-flux-config/tree/master/apps/toffee/recipe-receiver)
+- CFT - [plum-recipe-receiver](https://github.com/hmcts/cnp-flux-config/tree/master/apps/cnp/plum-recipe-receiver) (namespace `cnp`)
+- SDS - [toffee-recipe-receiver](https://github.com/hmcts/sds-flux-config/tree/master/apps/toffee/recipe-receiver) (namespace `toffee`)
 
 These are both deployed the same way and have the same setup, resources and testing steps.
+
+It is **not** deployed to every cluster, so check the relevant environment before testing. The
+authoritative list is the set of environment overlays in the Flux app folders above (each `<env>.yaml`
+is a cluster it is deployed to). At time of writing this is:
+
+| Estate | Namespace | Environments where Recipe Receiver is deployed |
+| --- | --- | --- |
+| CFT | `cnp` | `sbox`, `ithc`, `perftest`, `demo`, `aat`, `prod` |
+| SDS | `toffee` | `sbox`, `test`, `ithc`, `demo`, `stg`, `prod` |
+
+> Note: this is the *standing* deployment managed by Flux. The [recipe-receiver](https://github.com/hmcts/recipe-receiver)
+> app repo separately deploys *ephemeral, per-PR* resources, and only to **CFT Preview** and **SDS Dev** —
+> so don't rely on those clusters for post-patching checks.
+
+If Recipe Receiver is missing from a cluster where it *is* expected (per the table above), treat that as a
+failure to investigate rather than skipping it — a missing `ScaledJob` can be a symptom of a broken KEDA
+upgrade (for example the KEDA CRDs failing to install/upgrade).
 
 The resources in question that matter for this testing are `Azure Service Bus Queues`, each environment has a service bus with a queue that the `recipe-receiver` monitors for messages and will scale out when messages are added to the queue i.e. If `KEDA` is working correctly, the messages should be processed from the queue by the `scaledJob` of the recipe-receiver which creates `pods` to do the processing.
 
@@ -96,34 +157,70 @@ Steps to test KEDA updates:
 
 Once you are happy that KEDA is working across this environment you can deploy the patch to another non-production environment until you completed all non-production environments. Remember to test each environment after the update.
 
-#### Azure DevOps/Jenkins
+#### Azure DevOps / Jenkins agents
 
-Verify that the `azure-devops-agent` in the `azure-devops` namespace and `jenkins-webhook-relay` in the `jenkins` namespace Helm releases are still healthy after the KEDA upgrade (Helm status deployed, no failed revisions).
+These are the most heavily used `ScaledJobs` in the project: they run our self-hosted Azure DevOps agents and send
+webhook events to Jenkins to trigger builds. If they are not working they cause widespread problems for application
+teams and result in BAU tickets, so always verify them after patching.
 
-Run: `helm -n <NAMESPACE> status <HELM CHART NAME>` and `helm -n <NAMESPACE> history <HELM CHART NAME>`.
+These workloads are not deployed to every cluster KEDA runs on, so use the table below to
+know exactly where to run the checks. The Jenkins webhook relay only runs on the integration service (`intsvc`)
+clusters; the Azure DevOps agents run more widely in SDS:
 
-Confirm their KEDA ScaledJobs are reconciling.
+| Workload | Namespace | `ScaledJob` name(s) | CFT clusters | SDS clusters                         |
+| --- | --- | --- | --- |--------------------------------------|
+| Jenkins webhook relay | `jenkins` | `jenkins-webhook-relay-function` | `cft-ptl-00-aks`, `cft-ptlsbox-00-aks` | `ss-ptl-00-aks`, `ss-ptlsbox-00-aks` |
+| Azure DevOps agents (Linux) | `azure-devops` | `azure-devops-agent-function` | `cft-ptl-00-aks`, `cft-ptlsbox-00-aks` | All SDS clusters **except `demo`** |
+| Azure DevOps agents (Windows) | `azure-devops` | `azure-devops-agent-windows-function` | `cft-ptl-00-aks`, `cft-ptlsbox-00-aks` | `ss-ptl-00-aks`, `ss-ptlsbox-00-aks` |
 
-The scaledJobs created by these Helm releases are the most heavily used in the project as they are responsible for running our self hosted azure devops agents and for sending webhook events to Jenkins to trigger builds.
+Run the checks below against relevant cluster. Set the cluster once with:
 
-If these are not working, they will cause many issues for application teams and result in BAU tickets being submitted.
+```bash
+# pick the cluster you are checking, e.g. cft-ptl-00-aks, cft-ptlsbox-00-aks, ss-ptl-00-aks ...
+CTX=cft-ptl-00-aks
+```
 
-Get the list of scaled jobs in these namespaces using: `kubectl get scaledjob -n <NAMESPACE>`.
+First confirm the agents' Helm releases are healthy (`READY` should be `True`):
 
-Describe the scaled job by running: `kubectl describe scaledjob <SCALED JOB NAME>`.
+```bash
+kubectl --context "$CTX" get hr azure-devops-agent -n azure-devops
+kubectl --context "$CTX" get hr jenkins-webhook-relay -n jenkins
+```
 
-You should see events saying new jobs were created with the reason `KEDAJobsCreated`.
+List the `ScaledJobs` and confirm `READY` is `True`:
 
-You should also see new pods being created in the namespaces. They will be named after the job e.g. if the scaled job is called `azure-devops-agent-function`, the pods will be called `azure-devops-agent-function-<UNIQUE ID>`.
+```bash
+kubectl --context "$CTX" get scaledjob -n azure-devops
+kubectl --context "$CTX" get scaledjob -n jenkins
+```
 
-You can list the pods in the namespace based on its creation time, this makes it easy to see if new pods are being created after your updates:
+Remember `READY=True` is the pass criterion here — `ACTIVE=False` just means the agent pool / relay queue is
+currently idle and is not a problem.
 
-`kc get pods --sort-by=.metadata.creationTimestamp -n <NAMESPACE>`
+Describe a `ScaledJob` to confirm KEDA is creating jobs for it - look for events with the reason `KEDAJobsCreated`:
 
-Some application teams may have scaledjobs but if the azure devops agent and jenkins webhook relay jobs are working, we can expect other jobs to be working also.
+```bash
+kubectl --context "$CTX" describe scaledjob azure-devops-agent-function -n azure-devops
+kubectl --context "$CTX" describe scaledjob jenkins-webhook-relay-function -n jenkins
+```
+
+Recent `KEDAJobsCreated` events and fresh agent pods are good confirmation that scaling works, but their
+absence when the trigger is idle (`ACTIVE=False`) is expected and does not indicate a failure — a `READY=True`
+`ScaledJob` with recently completed jobs is healthy.
+
+Finally, confirm new agent pods are being created. Sorting by creation time makes it easy to see fresh pods appearing
+after your patch (pods are named after the job, e.g. `azure-devops-agent-function-<UNIQUE ID>`):
+
+```bash
+kubectl --context "$CTX" get pods -n azure-devops --sort-by=.metadata.creationTimestamp
+kubectl --context "$CTX" get pods -n jenkins --sort-by=.metadata.creationTimestamp
+```
+
+Some application teams have their own `ScaledJobs`, but if the Azure DevOps agent and Jenkins webhook relay jobs are
+working we can expect the others to be working too.
 
 Keep an eye on `#platops-help` for any tickets that may come in from application teams using scaled jobs.
 
-### Other links
+## Other links
 
 You can find info on how the jenkins webhook relay works [here](../jenkins/builds-starting-slowly.html#builds-not-being-triggered-at-all).

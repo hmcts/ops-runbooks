@@ -11,13 +11,24 @@ Use this page for tunnel + `ssh -L` forwarding to Crime services.
 
 ## Contents
 
+- [Prerequisites](#prerequisites)
 - [Pattern](#pattern)
 - [Example: Artemis admin UI](#example-artemis-admin-ui)
 - [Example: Postgres PaaS](#example-postgres-paas)
 - [Example: Gerrit over SSH](#example-gerrit-over-ssh)
-- [Git clone](#git-clone)
-- [Git Push](#git-push)
+  - [Git clone](#git-clone)
+  - [Git Push](#git-push)
 - [Closing sessions](#closing-sessions)
+- [Verification](#verification)
+- [Additional Information](#additional-information)
+
+## Prerequisites
+
+- Azure CLI installed and authenticated (`az login`).
+- Access to Bastion resource, target VM, and VM NIC.
+- SSH private key present locally.
+- General SSH working via Bastion. See [General SSH use](./general-ssh.html) first.
+- Target VM must have network path to the downstream service (Postgres, Artemis, Gerrit).
 
 ## Pattern
 
@@ -117,12 +128,16 @@ ssh -vvv -p 2022 \
 
 ### Git clone
 
-Clone Gerrit repo through forwarded local port:
+Clone Gerrit repo through the forwarded local port:
 
 ```bash
 git clone ssh://<ENTRA_USERNAME>@localhost:29418/<REPO_NAME>
-git clone ssh://<ENTRA_USERNAME>@localhost:29418/C2I
-Cloning into 'C2I'...
+```
+
+Expected output:
+
+```text
+Cloning into '<REPO_NAME>'...
 Warning: Permanently added '[localhost]:29418' (ED25519) to the list of known hosts.
 remote: Counting objects: 615, done
 remote: Total 145114 (delta 0), reused 145114 (delta 0)
@@ -132,27 +147,36 @@ Resolving deltas: 100% (33188/33188), done.
 
 ### Git Push
 
-Create branch and push:
+Create a branch and push:
 
 ```bash
-➜  C2I git:(master) git checkout -b test
-Switched to a new branch 'test'
+git checkout -b <FEATURE_BRANCH>
+git push
+```
 
-➜  C2I git:(test) git push
-fatal: The current branch test has no upstream branch.
+If the branch has no upstream set, the first push will fail with:
+
+```text
+fatal: The current branch <FEATURE_BRANCH> has no upstream branch.
 To push the current branch and set the remote as upstream, use
 
-    git push --set-upstream origin test
+    git push --set-upstream origin <FEATURE_BRANCH>
+```
 
-To have this happen automatically for branches without a tracking
-upstream, see 'push.autoSetupRemote' in 'git help config'.
+Set upstream and push:
 
-➜  C2I git:(test) git push --set-upstream origin test
+```bash
+git push --set-upstream origin <FEATURE_BRANCH>
+```
+
+Expected output:
+
+```text
 Total 0 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
 remote: Processing changes: refs: 1, done
-To ssh://localhost:29418/C2I
- * [new branch]          test -> test
-branch 'test' set up to track 'origin/test'.
+To ssh://localhost:29418/<REPO_NAME>
+ * [new branch]          <FEATURE_BRANCH> -> <FEATURE_BRANCH>
+branch '<FEATURE_BRANCH>' set up to track 'origin/<FEATURE_BRANCH>'.
 ```
 
 ## Closing sessions
@@ -160,3 +184,19 @@ branch 'test' set up to track 'origin/test'.
 - `Ctrl + C` in tunnel terminal closes Bastion tunnel.
 - `Ctrl + C` in forwarding SSH terminal stops local port forward.
 - Close browser tabs or tools using forwarded localhost endpoints.
+
+## Verification
+
+For each service, confirm connectivity from your local machine after the forward is open:
+
+- **Artemis** — open `http://localhost:8161` in a browser. The Artemis admin login page should load.
+- **Postgres** — run `psql -h localhost -U <DB_USERNAME> -d <DB_NAME>`. A `psql` prompt should appear.
+- **Gerrit** — run `git clone ssh://<ENTRA_USERNAME>@localhost:29418/<REPO_NAME>`. Clone progress should start.
+
+If the local port is open but no response comes, the forward is running but the path from the target VM to the service is blocked. See [Troubleshooting](./troubleshooting.html) for NSG and routing checks.
+
+## Additional Information
+
+- [General SSH use](./general-ssh.html) — establish basic Bastion SSH first.
+- [Troubleshooting](./troubleshooting.html) — port binding, host key, and service unreachable errors.
+- [Additional guidance via links](./additional-guidance-via-links.html) — Microsoft file transfer docs.

@@ -9,15 +9,21 @@ weight: 50
 
 Use this page for common Azure Bastion failures in Crime access flow.
 
-## Quick triage
+## Prerequisites
+
+- Access to Azure CLI and ability to run `az account show`.
+- Ability to check role assignments via Azure Portal or CLI.
+- Enough knowledge of which Bastion, resource group, and VM you are targeting.
+
+## Common Issues and Solutions
+
+### Quick triage
 
 1. Confirm subscription context.
 2. Confirm Bastion and VM IDs are correct.
 3. Confirm role assignments and authentication method.
 4. Confirm local tunnel port is free.
 5. Confirm target service reachable from jump VM.
-
-## Errors and fixes
 
 ### `az network bastion` command not found
 
@@ -72,9 +78,17 @@ ssh-keygen -R "[localhost]:2022"
 ssh-keygen -R "[localhost]:29418"
 ```
 
-## Escalation data to capture
+## Escalation Procedure
+
+If the issue cannot be resolved using this guide, raise with the platform team. Provide the following to speed up diagnosis:
 
 - Full command used (with secrets removed).
 - Exact error text.
 - Bastion name, resource group, target VM resource ID.
 - Time of failure and your source IP.
+
+## Additional Information
+
+- [General SSH use](./general-ssh.html) — verify basic SSH works before debugging forwarding.
+- [SSH Port Forwarding and services](./ssh-port-forwarding-and-services.html) — forwarding patterns and verification steps.
+- [Additional guidance via links](./additional-guidance-via-links.html) — Microsoft Bastion troubleshooting docs.

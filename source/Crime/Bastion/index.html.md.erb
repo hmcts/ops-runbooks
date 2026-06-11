@@ -1,0 +1,46 @@
+---
+title: Azure Bastion Access for Crime Services
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+Use this section to access Crime resources through new Azure Bastions.
+
+## Contents
+
+- [General SSH use](./general-ssh.html)
+- [SSH port forwarding and services](./ssh-port-forwarding-and-services.html)
+- [Using Azure Portal](./using-azure-portal.html)
+- [Troubleshooting](./troubleshooting.html)
+- [Additional guidance via links](./additional-guidance-via-links.html)
+
+## Who this is for
+
+- New users with no prior Bastion knowledge.
+- Experienced engineers who want copy/paste command paths.
+
+## Quick start order
+
+1. Read [General SSH use](./general-ssh.html).
+2. Use [SSH port forwarding and services](./ssh-port-forwarding-and-services.html) for Artemis, Postgres, and Gerrit.
+3. Use [Using Azure Portal](./using-azure-portal.html) for browser-based SSH/RDP path.
+4. Use [Troubleshooting](./troubleshooting.html) when connection fails.
+5. Check [Additional guidance via links](./additional-guidance-via-links.html) for product-level docs.
+
+## Placeholder convention
+
+All examples use obvious placeholders. Replace values before use.
+
+- `<SUBSCRIPTION_NAME_OR_ID>`
+- `<BASTION_NAME>`
+- `<BASTION_RESOURCE_GROUP>`
+- `<TARGET_VM_RESOURCE_GROUP>`
+- `<TARGET_VM_NAME>`
+- `<TARGET_VM_RESOURCE_ID>`
+- `<ENTRA_USERNAME>`
+- `<POSTGRES_FQDN>`
+- `<GERRIT_HOSTNAME>`
+- `<REPO_NAME>`

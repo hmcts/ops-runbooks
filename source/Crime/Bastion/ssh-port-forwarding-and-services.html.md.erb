@@ -1,0 +1,162 @@
+---
+title: SSH Port Forwarding and services
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+Use this page for tunnel + `ssh -L` forwarding to Crime services.
+
+## Contents
+
+- [Pattern](#pattern)
+- [Example: Artemis admin UI](#example-artemis-admin-ui)
+- [Example: Postgres PaaS](#example-postgres-paas)
+- [Example: Gerrit over SSH](#example-gerrit-over-ssh)
+- [Git clone](#git-clone)
+- [Git Push](#git-push)
+- [Closing sessions](#closing-sessions)
+
+## Pattern
+
+1. Open Bastion tunnel to target VM SSH port.
+2. Open SSH session to local tunnel endpoint.
+3. Forward service port with `-L`.
+
+Base tunnel command:
+
+```bash
+az network bastion tunnel \
+  --name "<BASTION_NAME>" \
+  --resource-group "<BASTION_RESOURCE_GROUP>" \
+  --target-resource-id "<TARGET_VM_RESOURCE_ID>" \
+  --resource-port 22 \
+  --port <LOCAL_TUNNEL_PORT>
+```
+
+## Example: Artemis admin UI
+
+Open tunnel:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Forward Artemis admin port:
+
+```bash
+ssh -p 2222 <ENTRA_USERNAME>@localhost -L 8161:localhost:8161
+```
+
+Browse:
+
+```text
+http://localhost:8161
+```
+
+![alt text](images/artemis-admin.png)
+
+## Example: Postgres PaaS
+
+Open tunnel:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Forward Postgres from reachable VM:
+
+```bash
+ssh -p 2022 \
+  -i ~/.ssh/id_rsa \
+  <ENTRA_USERNAME>@localhost \
+  -L 5432:<POSTGRES_FQDN>:5432 \
+  -N
+```
+
+Connect locally:
+
+```bash
+psql -h localhost -U <DB_USERNAME> -d <DB_NAME>
+```
+
+## Example: Gerrit over SSH
+
+Open tunnel to Bastion:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Port Forward Gerrit endpoint:
+
+```bash
+ssh -vvv -p 2022 \
+  -i ~/.ssh/id_rsa \
+  <ENTRA_USERNAME>@localhost \
+  -L 29418:coderepo.mdv.cpp.nonlive:29418 \
+  -N
+```
+
+### Git clone
+
+Clone Gerrit repo through forwarded local port:
+
+```bash
+git clone ssh://<ENTRA_USERNAME>@localhost:29418/<REPO_NAME>
+git clone ssh://<ENTRA_USERNAME>@localhost:29418/C2I
+Cloning into 'C2I'...
+Warning: Permanently added '[localhost]:29418' (ED25519) to the list of known hosts.
+remote: Counting objects: 615, done
+remote: Total 145114 (delta 0), reused 145114 (delta 0)
+Receiving objects: 100% (145114/145114), 42.19 MiB | 11.96 MiB/s, done.
+Resolving deltas: 100% (33188/33188), done.
+```
+
+### Git Push
+
+Create branch and push:
+
+```bash
+➜  C2I git:(master) git checkout -b test
+Switched to a new branch 'test'
+
+➜  C2I git:(test) git push
+fatal: The current branch test has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin test
+
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+
+➜  C2I git:(test) git push --set-upstream origin test
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Processing changes: refs: 1, done
+To ssh://localhost:29418/C2I
+ * [new branch]          test -> test
+branch 'test' set up to track 'origin/test'.
+```
+
+## Closing sessions
+
+- `Ctrl + C` in tunnel terminal closes Bastion tunnel.
+- `Ctrl + C` in forwarding SSH terminal stops local port forward.
+- Close browser tabs or tools using forwarded localhost endpoints.

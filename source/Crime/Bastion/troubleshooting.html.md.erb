@@ -1,0 +1,94 @@
+---
+title: Troubleshooting
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+Use this page for common Azure Bastion failures in Crime access flow.
+
+## Prerequisites
+
+- Access to Azure CLI and ability to run `az account show`.
+- Ability to check role assignments via Azure Portal or CLI.
+- Enough knowledge of which Bastion, resource group, and VM you are targeting.
+
+## Common Issues and Solutions
+
+### Quick triage
+
+1. Confirm subscription context.
+2. Confirm Bastion and VM IDs are correct.
+3. Confirm role assignments and authentication method.
+4. Confirm local tunnel port is free.
+5. Confirm target service reachable from jump VM.
+
+### `az network bastion` command not found
+
+The `az network bastion` subcommands ship as part of the Azure CLI network extension. Older CLI installs may predate this feature or have a stale extension version that does not include the `ssh` and `tunnel` subcommands. Running `az upgrade` updates both the core CLI and all installed extensions to the latest versions, which resolves missing subcommand errors.
+
+```bash
+az upgrade
+```
+
+### Authentication succeeds, SSH or tunnel fails
+
+Azure CLI auth and Bastion resource access are checked separately. Successfully completing `az login` only proves Entra ID identity. The Bastion service still needs Reader access on the Bastion resource, the target VM, and the VM's NIC. If the `--target-resource-id` points to the wrong resource (wrong subscription, wrong resource group, or a resource name typo) the connection will be refused even though auth succeeded. Wrong subscription context is a common cause — the subscription in scope during `az login` may not match the subscription holding the Bastion or VM.
+
+Checks:
+
+- Validate `--target-resource-id` matches exact VM. Use `az vm show --resource-group "<GROUP>" --name "<VM>" --query id -o tsv` to get the exact ID.
+- Validate access to Bastion resource, VM, and NIC with `az role assignment list --assignee "<ENTRA_USERNAME>" --all --output table`.
+- Re-run `az account show` and confirm expected subscription before retrying.
+
+### Tunnel opens, service still unavailable
+
+The Bastion tunnel only provides an encrypted channel from your local machine to the target VM's SSH port. It does not guarantee the target service is reachable from that VM. Once the tunnel is open, the second leg of the connection runs network traffic from the target VM to the downstream service (for example, Postgres or Gerrit). That path is subject to its own NSG rules and routing. If the VM cannot reach the service directly, your forwarded port will appear open locally but refuse connections or time out.
+
+Checks:
+
+- SSH into the target VM first and run `curl` or `nc` (netcat) directly against the service host and port to verify the path works from the VM.
+- Verify NSG rules allow outbound traffic from the target VM subnet to the service.
+- Confirm the service FQDN or IP in the `-L` flag is correct and DNS resolves from within the VM's virtual network.
+- Test alternate local port if a local conflict is suspected.
+
+### `bind: Address already in use`
+
+SSH `-L` forwarding binds a port on your local machine. If another process already holds that port (another open tunnel, a local Postgres instance, or a previous session that did not close cleanly) SSH cannot bind it and will refuse to open the forward. Changing the local port number avoids the conflict. The remote end is unaffected — only the left-hand side of `-L <LOCAL>:<HOST>:<REMOTE>` changes.
+
+Example, using 15432 for local port if `5432` is already used on your device
+
+```bash
+ssh -p 2022 \
+  -i ~/.ssh/id_rsa \
+  <ENTRA_USERNAME>@localhost \
+  -L 15432:<POSTGRES_FQDN>:5432 \
+  -N
+```
+
+### SSH host key mismatch on localhost forwarded ports
+
+When you open a Bastion tunnel to different target VMs over the same local port (for example, port 2022 for VM-A today, port 2022 for VM-B tomorrow) SSH records the host key it saw on first connection and compares it on every subsequent connection. Because you are connecting to `localhost:2022` each time, SSH sees a different key from a different VM and raises a host key mismatch warning. This is expected behaviour and not a security breach, but SSH will block the connection until the stale entry is removed. The `ssh-keygen -R` command removes the stored key for that specific `[localhost]:<port>` entry from your `~/.ssh/known_hosts` file, allowing a fresh host key to be recorded on next connection.
+
+```bash
+ssh-keygen -R "[localhost]:2222"
+ssh-keygen -R "[localhost]:2022"
+ssh-keygen -R "[localhost]:29418"
+```
+
+## Escalation Procedure
+
+If the issue cannot be resolved using this guide, raise with the platform team. Provide the following to speed up diagnosis:
+
+- Full command used (with secrets removed).
+- Exact error text.
+- Bastion name, resource group, target VM resource ID.
+- Time of failure and your source IP.
+
+## Additional Information
+
+- [General SSH use](./general-ssh.html) — verify basic SSH works before debugging forwarding.
+- [SSH Port Forwarding and services](./ssh-port-forwarding-and-services.html) — forwarding patterns and verification steps.
+- [Additional guidance via links](./additional-guidance-via-links.html) — Microsoft Bastion troubleshooting docs.

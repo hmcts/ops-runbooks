@@ -1,0 +1,97 @@
+---
+title: General SSH use
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+Use this page for direct SSH to target VM through Azure Bastion native client.
+
+## Contents
+
+- [Prerequisites](#prerequisites)
+- [How-to steps](#how-to-steps)
+- [Crime example](#crime-example)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+- [Additional Information](#additional-information)
+
+## Prerequisites
+
+1. Azure CLI installed.
+2. Access to Bastion resource and target VM resource.
+3. SSH private key present locally.
+
+Quick checks:
+
+```bash
+az version
+az account show --output table
+```
+
+## How-to steps
+
+1. Sign in to Azure:
+
+```bash
+az login
+az account set --subscription "<SUBSCRIPTION_NAME_OR_ID>"
+```
+
+1. Resolve target VM resource ID:
+
+```bash
+az vm show \
+  --resource-group "<TARGET_VM_RESOURCE_GROUP>" \
+  --name "<TARGET_VM_NAME>" \
+  --query id -o tsv
+```
+
+1. Connect via Bastion:
+
+```bash
+az network bastion ssh \
+  --name "<BASTION_NAME>" \
+  --resource-group "<BASTION_RESOURCE_GROUP>" \
+  --target-resource-id "<TARGET_VM_RESOURCE_ID>" \
+  --auth-type ssh-key \
+  --username "<ENTRA_USERNAME>" \
+  --ssh-key ~/.ssh/id_rsa
+```
+
+## Crime example
+
+Use this pattern with Crime-specific values:
+
+```bash
+az network bastion ssh \
+  --name "<CRIME_BASTION_NAME>" \
+  --resource-group "<CRIME_BASTION_RG>" \
+  --target-resource-id "<CRIME_TARGET_VM_RESOURCE_ID>" \
+  --auth-type ssh-key \
+  --username "<ENTRA_USERNAME>" \
+  --ssh-key ~/.ssh/id_rsa
+```
+
+## Verification
+
+A successful connection will drop you into an interactive shell on the target VM. Verify you are on the expected host:
+
+```bash
+hostname
+uname -n
+```
+
+The output should match the target VM name. If the prompt does not appear within 30 seconds, the connection has failed — check the Bastion name, resource group, and VM resource ID.
+
+## Troubleshooting
+
+See the [Troubleshooting](./troubleshooting.html) page for common failures including command not found, auth errors, and role assignment issues.
+
+## Additional Information
+
+- [SSH Port Forwarding and services](./ssh-port-forwarding-and-services.html) — forward ports after connecting.
+- [Using Azure Portal](./using-azure-portal.html) — browser-based alternative.
+- [Additional guidance via links](./additional-guidance-via-links.html) — Microsoft docs for CLI and SKU details.

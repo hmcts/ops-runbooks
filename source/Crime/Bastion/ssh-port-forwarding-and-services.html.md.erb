@@ -1,0 +1,202 @@
+---
+title: SSH Port Forwarding and services
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+Use this page for tunnel + `ssh -L` forwarding to Crime services.
+
+## Contents
+
+- [Prerequisites](#prerequisites)
+- [Pattern](#pattern)
+- [Example: Artemis admin UI](#example-artemis-admin-ui)
+- [Example: Postgres PaaS](#example-postgres-paas)
+- [Example: Gerrit over SSH](#example-gerrit-over-ssh)
+  - [Git clone](#git-clone)
+  - [Git Push](#git-push)
+- [Closing sessions](#closing-sessions)
+- [Verification](#verification)
+- [Additional Information](#additional-information)
+
+## Prerequisites
+
+- Azure CLI installed and authenticated (`az login`).
+- Access to Bastion resource, target VM, and VM NIC.
+- SSH private key present locally.
+- General SSH working via Bastion. See [General SSH use](./general-ssh.html) first.
+- Target VM must have network path to the downstream service (Postgres, Artemis, Gerrit).
+
+## Pattern
+
+1. Open Bastion tunnel to target VM SSH port.
+2. Open SSH session to local tunnel endpoint.
+3. Forward service port with `-L`.
+
+Base tunnel command:
+
+```bash
+az network bastion tunnel \
+  --name "<BASTION_NAME>" \
+  --resource-group "<BASTION_RESOURCE_GROUP>" \
+  --target-resource-id "<TARGET_VM_RESOURCE_ID>" \
+  --resource-port 22 \
+  --port <LOCAL_TUNNEL_PORT>
+```
+
+## Example: Artemis admin UI
+
+Open tunnel:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Forward Artemis admin port:
+
+```bash
+ssh -p 2222 <ENTRA_USERNAME>@localhost -L 8161:localhost:8161
+```
+
+Browse:
+
+```text
+http://localhost:8161
+```
+
+![alt text](images/artemis-admin.png)
+
+## Example: Postgres PaaS
+
+Open tunnel:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Forward Postgres from reachable VM:
+
+```bash
+ssh -p 2022 \
+  -i ~/.ssh/id_rsa \
+  <ENTRA_USERNAME>@localhost \
+  -L 5432:<POSTGRES_FQDN>:5432 \
+  -N
+```
+
+Connect locally:
+
+```bash
+psql -h localhost -U <DB_USERNAME> -d <DB_NAME>
+```
+
+## Example: Gerrit over SSH
+
+Open tunnel to Bastion:
+
+```bash
+az network bastion tunnel \
+  --name VN-MDV-DMZ-01-bastion \
+  --resource-group RG-MDV-DMZ-01 \
+  --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
+  --resource-port 22 \
+  --port 2022
+```
+
+Port Forward Gerrit endpoint:
+
+```bash
+ssh -vvv -p 2022 \
+  -i ~/.ssh/id_rsa \
+  <ENTRA_USERNAME>@localhost \
+  -L 29418:coderepo.mdv.cpp.nonlive:29418 \
+  -N
+```
+
+### Git clone
+
+Clone Gerrit repo through the forwarded local port:
+
+```bash
+git clone ssh://<ENTRA_USERNAME>@localhost:29418/<REPO_NAME>
+```
+
+Expected output:
+
+```text
+Cloning into '<REPO_NAME>'...
+Warning: Permanently added '[localhost]:29418' (ED25519) to the list of known hosts.
+remote: Counting objects: 615, done
+remote: Total 145114 (delta 0), reused 145114 (delta 0)
+Receiving objects: 100% (145114/145114), 42.19 MiB | 11.96 MiB/s, done.
+Resolving deltas: 100% (33188/33188), done.
+```
+
+### Git Push
+
+Create a branch and push:
+
+```bash
+git checkout -b <FEATURE_BRANCH>
+git push
+```
+
+If the branch has no upstream set, the first push will fail with:
+
+```text
+fatal: The current branch <FEATURE_BRANCH> has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin <FEATURE_BRANCH>
+```
+
+Set upstream and push:
+
+```bash
+git push --set-upstream origin <FEATURE_BRANCH>
+```
+
+Expected output:
+
+```text
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Processing changes: refs: 1, done
+To ssh://localhost:29418/<REPO_NAME>
+ * [new branch]          <FEATURE_BRANCH> -> <FEATURE_BRANCH>
+branch '<FEATURE_BRANCH>' set up to track 'origin/<FEATURE_BRANCH>'.
+```
+
+## Closing sessions
+
+- `Ctrl + C` in tunnel terminal closes Bastion tunnel.
+- `Ctrl + C` in forwarding SSH terminal stops local port forward.
+- Close browser tabs or tools using forwarded localhost endpoints.
+
+## Verification
+
+For each service, confirm connectivity from your local machine after the forward is open:
+
+- **Artemis** — open `http://localhost:8161` in a browser. The Artemis admin login page should load.
+- **Postgres** — run `psql -h localhost -U <DB_USERNAME> -d <DB_NAME>`. A `psql` prompt should appear.
+- **Gerrit** — run `git clone ssh://<ENTRA_USERNAME>@localhost:29418/<REPO_NAME>`. Clone progress should start.
+
+If the local port is open but no response comes, the forward is running but the path from the target VM to the service is blocked. See [Troubleshooting](./troubleshooting.html) for NSG and routing checks.
+
+## Additional Information
+
+- [General SSH use](./general-ssh.html) — establish basic Bastion SSH first.
+- [Troubleshooting](./troubleshooting.html) — port binding, host key, and service unreachable errors.
+- [Additional guidance via links](./additional-guidance-via-links.html) — Microsoft file transfer docs.

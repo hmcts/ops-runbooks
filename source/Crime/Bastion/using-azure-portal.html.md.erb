@@ -1,0 +1,102 @@
+---
+title: Using Azure Portal
+last_reviewed_on: 2026-06-11
+review_in: 6 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+Use this page for browser-based Bastion access from Azure Portal.
+
+## Contents
+
+- [Prerequisites](#prerequisites)
+- [When to use portal flow](#when-to-use-portal-flow)
+- [Portal SSH (Linux VM)](#portal-ssh-linux-vm)
+- [Portal RDP (Windows VM)](#portal-rdp-windows-vm)
+- [Architecture references](#architecture-references)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+- [Additional Information](#additional-information)
+
+## Prerequisites
+
+- Access to [Azure Portal](https://portal.azure.com/).
+- Reader role on the target VM, the VM NIC, and the Azure Bastion resource.
+- A Bastion host deployed in the target VM's virtual network.
+- No local client required — connection runs entirely in the browser.
+
+## When to use portal flow
+
+- Fast manual access.
+- No local SSH/RDP client setup needed.
+- Useful for first-time validation before native CLI path.
+
+## Portal SSH (Linux VM)
+
+1. Open [Azure Portal](https://portal.azure.com/).
+2. Open target Linux VM.
+3. Select `Connect`, then `Connect via Bastion`.
+4. Choose protocol `SSH`.
+5. Choose auth method (prefer Microsoft Entra ID when available).
+6. Select `Connect`.
+
+Reference doc:
+
+- [Create an SSH connection to a Linux VM using Azure Bastion](https://learn.microsoft.com/azure/bastion/bastion-connect-vm-ssh-linux)
+
+## Portal RDP (Windows VM)
+
+1. Open [Azure Portal](https://portal.azure.com/).
+2. Open target Windows VM.
+3. Select `Connect`, then `Bastion`.
+4. In connection settings choose protocol `RDP`.
+5. Set port (default `3389` unless custom configured).
+6. Choose auth method, then select `Connect`.
+
+Reference doc:
+
+- [Create an RDP connection to a Windows VM using Azure Bastion](https://learn.microsoft.com/azure/bastion/bastion-connect-vm-rdp-windows)
+
+## Architecture references
+
+The below are basic architectures show how SSH and RDP work with Azure Bastion
+
+Linux SSH architecture screenshot:
+
+![Azure Bastion SSH architecture](https://learn.microsoft.com/en-gb/azure/bastion/media/connect-vm-ssh-linux/host-architecture-ssh-linux.png)
+
+Windows RDP architecture screenshot:
+
+![Azure Bastion RDP architecture](https://learn.microsoft.com/en-gb/azure/bastion/media/connect-vm-rdp-windows/host-architecture-rdp.png)
+
+Planned local screenshot placeholders for Crime environment:
+
+- `TODO: VM Overview > Connect dropdown > Connect via Bastion`
+- `TODO: Bastion pane with protocol/auth selections`
+- `TODO: Browser SSH session tab`
+- `TODO: Browser RDP session tab`
+
+## Verification
+
+After selecting Connect, Azure opens a new browser tab with a terminal (SSH) or remote desktop (RDP) session.
+
+- **SSH** — a terminal prompt appears in the browser. Run `hostname` to confirm the correct VM.
+- **RDP** — a Windows desktop loads in the browser tab. Check the machine name in System Properties if needed.
+
+If the tab opens but immediately closes or shows an error, check the Bastion SKU supports your selected protocol and port, and confirm your role assignments.
+
+## Troubleshooting
+
+See the [Troubleshooting](./troubleshooting.html) page for role assignment and connection failure steps.
+
+Microsoft also provides troubleshooting guidance for portal connections:
+
+- [Troubleshoot Azure Bastion](https://learn.microsoft.com/azure/bastion/troubleshoot)
+
+## Additional Information
+
+- [General SSH use](./general-ssh.html) — native CLI path as an alternative.
+- [SSH Port Forwarding and services](./ssh-port-forwarding-and-services.html) — port forward from CLI path.
+- [Additional guidance via links](./additional-guidance-via-links.html) — full Microsoft connection docs.

@@ -43,6 +43,10 @@ jobs:
             cspell:node/dict/node.txt
             cspell:aws/aws.txt
             cspell:python/src/common/extra.txt
+            cspell:filetypes/filetypes.txt
+            cspell:cpp/src/compiler-clang-attributes.txt
+            cspell:elixir/dict/elixir.txt
+            cspell:django/dict/django.txt
   build:
     runs-on: ubuntu-latest
     name: 'Build and Test'

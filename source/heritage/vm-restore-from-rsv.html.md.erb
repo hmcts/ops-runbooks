@@ -1,6 +1,6 @@
 ---
 title: VM Restore from Recovery Services Vault (Heritage)
-last_reviewed_on: 2026-06-04
+last_reviewed_on: 2026-06-22
 review_in: 12 months
 weight: 60
 ---
@@ -33,10 +33,10 @@ For cross-subscription restore precedent see the [Atlassian Staging Build runboo
 
 For CNP and CPP platforms, a self-service Azure Pipeline is available in the [`azure-backup-vault`](https://github.com/hmcts/azure-backup-vault) repository. It implements all four restore methods with a PlatOps approval gate and produces a restore-metrics artifact.
 
-| Platform | Pipeline file |
-|----------|--------------|
-| CNP | `azure-pipelines-restore-vm-cnp.yaml` |
-| CPP | `azure-pipelines-restore-vm-cpp.yaml` |
+| Platform | Pipeline file (version link) |
+|----------|-------------------------------|
+| CNP | [`azure-pipelines-restore-vm-cnp.yaml`](https://github.com/hmcts/azure-backup-vault/blob/dtspo-32302-vm-restore-pipeline/azure-pipelines-restore-vm-cnp.yaml) |
+| CPP | [`azure-pipelines-restore-vm-cpp.yaml`](https://github.com/hmcts/azure-backup-vault/blob/dtspo-32302-vm-restore-pipeline/azure-pipelines-restore-vm-cpp.yaml) |
 
 **Key parameters:**
 
@@ -74,6 +74,8 @@ A `restore-metrics.json` artifact is published on every run (including dry runs)
 | C | Replace existing (OriginalLocation) | ~26 min total (~23 min restore job + stop + start) |
 
 > RTOs measured on Standard_D2ds_v5 in uksouth with InstantRP (snapshot tier, ≤7 days). Vault-tier (>7 days) will be 30–90 min longer.
+
+> For the full step-by-step self-service procedure (pre-flight checks, running the pipeline, approval gate, and post-restore verification), see [Self-Service VM Restore from RSV (CPP and CNP)](../azure-pipelines/vm-restore-self-service-cpp-cnp.html).
 
 ---
 

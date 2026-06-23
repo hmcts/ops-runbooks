@@ -115,6 +115,10 @@ The `skeleton/` directory mirrors the GitHub template structure, with Backstage 
 
 **Reference:** [fastapi-template-backstage](https://github.com/hmcts/fastapi-template-backstage)
 
+### Registering in the Backstage catalogue
+
+Once the template repository is created, register it in [backstage-portal](https://github.com/hmcts/backstage-portal) so it appears under "Create" in the software catalogue. Templates are registered in [`app-config.production.yaml`](https://github.com/hmcts/backstage-portal/blob/3374063fddbeaf52de7aa2288fac636507d7cf76/app-config.production.yaml#L150) — add an entry pointing to the `template.yaml` in your new Backstage template repository.
+
 ---
 
 ## 5. Update the Jenkins pipeline
@@ -173,7 +177,7 @@ Run the test suite locally before raising a PR:
 
 Before announcing support, validate the full pipeline end-to-end with a real application in the `hmcts` GitHub organisation.
 
-Use the GitHub template to scaffold the app. The test application should exercise:
+Use the GitHub or Backstage template to scaffold the app. The test application should exercise:
 
 - The full Jenkins pipeline (build, test, Sonar, security check, Docker build, preview deploy)
 - Smoke and functional tests running post-deploy
@@ -195,14 +199,10 @@ Once the test application is working in preview, register it in the appropriate 
 
 ## 8. Write documentation and the golden path
 
-Once support is validated end-to-end, create the developer-facing documentation and register the Backstage template.
+Once support is validated end-to-end, create the developer-facing documentation.
 
 ### Developer documentation
 
 Add a page to [hmcts.github.io](https://github.com/hmcts/hmcts.github.io) under `source/cloud-native-platform/new-component/`. Follow the same structure as the existing developer docs.
 
 **Reference:** [Python services guide](https://hmcts.github.io/cloud-native-platform/new-component/python.html) and its [source](https://github.com/hmcts/hmcts.github.io/blob/main/source/cloud-native-platform/new-component/python.html.md.erb).
-
-### Backstage catalogue
-
-Register the Backstage template in the HMCTS software catalogue so developers can self-serve from the "Create" page. See the Backstage admin documentation for how to register a new template.

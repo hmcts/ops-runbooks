@@ -9,7 +9,7 @@ weight: 230
 
 This guide covers how to add first-class support for a new programming language on the HMCTS platform. Follow the checklist below in order — each step links to its reference section.
 
-Use [Python support](https://github.com/hmcts/cnp-python-base) as the reference implementation throughout. The repositories created for Python are linked in each section as concrete examples.
+We will reference recent work to add Python support to the platform, but the same steps apply to any language.
 
 ## Checklist
 
@@ -39,7 +39,9 @@ Two things to add:
   targetImage: 'imported/distroless/python3'
 ```
 
-**B. Add a cache rule** — add an entry to [`acr-repositories.yaml`](https://github.com/hmcts/acr-base-importer/blob/master/acr-repositories.yaml). Cache rules allow teams to pull the image transparently from `hmctsprod` without hitting the upstream registry directly.
+**B. Add a cache rule (optional)** — depending on the language, teams may need additional upstream images available in ACR beyond the base image. For example, Python requires a multi-stage Docker build where the build stage uses a full Python image (with uv/pip and build tooling) to install dependencies, before copying the result into the distroless runtime image. A cache rule gives teams access to that builder image from `hmctsprod` rather than hitting the upstream registry directly.
+
+If the language runtime image is self-contained and no additional images are needed at build time, this step can be skipped. Add entries to [`acr-repositories.yaml`](https://github.com/hmcts/acr-base-importer/blob/master/acr-repositories.yaml) for any additional images that are required.
 
 See the [acr-base-importer README](https://github.com/hmcts/acr-base-importer#readme) for the full configuration reference.
 

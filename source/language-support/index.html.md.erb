@@ -1,0 +1,204 @@
+---
+title: Adding a new language to the platform
+last_reviewed_on: 2026-06-23
+review_in: 12 months
+weight: 230
+---
+
+# <%= current_page.data.title %>
+
+This guide covers how to add first-class support for a new programming language on the HMCTS platform. Follow the checklist below in order — each step links to its reference section.
+
+Use [Python support](https://github.com/hmcts/cnp-python-base) as the reference implementation throughout. The repositories created for Python are linked in each section as concrete examples.
+
+## Checklist
+
+1. [ ] [Import the upstream base image into ACR](#1-import-the-upstream-base-image)
+2. [ ] [Create the base Docker image](#2-create-the-base-docker-image)
+3. [ ] [Create the base Helm chart](#3-create-the-base-helm-chart)
+4. [ ] [Create service templates](#4-create-service-templates)
+5. [ ] [Update the Jenkins pipeline](#5-update-the-jenkins-pipeline)
+6. [ ] [Create a test application](#6-create-a-test-application)
+7. [ ] [Deploy to AKS via Flux](#7-deploy-to-aks-via-flux)
+8. [ ] [Write documentation and the golden path](#8-write-documentation-and-the-golden-path)
+
+---
+
+## 1. Import the upstream base image
+
+Before building an HMCTS base image you need the upstream image available in our ACR. This is managed by [acr-base-importer](https://github.com/hmcts/acr-base-importer).
+
+Two things to add:
+
+**A. Import the image** — add an entry to `baseImagestoImport` in [`trivy-scan-import.yml`](https://github.com/hmcts/acr-base-importer/blob/master/trivy-scan-import.yml). This imports the image into `hmctsprod` (and optionally `hmctssbox`) on a daily schedule, scanning for critical vulnerabilities before import.
+
+```yaml
+- baseRegistry: 'gcr.io'
+  baseImage: 'distroless/python3-debian13'
+  baseTag: 'latest'
+  targetImage: 'imported/distroless/python3'
+```
+
+**B. Add a cache rule** — add an entry to [`acr-repositories.yaml`](https://github.com/hmcts/acr-base-importer/blob/master/acr-repositories.yaml). Cache rules allow teams to pull the image transparently from `hmctsprod` without hitting the upstream registry directly.
+
+See the [acr-base-importer README](https://github.com/hmcts/acr-base-importer#readme) for the full configuration reference.
+
+---
+
+## 2. Create the base Docker image
+
+Create a new repository named `cnp-{language}-base` in the `hmcts` GitHub organisation.
+
+The base image sits between the upstream distroless/runtime image and application Dockerfiles. Its responsibilities are:
+
+- Installing the language runtime and package manager
+- Pre-wiring observability tooling (Azure Application Insights via OpenTelemetry)
+- Providing a consistent, security-scanned foundation for all services using that language
+
+The application Dockerfile then extends the base image with only application-specific layers.
+
+**Reference:** [cnp-python-base](https://github.com/hmcts/cnp-python-base) — includes the build pipeline, Application Insights wiring, and a `README` documenting the environment variables available to applications.
+
+---
+
+## 3. Create the base Helm chart
+
+Create a new repository named `chart-{language}` in the `hmcts` GitHub organisation.
+
+The base Helm chart provides the standard Kubernetes deployment configuration for services written in that language. It should cover:
+
+- Deployment, Service, and Ingress resources
+- Readiness and liveness probe paths (e.g. `/health/readiness`, `/health/liveness`)
+- Key Vault secret mounting via the CSI driver
+- Environment variable configuration
+- HPA (Horizontal Pod Autoscaler) configuration
+- PostgreSQL sidecar support (if applicable)
+
+The chart is published to [hmcts-charts](https://github.com/hmcts/hmcts-charts) via the release pipeline so it can be consumed as a Helm dependency by application charts.
+
+**Reference:** [chart-python](https://github.com/hmcts/chart-python) — see its README for the full set of configurable values.
+
+---
+
+## 4. Create service templates
+
+Two templates are needed: one for GitHub and one for Backstage. Both scaffold a new service that is immediately pipeline-compatible.
+
+### GitHub template
+
+Create a repository named `{framework}-template-github` (e.g. `fastapi-template-github`).
+
+The template must include:
+
+- Application scaffold with the framework installed and a working entry point
+- `GET /health`, `GET /health/readiness`, `GET /health/liveness` endpoints
+- `Jenkinsfile_CNP`, `Jenkinsfile_nightly`, `Jenkinsfile_parameterized`
+- `sonar-project.properties`
+- Helm chart in `charts/` using the base Helm chart
+- `values.preview.template.yaml` and `values.aat.template.yaml`
+- GitHub Actions CI workflow (lint, test, coverage)
+- `.python-version` or equivalent runtime version file
+- Lock file committed (e.g. `uv.lock`)
+- `README.md` covering local setup, testing, dependencies, security scanning, and Application Insights
+
+**Reference:** [fastapi-template-github](https://github.com/hmcts/fastapi-template-github)
+
+### Backstage template
+
+Create a repository named `{framework}-template-backstage` (e.g. `fastapi-template-backstage`). This wraps the GitHub template with Backstage scaffolding so it appears in the HMCTS software catalogue under "Create".
+
+The `skeleton/` directory mirrors the GitHub template structure, with Backstage template variables (e.g. `${{ values.product }}`, `${{ values.component }}`) substituted throughout.
+
+**Reference:** [fastapi-template-backstage](https://github.com/hmcts/fastapi-template-backstage)
+
+---
+
+## 5. Update the Jenkins pipeline
+
+The common pipeline ([cnp-jenkins-library](https://github.com/hmcts/cnp-jenkins-library)) needs four changes to support a new language.
+
+### Builder class
+
+Create `src/uk/gov/hmcts/contino/{Language}Builder.groovy` extending `AbstractBuilder`. Implement at minimum:
+
+| Method | Purpose |
+|---|---|
+| `build()` | Install dependencies |
+| `test()` | Run unit tests with coverage |
+| `securityCheck()` | Run dependency vulnerability audit, archive report, fail on findings |
+| `sonarScan()` | Run SonarCloud scanner |
+| `smokeTest()` | Run smoke tests post-deploy |
+| `functionalTest()` | Run functional tests post-deploy |
+
+**Reference:** [`PythonBuilder.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/contino/PythonBuilder.groovy)
+
+### PipelineType class
+
+Create `src/uk/gov/hmcts/contino/{Language}PipelineType.groovy`. This wires the Builder to the pipeline and declares the language identifier.
+
+**Reference:** [`PythonPipelineType.groovy`](https://github.com/hmcts/cnp-jenkins-library/blob/master/src/uk/gov/hmcts/contino/PythonPipelineType.groovy)
+
+### Register in pipeline entry points
+
+Add an import and an entry to the `pipelineTypes` map in all three pipeline files:
+
+- `vars/withPipeline.groovy`
+- `vars/withParameterizedPipeline.groovy`
+- `vars/withNightlyPipeline.groovy`
+
+```groovy
+import uk.gov.hmcts.contino.PythonPipelineType
+
+// in pipelineTypes map:
+python: { new PythonPipelineType(this, product, component) }
+```
+
+### Tests
+
+Add a corresponding test class at `test/uk/gov/hmcts/contino/{Language}BuilderTest.groovy`. All existing tests must continue to pass.
+
+Run the test suite locally before raising a PR:
+
+```bash
+./gradlew test
+```
+
+---
+
+## 6. Create a test application
+
+Before announcing support, validate the full pipeline end-to-end with a real application in the `hmcts` GitHub organisation.
+
+Use the GitHub template to scaffold the app. The test application should exercise:
+
+- The full Jenkins pipeline (build, test, Sonar, security check, Docker build, preview deploy)
+- Smoke and functional tests running post-deploy
+- The base Helm chart values files
+- Application Insights (if wired in the base image)
+
+**Reference:** [cnp-plum-fastapi-backend](https://github.com/hmcts/cnp-plum-fastapi-backend)
+
+---
+
+## 7. Deploy to AKS via Flux
+
+Once the test application is working in preview, register it in the appropriate Flux config repo so it is deployed and managed across all environments.
+
+- **CFT clusters:** [cnp-flux-config](https://github.com/hmcts/cnp-flux-config) — see the [app deployment guide](https://github.com/hmcts/cnp-flux-config/blob/master/docs/app-deployment-v2.md)
+- **SDS clusters:** [sds-flux-config](https://github.com/hmcts/sds-flux-config) — follows the same process
+
+---
+
+## 8. Write documentation and the golden path
+
+Once support is validated end-to-end, create the developer-facing documentation and register the Backstage template.
+
+### Developer documentation
+
+Add a page to [hmcts.github.io](https://github.com/hmcts/hmcts.github.io) under `source/cloud-native-platform/new-component/`. Follow the same structure as the existing developer docs.
+
+**Reference:** [Python services guide](https://hmcts.github.io/cloud-native-platform/new-component/python.html) and its [source](https://github.com/hmcts/hmcts.github.io/blob/main/source/cloud-native-platform/new-component/python.html.md.erb).
+
+### Backstage catalogue
+
+Register the Backstage template in the HMCTS software catalogue so developers can self-serve from the "Create" page. See the Backstage admin documentation for how to register a new template.

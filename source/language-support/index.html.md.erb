@@ -67,7 +67,9 @@ The application Dockerfile then extends the base image with only application-spe
 
 Create a new repository named `chart-{language}` in the `hmcts` GitHub organisation.
 
-The base Helm chart provides the standard Kubernetes deployment configuration for services written in that language. It should cover:
+The base Helm chart provides the standard Kubernetes deployment configuration for services written in that language. It extends [chart-library](https://github.com/hmcts/chart-library), which provides the common HMCTS Helm templates (Deployment, Service, Ingress, etc.). The language-specific chart adds sensible defaults on top — things like the application port, health probe paths, and any language-specific sidecar configuration.
+
+It should cover:
 
 - Deployment, Service, and Ingress resources
 - Readiness and liveness probe paths (e.g. `/health/readiness`, `/health/liveness`)

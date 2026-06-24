@@ -39,9 +39,14 @@ Two things to add:
   targetImage: 'imported/distroless/python3'
 ```
 
-**B. Add a cache rule (optional)** — depending on the language, teams may need additional upstream images available in ACR beyond the base image. For example, Python requires a multi-stage Docker build where the build stage uses a full Python image (with uv/pip and build tooling) to install dependencies, before copying the result into the distroless runtime image. A cache rule gives teams access to that builder image from `hmctsprod` rather than hitting the upstream registry directly.
+**B. Import any additional images (optional)** — depending on the language, teams may need additional upstream images available in ACR beyond the base image. For example, Python requires a multi-stage Docker build where the build stage uses a full Python image (with uv/pip and build tooling) to install dependencies, before copying the result into the distroless runtime image.
 
-If the language runtime image is self-contained and no additional images are needed at build time, this step can be skipped. Add entries to [`acr-repositories.yaml`](https://github.com/hmcts/acr-base-importer/blob/master/acr-repositories.yaml) for any additional images that are required.
+If the language runtime image is self-contained and no additional images are needed at build time, this step can be skipped.
+
+How an additional image is made available depends on its source registry:
+
+- **`docker.io` images** — create a cache rule in [`acr-repositories.yaml`](https://github.com/hmcts/acr-base-importer/blob/master/acr-repositories.yaml). This proxies pulls through `hmctsprod` rather than hitting Docker Hub directly.
+- **`ghcr.io` images** — add an import entry to [`trivy-scan-import.yml`](https://github.com/hmcts/acr-base-importer/blob/master/trivy-scan-import.yml), the same way as the base image in step A.
 
 See the [acr-base-importer README](https://github.com/hmcts/acr-base-importer#readme) for the full configuration reference.
 

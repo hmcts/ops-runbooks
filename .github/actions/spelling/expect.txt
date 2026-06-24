@@ -59,10 +59,12 @@ Datlassian
 DBfor
 dbsetup
 dde
+debian
 deevanapalli
 DEVJUMPL
 devrot
 dgwzf
+distroless
 dnat
 dockerfiles
 dsl
@@ -78,6 +80,7 @@ Ente
 ENVCCM
 Eyetan
 failedjobshistorylimit
+fastapi
 fba
 fbf
 federatedidentitycredential
@@ -116,7 +119,6 @@ jira
 JMES
 journalctl
 kalyan
-keyfile
 kiali
 KQL
 kubctl
@@ -163,7 +165,6 @@ onmicrosoft
 openvpn
 overriden
 paramatised
-pcs
 peerings
 pki
 plumsi
@@ -252,8 +253,6 @@ vvv
 wafcc
 wildfly
 wrkagentpool
-wsdl
 xpack
 XXXX
 zlf
-zshrc

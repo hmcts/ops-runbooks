@@ -17,7 +17,9 @@ task :check_urls do
                 # This is a url that's generated each time we build the html by tech-docs-gem but does not exist
                 %r{https://github.com/hmcts/ops-runbooks/blob/master/source/search/index.html},
                 # This handles new files that haven't been merged to master branch yet for this repo in a PR
-                %r{(?=.*ops-runbooks)(?=.*github)}
+                %r{(?=.*ops-runbooks)(?=.*github)},
+                # Staging environment, not reliably accessible
+                'https://crimeportal.staging.apps.hmcts.net'
             ]
         })
 

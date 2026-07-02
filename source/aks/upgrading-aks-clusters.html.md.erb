@@ -182,7 +182,7 @@ Check the front end IP of the relevant `kubernetes-internal` loadbalancer:
 <a id="pdb-adjustments"></a>
 ### The PDB Adjustments with `pdb_disruption_patch.sh`
 
-- go to the repo [PlatOps-Scripts-and-Templates](https://github.com/hmcts/PlatOps-Scripts-and-Templates/), folder "AKS Pathing", 
+- go to the repo [PlatOps-Scripts-and-Templates](https://github.com/hmcts/PlatOps-Scripts-and-Templates/), folder "AKS Patching", 
 and read instruction in the script `pdb_disruption_patch.sh` to understand how it works.
 - main steps are:
   - `./pdb_disruption_patch.sh prepare --run-dir ./runs/demo-00 --context cft-demo-00-aks` # This will create a patch file 'targets.jsonl' in the run directory that will be applied to the cluster to allow for the upgrade to proceed.

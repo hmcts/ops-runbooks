@@ -86,18 +86,23 @@ kubectl get pods --all-namespaces
 kubectl get hr --all-namespaces
 ```
 
-- Check if these pods have pod disruption budgets
+- The PDB (Pod Disruption Budgets)
+
+The PDBs are used to ensure that a certain number of pods are always available during voluntary disruptions. If the PDB 
+associated with the application pod and the Allowed Disruptions is set to 0, do not proceed with the cluster 
+upgrade until this application pod is back up and running, or it will block the upgrade. When it is set to 0, it essentially 
+prohibits any voluntary evictions. This means that no pods can be taken down intentionally during maintenance or disruptions.
 
 ```command
 echo -e "NAMESPACE\t\tDISRUPTIONS_ALLOWED\t\tNAME" && kubectl get pdb -A -o json | jq -r '.items[] | select(.status.disruptionsAllowed==0) | {namespace: .metadata.namespace,disruptionsAllowed: .status.disruptionsAllowed,name: .metadata.name} | [.namespace, .disruptionsAllowed, .name] | @tsv' | sed 's/\t\t/ | /g'
 ```
 
-  <%= warning_text('If the <code>pdb</code> associated with the application pod and the Allowed Disruptions is set to 0 do not proceed with the cluster upgrade until this application pod is back up and running or it will block the upgrade. When it set to 0, it essentially prohibiting any voluntary evictions. This means that no pods can be taken down intentionally during maintenance or disruptions.') %>
-
-- We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster. Please remember to revert the PR after upgrade.
+We can temporarily disable pod distribution budget policy for particular application so that it will allow us to do smoother upgrade of the cluster. Please remember to revert the PR after upgrade.
 
   - [SDS example](https://github.com/hmcts/sds-flux-config/pull/4547/files)
   - [CFT example](https://github.com/hmcts/cnp-flux-config/pull/30547/files)
+
+Alternatively, refer to the section on [PDB Adjustments](#pdb-adjustments) for more details.
 
 
 - For failed helm releases where pods are not deployed, test if rolling back to a previous successful release (which helps narrow down issue being specific to current release).
@@ -132,8 +137,12 @@ helm rollback <chart name>  <version number> -n <namespace>
 
 - To find by an app team, search this [file] (https://github.com/hmcts/cnp-jenkins-config/blob/master/team-config.yml) with the name of the namespace the pod is in. Under the "contact_channel", you will find the app teams slack channel for you to reach out on.
 
-- For a non production environment (or a non live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade, like the following [example](https://github.com/hmcts/cnp-flux-config/blob/8b049088445ee0ac282bb85eb3d28d94f202c252/clusters/ithc/base/kustomization.yaml#L14C2-L14C2).
+- For a non production environment (or a non-live application in production) if the team cannot fix the issue quickly and it is not a common component then comment out the application in flux for the environment to unblock the upgrade, like the following [example](https://github.com/hmcts/cnp-flux-config/blob/8b049088445ee0ac282bb85eb3d28d94f202c252/clusters/ithc/base/kustomization.yaml#L14C2-L14C2).
 
+### Readiness checks with Agent Skills
+
+We now have an Agent Skill, `aks-upgrade-readiness`, available in the HMCTS Github repo [platops-agent-skills](https://app.notion.com/p/cluo12uk/[https://github.com/hmcts/platops-agent-skills](https://github.com/hmcts/platops-agent-skills)). 
+Follow the README.md for instructions on how to use the skill.
 
 ## Common Upgrade Steps
 
@@ -145,7 +154,7 @@ The upgrade process begins by removing the cluster you are going to upgrade from
   - [PR example for SDS here](https://github.com/hmcts/sds-azure-platform/pull/473/files)
   - [PR example for CFT here](https://github.com/hmcts/azure-platform-terraform/pull/580/files)
 
-Please remember when you switching from 00 to 01 on the Application Gateway, and 01 to 00, **it is best practice to have the pipeline complete one step at a time**
+Please remember when you switch from 00 to 01 on the Application Gateway, and 01 to 00, **it is best practice to have the pipeline complete one step at a time**
 
 E.g.  All below steps should be separate pull requests with a successful pipeline run at each step
 
@@ -170,6 +179,16 @@ Check the front end IP of the relevant `kubernetes-internal` loadbalancer:
                         -> click on Frontend IP Configuration
                             -> the IP Address is the one you need
 
+<a id="pdb-adjustments"></a>
+### The PDB Adjustments with `pdb_disruption_patch.sh`
+
+- go to the repo [PlatOps-Scripts-and-Templates](https://github.com/hmcts/PlatOps-Scripts-and-Templates/), folder "AKS Pathing", 
+and read instruction in the script `pdb_disruption_patch.sh` to understand how it works.
+- main steps are:
+  - `./pdb_disruption_patch.sh prepare --run-dir ./runs/demo-00 --context cft-demo-00-aks` # This will create a patch file 'targets.jsonl' in the run directory that will be applied to the cluster to allow for the upgrade to proceed.
+  - `./pdb_disruption_patch.sh apply --run-dir ./runs/demo-00 --context cft-demo-00-aks` # This will apply the patch to the cluster to allow for the upgrade to proceed.
+  - `./pdb_disruption_patch.sh revert --run-dir ./runs/demo-00 --context cft-demo-00-aks` # This will revert the PDB changes after the upgrade is complete.
+
 ## Environment Specific Steps
 
 Some environments do have some additional requirements / checks that need to be confirmed prior to upgrading any of its clusters.
@@ -178,7 +197,7 @@ We upgrade PTL/PTLSbox and Preview/Dev/ITHC (only because we have one ITHC clust
 ### PTLsbox, PTL, AAT
 
 This environment is best to be done early in the morning, that Jenkins may be briefly unavailable on the relevant #cloud-native-announce slack channel.
-Subsequently, please verify the status of [Jenkins instances] for CFT (https://build.hmcts.net/) and SDS (https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.
+Subsequently, please verify the status of Jenkins instances for [CFT](https://build.hmcts.net/) and [SDS](https://sds-build.hmcts.net/) to ensure they are operational following the upgrades.
 
 We upgrade PTL/PTLSbox and Preview/Dev environments by performing an in-place upgrade on the current live cluster. This means we aren't building another cluster or switching in the Application Gateway unless necessary. If one of these environments must instead be rebuilt and swapped over, please refer to the [Rebuilding AKS Clusters guide](https://hmcts.github.io/ops-runbooks/aks/rebuilding-aks-clusters.html#environment-specific).
 

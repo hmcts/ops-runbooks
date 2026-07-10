@@ -25,9 +25,9 @@ This process applies to both CNP and SDS hub firewalls.
 1. Detect latest Threat Content release from PAN-OS update feed.
 2. Propose or update pinned version in environment tfvars.
 3. Promote in stages:
-   - `sbox-int` first
-   - `nonprodi` after 7 days soak
-   - `prod-int` after 21 days soak
+   - `sbox-int` is applied right away
+   - `nonprodi` is applied 1 week later
+   - `prod-int` is applied 3 weeks after `nonprodi`
 4. Terraform apply triggers Ansible.
 5. Ansible validates target version and package, then installs if needed.
 6. Ansible skips install if current version already matches the pin.
@@ -50,7 +50,6 @@ This process applies to both CNP and SDS hub firewalls.
 - `check_and_pr.py` queries PAN-OS update information.
 - Latest version is selected by release timestamp, not only numeric ordering.
 - A pull request is raised or updated with tfvars changes for the next environment in the rollout. [Example](https://github.com/hmcts/hub-terraform-infra/pull/287)
-
 ### 2. Pin target version in tfvars
 - `pan_threat_content_version` controls the desired content package.
 - Example format: `9122-10145`.
@@ -87,9 +86,10 @@ Use environment-specific tfvars and pipeline targets, but maintain the same cont
 
 ### Required PlatOps inputs
 1. Approve and merge rollout pull requests for each environment stage.
-2. Confirm soak windows are respected:
-   - 7 days before `nonprodi`
-   - 21 days before `prod-int`
+2. Confirm rollout timings are respected:
+   - `sbox-int` is applied immediately
+   - `nonprodi` is applied 1 week after `sbox-int`
+   - `prod-int` is applied 3 weeks after `nonprodi`
 3. Decide go/no-go if threat intelligence or change risk requires a hold.
 4. Trigger or approve Terraform apply where operational controls require a manual gate.
 

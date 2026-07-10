@@ -72,16 +72,8 @@ When pinning is enabled, Ansible:
 <file>panupv2-all-contents-<version>.tgz</file>
 ```
 
-## CNP and SDS Operational Model
-The same staged promotion model and operational checks apply to both CNP and SDS hub environments.
-
-Use environment-specific tfvars and pipeline targets, but maintain the same controls:
-- Promote only after successful validation in the current stage.
-- Respect soak windows before downstream promotion.
-- Hold rollout when risk signals indicate elevated change risk.
-
 ## PlatOps Inputs and Responsibilities
-<%= warning_text('For prod-int promotion, should be applied outside of core business hours.') %>
+<%= warning_text('For production promotion, terraform should be applied outside of core business hours.') %>
 
 ### Required PlatOps inputs
 1. Approve and merge rollout pull requests for each environment stage.

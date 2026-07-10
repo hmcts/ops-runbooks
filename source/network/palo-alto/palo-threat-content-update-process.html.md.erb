@@ -1,0 +1,140 @@
+---
+title: Palo Alto Threat Content Update Process
+last_reviewed_on: 2026-07-10
+review_in: 12 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## Purpose
+This runbook describes how Palo Alto Threat Content updates are detected, pinned, promoted across environments, and installed by automation.
+
+## Scope
+Applies to Hub Infra firewalls managed by Terraform and Ansible in the [hmcts/hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra) repository.
+
+This process applies to both CNP and SDS hub firewalls.
+
+## Prerequisites
+- Access to [hmcts/hub-terraform-infra](https://github.com/hmcts/hub-terraform-infra)
+- Access to the Terraform pipeline used for Hub Infra firewall changes
+- Access to pipeline logs for Terraform and Ansible stages
+- Understanding of environment promotion order and CAB/change controls
+
+## High-Level Flow
+1. Detect latest Threat Content release from PAN-OS update feed.
+2. Propose or update pinned version in environment tfvars.
+3. Promote in stages:
+   - `sbox-int` is applied right away
+   - `nonprodi` is applied 1 week later
+   - `prod-int` is applied 3 weeks after `nonprodi`
+4. Terraform apply triggers Ansible.
+5. Ansible validates target version and package, then installs if needed.
+6. Ansible skips install if current version already matches the pin.
+
+## Key Repository Components
+### Detection and promotion scripts
+- `scripts/pan-threat-content/check_and_pr.py`
+- `scripts/pan-threat-content/rollout_promote.py`
+
+### Environment pins
+- `environments/hub_infra-sbox-int.tfvars`
+- `environments/hub_infra-nonprodi.tfvars`
+- `environments/hub_infra-prod-int.tfvars`
+
+### Ansible install logic
+- `components/modules/palo-alto/ansible/roles/palo/tasks/main.yml`
+
+## Detailed Process
+### 1. Detect latest available content
+- `check_and_pr.py` queries PAN-OS update information.
+- Latest version is selected by release timestamp, not only numeric ordering.
+- A pull request is raised or updated with tfvars changes for the next environment in the rollout. [Example](https://github.com/hmcts/hub-terraform-infra/pull/287)
+### 2. Pin target version in tfvars
+- `pan_threat_content_version` controls the desired content package.
+- Example format: `9122-10145`.
+- Pinning is environment-specific to support staged rollout.
+
+### 3. Terraform apply and Ansible execution
+Terraform runs remote Ansible tasks for firewall management.
+
+When pinning is enabled, Ansible:
+1. Reads update information and parses available versions and package files.
+2. Confirms the pinned version is advertised.
+3. Resolves package filename and appends `.tgz`.
+4. Reads currently installed app-version from `show system info`.
+5. Installs only when current version differs from the pin.
+
+### 4. Install method used
+- Direct `install version <explicit>` is not used for this platform build.
+- Automation uses XML op install by package file:
+
+```xml
+<file>panupv2-all-contents-<version>.tgz</file>
+```
+
+## CNP and SDS Operational Model
+The same staged promotion model and operational checks apply to both CNP and SDS hub environments.
+
+Use environment-specific tfvars and pipeline targets, but maintain the same controls:
+- Promote only after successful validation in the current stage.
+- Respect soak windows before downstream promotion.
+- Hold rollout when risk signals indicate elevated change risk.
+
+## PlatOps Inputs and Responsibilities
+<%= warning_text('For prod-int promotion, ensure CAB/change-management requirements are met before apply and keep evidence in the change record.') %>
+
+### Required PlatOps inputs
+1. Approve and merge rollout pull requests for each environment stage.
+2. Confirm rollout timings are respected:
+   - `sbox-int` is applied immediately
+   - `nonprodi` is applied 1 week after `sbox-int`
+   - `prod-int` is applied 3 weeks after `nonprodi`
+3. Decide go/no-go if threat intelligence or change risk requires a hold.
+4. Trigger or approve Terraform apply where operational controls require a manual gate.
+
+### Operational checks by PlatOps
+1. Confirm pipeline completed without Ansible validation or install errors.
+2. Review logs for:
+   - parsed available package files
+   - resolved `pan_threat_content_target_file`
+   - install payload and result status
+3. Verify post-change installed version on firewalls where required by policy.
+
+### When PlatOps intervention is required
+1. Pinned version is not advertised by firewall update feed.
+2. Package filename cannot be resolved to `.tgz`.
+3. Current app-version cannot be parsed from `show system info` output.
+4. PAN-OS API returns invalid XML or install command errors.
+5. Emergency rollback or rollout freeze is needed.
+
+## Failure Handling
+1. Do not promote to next environment until current stage is healthy.
+2. Keep current stable pin in downstream environments.
+3. Open an incident or ticket with:
+   - pipeline run link
+   - failing task name
+   - PAN-OS/API error payload
+   - affected environment and firewall IPs
+4. If needed, set or restore previous known-good `pan_threat_content_version` and re-apply.
+
+## Rollback Approach
+1. Update environment tfvars pin back to the last known-good version.
+2. Run Terraform apply to execute Ansible install for that pinned package.
+3. Validate version and health checks before resuming staged promotion.
+
+## Verification
+- Confirm merged tfvars shows expected `pan_threat_content_version` for target environment.
+- Confirm Terraform apply succeeded and Ansible tasks passed.
+- Confirm logs show target package file resolved and install result success (or explicit skip due to matching installed version).
+- Confirm firewall reported app-version matches pinned version after apply.
+
+## Notes
+- Successful detection of a newer release does not imply immediate promotion to all environments.
+- Staged rollout and soak windows are the primary risk controls.
+- Keep this process aligned with CAB/change-management requirements.
+
+## Related Documentation
+- [Palo Alto & Panorama index](index.html)
+- [Troubleshooting issues](palos-troubleshooting.html)
+- [Upgrading Palo Alto firewall Software](palos-upgrade.html)

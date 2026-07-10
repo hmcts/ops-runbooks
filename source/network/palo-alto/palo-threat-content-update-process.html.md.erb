@@ -61,7 +61,7 @@ Terraform runs remote Ansible tasks for firewall management.
 When pinning is enabled, Ansible:
 1. Reads update information and parses available versions and package files.
 2. Confirms the pinned version is advertised.
-3. Resolves package filename and normalises to `.tgz`.
+3. Resolves package filename and appends `.tgz`.
 4. Reads currently installed app-version from `show system info`.
 5. Installs only when current version differs from the pin.
 

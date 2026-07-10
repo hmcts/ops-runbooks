@@ -256,3 +256,5 @@ wrkagentpool
 xpack
 XXXX
 zlf
+panupv
+tgz

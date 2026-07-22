@@ -1,0 +1,13 @@
+### Enable Cost Analysis
+
+Cost analysis is required until Terraform support is available.
+
+```bash
+az aks update --resource-group <cluster-rg> --name <cluster> --enable-cost-analysis
+```
+
+Verify the pod is running:
+
+```bash
+kubectl get deploy cost-analysis-agent -n kube-system
+```

@@ -1,0 +1,36 @@
+<%
+  # Generic renderer for a content-filtered step list.
+  #
+  # Locals (all required):
+  #   category_structure — Hash of { 'LABEL' => ['step-name', ...] }
+  #   category_order     — Comma-separated string of button order, e.g. 'DEV,STE,SIT'
+  #   partials_directory — Partial path prefix, e.g. 'aks/partials/crime-switchover'
+  #
+  # Optional:
+  #   filter_label     — Overrides the default 'Make a selection:' prompt
+  #   no_selection_msg — Overrides the default placeholder message
+  #
+  # The superset order and data-filter-values are computed automatically.
+  # Authors should never need to edit this file.
+
+  superset = []
+  category_structure.each_value { |steps| steps.each { |s| superset << s unless superset.include?(s) } }
+  step_categories = superset.map { |step| [step, category_structure.select { |_, v| v.include?(step) }.keys] }
+
+  _filter_label     = defined?(filter_label)     && filter_label     ? filter_label     : nil
+  _no_selection_msg = defined?(no_selection_msg) && no_selection_msg ? no_selection_msg : 'Please make a selection above.'
+%>
+<%= partial '/partials/content_filter', locals: { filter_order: category_order }.tap { |l| l[:filter_label] = _filter_label if _filter_label } %>
+
+<div class="content-filter-container">
+<div class="content-filter-no-selection">
+<p><%= _no_selection_msg %></p>
+</div>
+<% step_categories.each do |step, categories| %>
+<div data-filter-values="<%= categories.join(' ') %>">
+<div class="step-section">
+<%= partial "#{partials_directory}/step-#{step}" %>
+</div>
+</div>
+<% end %>
+</div>

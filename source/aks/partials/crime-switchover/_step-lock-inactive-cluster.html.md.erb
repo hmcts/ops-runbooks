@@ -1,0 +1,39 @@
+### Lock Inactive Cluster
+
+Post cluster switchover, lock down the old cluster access so it becomes inactive.
+
+#### Step 1: Update user_rbac in aks-config Repo
+
+Update `user_rbac` in the var file for the inactive cluster to an empty list for the following groups:
+
+- `aks_reader_members_ids`
+- `aks_contributor_members_ids`
+- `aks_cluster_admin_members_ids`
+
+**Reference:** [cpp-terraform-azurerm-aks-config/pull/134](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/pull/134)
+
+**Steps:**
+
+1. Create a branch from the release branch:
+   ```bash
+   cd cpp-terraform-azurerm-aks-config
+   git fetch origin
+   git checkout release/<aks-version>  # e.g., release/1.34
+   git pull origin release/<aks-version>
+   git switch -c [jira-ref]/lock-inactive-[cluster-name]-[env]
+   ```
+2. Update inactive cluster vars by clearing the list for `user_rbac` variable
+3. Merge the changes to the **release branch** (e.g., `release/1.34`) and apply (ensure the plan shows only changes with respect to user resource)
+
+#### Step 2: Remove Vault Entries
+
+Remove the vault entry for the following service accounts to restrict deployments via Jenkins. Update `aks_cluster_name` to the cluster that will be inactive:
+
+- `secret/terraform/${var.environment}/${var.aks_cluster_name}/jenkins_deploy_clusterrole_kubeconfig`
+- `secret/terraform/${var.environment}/${var.aks_cluster_name}/jenkins_admin_clusterrole_kubeconfig`
+
+#### Step 3: Restrict DevOps User Access
+
+Empty the following group in the aks repo: `aks_cluster_admins_aad_group_ids`
+
+After updating the var files, get them reviewed and run `terraform plan/apply` on the inactive cluster. After performing all the above steps, verify access is restricted by performing `az login`.

@@ -1,0 +1,32 @@
+## Troubleshooting
+
+### When Building Cluster
+
+**Issue:** Key Vault Data Access Administrator Error
+
+When running the AKS Config pipeline, you may encounter an error related to the Key Vault Data Access Administrator role (which was in preview state when older clusters were built).
+
+**Error Message:**
+
+```
+Error: Provider produced inconsistent final plan
+
+When expanding the plan for
+module.aks_base_config.kubectl_manifest.store_azure_info1 to include new
+values learned so far during apply, provider
+"registry.terraform.io/gavinbunney/kubectl" produced an invalid new value
+for .yaml_body_parsed: was cty.StringVal("apiVersion: v1\ndata:\n
+AvereContributor:
+/providers/Microsoft.Authorization/roleDefinitions/4f8fab4f-1852-4a58-a46a-8eaf358af14a\n
+...
+```
+
+**Solution:**
+
+Delete the `role-definition` ConfigMap from the `azure-info` namespace and rerun the Terraform pipeline:
+
+```bash
+kubectl delete cm role-definition -n azure-info
+```
+
+Then rerun the aks-config pipeline.

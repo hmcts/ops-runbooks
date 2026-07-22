@@ -1,4 +1,6 @@
 //= require govuk_tech_docs
+//= require content-filter
+//= require page-toc
 
 var tabsItemClass = 'app-tabs__item';
 var tabsItemCurrentClass = tabsItemClass + '--current';

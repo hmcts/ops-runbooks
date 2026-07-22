@@ -186,6 +186,217 @@ $govuk-font-family: nta, Helvetica, sans-serif;
   padding-bottom: 0;
 }
 
-.platform-selector {
-  margin-bottom: 1rem;
+// =========================================================
+// Content filter (content-filter.js)
+// =========================================================
+
+.content-filter {
+  margin: govuk-spacing(4) 0 govuk-spacing(6);
+  padding: govuk-spacing(4);
+  background-color: #f3f2f1; // govuk-colour("light-grey")
+  border-left: 4px solid #1d70b8; // govuk-colour("blue")
+}
+
+.content-filter__label {
+  @include govuk-font(19);
+  font-weight: bold;
+  margin: 0 0 govuk-spacing(3) 0;
+
+  // Reset app-prose-scope paragraph margin override if present
+  .app-prose-scope & {
+    margin-bottom: govuk-spacing(3);
+  }
+}
+
+.content-filter__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  margin: 0;
+  padding: 0;
+}
+
+.content-filter__btn {
+  @include govuk-font(16);
+  padding: govuk-spacing(1) govuk-spacing(3);
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 2px solid #b1b4b6; // govuk-colour("mid-grey")
+  color: #0b0c0c; // govuk-colour("black")
+
+  &:hover {
+    background-color: #f3f2f1;
+    border-color: #0b0c0c;
+  }
+
+  &:focus {
+    outline: 3px solid #fd0; // govuk focus yellow
+    outline-offset: 0;
+    background-color: #fd0;
+    color: #0b0c0c;
+  }
+
+  &--active {
+    background-color: #1d70b8; // govuk-colour("blue")
+    border-color: #1d70b8;
+    color: #ffffff;
+
+    &:hover {
+      background-color: #003078; // govuk-colour("dark-blue")
+      border-color: #003078;
+    }
+  }
+}
+
+// Override the gem's 40em prose cap
+// max-width is set on .technical-documentation inside .page-layout below
+.technical-documentation {
+  max-width: 900px;
+}
+
+// Page layout: prose + right-side TOC
+// =========================================================
+
+.page-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: govuk-spacing(8);
+}
+
+.page-layout .technical-documentation {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+}
+
+// Right-side in-page TOC
+.page-toc {
+  flex: 0 0 260px;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 80px);
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  border-left: 4px solid #b1b4b6;
+  padding-left: govuk-spacing(4);
+  margin-top: govuk-spacing(6);
+  // Thin scrollbar where supported
+  scrollbar-width: thin;
+  scrollbar-color: #b1b4b6 transparent;
+}
+
+.page-toc__title {
+  @include govuk-font(16);
+  font-weight: bold;
+  color: #505a5f; // govuk-colour("secondary")
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 govuk-spacing(3) 0;
+}
+
+.page-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page-toc__item {
+  margin-bottom: govuk-spacing(2);
+
+  &--h3 {
+    padding-left: govuk-spacing(3);
+  }
+}
+
+.page-toc__link {
+  @include govuk-font(16);
+  color: #505a5f;
+  text-decoration: none;
+
+  &:hover {
+    color: #0b0c0c;
+    text-decoration: underline;
+  }
+
+  &--active {
+    color: #1d70b8;
+    font-weight: bold;
+  }
+}
+
+hr.section-divider {
+  border: none;
+  border-top: 3px solid #b1b4b6; // govuk-colour("mid-grey")
+  margin: govuk-spacing(9) 0;
+}
+
+// Outer blue container — wraps all filtered content for a section.
+// JS sets data-active-filter so the ::before badge reflects the active selection.
+.content-filter-container {
+  margin-top: govuk-spacing(8) + 24px; // extra room for the badge above
+  margin-bottom: govuk-spacing(8);
+  padding: govuk-spacing(7) govuk-spacing(5) govuk-spacing(5);
+  border-top: 4px solid #1d70b8; // govuk-colour("blue")
+  background-color: rgba(29, 112, 184, 0.05);
+  position: relative;
+
+  // Active selection badge floating above the top border
+  &[data-active-filter]::before {
+    content: attr(data-active-filter);
+    position: absolute;
+    top: -4px;
+    left: 0;
+    transform: translateY(-100%);
+    background-color: #1d70b8;
+    color: #ffffff;
+    @include govuk-font(16);
+    font-weight: bold;
+    padding: govuk-spacing(1) govuk-spacing(3);
+    border-radius: 3px 3px 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  // Space between filtered content blocks.
+  > [data-filter-values] {
+    margin-bottom: govuk-spacing(7);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// "No selection" placeholder inside .content-filter-container.
+// Hidden by JS once a selection is made.
+.content-filter-no-selection {
+  padding: govuk-spacing(5);
+  border: 2px dashed #b1b4b6;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #505a5f; // govuk-colour("secondary")
+  @include govuk-font(19);
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Step card — white box inside the blue container.
+.step-section {
+  padding: govuk-spacing(5);
+  border: 2px solid #b1b4b6; // govuk-colour("mid-grey")
+  border-radius: 4px;
+  background-color: #ffffff;
+
+  // First heading sits flush with the top of the box
+  h3:first-of-type {
+    margin-top: 0;
+  }
+
+  // Last element doesn't double-up bottom spacing
+  > *:last-child {
+    margin-bottom: 0;
+  }
 }

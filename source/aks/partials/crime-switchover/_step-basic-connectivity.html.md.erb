@@ -1,0 +1,15 @@
+### Basic Connectivity Testing
+
+Activate VPN and test connectivity from your workstation. This will verify that the new cluster is reachable and that the ingress controller is functioning correctly:
+
+```bash
+curl -k https://sitccm01.ingress01.sit.nl.cjscp.org.uk:443/usersgroups-service/internal/metrics/ping
+```
+
+Test from a server in the target environment (e.g., `ENVCCM01ACTAP##.cpp.nonlive`):
+
+```bash
+curl -k https://sitccm01-api-lb.sit.cpp.nonlive:443/usersgroups-service/internal/metrics/ping
+```
+
+Both should return `pong`.

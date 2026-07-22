@@ -1,0 +1,28 @@
+## Prerequisites
+
+### Approval and Scheduling
+
+- Obtain approval for the switchover work for non-live environments
+- For PRP and PRD: **Raise a Request for Change (RFC) in Halo**
+- Schedule the switchover during designated maintenance windows
+- Create the new AKS cluster one day before go-live date (except PRP/PRD which require RFCs)
+
+### Release Branch for Workload Deployments
+
+Before beginning the switchover, identify the correct cpp-pipeline release branch for the target environment. You can determine this by inspecting the currently deployed workloads:
+
+```bash
+helm ls -n ns-<env>-ccm-01
+```
+
+Example output:
+
+```
+NAME                           	NAMESPACE    	REVISION	UPDATED                                	STATUS  	CHART                	APP VERSION
+example-service            	ns-dev-ccm-08	2       	2026-04-08 11:07:30.183452632 +0000 UTC	deployed	wildfly-app-0.25.3   	dev/2608
+```
+
+The `APP VERSION` column indicates the release branch to use (e.g., `dev/2608` means the cpp-pipeline release branch is `dev/2608`).
+
+If you cannot determine the branch this way, ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://tools.hmcts.net/confluence/spaces/HSS/pages/1694702148/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document.
+

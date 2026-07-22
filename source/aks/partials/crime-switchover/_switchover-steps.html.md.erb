@@ -1,0 +1,131 @@
+<%
+  # Define each environment's steps in the order they should be performed.
+  # This is the only place you need to edit to add, remove, or reorder steps.
+  # The rendering logic below computes the superset order and data-envs
+  # automatically — you never need to write data-envs attributes by hand.
+  env_steps = {
+    'DEV' => %w[
+      access-dts-services
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-mi-ado-agent
+      update-jenkins-config
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'STE' => %w[
+      access-dts-services
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-mi-ado-agent
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'SIT' => %w[
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'NFT' => %w[
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRP' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      deploy-reporting-cronjobs
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRD' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      deploy-reporting-cronjobs
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      apply-progression-scaling
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRX' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ]
+  }
+
+  # Derive the superset step order by walking each env's list in definition
+  # order and appending any step not yet seen. This preserves the relative
+  # ordering each env author intended while producing a single DOM sequence.
+  superset = []
+  env_steps.each_value { |steps| steps.each { |s| superset << s unless superset.include?(s) } }
+
+  # For each step in superset order, collect the categories it belongs to.
+  step_categories = superset.map { |step| [step, env_steps.select { |_, v| v.include?(step) }.keys] }
+%>
+
+## Cluster Switchover Steps
+
+<%= partial '/partials/content_filter', locals: { filter_order: 'DEV,STE,SIT,NFT,PRP,PRD,PRX' } %>
+
+<div class="content-filter-container">
+<div class="content-filter-no-selection">
+<p>Please make a selection above.</p>
+</div>
+<% step_categories.each do |step, categories| %>
+<div data-filter-values="<%= categories.join(' ') %>">
+<div class="step-section">
+<%= partial "aks/partials/crime-switchover/#{step}" %>
+</div>
+</div>
+<% end %>
+</div>

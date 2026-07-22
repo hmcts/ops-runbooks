@@ -1,0 +1,10 @@
+### Request Environment Shuttering
+
+Before proceeding with the cluster switchover in PROD, request SRE resources to shutter the environment. This includes:
+
+- Web Application Firewall (WAF)
+- Other components that are typically shuttered during production releases
+
+**Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://tools.hmcts.net/confluence/spaces/HSS/pages/1580172783/Run+PGBASEBACKUP+on+Sunday+in+PROD)
+
+> **Note:** From the referenced document, perform **steps 1 to 7** for shuttering and **steps 10 to 15** for unshuttering. Other steps in that document are related to backups and can be ignored for the cluster switchover process.

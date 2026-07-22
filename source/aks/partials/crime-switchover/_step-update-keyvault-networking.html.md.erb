@@ -1,0 +1,17 @@
+### Update Key Vault Networking
+
+Configure the Key Vault to allow access from the new cluster VNET.
+
+1. Go to **Key Vault** → `KV-<ENV>-CCP01` in the Azure portal
+2. Click **Networking** tab and check the firewall access policy
+
+**If "Allow public access from all networks":** No change required
+
+**If "Allow public access from specific virtual networks and IP addresses":**
+
+1. Click **Add virtual network** → **Add existing virtual network**
+2. Select the new cluster VNET & subnet (select only APP Subnet)
+3. Click **Enable**
+4. Click **Save/Apply**
+5. Verify the cluster VNET and subnet appear under Virtual networks section
+6. **After updating the new VNET details, delete the old VNET details**

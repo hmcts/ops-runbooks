@@ -1,0 +1,23 @@
+### Update mi-ado-agent Managed Identity
+
+Update the `mi-ado-agent` Managed Identity with the OIDC URL of the new cluster on the HMCTS.net Subscription. **The URL must contain a trailing slash.**
+
+**Portal location:** Log in to the **hmcts.net** tenant, then navigate to [Federated Credentials](https://portal.azure.com/#@HMCTS.NET/resource/subscriptions/ef8dd153-3fba-47a4-be65-15775bcde240/resourceGroups/CORE/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-ado-agent/federatedcredentials)
+
+Get the new cluster's OIDC URL:
+
+```bash
+az aks show --name <new_cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+```
+
+Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/0dccffda-21f3-4db3-bca7-9f8392cf3587/`
+
+**Update the Cluster Issuer URL** in the federated credentials for your cluster:
+
+| Cluster | Federated Credential Names to Update |
+|---------|--------------------------------------|
+| **K8-DEV-CS01-CL01** | `k8-dev-cs01-cl01-ado`, `k8-dev-cs01-cl01-ado-agent` |
+| **K8-STE-CS01-CL01** | `k8-ste-cs01-cl01-ado`, `k8-ste-cs01-cl01-ado-agent` |
+| **K8-DEV-CS01-CL02** | `ado-agent-aks-dev01`, `ado-agent-aks-dev01-keda-operator` |
+
+> **Note:** Only the **Cluster Issuer URL** needs to change. The namespace and service account values remain the same.

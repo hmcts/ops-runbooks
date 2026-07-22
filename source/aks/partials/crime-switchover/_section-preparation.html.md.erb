@@ -1,0 +1,112 @@
+## Preparation
+
+Before beginning the switchover process, prepare the [cpp-terraform-azurerm-aks](https://github.com/hmcts/cpp-terraform-azurerm-aks) and [cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config) repositories.
+
+### AKS Repository
+
+**Purpose:** Contains code to build the cluster and all related resources (Virtual Network, subnets, private endpoints, etc.)
+
+#### 1. Create Release Branch
+
+> **Recommended:** Create a release branch to isolate all switchover changes across environments. This allows gradual rollout (DEV → SIT → NFT → PRP → PRD) and a final merge to `main` only after all environments are verified.
+
+Clone the repository (if not already cloned) and create a release branch:
+
+```bash
+git clone https://github.com/hmcts/cpp-terraform-azurerm-aks.git
+cd cpp-terraform-azurerm-aks
+git switch main && git pull --rebase
+git switch -c release/<aks-version>
+# Example: release/1.34
+```
+
+Then create your environment-specific branch from this release branch:
+
+```bash
+git switch -c [jira-ref]/[env]-aks-<new-version>-upgrade
+# Example: EI-2230/dev-aks-1.34-upgrade
+```
+
+#### 2. Modify the Relevant .tfvars File
+
+Update the Kubernetes version parameters:
+
+```hcl
+kubernetes_version   = "1.28.3"  # --> "1.30.3"
+orchestrator_version = "1.28.3"  # --> "1.30.3"
+```
+
+- Change any other references required for your upgrade
+- **Example PR:** [cpp-terraform-azurerm-aks/pull/121](https://github.com/hmcts/cpp-terraform-azurerm-aks/pull/121/files)
+- If creating a new `env.tfvars`, refer to the Network and Azure Components documentation
+
+### AKS Config Repository
+
+**Purpose:** Contains application code to deploy vital system components (Istio, Prometheus, Gatekeeper, etc.) to the AKS cluster.
+
+#### 1. Understand the Branching Strategy
+
+- **Module Repository** ([cpp-module-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-module-terraform-azurerm-aks-config)): Uses tags to mark specific, immutable versions corresponding to AKS versions (e.g., v1.28.3)
+- **Root Repository** ([cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config)): Uses branches to manage environment-specific configurations (e.g., main, aks-1.28.3)
+
+#### 2. Create Release Branch
+
+> **Recommended:** Use the same release branch strategy as the AKS repository for consistency.
+
+Clone the repository (if not already cloned) and create a release branch:
+
+```bash
+git clone https://github.com/hmcts/cpp-terraform-azurerm-aks-config.git
+cd cpp-terraform-azurerm-aks-config
+git switch main && git pull --rebase
+git switch -c release/<aks-version>
+# Example: release/1.34
+```
+
+Then create your environment-specific branch from this release branch:
+
+```bash
+git switch -c [jira-ref]/[env]-aks-<new-version>-upgrade
+# Example: EI-2230/dev-aks-1.34-upgrade
+```
+
+#### 3. Review tfvars File
+
+Ensure your environment's `.tfvars` code is correct and up to date:
+
+- Double-check all versions are updated
+- Verify the `user_rbac` map is updated with groups (this allows users to access the cluster; if empty, no one can access it)
+- In `main.tf`, ensure the module source points to `main`:
+
+```hcl
+module "aks_base_config" {
+  source = "git::https://github.com/hmcts/cpp-module-terraform-azurerm-aks-config.git?ref=main"
+}
+```
+
+**Example PR:** [cpp-terraform-azurerm-aks-config/pull/217](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/pull/217/files)
+
+### Build Cluster via Pipelines
+
+Once branches are up to date, raise Pull Requests and run the ADO pipelines for aks and aks-config.
+
+#### 1. Raise Pull Requests
+
+- Verify everything is correct
+- Raise a pull request and get it peer-reviewed
+
+#### 2. Run the ADO Pipelines
+
+**AKS Pipeline** (run this first):
+
+- **Pipeline:** [AKS Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=44)
+- **Branch:** Your feature branch (e.g., `EI-2230/dev-aks-1.30.3-upgrade`)
+- **Environment:** Select the cluster you are building
+
+**AKS Config Pipeline** (run after AKS pipeline succeeds):
+
+- **Pipeline:** [AKS Config Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=46)
+- **Branch:** Your feature branch (e.g., `EI-2230/dev-aks-1.30.3-upgrade`)
+- **Environment:** Select the cluster you are building
+
+For PRP and PRD, run the pipelines against your feature branch and verify the Terraform plan looks sound and error-free.

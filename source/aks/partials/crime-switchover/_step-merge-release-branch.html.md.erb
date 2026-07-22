@@ -1,0 +1,44 @@
+### Merge Release Branch to Main (After All Environments Switched)
+
+Once all environments (DEV, SIT, NFT, PRP, PRD) have been successfully switched to the new clusters and the old clusters are destroyed:
+
+**1. Merge the release branch to `main` for both repositories:**
+
+For **cpp-terraform-azurerm-aks**:
+
+```bash
+cd cpp-terraform-azurerm-aks
+git checkout main
+git pull origin main
+git merge release/<aks-version>
+git push origin main
+```
+
+For **cpp-terraform-azurerm-aks-config**:
+
+```bash
+cd cpp-terraform-azurerm-aks-config
+git checkout main
+git pull origin main
+git merge release/<aks-version>
+git push origin main
+```
+
+**2. Tag the release:**
+
+```bash
+git tag -a v<aks-version> -m "AKS cluster switchover to version <aks-version>"
+git push origin v<aks-version>
+```
+
+**3. Clean up the release branch** (optional):
+
+```bash
+git push origin --delete release/<aks-version>
+```
+
+> **Benefits of this approach:**
+> - All switchover changes are now in `main` for future reference
+> - The release is properly tagged for audit trail
+> - Future cluster builds use the updated configuration
+> - Provides clear separation between in-progress switchovers and stable main branch

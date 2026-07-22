@@ -1,0 +1,68 @@
+### Apply Progression Scaling CronJob (If Applicable)
+
+> **Note:** This step is applicable as of 2 June 2026. If the job is not on the source cluster, don't apply it.
+
+> **Important:** Delete the cron from the old cluster to prevent it from scaling up services if the cluster isn't destroyed immediately.
+
+```yaml
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-up-progression
+  namespace: kube-system
+spec:
+  schedule: "5 5 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: cleanup
+              image: crmpdrepo01.azurecr.io/hmcts/jenkins-agent-java11:v1.0.4-jdk11
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - kubectl patch hpa progression-service-wildfly-app -p '{"spec":{"minReplicas":30}}' -n ns-prd-ccm-01
+              resources:
+                requests:
+                  memory: "64Mi"
+                limits:
+                  memory: "128Mi"
+          restartPolicy: Never
+          serviceAccountName: jenkins-admin
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-down-progression
+  namespace: kube-system
+spec:
+  schedule: "5 22 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: cleanup
+              image: crmpdrepo01.azurecr.io/hmcts/jenkins-agent-java11:v1.0.4-jdk11
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - kubectl patch hpa progression-service-wildfly-app -p '{"spec":{"minReplicas":8}}' -n ns-prd-ccm-01
+              resources:
+                requests:
+                  memory: "64Mi"
+                limits:
+                  memory: "128Mi"
+          restartPolicy: Never
+          serviceAccountName: jenkins-admin
+```

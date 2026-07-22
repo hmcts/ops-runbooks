@@ -1,0 +1,22 @@
+### Deploy Workloads on Destination Cluster
+
+Use the release branch identified in the [Release Branch for Workload Deployments](#release-branch-for-workload-deployments) prerequisite step.
+
+**Deploy workloads (main stacks):**
+
+- **Pipeline:** [Deploy Stack #333](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
+
+This pipeline deploys the following namespaces per stack:
+
+- `ns-<env>-ccm-<stack>`
+- `ns-<env>-idam-<stack>`
+- `ns-<env>-cdns-<stack>`
+- `ns-<env>-web-<stack>`
+
+**Deploy Alfapp workloads:**
+
+For `ns-<env>-alfapp-<stack>` namespaces, use a separate pipeline:
+
+- **Pipeline:** [Deploy Alfapp #181](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+
+For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.

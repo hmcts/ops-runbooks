@@ -1,0 +1,77 @@
+### Update Authentication to DTS Services
+
+Some Kubernetes workloads (e.g. pods) require access to DTS services. Currently only the PIP service requires OIDC federation. 
+
+
+The federated identity credential on the PIP managed identity needs updating to trust the new cluster's OIDC issuer URL so that workloads can authenticate. 
+This is done by updating config in a secret and running the PIP shared infra pipeline via SDS Jenkins.
+
+---
+
+**Get the OIDC Issuer URL for the new cluster:**
+
+```bash
+az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+```
+
+The OIDC issuer URL format is: 
+
+```bash
+https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}
+```
+
+---
+
+**Update the Key Vault Secret:**
+
+> **Secret name:** `crime-oidc-issuer-config` 
+
+
+> **Key Vaults:**
+
+> &nbsp;&nbsp;&nbsp;&nbsp; **STE, SIT, PRP:** `pip-bootstrap-stg-kv`
+
+> &nbsp;&nbsp;&nbsp;&nbsp; **PRD:** `pip-bootstrap-prod-kv`
+
+
+Retrieve the current secret value and format it as JSON in your IDE for readability and editing.
+
+The secret value is a JSON object containing an array of connections. Each connection includes:
+
+- `name`: Environment identifier
+- `issuer`: The OIDC issuer URL
+- `subject`: The service account in format:
+    - _system:serviceaccount:\<namespace>:\<service-account-name\>_
+
+Example:
+
+```json
+{
+    "connections": [
+        {
+            "name": "SIT",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/059790e1-cb17-43e5-b0b2-8bc4d39736de/",
+            "subject": "system:serviceaccount:ns-sit-ccm-01:stagingpubhub-service-wildfly-app"
+        },
+        {
+            "name": "PRP",
+            "issuer": "https://uksouth.oic.prod-aks.azure.com/77f54315-6dde-4fe7-9e17-74762c3eb096/e0137a4c-dadb-43a4-b3fb-881df89ddda8/",
+            "subject": "system:serviceaccount:ns-prp-ccm-01:stagingpubhub-service-wildfly-app"
+        }
+    ]
+}
+```
+
+Update the JSON configuration with the new cluster's OIDC issuer URL for target environment and save it back to the Key Vault secret.
+
+> **Note:** When upgrading in PRP or PRD add both the old and new cluster issuer URLs to the connections array. This allows keeping the old cluster running while testing the new one. Remove the old cluster's entry after the new one has been verified and tested.
+
+---
+
+**Apply the Changes:**
+
+After updating the Key Vault secret, run the master job for pip-shared-infrastructures in SDS Jenkins to apply the configuration:
+
+[pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
+
+Reference: The Key Vault configuration is managed in [pip-shared-infrastructures/main.tf](https://github.com/hmcts/pip-shared-infrastructures/blob/master/main.tf#L51-L54)

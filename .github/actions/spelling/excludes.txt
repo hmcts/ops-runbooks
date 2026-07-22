@@ -2,6 +2,7 @@ ignore$
 \.png$
 \.svg$
 \.drawio$
+\.scss$
 \.t$
 ^LICENSE\.txt$
 ^\.github/

@@ -1,0 +1,112 @@
+<%
+  # Define each category's content in the order they should be displayed.
+  # These must be "_step-" prefix partials located in the partials_directory specified below.
+  # Omit "_step-" prefix and ".html.md.erb" suffix when specifying the partial name.
+  categories = {
+    'DEV' => %w[
+      access-dts-services
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-mi-ado-agent
+      update-jenkins-config
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'STE' => %w[
+      access-dts-services
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-mi-ado-agent
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'SIT' => %w[
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'NFT' => %w[
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRP' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      deploy-reporting-cronjobs
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRD' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      deploy-reporting-cronjobs
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-dynatrace
+      update-keyvault-networking
+      apply-progression-scaling
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ],
+    'PRX' => %w[
+      request-shuttering
+      scale-down-source
+      access-dts-services
+      deploy-workloads
+      update-global-dns
+      basic-connectivity
+      update-redirect-uris
+      update-keyvault-networking
+      enable-cost-analysis
+      lock-inactive-cluster
+      destroy-old-cluster
+      merge-release-branch
+    ]
+  }
+%>
+
+## Cluster Switchover Steps
+
+<%= partial '/partials/content_filter_steps', locals: {
+  category_structure: categories,
+  category_order:     'DEV,STE,SIT,NFT,PRP,PRD,PRX',
+  partials_directory: 'aks/partials/crime-switchover'
+} %>

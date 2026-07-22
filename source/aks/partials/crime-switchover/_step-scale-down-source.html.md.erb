@@ -1,0 +1,14 @@
+### Scale Down Source Cluster Workloads
+
+Scale both **deployments** and **statefulsets** replicas to 0 for all workload namespaces on the source cluster:
+
+- `ns-<env>-ccm-<stack>`
+- `ns-<env>-idam-<stack>`
+- `ns-<env>-cdns-<stack>`
+- `ns-<env>-web-<stack>`
+- `ns-<env>-alfapp-<stack>`
+
+```bash
+kubectl scale deploy -n <namespace> --replicas=0 --all
+kubectl scale statefulset -n <namespace> --replicas=0 --all
+```

@@ -1,0 +1,37 @@
+### Update Jenkins Configuration for AKS Agents
+
+Configure Jenkins to spin up agents on the new AKS cluster.
+
+1. Go to **Manage Jenkins** → **Configure System**
+2. Navigate to: [https://build.mdv.cpp.nonlive/configure](https://build.mdv.cpp.nonlive/configure)
+3. Find the **Kubernetes** section → Identify your cluster configuration (figure out from name)
+
+**Update the following:**
+
+**Kubernetes URL:**
+
+```bash
+kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+```
+
+**Certificate key:**
+
+```bash
+kubectl get secrets/jenkins-admin-token -n kube-system -o jsonpath="{.data['ca\.crt']}" | base64 -d
+```
+
+4. Keep a note of the **Credentials name**
+5. Open another tab: [https://build.mdv.cpp.nonlive/credentials/](https://build.mdv.cpp.nonlive/credentials/)
+6. Identify your credentials → Open it and click **Update**
+
+**Update Secret:**
+
+```bash
+kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token | base64decode}}'
+```
+
+7. Go back to the other tab where you updated URL and certificate
+8. Click **Test Connection** (should be successful if URL, certificate, and token are correct)
+9. Click **Apply** and **Save**
+
+> **Note:** There is an issue with the Jenkins plugin where even if the test is successful, Jenkins may fail to spin up agents on AKS. Test by running a verify/validation job to see if it can spin up agents in the Jenkins namespace. If it fails, in the Kubernetes section for the cluster, simply copy and paste the same certificate and apply — this seems to fix the issue.

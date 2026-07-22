@@ -5,19 +5,12 @@
   // history.replaceState patch
   //
   // govuk-tech-docs has a debounced scroll handler (~100ms) that calls
-  // replaceState with a bare #heading-id. Two problems arise without this patch:
-  //
-  //   1. It fires after our synchronous scroll handler and drops the filter= param.
-  //   2. It queries ALL [id] elements including display:none ones from hidden
-  //      content blocks. Hidden elements report position().top === 0 in jQuery so
-  //      they always "win", producing wrong IDs like "some-heading-6".
+  // replaceState with a bare #heading-id, which drops our filter= param.
   //
   // Fix: intercept any replaceState call whose fragment has no key=value params
   // (i.e. a bare #anchor from govuk-tech-docs), discard it, and keep the URL
   // that page-toc's synchronous scroll handler already wrote.
   // ---------------------------------------------------------------------------
-  var moduleActiveFilter = null; // kept in sync with the active filter via applyFilter()
-
   var _origReplaceState = history.replaceState.bind(history);
   history.replaceState = function (state, title, url) {
     if (url && typeof url === 'string') {
@@ -216,8 +209,6 @@
   // Dispatches 'filterchange' so page-toc can rebuild its heading list.
   ContentFilter.prototype.applyFilter = function () {
     var activeFilter = this.activeFilter;
-    moduleActiveFilter = activeFilter;
-
     var noSel      = document.querySelectorAll('.content-filter-no-selection');
     var containers = document.querySelectorAll('.content-filter-container');
 

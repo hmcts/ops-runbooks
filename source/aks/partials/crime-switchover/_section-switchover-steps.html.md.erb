@@ -1,8 +1,7 @@
 <%
-  # Define each environment's steps in the order they should be performed.
-  # This is the only place you need to edit to add, remove, or reorder steps.
-  # The rendering logic below computes the superset order and data-envs
-  # automatically — you never need to write data-envs attributes by hand.
+  # Define each category's content in the order they should be displayed.
+  # These must be "_step-" prefix partials located in the partials_directory specified below.
+  # Omit "_step-" prefix and ".html.md.erb" suffix when specifying the partial name.
   categories = {
     'DEV' => %w[
       access-dts-services

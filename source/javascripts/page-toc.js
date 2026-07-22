@@ -140,7 +140,7 @@
   // than window — govuk-tech-docs scrolls the inner pane so window scroll
   // events never fire in this layout.
   //
-  // Uses this.activeEnv (kept in sync via envchange events) rather than reading
+  // Uses this.activeFilter (kept in sync via filterchange events) rather than reading
   // window.location.hash, which may already be overwritten by the time this
   // handler completes.
   PageTOC.prototype.bindScroll = function () {

@@ -72,7 +72,7 @@
     this.bindTocClicks();
   };
 
-  // Refresh the heading list after an env switch. The nav wrapper stays in
+  // Refresh the heading list after a filter switch. The nav wrapper stays in
   // place; only the <ul> contents are replaced by populateList().
   PageTOC.prototype.rebuild = function () {
     if (!this.nav) return;
@@ -111,9 +111,9 @@
     });
   };
 
-  // TOC link clicks: write #env=ENV&section=ID to the URL and scroll smoothly
+  // TOC link clicks: write #filter=VALUE&section=ID to the URL and scroll smoothly
   // to the target, rather than letting the browser navigate via the plain
-  // #heading-id href which would drop the env= param.
+  // #heading-id href which would drop the filter= param.
   PageTOC.prototype.bindTocClicks = function () {
     var self = this;
     this.nav.addEventListener('click', function (e) {
@@ -123,7 +123,7 @@
       var id = (link.getAttribute('href') || '').replace(/^#/, '');
       if (!id) return;
       var el = document.getElementById(id);
-      // Use env= only when the target heading is inside the steps container.
+      // Use filter= only when the target heading is inside the steps container.
       var inContainer = el && el.closest('.content-filter-container');
       if (inContainer && self.activeFilter) {
         history.replaceState(null, '', '#filter=' + self.activeFilter + '&section=' + id);

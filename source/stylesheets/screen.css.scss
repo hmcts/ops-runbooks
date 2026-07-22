@@ -248,12 +248,6 @@ $govuk-font-family: nta, Helvetica, sans-serif;
   }
 }
 
-// Override the gem's 40em prose cap
-// max-width is set on .technical-documentation inside .page-layout below
-.technical-documentation {
-  max-width: 900px;
-}
-
 // Page layout: prose + right-side TOC
 // =========================================================
 

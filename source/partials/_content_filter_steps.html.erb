@@ -20,7 +20,7 @@
   _filter_label     = defined?(filter_label)     && filter_label     ? filter_label     : nil
   _no_selection_msg = defined?(no_selection_msg) && no_selection_msg ? no_selection_msg : 'Please make a selection above.'
 %>
-<%= partial '/partials/content_filter', locals: { filter_order: category_order }.tap { |l| l[:filter_label] = _filter_label if _filter_label } %>
+<div data-content-filter<% if category_order %> data-filter-order="<%= category_order %>"<% end %><% if _filter_label %> data-filter-label="<%= _filter_label %>"<% end %>></div>
 
 <div class="content-filter-container">
 <div class="content-filter-no-selection">

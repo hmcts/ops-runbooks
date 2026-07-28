@@ -9,6 +9,7 @@ ignore$
 ^\Gemfile.lock
 ^\Qsource/Certificates/forms/SSL-Certificate-Request-Form.docx\E$
 (?:^|/)accounts\.html\.md\.erb$
+^\.devcontainer.json
 pmd
 DEVJUMPL
 mpd

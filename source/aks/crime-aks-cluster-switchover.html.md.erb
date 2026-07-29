@@ -1,6 +1,6 @@
 ---
 title: Crime AKS Cluster Switchover
-last_reviewed_on: 2026-04-10
+last_reviewed_on: 2026-07-23
 review_in: 12 months
 weight: 45
 ---
@@ -20,7 +20,7 @@ This guide provides step-by-step instructions for switching over Crime AKS clust
 - Schedule the switchover during designated maintenance windows
 - Create the new AKS cluster one day before go-live date (except PRP/PRD which require RFCs)
 
-### Release Branch for Workload Deployments
+### Release Branch for Main Workload Deployments
 
 Before beginning the switchover, identify the correct cpp-pipeline release branch for the target environment. You can determine this by inspecting the currently deployed workloads:
 
@@ -39,58 +39,7 @@ The `APP VERSION` column indicates the release branch to use (e.g., `dev/2608` m
 
 If you cannot determine the branch this way, ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://tools.hmcts.net/confluence/spaces/HSS/pages/1694702148/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document.
 
-### Access to DTS Services
-
-Authenticate the new cluster to access DTS services integrated with the Crime platform.
-
-Some Kubernetes workloads (e.g., pods) require access to DTS services. Currently, the PIP service requires OIDC federation. You must update the OIDC issuer's URL in the Federated Identity Credential in Azure Entra ID.
-
-**Get the OIDC issuer URL:**
-
-```bash
-az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
-```
-
-The OIDC issuer URL format: `https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}`
-
-**Update the Key Vault Secret:**
-
-Update the `crime-oidc-issuer-config` secret in the appropriate Key Vault:
-- **STE, SIT, PRP:** `pip-bootstrap-stg-kv`
-- **PRD:** `pip-bootstrap-prod-kv`
-
-The secret value is a JSON object containing an array of connections. Each connection includes:
-- `name`: Environment identifier (e.g., "SIT", "PRP", "PRD-NEW")
-- `issuer`: The OIDC issuer URL obtained from the command above
-- `subject`: The service account in format `system:serviceaccount:<namespace>:<service-account-name>`
-
-Example format:
-```json
-{
-    "connections": [
-        {
-            "name": "SIT",
-            "issuer": "https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/059790e1-cb17-43e5-b0b2-8bc4d39736de/",
-            "subject": "system:serviceaccount:ns-sit-ccm-01:stagingpubhub-service-wildfly-app"
-        },
-        {
-            "name": "PRP",
-            "issuer": "https://uksouth.oic.prod-aks.azure.com/77f54315-6dde-4fe7-9e17-74762c3eb096/e0137a4c-dadb-43a4-b3fb-881df89ddda8/",
-            "subject": "system:serviceaccount:ns-prp-ccm-01:stagingpubhub-service-wildfly-app"
-        }
-    ]
-}
-```
-
-**Reference:** The Key Vault configuration is managed in [pip-shared-infrastructures/main.tf](https://github.com/hmcts/pip-shared-infrastructures/blob/master/main.tf#L51-L54)
-
-**Apply the Changes:**
-
-After updating the Key Vault secret, re-run the Jenkins master job to apply the configuration:
-
-[pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
-
-> **Note:** OIDC federation is required in SIT, NFT, PRP, and PRD environments. When upgrading AKS clusters in environments like PRP and PRD, add both the old and new cluster issuer URLs to the connections array. This allows you to keep the old cluster running while testing the new one. Remove the old cluster's entry after the new one has been verified and tested.
+<hr class="section-divider">
 
 ## Preparation
 
@@ -205,11 +154,13 @@ Once branches are up to date, raise Pull Requests and run the ADO pipelines for 
 
 For PRP and PRD, run the pipelines against your feature branch and verify the Terraform plan looks sound and error-free.
 
+<hr class="section-divider">
+
 ## Cluster Switchover Steps
 
-> Each step specifies which environments it applies to. Environments: **STE, DEV, SIT, NFT** (non-live) and **PRP, PRD, PRX** (live).
+### 1. Request Environment Shuttering
 
-### 1. (PRP, PRD, PRX) Request Environment Shuttering
+> **Applies to:** PRP, PRD, PRX
 
 Before proceeding with the cluster switchover in PROD, request SRE resources to shutter the environment. This includes:
 
@@ -220,46 +171,193 @@ Before proceeding with the cluster switchover in PROD, request SRE resources to 
 
 > **Note:** From the referenced document, perform **steps 1 to 7** for shuttering and **steps 10 to 15** for unshuttering. Other steps in that document are related to backups and can be ignored for the cluster switchover process.
 
-### 2. (SIT, NFT, PRP, PRD, PRX) Scale Down Source Cluster Workloads
 
-Set replicas to 0 for all workload namespaces on the source cluster. Scale both **deployments** and **statefulsets** for each of the following namespace groups:
+---
+
+### 2. Delete Source Cluster Workloads
+
+> **Applies to:** SIT, NFT, PRP, PRD, PRX
+
+Delete the workload namespaces on the source cluster:
 
 - `ns-<env>-ccm-<stack>`
 - `ns-<env>-idam-<stack>`
 - `ns-<env>-cdns-<stack>`
 - `ns-<env>-web-<stack>`
 - `ns-<env>-alfapp-<stack>`
+- `ns-<env>-rd-<stack>`
+- `ns-<env>-amp-<stack>`
 
 ```bash
-kubectl scale deploy -n <namespace> --replicas=0 --all
-kubectl scale statefulset -n <namespace> --replicas=0 --all
+kubectl delete namespace <namespace>
 ```
 
-### 3. (SIT, NFT, PRP, PRD, PRX) Deploy Workloads on Destination Cluster
+Its possible this may hang indefinitely due to Azure resource locks. CTRL+C out of the command and assess what resources are leftover, the most likely offender will be roleAssignments.
 
-> **Note:** DEV and STE are deployed by the dev/release teams themselves — skip this step for those environments.
+Check resource status & describe it to view recent events. If blocked by locks (scope lock) you’ll see:
 
-Use the release branch identified in the [Release Branch for Workload Deployments](#release-branch-for-workload-deployments) prerequisite step.
+```bash
+RESPONSE 409: 409 Conflict
+ERROR CODE: ScopeLocked
+```
+
+Delete the lock from the resource referenced in error output via Azure Portal under `settings -> locks`. You require PIM for this.
+
+Check for the resource on the cluster again, it may delete as soon as locks are removed and simply not be there now. If still there, try delete it again now lock is removed
+
+---
+
+### 3. Update Authentication to DTS Services
+
+> **Applies to:** ALL
+
+Some Kubernetes workloads (e.g. pods) require access to DTS services. Currently only the PIP service requires OIDC federation. 
+
+
+The federated identity credentials on the PIP managed identity needs updating to trust the new cluster's OIDC issuer URL so that workloads can authenticate. 
+
+# **Get the OIDC Issuer URL for the new cluster:**
+
+# ```bash
+# az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+# ```
+
+# The OIDC issuer URL format is: 
+
+# ```bash
+# https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}
+# ```
+
+<%# 
+REMOVED FOR NOW - this workflow is under review
+
+# **Update the Key Vault Secret:**
+
+# > **Secret name:** `crime-oidc-issuer-config` 
+
+
+# > **Key Vaults:**
+
+# > &nbsp;&nbsp;&nbsp;&nbsp; **STE, SIT, PRP:** `pip-bootstrap-stg-kv`
+
+# > &nbsp;&nbsp;&nbsp;&nbsp; **PRD:** `pip-bootstrap-prod-kv`
+
+
+# Retrieve the current secret value and format it as JSON in your IDE for readability and editing.
+
+# The secret value is a JSON object containing an array of connections. Each connection includes:
+
+# - `name`: Environment identifier
+# - `issuer`: The OIDC issuer URL
+# - `subject`: The service account in format:
+#     - _system:serviceaccount:\<namespace>:\<service-account-name\>_
+
+# Example:
+
+# ```json
+# {
+#     "connections": [
+#         {
+#             "name": "SIT",
+#             "issuer": "https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e0603518e/059790e1-cb17-43e5-b0b2-8bc4d39736de/",
+#             "subject": "system:serviceaccount:ns-sit-ccm-01:stagingpubhub-service-wildfly-app"
+#         },
+#         {
+#             "name": "PRP",
+#             "issuer": "https://uksouth.oic.prod-aks.azure.com/77f54315-6dde-4fe7-9e17-74762c3eb096/e0137a4c-dadb-43a4-b3fb-881df89ddda8/",
+#             "subject": "system:serviceaccount:ns-prp-ccm-01:stagingpubhub-service-wildfly-app"
+#         }
+#     ]
+# }
+# ```
+
+# Update the JSON configuration with the new cluster's OIDC issuer URL for target environment and save it back to the Key Vault secret.
+
+# > **Note:** When upgrading in PRP or PRD add both the old and new cluster issuer URLs to the connections array. This allows keeping the old cluster running while testing the new one. Remove the old cluster's entry after the new one has been verified and tested.
+
+
+# **Apply the Changes:**
+
+# After updating the Key Vault secret, run the master job for pip-shared-infrastructures in SDS Jenkins to apply the configuration:
+
+# [pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
+%>
+
+`pip-cp-stg-mi` or `pip-cp-prod-mi` are the MI's used for this depending on environment being target.
+
+navigating to the Managed Identity in Azure Portal directly. Go to Settings -> Federated credential. Use the Subject Identifier to identify the federated credentials which are for the environment being worked on. 
+Update the Issuer for the appropriate federated credential manually via Portal. 
+
+---
+
+### 4. Deploy Workloads on Destination Cluster
+
+> **Applies to:** SIT, NFT, PRP, PRD, PRX
+
+Use the release branch identified in the [Release Branch for Main Workload Deployments](#release-branch-for-main-workload-deployments) prerequisite step.
 
 **Deploy workloads (main stacks):**
 
-- **Pipeline:** [Deploy Stack #333](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
+- **Pipeline:** [cpp-aks-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
 
 This pipeline deploys the following namespaces per stack:
+
 - `ns-<env>-ccm-<stack>`
 - `ns-<env>-idam-<stack>`
 - `ns-<env>-cdns-<stack>`
 - `ns-<env>-web-<stack>`
 
+Parameters:
+- `Environment:` your target environment (SIT/DEV/STE etc)
+- `Stack:` your stack (\<env>ccm01 for non DEV/STE environments)
+- `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
+- `CPP Pipeline Branch:` use value found in [Release Branch for Main Workload Deployments](#release-branch-for-main-workload-deployments) step above
+- ensure `deploy-service` & `create_replica_configmap` are checked
+
+
 **Deploy Alfapp workloads:**
 
 For `ns-<env>-alfapp-<stack>` namespaces, use a separate pipeline:
 
-- **Pipeline:** [Deploy Alfapp #181](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+- **Pipeline:** [cpp-alfresco-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181)
+
+Parameters:
+
+- deploy from `release/1.35` branch
+
+**Deploy Results Definition workloads:**
+
+For `ns-<env>-rd-<stack>` namespaces, use this pipeline:
+
+- **Pipeline:** [results-definition-pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=586)
+
+Parameters:
+
+- deploy from `main` branch
+- leave imageTag as default
+
+**Deploy API Marketplace workloads:**
+
+For `ns-<env>-amp-<stack>` namespaces, use this pipeline:
+
+- **Pipeline:** [cp-vp-aks-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=434)
+
+Parameters:
+
+- use `env/<env>` for branch (check branches that this exists first)
+- `Environment:` <env> (e.g. sit/dev/ste etc)
+- `CP Backend Target Environment:` <env>ccm01 (or another stack if DEV/STE)
+- `Stack:` \<env>amp01 (e.g. sitamp01)
+- `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
 
 For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.
 
-### 4. (PRP, PRD) Deploy Reporting Cronjobs
+
+---
+
+### 5. Deploy Reporting Cronjobs
+
+> **Applies to:** PRP, PRD
 
 Generally use the `main` branch for reporting cronjobs. If unsure, check with the SRE team to confirm.
 
@@ -267,32 +365,48 @@ Generally use the `main` branch for reporting cronjobs. If unsure, check with th
 
 - **Pipeline:** [Deploy Reporting #225](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=225)
 
-### 5. (ALL) Update Global DNS
 
-Update DNS to point to the new cluster.
+---
+
+### 6. Update Global DNS
+
+> **Applies to:** ALL
+
+Update Global DNS to point to the new cluster.
 
 - **Repo:** [cpp-terraform-network](https://github.com/hmcts/cpp-terraform-network)
 - **Example PR:** [Commit](https://github.com/hmcts/cpp-terraform-network/commit/8014ee1d57307a587d5c09f525247c6bc6b2e648)
 - **Pipeline:** [Network Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=54)
   - **Environment:** mdv (or mpd)
 
-### 6. (ALL) Basic Connectivity Testing
+Additionally check the environment tfvars for the cluster you are working on. Ensure any explicit vnet peerings are also updated to target the new cluster network. [An example from SIT](https://github.com/hmcts/cpp-terraform-network/blob/main/vars/sit.tfvars#L73-L79). The Resource Group and Virtual Network will need updating (from 02 to 01 or vice vera)
 
-Test connectivity from your workstation (over VPN):
+---
+
+### 7. Basic Connectivity Testing
+
+> **Applies to:** ALL
+
+Activate VPN and test connectivity from your workstation. This will verify that the new cluster is reachable and that the ingress controller is functioning correctly:
 
 ```bash
-curl https://sitccm01.ingress01.sit.nl.cjscp.org.uk:443/usersgroups-service/internal/metrics/ping
+curl -k https://sitccm01.ingress01.sit.nl.cjscp.org.uk:443/usersgroups-service/internal/metrics/ping
 ```
 
-Test from a server in the specific environment (e.g., `ENVCCM01ACTAP##.cpp.nonlive`):
+Test from a server in the target environment (e.g., `ENVCCM01ACTAP##.cpp.nonlive`):
 
 ```bash
-curl https://sitccm01-api-lb.sit.cpp.nonlive:443/usersgroups-service/internal/metrics/ping
+curl -k https://sitccm01-api-lb.sit.cpp.nonlive:443/usersgroups-service/internal/metrics/ping
 ```
 
 Both should return `pong`.
 
-### 7. (ALL) Update Redirect URIs for Kiali/Grafana
+
+---
+
+### 8. Update Redirect URIs for Kiali/Grafana
+
+> **Applies to:** ALL
 
 1. Search for `mdv-k8s-monitor` Application in the Azure portal
 2. Navigate to **Authentication**
@@ -300,11 +414,23 @@ Both should return `pong`.
    - Kiali: `https://kiali.mgmt.cs01cl02.nft.nl.cjscp.org.uk/kiali/`
    - Grafana: `https://grafana.mgmt.cs01cl02.nft.nl.cjscp.org.uk/login/azuread`
 
-### 8. (NFT, PRP, PRD) Update Dynatrace
+Search for any other entries which point to old k8s cluster and update. Search `.cs01cl0<x>.<env>.` E.g. `.cs01cl01.sit`
+
+
+---
+
+### 9. Update Dynatrace
+
+> **Applies to:** NFT, PRP, PRD
 
 Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration) guide.
 
-### 9. (SIT, NFT, PRP, PRD, PRX) Update Key Vault Networking
+
+---
+
+### 10. Update Key Vault Networking
+
+> **Applies to:** SIT, NFT, PRP, PRD, PRX
 
 Configure the Key Vault to allow access from the new cluster VNET.
 
@@ -322,7 +448,12 @@ Configure the Key Vault to allow access from the new cluster VNET.
 5. Verify the cluster VNET and subnet appear under Virtual networks section
 6. **After updating the new VNET details, delete the old VNET details**
 
-### 10. (PRD) Apply Progression Scaling CronJob (If Applicable)
+
+---
+
+### 11. Apply Progression Scaling CronJob (If Applicable)
+
+> **Applies to:** PRD
 
 > **Note:** This step is applicable as of 2 June 2026. If the job is not on the source cluster, don't apply it.
 
@@ -391,7 +522,12 @@ spec:
           serviceAccountName: jenkins-admin
 ```
 
-### 11. (DEV, STE) Update mi-ado-agent Managed Identity
+
+---
+
+### 12. Update mi-ado-agent Managed Identity
+
+> **Applies to:** DEV, STE
 
 Update the `mi-ado-agent` Managed Identity with the OIDC URL of the new cluster on the HMCTS.net Subscription. **The URL must contain a trailing slash.**
 
@@ -415,7 +551,12 @@ Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e060
 
 > **Note:** Only the **Cluster Issuer URL** needs to change. The namespace and service account values remain the same.
 
-### 12. (DEV) Update Jenkins Configuration for AKS Agents
+
+---
+
+### 13. Update Jenkins Configuration for AKS Agents
+
+> **Applies to:** DEV
 
 Configure Jenkins to spin up agents on the new AKS cluster.
 
@@ -451,9 +592,14 @@ kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token
 8. Click **Test Connection** (should be successful if URL, certificate, and token are correct)
 9. Click **Apply** and **Save**
 
-> **Note:** There is an issue with the Jenkins plugin where even if the test is successful, Jenkins may fail to spin up agents on AKS. Test by running a verify/validation job to see if it can spin up agents in the Jenkins namespace. If it fails, in the Kubernetes section for the cluster, simply copy and paste the same certificate and apply—this seems to fix the issue.
+> **Note:** There is an issue with the Jenkins plugin where even if the test is successful, Jenkins may fail to spin up agents on AKS. Test by running a verify/validation job to see if it can spin up agents in the Jenkins namespace. If it fails, in the Kubernetes section for the cluster, simply copy and paste the same certificate and apply — this seems to fix the issue.
 
-### 13. (ALL) Enable Cost Analysis
+
+---
+
+### 14. Enable Cost Analysis
+
+> **Applies to:** ALL
 
 Cost analysis is required until Terraform support is available.
 
@@ -466,8 +612,13 @@ Verify the pod is running:
 ```bash
 kubectl get deploy cost-analysis-agent -n kube-system
 ```
+If the pod stays hung on 'pending' status, its likely the PVC is being rejected by Azure policy for tagging. Review the exceptions and add the relevant resources to the exceptions list. [An example for SIT](https://github.com/hmcts/cpp-azure-policy/pull/103/changes)
 
-### 14. (ALL) Lock Inactive Cluster
+---
+
+### 15. Lock Inactive Cluster
+
+> **Applies to:** ALL
 
 Post cluster switchover, lock down the old cluster access so it becomes inactive.
 
@@ -507,7 +658,12 @@ Empty the following group in the aks repo: `aks_cluster_admins_aad_group_ids`
 
 After updating the var files, get them reviewed and run `terraform plan/apply` on the inactive cluster. After performing all the above steps, verify access is restricted by performing `az login`.
 
-### 15. (ALL) Destroy Old Cluster (After a Few Days)
+
+---
+
+### 16. Destroy Old Cluster (After a Few Days)
+
+> **Applies to:** ALL
 
 When running the `aks-config-destroy` pipeline, some namespaces will get stuck in the finalizer stage. Use the following command to delete those namespaces:
 
@@ -517,13 +673,19 @@ for ns in $(kubectl get ns --field-selector status.phase=Terminating -o jsonpath
 done
 ```
 
-### 16. (ALL) Merge Release Branch to Main (After All Environments Switched)
+
+---
+
+### 17. Merge Release Branch to Main (After All Environments Switched)
+
+> **Applies to:** ALL
 
 Once all environments (DEV, SIT, NFT, PRP, PRD) have been successfully switched to the new clusters and the old clusters are destroyed:
 
 **1. Merge the release branch to `main` for both repositories:**
 
 For **cpp-terraform-azurerm-aks**:
+
 ```bash
 cd cpp-terraform-azurerm-aks
 git checkout main
@@ -533,6 +695,7 @@ git push origin main
 ```
 
 For **cpp-terraform-azurerm-aks-config**:
+
 ```bash
 cd cpp-terraform-azurerm-aks-config
 git checkout main
@@ -542,12 +705,14 @@ git push origin main
 ```
 
 **2. Tag the release:**
+
 ```bash
 git tag -a v<aks-version> -m "AKS cluster switchover to version <aks-version>"
 git push origin v<aks-version>
 ```
 
 **3. Clean up the release branch** (optional):
+
 ```bash
 git push origin --delete release/<aks-version>
 ```
@@ -557,6 +722,8 @@ git push origin --delete release/<aks-version>
 > - The release is properly tagged for audit trail
 > - Future cluster builds use the updated configuration
 > - Provides clear separation between in-progress switchovers and stable main branch
+
+<hr class="section-divider">
 
 ## Troubleshooting
 

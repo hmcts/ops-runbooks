@@ -294,7 +294,7 @@ Update the Issuer for the appropriate federated credential manually via Portal.
 
 > **Applies to:** SIT, NFT, PRP, PRD, PRX
 
-Use the release branch identified in the [Release Branch for Workload Deployments](#release-branch-for-workload-deployments) prerequisite step.
+Use the release branch identified in the [Release Branch for Main Workload Deployments](#release-branch-for-main-workload-deployments) prerequisite step.
 
 **Deploy workloads (main stacks):**
 
@@ -311,7 +311,7 @@ Parameters:
 - `Environment:` your target environment (SIT/DEV/STE etc)
 - `Stack:` your stack (\<env>ccm01 for non DEV/STE environments)
 - `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
-- `CPP Pipeline Branch:` use value found in 'Release Branch for Main Workload Deployments' step above
+- `CPP Pipeline Branch:` use value found in [Release Branch for Main Workload Deployments](#release-branch-for-main-workload-deployments) step above
 - ensure `deploy-service` & `create_replica_configmap` are checked
 
 

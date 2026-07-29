@@ -308,6 +308,7 @@ This pipeline deploys the following namespaces per stack:
 - `ns-<env>-web-<stack>`
 
 Parameters:
+
 - `Environment:` your target environment (SIT/DEV/STE etc)
 - `Stack:` your stack (\<env>ccm01 for non DEV/STE environments)
 - `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
@@ -345,8 +346,8 @@ For `ns-<env>-amp-<stack>` namespaces, use this pipeline:
 Parameters:
 
 - use `env/<env>` for branch (check branches that this exists first)
-- `Environment:` <env> (e.g. sit/dev/ste etc)
-- `CP Backend Target Environment:` <env>ccm01 (or another stack if DEV/STE)
+- `Environment:` \<env> (e.g. sit/dev/ste etc)
+- `CP Backend Target Environment:` \<env>ccm01 (or another stack if DEV/STE)
 - `Stack:` \<env>amp01 (e.g. sitamp01)
 - `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
 

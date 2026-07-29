@@ -792,3 +792,5 @@ sas
 FLUSHALL
 PDB
 PDBs
+XPOST
+sitamp

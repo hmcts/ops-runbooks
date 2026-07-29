@@ -140,7 +140,7 @@ This may be requested by service teams in platops help if they suspect cases are
 To check the Dead Letter Queue (DLQ) for case types, use the following command:
 
 ```
-curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<case_type_id>\""}}}'
+curl --header "Content-Type: application/json" 'localhost:9200/ccd-logstash-dead-letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<case_type_id>\""}}}'
 ```
 
 Replace `<case_type_id>` with the case type ID you want to check.
@@ -152,13 +152,13 @@ In some events service teams may need us to pull cases from the DLQ to email ove
 To pull cases from the DLQ for investigation, use the following command:
 
 ```
-curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+curl --header "content-type: application/JSON" 'localhost:9200/ccd-logstash-dead-letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
 ```
 
 In cases where there are a large number of cases in the DLQ for the case_type_id provided, try utilising the below command to limit the number of cases returned.
 
 ```
-curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+curl --header "content-type: application/JSON" 'localhost:9200/ccd-logstash-dead-letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
 ```
 
 Where `Y` is the number of cases you want to return.
@@ -172,7 +172,7 @@ If a team has confirmed that all cases in the DLQ are fully investigated they ma
 To clear cases out of the Dead Letter Queue (DLQ), use the following command:
 
 ```
-curl -XPOST --header "content-type: application/JSON" ' http://localhost:9200/.logstash_dead_letter/_delete_by_query?conflicts=proceed&pretty' -d '{"query": {"query_string": { "query":"<case_type_id>"}}}'
+curl -XPOST --header "content-type: application/JSON" 'localhost:9200/ccd-logstash-dead-letter/_delete_by_query?conflicts=proceed&pretty' -d '{"query": {"query_string": { "query":"<case_type_id>"}}}'
 ```
 
 Replace `<case_type_id>` with the case type ID you want to clear.

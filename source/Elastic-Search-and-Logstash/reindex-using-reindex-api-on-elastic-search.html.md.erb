@@ -92,7 +92,7 @@ SELECT count(*) FROM case_data WHERE case_type_id = '<your case type id>';
 9) Get a count of the Dead Letter Queue on elastic search for the case_type_id
 
 ```
-curl --header "Content-Type: application/json" 'http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+curl --header "Content-Type: application/json" 'localhost:9200/ccd-logstash-dead-letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
 10) Block writing to main index ahead of cloning

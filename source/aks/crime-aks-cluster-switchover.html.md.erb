@@ -216,17 +216,17 @@ Some Kubernetes workloads (e.g. pods) require access to DTS services. Currently 
 
 The federated identity credentials on the PIP managed identity needs updating to trust the new cluster's OIDC issuer URL so that workloads can authenticate. 
 
-# **Get the OIDC Issuer URL for the new cluster:**
+**Get the OIDC Issuer URL for the new cluster:**
 
-# ```bash
-# az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
-# ```
+```bash
+az aks show --name <cluster_name> --resource-group <resource_group> --query "oidcIssuerProfile.issuerUrl" -o tsv
+```
 
-# The OIDC issuer URL format is: 
+The OIDC issuer URL format is:
 
-# ```bash
-# https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}
-# ```
+```text
+https://uksouth.oic.prod-aks.azure.com/{tenant_id}/{uuid}
+```
 
 <%# 
 REMOVED FOR NOW - this workflow is under review

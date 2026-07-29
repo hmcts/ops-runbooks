@@ -1,0 +1,60 @@
+---
+title: Refreshing Dynatrace API tokens on private ActiveGates
+last_reviewed_on: 2026-07-29
+review_in: 12 months
+weight: 40
+---
+# <%= current_page.data.title %>
+
+API tokens are used to download, install and configure Dynatrace ActiveGate instances. 
+
+These tokens are generated in the Dynatrace portal and have a limited lifetime.
+
+When these tokens are about to expire, the Dynatrace team will generate new tokens and provide them to the Platform Operations team.
+
+## Updating the tokens
+
+The tokens are stored in the cftptl-intsvc keyvault under the secret names:
+
+- `dynatrace-nonprod-paas-token`
+- `dynatrace-ptl-paas-token`
+
+When you receive the new tokens, you will need to update the secrets in the keyvault.
+
+## Updating the private ActiveGate instances
+
+New private ActiveGate instances will need to be created with the new tokens, and the old instances will need to be removed.
+
+To do this, delete the old instances from the azure portal by navigating to the appropriate scale set and deleting the instances.
+
+**The non-private ActiveGate instances are not affected by this and can be ignored.**
+
+Once the instances are deleted, run the [Dynatrace ActiveGate pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=921&_a=summary) to create new instances with the new tokens.
+
+## Confirming the new instances are working
+
+Navigate to the [Dynatrace portal](https://yrk32651.live.dynatrace.com/ui/deploymentstatus/activegates?gtf=-2h&gf=all) and check that the new instances are showing in the list.
+
+If any are not showing, go to the [troubleshooting section](./refreshing-tokens-activegate.html#troubleshooting) of this page.
+
+## Updating DNS records
+
+Any VMs or services that use the private ActiveGate instances do so via a DNS record that points to the active instance in the scale set.
+
+When the new instances are created, the DNS records will need to be updated to point to the new instances.
+
+Get the IP of one of the instances and create a PR to update the DNS records in the [azure-private-dns](https://github.com/hmcts/azure-private-dns) repo.
+
+See [example PR](https://github.com/hmcts/azure-private-dns/pull/1043/changes).
+
+Ensure the pipeline has ran successfully and the DNS records have been updated.
+
+## Troubleshooting
+
+If the new instances are not showing in the Dynatrace portal, there might be an issue with the installation.
+
+This happened in July 2026 when refreshing the tokens. Upon logging into the new instances using the [guide](./connecting-to-activegate-instances.html), it was clear that they both had the same hostname.
+
+To fix this, the instance that was not appearing in the Dynatrace portal was deleted via the Azure portal and the pipeline was re-run to create a new instance.
+
+The new instance had a different hostname and appeared in the Dynatrace portal immediately.

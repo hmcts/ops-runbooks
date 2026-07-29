@@ -46,7 +46,7 @@ Again because CCD team need to approve its best to raise this in hours before th
 3) Take a count of the DLQ for the case_type_id to be reindexed
 
 ```
-curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+curl --header "Content-Type: application/json" 'localhost:9200/ccd-logstash-dead-letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
 4) Get a count of the index for the jurisdiction to be reindexed
@@ -124,7 +124,7 @@ curl --silent localhost:9200/_cat/indices | awk '{print $3, $7}' | grep <your in
 8) Get a count of the Dead Letter Queue on elastic search for the case_type_id
 
 ```
-curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+curl --header "Content-Type: application/json" 'localhost:9200/ccd-logstash-dead-letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
 9) Change the index to read only for cloning in case of roll back.
@@ -343,19 +343,19 @@ They may have fallen into the dead letter queue.  Below are commands to check th
 Count the DLQ for specific jurisdictions:
 
 ```
-curl --header "Content-Type: application/json" ' http://localhost:9200/.logstash_dead_letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
+curl --header "Content-Type: application/json" 'localhost:9200/ccd-logstash-dead-letter/_count' -d '{"query": {"match_phrase": {"failed_case": "\"case_type_id\":\"<your case type id>\""}}}'
 ```
 
 Pull cases from the DLQ for specific jurisdictions:
 
 ```
-curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+curl --header "content-type: application/JSON" 'localhost:9200/ccd-logstash-dead-letter/_search' -d '{  "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
 ```
 
 If there is a large amount of cases in the DLQ you may need to limit the output to a smaller number, the following command should work for this purpose.
 
 ```
-curl --header "content-type: application/JSON" 'localhost:9200/.logstash_dead_letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
+curl --header "content-type: application/JSON" 'localhost:9200/ccd-logstash-dead-letter/_search' -d '{"from":0, "size":Y, "query":{  "query_string":{  "query":"<case_type_id>"}}}' -o output.txt
 ```
 
 Where Y is the number of cases you want to pull from the DLQ.

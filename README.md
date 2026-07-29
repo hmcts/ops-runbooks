@@ -4,24 +4,7 @@ This repo is a collection of runbooks for common tasks and activities done by th
 
 [Ops-Runbooks Site](https://hmcts.github.io/ops-runbooks/)
 
-<a href="https://gitpod.io/#https://github.com/hmcts/ops-runbooks">
-  <img
-    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
-    alt="Contribute with Gitpod"
-  />
-</a>
-
-## Getting started
-
-To preview or build the website, there is two options.
-
-### Gitpod
-
-Gitpod is the easiest way to develop on this repository, you will get a fresh automated dev environment without having to setup anything on your machine.
-
-Click the below button to get started:
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/hmcts/ops-runbooks)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/hmcts/ops-runbooks)
 
 ### Local installation
 

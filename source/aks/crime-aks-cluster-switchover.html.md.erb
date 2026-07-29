@@ -20,7 +20,7 @@ This guide provides step-by-step instructions for switching over Crime AKS clust
 - Schedule the switchover during designated maintenance windows
 - Create the new AKS cluster one day before go-live date (except PRP/PRD which require RFCs)
 
-### Release Branch for Workload Deployments
+### Release Branch for Main Workload Deployments
 
 Before beginning the switchover, identify the correct cpp-pipeline release branch for the target environment. You can determine this by inspecting the currently deployed workloads:
 
@@ -174,33 +174,36 @@ Before proceeding with the cluster switchover in PROD, request SRE resources to 
 
 ---
 
-### 2. Scale Down Source Cluster Workloads
+### 2. Delete Source Cluster Workloads
 
 > **Applies to:** SIT, NFT, PRP, PRD, PRX
 
-Scale both **deployments** and **statefulsets** replicas to 0 for all workload namespaces on the source cluster:
+Delete the workload namespaces on the source cluster:
 
 - `ns-<env>-ccm-<stack>`
 - `ns-<env>-idam-<stack>`
 - `ns-<env>-cdns-<stack>`
 - `ns-<env>-web-<stack>`
 - `ns-<env>-alfapp-<stack>`
+- `ns-<env>-rd-<stack>`
+- `ns-<env>-amp-<stack>`
 
 ```bash
-kubectl scale deploy -n <namespace> --replicas=0 --all
-kubectl scale statefulset -n <namespace> --replicas=0 --all
+kubectl delete namespace <namespace>
 ```
 
-Delete **roleassignments** from the source cluster ccm namespaces. 
+Its possible this may hang indefintely due to Azure resource locks. CTRL+C out of the command and assess what resources are leftover, the most likely offender will be roleAssignments.
 
-These are put in place by Azure Service Operator and will clash when workloads are redeployed to the new cluster. Run the following commands for all `ns-<env>-ccm-<stack>` namespaces:
+Check resource status & describe it to view recent events. If blocked by locks (scope lock) you’ll see:
 
 ```bash
-kubectl get roleassignments -n <namespace>
-kubectl delete roleassignments -n <namespace> --all
+RESPONSE 409: 409 Conflict
+ERROR CODE: ScopeLocked
 ```
 
-_maintenance note: `ns-<env>-amp-<stack>` & `ns-<env>-rd-<stack>` exist. We need to define how to handle these gracefully for live environments and update accordingly. For now these are untouched and then Richard Dakin informed after cluster switchover to update as needed. Live environments will be shuttered for switchover however we need to know this is all good before proceeding to unshutter_
+Delete the lock from the resource referenced in error output via Azure Portal under `settings -> locks`. You require PIM for this.
+
+Check for the resource on the cluster again, it may delete as soon as locks are removed and simply not be there now. If still there, try delete it again now lock is removed
 
 ---
 
@@ -279,8 +282,11 @@ After updating the Key Vault secret, run the master job for pip-shared-infrastru
 
 [pip-shared-infrastructures/master](https://sds-build.hmcts.net/job/HMCTS/job/pip-shared-infrastructures/job/master/)
 
-Reference: The Key Vault configuration is managed in [pip-shared-infrastructures/main.tf](https://github.com/hmcts/pip-shared-infrastructures/blob/master/main.tf#L51-L54)
+> **Note:** We're unsure if this mechanism is working correctly. The pipeline should update the Issuer for federated credentials on `pip-cp-stg-mi` or `pip-cp-prod-mi` depending on environemnt being target.
 
+Verify the Issuer is correct for the appropriate federated credential by navigating to the Managed Identity in Azure Portal directly. Settings -> Federated credential. 
+
+Use the Subject Identifier to identify the federated credentials which are for the environment being worked on. If these don't match the new cluster OIDC Issuer URL, update them manually. 
 
 ---
 
@@ -292,7 +298,7 @@ Use the release branch identified in the [Release Branch for Workload Deployment
 
 **Deploy workloads (main stacks):**
 
-- **Pipeline:** [Deploy Stack #333](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
+- **Pipeline:** [cpp-aks-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=333)
 
 This pipeline deploys the following namespaces per stack:
 
@@ -301,11 +307,48 @@ This pipeline deploys the following namespaces per stack:
 - `ns-<env>-cdns-<stack>`
 - `ns-<env>-web-<stack>`
 
+Parameters:
+- `Environment:` your target environment (SIT/DEV/STE etc)
+- `Stack:` your stack (\<env>ccm01 for non DEV/STE environments)
+- `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
+- `CPP Pipeline Branch:` use value found in 'Release Branch for Main Workload Deployments' step above
+- ensure `depoy-service` & `create_replica_configmap` are checked
+
+
 **Deploy Alfapp workloads:**
 
 For `ns-<env>-alfapp-<stack>` namespaces, use a separate pipeline:
 
-- **Pipeline:** [Deploy Alfapp #181](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+- **Pipeline:** [cpp-alfresco-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+
+Parameters:
+
+- deploy from `release/1.35` branch
+
+**Deploy Results Definition worloads:**
+
+For `ns-<env>-rd-<stack>` namespaces, use this pipeline:
+
+- **Pipeline:** [results-definition-pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+
+Parameters:
+
+- deploy from `main` branch
+- leave imageTag as default
+
+**Deploy API Marketplace workloads:**
+
+For `ns-<env>-amp-<stack>` namespaces, use this pipeline:
+
+- **Pipeline:** [cp-vp-aks-deploy](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=181&_a=summary)
+
+Parameters:
+
+- use `env/<env>` for branch (check branches that this exists first)
+- `Environment:` <env> (e.g. sit/dev/ste etc)
+- `CP Backend Target Environment:` <env>ccm01 (or another stack if DEV/STE)
+- `Stack:` \<env>amp01 (e.g. sitamp01)
+- `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
 
 For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.
 
@@ -329,13 +372,14 @@ Generally use the `main` branch for reporting cronjobs. If unsure, check with th
 
 > **Applies to:** ALL
 
-Update DNS to point to the new cluster.
+Update Global DNS to point to the new cluster.
 
 - **Repo:** [cpp-terraform-network](https://github.com/hmcts/cpp-terraform-network)
 - **Example PR:** [Commit](https://github.com/hmcts/cpp-terraform-network/commit/8014ee1d57307a587d5c09f525247c6bc6b2e648)
 - **Pipeline:** [Network Pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=54)
   - **Environment:** mdv (or mpd)
 
+Additionally check the environment tfvars for the cluster you are working on. Ensure any explicit vnet peerings are also updated to target the new cluster network. [An example from SIT](https://github.com/hmcts/cpp-terraform-network/blob/main/vars/sit.tfvars#L73-L79). The Resource Group and Virtual Network will need updating (from 02 to 01 or vice vera)
 
 ---
 
@@ -369,6 +413,8 @@ Both should return `pong`.
 3. Add Web Redirect URIs:
    - Kiali: `https://kiali.mgmt.cs01cl02.nft.nl.cjscp.org.uk/kiali/`
    - Grafana: `https://grafana.mgmt.cs01cl02.nft.nl.cjscp.org.uk/login/azuread`
+
+Search for any other entries which point to old k8s cluster and update. Search `.cs01cl0<x>.<env>.` E.g. `.cs01cl01.sit`
 
 
 ---
@@ -566,7 +612,7 @@ Verify the pod is running:
 ```bash
 kubectl get deploy cost-analysis-agent -n kube-system
 ```
-
+If the pod stays hung on 'pending' status, its likely the PVC is being rejected by Azure policy for tagging. Review the exceptions and add the relevant resources to the exceptions list. [An example for SIT](https://github.com/hmcts/cpp-azure-policy/pull/103/changes)
 
 ---
 

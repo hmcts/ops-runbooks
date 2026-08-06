@@ -42,6 +42,7 @@ CJSC
 clusterrole
 clusterrolebinding
 coderepo
+Codespaces
 configmap
 containerised
 coreutils
@@ -164,6 +165,7 @@ onlineplea
 onmicrosoft
 openvpn
 overriden
+panupv
 paramatised
 peerings
 pki
@@ -231,6 +233,7 @@ switchovers
 sysagentpool
 tblk
 Tenables
+tgz
 themisgatewayapi
 thw
 timeframe
@@ -256,5 +259,3 @@ wrkagentpool
 xpack
 XXXX
 zlf
-panupv
-tgz

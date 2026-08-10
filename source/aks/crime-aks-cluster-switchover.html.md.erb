@@ -677,7 +677,30 @@ done
 
 ---
 
-### 17. Merge Release Branch to Main (After All Environments Switched)
+### 17. Destroy Old Cluster Base Infrastructure
+
+Applies to: ALL
+
+Once the config-destroy pipeline (step 16) has completed successfully, run the separate cluster destroy pipeline to remove the base AKS cluster and its supporting infrastructure (cluster resource, VNet, NSGs, managed identities, private DNS zones).
+
+- Repo: `cpp-terraform-azurerm-aks`
+- Pipeline: `CPP Terraform AKS Cluster Destroy` (`azure-pipelines-destroy.yml`)
+- Parameters: `environment`, `platform` set to match the old cluster being destroyed
+
+Verify the plan output only targets resources for the old cluster, then apply.
+
+After the pipeline completes, verify the cluster and its resource group are fully gone:
+
+```bash
+az aks show --name <cluster_name> --resource-group <resource_group>
+```
+
+This should return a `ResourceGroupNotFound` error once destruction is complete.
+
+
+---
+
+### 18. Merge Release Branch to Main (After All Environments Switched)
 
 > **Applies to:** ALL
 

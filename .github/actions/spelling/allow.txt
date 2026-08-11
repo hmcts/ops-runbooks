@@ -662,6 +662,7 @@ updateinfo
 upgradable
 usr
 vaultcore
+Velero
 versioned
 Versioning
 vhd

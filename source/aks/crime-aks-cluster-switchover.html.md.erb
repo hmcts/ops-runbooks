@@ -666,6 +666,10 @@ After updating the var files, get them reviewed and run `terraform plan/apply` o
 
 > **Applies to:** ALL
 
+**1. Destroy Old Cluster Config**
+
+Run the `aks-config-destroy` pipeline against the old cluster. This only tears down the config/add-on layer deployed on top of the cluster (Istio, Kiali, Gatekeeper, Velero, Dynatrace, private DNS zones/endpoints, etc.) — it does **not** destroy the underlying AKS cluster resource, VNet, NSGs, or managed identities. See step 2 below for that.
+
 When running the `aks-config-destroy` pipeline, some namespaces will get stuck in the finalizer stage. Use the following command to delete those namespaces:
 
 ```bash
@@ -674,14 +678,9 @@ for ns in $(kubectl get ns --field-selector status.phase=Terminating -o jsonpath
 done
 ```
 
+**2. Destroy Old Cluster Base Infrastructure**
 
----
-
-### 17. Destroy Old Cluster Base Infrastructure
-
-Applies to: ALL
-
-Once the config-destroy pipeline (step 16) has completed successfully, run the separate cluster destroy pipeline to remove the base AKS cluster and its supporting infrastructure (cluster resource, VNet, NSGs, managed identities, private DNS zones).
+Once the config-destroy pipeline has completed successfully, run the separate cluster destroy pipeline to remove the base AKS cluster and its supporting infrastructure (cluster resource, VNet, NSGs, managed identities, private DNS zones).
 
 - Repo: `cpp-terraform-azurerm-aks`
 - Pipeline: `CPP Terraform AKS Cluster Destroy` (`azure-pipelines-destroy.yml`)
@@ -700,7 +699,7 @@ This should return a `ResourceGroupNotFound` error once destruction is complete.
 
 ---
 
-### 18. Merge Release Branch to Main (After All Environments Switched)
+### 17. Merge Release Branch to Main (After All Environments Switched)
 
 > **Applies to:** ALL
 

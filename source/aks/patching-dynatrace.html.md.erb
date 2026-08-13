@@ -30,15 +30,20 @@ In this case, as there were no breaking changes or config changes, I applied to 
 
 ## Preview specific steps
 
-Dynatrace on preview is a lot larger than on other nonprod environments, so we need to approach the patching differently.
+Preview's node count is much higher than any other environment. Dynatrace has two daemon sets with a rolling update strategy that upgrades 1 at a time. This is to reduce potential of setting off implemented alerts for the cluster from within Dynatrace.
 
-For preview we need to allow it to upgrade up to 15 one agents pods at a time and 5 csi driver pods at a time. We do this by adding specific patches to the preview deployment. 
+This update strategy is too slow given the node count for preview and would require a HR timeout of roughly 4hrs. Instead, we can set Dynatrace into a maintenance window for host group: PREVIEW_CFT & then increase parallelism
 
-Before raising the PR to flux for upgrading preview ensure you have put dynatrace into a monitoring window. 
+Before raising the PR to flux for upgrading preview ensure you have put dynatrace into a monitoring window, To set the maintenance window (dynatrace admin rights are needed).
 
 To make clean up post upgrade easier I recommend increasing the version of dynatrace on preview in a separate PR before adding these adjustments, by doing this we can just revert this PR after upgrade is successful.
 
-[Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) of the preview specific changes. 
+See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) for increasing parallelism. Ignore the change to dry-run-kustomize.sh, this is not applicable for most circumstances. This:
+
+patches parallelism of 15 for oneagent
+patches parallelism of 5 for the csi driver
+only applies to preview
+Use this mechanism and values for preview only
 
 ### Monitoring the upgrade
 

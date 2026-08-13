@@ -45,6 +45,12 @@ patches parallelism of 5 for the csi driver
 only applies to preview
 Use this mechanism and values for preview only
 
+The daemon set rollout can be monitored by running the following command periodically (or using -w to for dynamically updating):
+
+kubectl get ds -n dynatrace
+
+It was seen that the HR status can succeed before rollout is complete, ensure the rollout is finished before terminating the maintenance window in Dyantrace - general monitoring is also described in the section below
+
 ### Monitoring the upgrade
 
 Once the PR to flux is merged, you can check if the cluster has picked it up yet by running:

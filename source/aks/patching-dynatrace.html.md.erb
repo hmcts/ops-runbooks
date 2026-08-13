@@ -28,6 +28,32 @@ Dynatrace is deployed through flux-config, upgrading involves a PR to flux to ch
 
 In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize. There is a good example of applying CRDS to a certain env in the traefik patching docs.
 
+## Preview specific steps
+
+Preview's node count is much higher than any other environment. Dynatrace has two daemon sets with a rolling update strategy that upgrades 1 at a time. This is to reduce potential of setting off implemented alerts for the cluster from within Dynatrace.
+
+This update strategy is too slow given the node count for preview and would require a HR timeout of roughly 4hrs. Instead, we can set Dynatrace into a maintenance window for host group: PREVIEW_CFT & then increase parallelism
+
+Before raising the PR to flux for upgrading preview ensure you have put dynatrace into a monitoring window, To set the maintenance window (dynatrace admin rights are needed).
+
+To make clean up post upgrade easier I recommend increasing the version of dynatrace on preview in a separate PR before adding these adjustments, by doing this we can just revert this PR after upgrade is successful.
+
+See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) for increasing parallelism. Ignore the change to dry-run-kustomize.sh, this is not applicable for most circumstances. This:
+
+- patches parallelism of 15 for oneagent
+- patches parallelism of 5 for the csi driver
+- only applies to preview
+
+Use this mechanism and values for preview only
+
+The daemon set rollout can be monitored by running the following command periodically (or using -w for dynamically updating):
+
+```bash
+kubectl get ds -n dynatrace
+```
+
+It was seen that the HR status can succeed before rollout is complete, ensure the rollout is finished before terminating the maintenance window in Dynatrace - general monitoring is also described in the section below
+
 ### Monitoring the upgrade
 
 Once the PR to flux is merged, you can check if the cluster has picked it up yet by running:
@@ -70,9 +96,9 @@ helm ls -a -n dynatrace
 ```
 
 ### Troubleshooting
-After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dyntrace has fixed this but when the HR would would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
+After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dynatrace has fixed this but when the HR would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
 
-If the helm release fails to install, you can check the kustomize pods logs and grep for dynatrace, you might mind for example that it cannot find the webhook. The following commands have been used to work around this.
+If the helm release fails to install, you can check the kustomize pods logs and grep for dynatrace, you might find for example that it cannot find the webhook. The following commands have been used to work around this.
 
 First delete the CRDs, use Helm to install the HR pointing to the image on our repository to pull values and then reconcile Flux.
 
@@ -107,5 +133,5 @@ It may take a few times of doing this if you keep seeing a context deadline exce
 #### Edge case
 
 Somehow, it may get into a state where helm shows the latest chart version as deployed, but kubectl shows it in a "False" state.
-This happens when kubectl has hit it's max retries, but you have manually used helm rollback to get the deployment into the correct state.
+This happens when kubectl has hit its max retries, but you have manually used helm rollback to get the deployment into the correct state.
 You can use kubectl edit, to increase the retries temporarily, and flux should reconcile the kubectl reply to show the correct status. Flux will reset this back to the original value for retries after a few minutes.

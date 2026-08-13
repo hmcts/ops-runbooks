@@ -36,7 +36,7 @@ For preview we need to allow it to upgrade up to 15 one agents pods at a time an
 
 Before raising the PR to flux for upgrading preview ensure you have put dynatrace into a monitoring window. 
 
-To make clean up post upgrade easier i reccommend increasing the version of dynatrace on preview in a seperate PR before adding these adjustments, by doing this we can just revert this PR after upgrade is successful.
+To make clean up post upgrade easier I recommend increasing the version of dynatrace on preview in a separate PR before adding these adjustments, by doing this we can just revert this PR after upgrade is successful.
 
 [Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) of the preview specific changes. 
 
@@ -82,9 +82,9 @@ helm ls -a -n dynatrace
 ```
 
 ### Troubleshooting
-After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dyntrace has fixed this but when the HR would would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
+After patching to version 1.1.0 there was an issue where the CRDs would create other resources, Dynatrace has fixed this but when the HR would try to deploy it would still complain about existing resources. If you see this you can remove the HR and wait for it to come back, if it fails then straight away remove the following CRDS
 
-If the helm release fails to install, you can check the kustomize pods logs and grep for dynatrace, you might mind for example that it cannot find the webhook. The following commands have been used to work around this.
+If the helm release fails to install, you can check the kustomize pods logs and grep for dynatrace, you might find for example that it cannot find the webhook. The following commands have been used to work around this.
 
 First delete the CRDs, use Helm to install the HR pointing to the image on our repository to pull values and then reconcile Flux.
 
@@ -119,5 +119,5 @@ It may take a few times of doing this if you keep seeing a context deadline exce
 #### Edge case
 
 Somehow, it may get into a state where helm shows the latest chart version as deployed, but kubectl shows it in a "False" state.
-This happens when kubectl has hit it's max retries, but you have manually used helm rollback to get the deployment into the correct state.
+This happens when kubectl has hit its max retries, but you have manually used helm rollback to get the deployment into the correct state.
 You can use kubectl edit, to increase the retries temporarily, and flux should reconcile the kubectl reply to show the correct status. Flux will reset this back to the original value for retries after a few minutes.

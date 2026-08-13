@@ -40,14 +40,17 @@ To make clean up post upgrade easier I recommend increasing the version of dynat
 
 See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) for increasing parallelism. Ignore the change to dry-run-kustomize.sh, this is not applicable for most circumstances. This:
 
-patches parallelism of 15 for oneagent
-patches parallelism of 5 for the csi driver
-only applies to preview
+- patches parallelism of 15 for oneagent
+- patches parallelism of 5 for the csi driver
+- only applies to preview
+
 Use this mechanism and values for preview only
 
 The daemon set rollout can be monitored by running the following command periodically (or using -w to for dynamically updating):
 
+```bash
 kubectl get ds -n dynatrace
+```
 
 It was seen that the HR status can succeed before rollout is complete, ensure the rollout is finished before terminating the maintenance window in Dyantrace - general monitoring is also described in the section below
 

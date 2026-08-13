@@ -12,7 +12,14 @@ We use PATs to allow azure-devops self-hosted agents to spin up through KEDA bas
 We use a bot account to sign in to Azure Devops and generate new PATs.
 You can sign in with `rpe-azure-devops-email` and `rpe-azure-devops-password` found in the `rpe-prod` Key Vault in Azure.
 
-Once signed in, click on user settings > Personal access tokens as below:
+> *Note:* Ensure you sign into the Azure Devops account by clicking on your profile in the top right and `Sign in with a different account`. If you get redirected to the main Microsoft sign-in flow you might get prompted for the MFA (authenticator app or a phone number) for this account which is currently unavailable.
+
+Once signed in you may land on a general landing site, if this is a case, click on `dev.azure.com/hmcts (Member)` this will redirect you to the Azure Devops page logged in as the PAT account.
+![General Landing Page](images/ADO-PAT-account-general-landing-page.png)
+
+
+Once there click on user settings > Personal access tokens as below:
+
 ![Agent_Token_Generation](images/ADO-Agent-PAT-setting.png)
 
 You will be able to see current active tokens, and expired/revoked tokens too once in this page.

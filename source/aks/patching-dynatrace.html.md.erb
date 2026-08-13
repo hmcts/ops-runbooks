@@ -28,6 +28,18 @@ Dynatrace is deployed through flux-config, upgrading involves a PR to flux to ch
 
 In this case, as there were no breaking changes or config changes, I applied to base in SDS first and then CFT after all successful. If there are things you want to test in an upgrade, you can apply this to one nonprod environment first using kustomize. There is a good example of applying CRDS to a certain env in the traefik patching docs.
 
+## Preview specific steps
+
+Dynatrace on preview is a lot larger than on other nonprod environments, so we need to approach the patching differently.
+
+For preview we need to allow it to upgrade up to 15 one agents pods at a time and 5 csi driver pods at a time. We do this by adding specific patches to the preview deployment. 
+
+Before raising the PR to flux for upgrading preview ensure you have put dynatrace into a monitoring window. 
+
+To make clean up post upgrade easier i reccommend increasing the version of dynatrace on preview in a seperate PR before adding these adjustments, by doing this we can just revert this PR after upgrade is successful.
+
+[Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) of the preview specific changes. 
+
 ### Monitoring the upgrade
 
 Once the PR to flux is merged, you can check if the cluster has picked it up yet by running:

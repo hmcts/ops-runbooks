@@ -46,13 +46,13 @@ See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/46819) for increa
 
 Use this mechanism and values for preview only
 
-The daemon set rollout can be monitored by running the following command periodically (or using -w to for dynamically updating):
+The daemon set rollout can be monitored by running the following command periodically (or using -w for dynamically updating):
 
 ```bash
 kubectl get ds -n dynatrace
 ```
 
-It was seen that the HR status can succeed before rollout is complete, ensure the rollout is finished before terminating the maintenance window in Dyantrace - general monitoring is also described in the section below
+It was seen that the HR status can succeed before rollout is complete, ensure the rollout is finished before terminating the maintenance window in Dynatrace - general monitoring is also described in the section below
 
 ### Monitoring the upgrade
 

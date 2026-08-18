@@ -65,6 +65,11 @@ az network bastion ssh \
 
 Use this pattern with Crime-specific values:
 
+| Environment | Bastion name | Resource group |
+| --- | --- | --- |
+| Nonlive | `BA-MDV-DMZ-01` | `RG-MDV-BASTION-01` |
+| Live | `BA-MPD-DMZ-01` | `RG-MPD-BASTION-01` |
+
 ```bash
 az network bastion ssh \
   --name "<CRIME_BASTION_NAME>" \

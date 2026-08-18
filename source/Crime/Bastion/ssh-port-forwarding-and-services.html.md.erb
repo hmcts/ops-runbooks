@@ -12,6 +12,7 @@ Use this page for tunnel + `ssh -L` forwarding to Crime services.
 ## Contents
 
 - [Prerequisites](#prerequisites)
+- [Bastion reference](#bastion-reference)
 - [Pattern](#pattern)
 - [Example: Artemis admin UI](#example-artemis-admin-ui)
 - [Example: Postgres PaaS](#example-postgres-paas)
@@ -29,6 +30,15 @@ Use this page for tunnel + `ssh -L` forwarding to Crime services.
 - SSH private key present locally.
 - General SSH working via Bastion. See [General SSH use](./general-ssh.html) first.
 - Target VM must have network path to the downstream service (Postgres, Artemis, Gerrit).
+
+## Bastion reference
+
+| Environment | Bastion name | Resource group |
+| --- | --- | --- |
+| Nonlive | `BA-MDV-DMZ-01` | `RG-MDV-BASTION-01` |
+| Live | `BA-MPD-DMZ-01` | `RG-MPD-BASTION-01` |
+
+The examples below use the nonlive values. Swap in the live values for production access.
 
 ## Pattern
 
@@ -53,8 +63,8 @@ Open tunnel:
 
 ```bash
 az network bastion tunnel \
-  --name VN-MDV-DMZ-01-bastion \
-  --resource-group RG-MDV-DMZ-01 \
+  --name BA-MDV-DMZ-01 \
+  --resource-group RG-MDV-BASTION-01 \
   --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
   --resource-port 22 \
   --port 2022
@@ -80,8 +90,8 @@ Open tunnel:
 
 ```bash
 az network bastion tunnel \
-  --name VN-MDV-DMZ-01-bastion \
-  --resource-group RG-MDV-DMZ-01 \
+  --name BA-MDV-DMZ-01 \
+  --resource-group RG-MDV-BASTION-01 \
   --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
   --resource-port 22 \
   --port 2022
@@ -109,8 +119,8 @@ Open tunnel to Bastion:
 
 ```bash
 az network bastion tunnel \
-  --name VN-MDV-DMZ-01-bastion \
-  --resource-group RG-MDV-DMZ-01 \
+  --name BA-MDV-DMZ-01 \
+  --resource-group RG-MDV-BASTION-01 \
   --target-resource-id "/subscriptions/e6b5053b-4c38-4475-a835-a025aeb3d8c7/resourceGroups/RG-MDV-INT-01/providers/Microsoft.Compute/virtualMachines/MDVCREV01.cpp.nonlive" \
   --resource-port 22 \
   --port 2022

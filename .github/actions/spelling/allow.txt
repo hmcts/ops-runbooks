@@ -793,6 +793,11 @@ sas
 FLUSHALL
 PDB
 PDBs
+AZCLI
+azcopy
+platopslackhelpbotai
+popd
+pushd
 XPOST
 sitamp
 sitamp01

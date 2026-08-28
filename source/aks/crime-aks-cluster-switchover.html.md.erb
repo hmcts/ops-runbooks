@@ -369,7 +369,44 @@ Generally use the `main` branch for reporting cronjobs. If unsure, check with th
 
 ---
 
-### 6. Update Global DNS
+### 6. Verify Audit/Fabric Dependencies
+
+> **Applies to:** PRP, PRD
+
+If Audit Reports uses Microsoft Fabric in the environment being switched, confirm the Fabric workspace still has a working route and permission to run against the destination cluster.
+
+This check is required because the standard AKS connectivity tests prove that services are reachable from the cluster, but they do not prove that Fabric can still call CP APIs or start report pipelines after a cluster switchover.
+
+Check the following before declaring the switchover complete:
+
+1. **Fabric managed private endpoint**
+   - Confirm any Fabric managed private endpoint used by Audit points to the destination AKS ingress Private Link Service.
+   - Confirm the managed private endpoint connection is approved.
+   - Failure mode: Fabric notebooks cannot call CP APIs through the expected private route after failover.
+
+2. **Fabric workspace role assignments**
+   - Confirm the destination cluster workload identities have access to the Fabric workspace.
+   - Required identities normally include:
+     - `ns-<env>-ccm-01-springboot-identity`
+     - `ns-<env>-ccm-01-wildfly-identity`
+   - These identities need sufficient workspace permission to run the configured Fabric pipeline/notebook.
+   - Failure mode: `auditreports-service` can create the report request row, but Fabric rejects the pipeline start with `403`.
+
+3. **Terraform**
+   - Apply the relevant environment in [cpp-terraform-audit-fabric](https://github.com/hmcts/cpp-terraform-audit-fabric) after the AKS identity has changed.
+   - For PRD, confirm the Fabric workspace assignment includes the current service principal object IDs for the live AKS workload identities.
+
+4. **Verification**
+   - Submit a small Audit Reports request through the UI.
+   - Confirm the `/auditreports-service/reports` POST succeeds.
+   - Confirm a `reportrequests` row is created.
+   - Confirm `pipelineJobId` is populated.
+   - Confirm the Fabric pipeline starts.
+
+
+---
+
+### 7. Update Global DNS
 
 > **Applies to:** ALL
 
@@ -384,7 +421,7 @@ Additionally check the environment tfvars for the cluster you are working on. En
 
 ---
 
-### 7. Basic Connectivity Testing
+### 8. Basic Connectivity Testing
 
 > **Applies to:** ALL
 
@@ -405,7 +442,7 @@ Both should return `pong`.
 
 ---
 
-### 8. Update Redirect URIs for Kiali/Grafana
+### 9. Update Redirect URIs for Kiali/Grafana
 
 > **Applies to:** ALL
 
@@ -420,7 +457,7 @@ Search for any other entries which point to old k8s cluster and update. Search `
 
 ---
 
-### 9. Update Dynatrace
+### 10. Update Dynatrace
 
 > **Applies to:** NFT, PRP, PRD
 
@@ -429,7 +466,7 @@ Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces
 
 ---
 
-### 10. Update Key Vault Networking
+### 11. Update Key Vault Networking
 
 > **Applies to:** SIT, NFT, PRP, PRD, PRX
 
@@ -452,7 +489,7 @@ Configure the Key Vault to allow access from the new cluster VNET.
 
 ---
 
-### 11. Apply Progression Scaling CronJob (If Applicable)
+### 12. Apply Progression Scaling CronJob (If Applicable)
 
 > **Applies to:** PRD
 
@@ -526,7 +563,7 @@ spec:
 
 ---
 
-### 12. Update mi-ado-agent Managed Identity
+### 13. Update mi-ado-agent Managed Identity
 
 > **Applies to:** DEV, STE
 
@@ -555,7 +592,7 @@ Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e060
 
 ---
 
-### 13. Update Jenkins Configuration for AKS Agents
+### 14. Update Jenkins Configuration for AKS Agents
 
 > **Applies to:** DEV
 
@@ -598,7 +635,7 @@ kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token
 
 ---
 
-### 14. Enable Cost Analysis
+### 15. Enable Cost Analysis
 
 > **Applies to:** ALL
 
@@ -617,7 +654,7 @@ If the pod stays hung on 'pending' status, its likely the PVC is being rejected 
 
 ---
 
-### 15. Lock Inactive Cluster
+### 16. Lock Inactive Cluster
 
 > **Applies to:** ALL
 
@@ -662,7 +699,7 @@ After updating the var files, get them reviewed and run `terraform plan/apply` o
 
 ---
 
-### 16. Destroy Old Cluster (After a Few Days)
+### 17. Destroy Old Cluster (After a Few Days)
 
 > **Applies to:** ALL
 
@@ -699,7 +736,7 @@ This should return a `ResourceGroupNotFound` error once destruction is complete.
 
 ---
 
-### 17. Merge Release Branch to Main (After All Environments Switched)
+### 18. Merge Release Branch to Main (After All Environments Switched)
 
 > **Applies to:** ALL
 

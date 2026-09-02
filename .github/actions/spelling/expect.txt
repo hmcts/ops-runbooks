@@ -182,6 +182,7 @@ privatednszonename
 privatekeyfilename
 prl
 PRX
+PRXCCM
 pvc
 Qube
 rdp

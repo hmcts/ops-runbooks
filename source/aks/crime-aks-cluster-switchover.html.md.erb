@@ -405,7 +405,33 @@ Both should return `pong`.
 
 ---
 
-### 8. Update Redirect URIs for Kiali/Grafana
+### 8. Restart IDAM Stack Docker Containers (PRX Docker Host)
+
+> **Applies to:** PRX, only when the cluster switchover has changed the cluster's IP
+
+PRX runs its IDAM stack on a docker host (PRXCCM01DK01.cp.cjs.hmcts.net) instead of full IDAM stack on VM's. This step only applies when the cluster switchover has changed the cluster's IP — the docker host's containers need restarting to pick up the DNS change.
+
+**Known issue (2026-09-01 CL01 switchover):** Dynatrace OneAgent can break these containers on restart. It auto-injects a monitoring agent into every process, including in-container, and if it has auto-updated since the containers last started, its agent library can require a newer `glibc` than these old (EL6-based) images have — every JVM container then fails to start with `Could not find agent library ... GLIBC_2.17' not found`.
+
+Check whether `oneagent.service` is running and stop it before restarting containers:
+
+```bash
+systemctl status oneagent.service
+sudo systemctl stop oneagent.service
+```
+
+Then restart the IDAM stack containers via systemd, which starts them in the compose-defined order:
+
+```bash
+sudo systemctl stop idam-stack.service
+sudo systemctl start idam-stack.service
+```
+
+Verify `docker ps` shows 30 containers running.
+
+---
+
+### 9. Update Redirect URIs for Kiali/Grafana
 
 > **Applies to:** ALL
 
@@ -420,7 +446,7 @@ Search for any other entries which point to old k8s cluster and update. Search `
 
 ---
 
-### 9. Update Dynatrace
+### 10. Update Dynatrace
 
 > **Applies to:** NFT, PRP, PRD
 
@@ -429,7 +455,7 @@ Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces
 
 ---
 
-### 10. Update Key Vault Networking
+### 11. Update Key Vault Networking
 
 > **Applies to:** SIT, NFT, PRP, PRD, PRX
 
@@ -452,7 +478,7 @@ Configure the Key Vault to allow access from the new cluster VNET.
 
 ---
 
-### 11. Apply Progression Scaling CronJob (If Applicable)
+### 12. Apply Progression Scaling CronJob (If Applicable)
 
 > **Applies to:** PRD
 
@@ -526,7 +552,7 @@ spec:
 
 ---
 
-### 12. Update mi-ado-agent Managed Identity
+### 13. Update mi-ado-agent Managed Identity
 
 > **Applies to:** DEV, STE
 
@@ -555,7 +581,7 @@ Example: `https://uksouth.oic.prod-aks.azure.com/e2995d11-9947-4e78-9de6-d44e060
 
 ---
 
-### 13. Update Jenkins Configuration for AKS Agents
+### 14. Update Jenkins Configuration for AKS Agents
 
 > **Applies to:** DEV
 
@@ -598,7 +624,7 @@ kubectl get secrets/jenkins-admin-token -n kube-system --template='{{.data.token
 
 ---
 
-### 14. Enable Cost Analysis
+### 15. Enable Cost Analysis
 
 > **Applies to:** ALL
 
@@ -617,7 +643,7 @@ If the pod stays hung on 'pending' status, its likely the PVC is being rejected 
 
 ---
 
-### 15. Lock Inactive Cluster
+### 16. Lock Inactive Cluster
 
 > **Applies to:** ALL
 
@@ -662,7 +688,7 @@ After updating the var files, get them reviewed and run `terraform plan/apply` o
 
 ---
 
-### 16. Destroy Old Cluster (After a Few Days)
+### 17. Destroy Old Cluster (After a Few Days)
 
 > **Applies to:** ALL
 
@@ -699,7 +725,7 @@ This should return a `ResourceGroupNotFound` error once destruction is complete.
 
 ---
 
-### 17. Merge Release Branch to Main (After All Environments Switched)
+### 18. Merge Release Branch to Main (After All Environments Switched)
 
 > **Applies to:** ALL
 

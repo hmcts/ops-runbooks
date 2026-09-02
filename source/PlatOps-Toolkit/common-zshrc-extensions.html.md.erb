@@ -1,0 +1,103 @@
+---
+title: Common ZSHRC Extensions
+last_reviewed_on: 2025-09-02
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+When using oh-my-zsh, you can add some extensions and custom code to your `.zshrc` file to improve your workflow. Below are some common extensions that can be added to your `.zshrc` file.
+
+- Useful zsh plugins
+  - Add these to your `.zshrc` file:
+    `plugins=(git kubectl kube-ps1)`
+
+- [kubectx](https://github.com/ahmetb/kubectx)
+  - A utility to switch between Kubernetes contexts and namespaces easily. It provides a command-line interface to manage multiple Kubernetes clusters and namespaces efficiently.
+
+    Run `kubens namespace-name` to switch to the desired Kubernetes namespace.
+
+    ![kubens](images/kubens.png)
+
+- alias for kube context switching
+  - Add the following alias to your `.zshrc` file to switch between Kubernetes contexts easily:
+
+    `alias kx="/opt/homebrew/bin/kubectx"`
+
+    Run `kx aks-cluster-name` to switch to the desired Kubernetes context.
+
+    ![kx](images/kx.png)
+
+- [kube-ps1](https://github.com/jonmosco/kube-ps1)
+  - A Zsh prompt extension that displays the current Kubernetes context and namespace in your terminal prompt. It helps you keep track of which cluster and namespace you are working with.
+
+    ![kube-ps1](images/kube-ps1.png)
+
+- Master/main push sanity checks
+  - Add the following code to your `.zshrc` file to prevent accidental pushes to the `master` or `main` branches. This code will check if you are on the `master` or `main` branch and prompt you for confirmation before allowing the push.
+
+  ```bash
+  # Sanity Checks
+  preexec () { 
+    if [[ ${1} =~ "gpush" || ${1} =~ "git push" ]];then 
+      branch=$(git branch --show-current)
+      # Check if branch is main or master and stop push going straight through
+      if [[ ${branch} == "master" || ${branch} == "main" ]];then
+        read -q "execStatus?-----  To master? Really? [y/n]  ----- "
+        if [[ ${execStatus} == "y" ]];then
+          printf "\nExecuting...\n"
+        else
+          printf "\nCancelled $1... Refreshing shell.\n"
+          exec zsh
+        fi
+      fi
+    fi
+  }
+```
+
+- Automatically switch to main/master when you get the branch wrong
+  - Add the following code to your `.zshrc` file to automatically switch to the `main` or `master` branch if you try to checkout a non-existent branch.
+
+  ```bash
+  git() {
+    if [[ "$1" == "checkout" && "$#" -eq 2 ]]; then
+      case "$2" in
+        master)
+          command git checkout master || command git checkout main
+          ;;
+        main)
+          command git checkout main || command git checkout master
+          ;;
+        *)
+          command git "$@"
+          ;;
+      esac
+    else
+      command git "$@"
+    fi
+  }
+```
+
+- Use functions to make switching azure account easier
+  - Add the following aliases to your `.zshrc` file to switch between Azure accounts easily:
+
+  ```bash
+  # Login automatically
+  function az_login_hmcts {
+      export AZURE_CONFIG_DIR=~/.azure
+      az login
+  }
+  
+  # Prompt for device code so it doesn't use your default account
+  function az_login_crime_nonlive {
+      export AZURE_CONFIG_DIR=~/.azure-crime-nonlive
+      az login --use-device-code
+  }
+
+  # Prompt for device code so it doesn't use your default account
+  function az_login_crime_live {
+      export AZURE_CONFIG_DIR=~/.azure-crime-live
+      az login --use-device-code
+  }
+  ```

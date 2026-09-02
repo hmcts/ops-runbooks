@@ -79,6 +79,7 @@ emoji
 Enda
 Ente
 ENVCCM
+esac
 Eyetan
 failedjobshistorylimit
 fastapi
@@ -100,6 +101,7 @@ GEOLOCATIONUPDATES
 gerrit
 Glust
 gluster
+gpush
 grafana
 Hashicorp
 hcp
@@ -123,6 +125,7 @@ kalyan
 kiali
 KQL
 kubctl
+kubens
 KVs
 lau
 ldhx
@@ -177,6 +180,7 @@ poolname
 postgress
 prd
 PRDATL
+preexec
 prepatch
 privatednszonename
 privatekeyfilename

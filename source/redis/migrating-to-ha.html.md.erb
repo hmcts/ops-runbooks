@@ -1,0 +1,49 @@
+---
+title: Upgrading Redis Cache to High Availability
+weight: 255
+last_reviewed_on: 2025-09-30
+review_in: 12 months
+---
+# <%= current_page.data.title %>
+
+**Contents**
+
+- [Intro](#intro)
+- [Enabling HA (Premium SKU only)](#enabling-ha-premium-sku-only)
+- [Enabling HA (Standard or Basic SKU)](#enabling-ha-standard-or-basic-sku)
+
+## Intro
+
+Azure Cache for Redis is a fully managed service that provides a secure and dedicated Redis cache, managed by Microsoft.
+Redis is an open-source, in-memory data structure store, used as a database, cache and message broker.
+Premium SKU Redis Cache instances can be upgraded in-place to a high availability (HA) configuration to provide enhanced reliability and uptime for applications that rely on Redis.
+Basic and Standard SKU Redis Cache instances can be upgraded to HA, but this requires re-creating the resource via terraform.
+The redis cache instance must be in a supported Azure region in order to enable HA (UK South is a supported region).
+
+## Enabling HA (Premium SKU only)
+
+1. Navigate to the Redis Cache instance in the Azure portal.
+2. In the left-hand menu, select "Advanced Settings".
+3. Under "Zone Redundancy", tick the "Allocate zones automatically" checkbox.
+4. Click "Save" to apply the changes.
+
+The resource may then require a terraform import to bring the change back into terraform state.
+See the [Terraform Import guide](../Terraform/terraform-import.html) for how this can be accomplished in code.
+
+**TODO** Check if the terraform import is required, or if a terraform plan will show no changes.
+**TODO** Check if the `available_zones` argument in the terraform code needs to be updated.
+
+## Enabling HA (Standard or Basic SKU)
+
+A Standard or Basic SKU Redis Cache instance cannot be upgraded in-place to a High Availability configuration.
+In order to enable HA on an existing Standard or Basic SKU Redis Cache instance, the Redis Cache instance must be re-created via terraform.
+Alternatively, the instance can be upgraded in-place to a Premium SKU and then the HA enabled with the above method.
+Redis Cache instances cannot be downgraded from Premium to Standard or Basic SKUs without re-creating.
+
+To enable HA on a Standard or Basic SKU Redis Cache instance via terraform:
+
+1. In the terraform code, manually specify the `available_zones` argument in the `cnp-module-tedis-cache` module block.
+2. Run `terraform plan` to see the changes that will be applied. This will show that the existing Redis Cache instance will be destroyed and a new one created.
+3. Run `terraform apply` to apply the changes. This will create a new Redis Cache instance with the specified availability zones.
+
+Valid availability zones in UK South are 1, 2 and 3.  At least two zones must be specified to enable HA.

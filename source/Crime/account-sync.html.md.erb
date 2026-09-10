@@ -28,7 +28,7 @@ Only `account_enabled = true` to `account_enabled = false` changes are permitted
 1. Open the [CNP Account Sync pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=798&_a=summary) run and confirm the reconciliation stage succeeded.
 2. Download the relevant artifacts:
    - `cnp-account-sync-report` provides aggregate counts.
-   - `cnp-account-sync-disable-candidates` lists proposed disablements.
+   - `cnp-account-sync-disable-candidates` lists accounts proposed for disabling.
    - `cnp-account-sync-unmatched-crime-users` lists enabled Crime users without an HMCTS match.
    - `cnp-account-sync-hmcts-duplicate-emails` lists ambiguous HMCTS source emails.
 3. Review each managed team pull request and confirm every change only sets `account_enabled` from `true` to `false` for the expected users.

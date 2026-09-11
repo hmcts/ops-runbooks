@@ -1,0 +1,54 @@
+---
+title: Review CNP account sync
+last_reviewed_on: 2026-09-10
+review_in: 12 months
+weight: 110
+---
+
+# <%= current_page.data.title %>
+
+The CNP account sync runs daily at 23:00 UTC. It compares enabled Crime users with accounts in the `HMCTS.NET` Entra ID tenant and creates or updates one review pull request per affected Crime team.
+
+The pipeline never auto-merges pull requests, runs Terraform, or directly changes accounts in either tenant.
+
+## Prerequisites
+
+- Access to the `hmcts-cpp` Azure DevOps organisation and the `cpp-apps` project
+- Read access to `hmcts/cpp-terraform-azurerm-azuread` GitHub repository
+- Permission to review Terraform account configuration changes for the affected Crime team
+
+## Matching and safety
+
+The `HMCTS.NET` Entra ID tenant is the source of truth. Account data is retrieved through Microsoft Graph, and matching uses exact, case-insensitive equality between the Entra ID `mail` attribute and the Crime user's `email` value defined in Terraform.
+
+Only `account_enabled = true` to `account_enabled = false` changes are permitted. Missing HMCTS matches and duplicate HMCTS source emails fail closed and do not produce changes.
+
+## Review a run
+
+1. Open the [CNP Account Sync pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=798&_a=summary) run and confirm the reconciliation stage succeeded.
+2. Download the relevant artifacts:
+   - `cnp-account-sync-report` provides aggregate counts.
+   - `cnp-account-sync-disable-candidates` lists accounts proposed for disabling.
+   - `cnp-account-sync-unmatched-crime-users` lists enabled Crime users without an HMCTS match.
+   - `cnp-account-sync-hmcts-duplicate-emails` lists ambiguous HMCTS source emails.
+3. Review each managed team pull request and confirm every change only sets `account_enabled` from `true` to `false` for the expected users.
+4. Obtain the normal team approval before merging. The existing users pipeline applies merged Terraform changes separately.
+
+## Run manually
+
+Queue the [CNP Account Sync pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=798&_a=summary) from `main` with:
+
+- `dryRun=true` to publish artifacts without changing branches or pull requests.
+- `dryRun=false` and `team=auto` to create or update pull requests for all actionable teams.
+- `dryRun=false` and `team=<team-name>` to limit pull request processing to one team.
+
+Use a dry run first when investigating unexpected results.
+
+## Troubleshooting
+
+- **No pull request is created:** Check the summary and candidate artifacts. The run may have no actionable users, or the HMCTS source match may be missing or ambiguous.
+- **A managed pull request has no new commit:** It is already up to date; repeat runs are expected to be idempotent.
+- **The pipeline fails before reconciliation:** Check access to the detector credentials in `central-app-reg-kv`.
+- **Pull request publication fails:** Check access to the GitHub bot token in `infra-vault-nonprod` and the token owner's repository permissions.
+
+For implementation details, see the [CNP Account Sync README](https://github.com/hmcts/cpp-terraform-azurerm-azuread).

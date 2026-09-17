@@ -1,6 +1,6 @@
 ---
 title: Tenable Nessus
-last_reviewed_on: 2026-05-01
+last_reviewed_on: 2026-09-15
 review_in: 12 months
 weight: 200
 ---
@@ -11,7 +11,11 @@ to scan devices and check them against the nessus database that contains thousan
 and patch them before they are exploited. There are three components to the tenable setup, the server, scanners
 and the agents. 
 
-Access is via the URL https://nessus.hmcts.net/ which is an Azure Entra ID enterprise application called Nessus. (See below for renewing certs)
+When connected to the CNP VPN, access Tenable Security Center directly at https://tenable-sc.platform.hmcts.net/. Sign
+in using a local Tenable SC account, not your Entra credentials.
+
+https://nessus.hmcts.net/ is the public Azure App Proxy endpoint. It proxies to the internal URL and uses Entra
+authentication. (See below for renewing certs)
 
 This runbook will cover the following
 

@@ -1,0 +1,52 @@
+---
+title: Patterns for Cross-Tenant Communication
+last_reviewed_on: 2026-09-25
+review_in: 12 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+This guide describes the preferred connectivity models when connecting Common Platform (CP) to the Cloud Native Platform (CNP) tenant.
+
+## Principles
+
+- Use the first suitable option in the preference order below. If a use case requires a lower-ranked option, clearly document why each higher-ranked option is not suitable, including the security, operational, and support implications.
+- Use NSG (Network Security Groups) to control and restrict traffic between subnets and virtual networks, ensuring that only the necessary communication is allowed.
+
+## Preference Order
+
+1. **Inbound private endpoints**
+
+   Prefer an inbound private endpoint when CP needs to consume a specific CNP service or a Shared Platform Service hosted in CNP. This keeps access private and scopes connectivity to the required service rather than joining the tenant networks.
+
+   - [Azure Private Endpoint overview](https://learn.microsoft.com/azure/private-link/private-endpoint-overview)
+
+2. **Direct subnet peering**
+
+   Use direct subnet peering only when private endpoint connectivity cannot meet the requirement and the connection can be limited to the required subnets. Document the subnets, routes, DNS dependencies, and network security controls.
+
+   - [Configure Azure subnet peering](https://learn.microsoft.com/azure/virtual-network/how-to-configure-subnet-peering)
+
+3. **Direct virtual network peering**
+
+   Use direct virtual network peering only when subnet-scoped connectivity is insufficient. This has a broader connectivity scope and requires a documented justification, awareness of potential IP space overlap, including the required route and security boundaries.
+
+   - [Azure virtual network peering overview](https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview)
+
+4. **Over the internet**
+
+   Use public internet connectivity only when private connectivity options are not viable, and as a last resort. The justification must describe the public exposure, authentication, encryption, ingress restrictions, and monitoring controls.
+   In this case, we should also ensure that traffic is sent via the required network appliances on both tenants for required visibility (Palo Altos, NGFs)
+
+   - [Azure public IP addresses](https://learn.microsoft.com/azure/virtual-network/ip-services/public-ip-addresses)
+
+## Required Documentation
+
+For every CP-to-CNP use case, record the selected model from above, reasoning, and implementation and security controls.
+
+When the selected model is not an inbound private endpoint, a completed [Architecture Decision Record (ADR) template](adrs/example-adr.md) is required. The ADR must explain why inbound private endpoints are unsuitable and, when applicable, why each higher-ranked option was not selected.
+
+## Related Documentation
+
+- [Networking index](index.html)

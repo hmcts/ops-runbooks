@@ -155,6 +155,7 @@ ndata
 netcat
 networksetup
 nfdiv
+NGFs
 nodelocaldns
 nodepool
 NONLINE

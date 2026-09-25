@@ -11,7 +11,8 @@ This guide describes the preferred connectivity models when connecting Common Pl
 
 ## Principles
 
-Use the first suitable option in the preference order below. If a use case requires a lower-ranked option, clearly document why each higher-ranked option is not suitable, including the security, operational, and support implications.
+- Use the first suitable option in the preference order below. If a use case requires a lower-ranked option, clearly document why each higher-ranked option is not suitable, including the security, operational, and support implications.
+- Use NSG (Network Security Groups) to control and restrict traffic between subnets and virtual networks, ensuring that only the necessary communication is allowed.
 
 ## Preference Order
 
@@ -36,6 +37,7 @@ Use the first suitable option in the preference order below. If a use case requi
 4. **Over the internet**
 
    Use public internet connectivity only when private connectivity options are not viable, and as a last resort. The justification must describe the public exposure, authentication, encryption, ingress restrictions, and monitoring controls.
+   In this case, we should also ensure that traffic is sent via the required network appliances on both tenants for required visibility (Palo Altos, NGFs)
 
    - [Azure public IP addresses](https://learn.microsoft.com/azure/virtual-network/ip-services/public-ip-addresses)
 

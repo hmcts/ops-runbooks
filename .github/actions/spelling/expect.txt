@@ -3,6 +3,7 @@ ACNF
 ACRD
 acrsync
 ACTAP
+adr
 aeb
 Afresco
 agentpool

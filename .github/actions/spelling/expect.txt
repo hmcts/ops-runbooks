@@ -3,6 +3,7 @@ ACNF
 ACRD
 acrsync
 ACTAP
+adr
 aeb
 Afresco
 agentpool
@@ -155,6 +156,7 @@ ndata
 netcat
 networksetup
 nfdiv
+NGFs
 nodelocaldns
 nodepool
 NONLINE

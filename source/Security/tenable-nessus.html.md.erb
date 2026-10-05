@@ -1,9 +1,10 @@
 ---
 title: Tenable Nessus
-last_reviewed_on: 2026-09-15
+last_reviewed_on: 2026-10-05
 review_in: 12 months
 weight: 200
 ---
+
 # <%= current_page.data.title %>
 
 Tenable Nessus is a proprietary vulnerability scanner developed by Tenable. The scanner allows the security team
@@ -17,38 +18,52 @@ in using a local Tenable SC account, not your Entra credentials.
 https://nessus.hmcts.net/ is the public Azure App Proxy endpoint. It proxies to the internal URL and uses Entra
 authentication. (See below for renewing certs)
 
-This runbook will cover the following
+This runbook covers CNP production infrastructure, access and agent operations. Crime procedures are documented separately in the [Crime agent guide](../Services/nessus-agent-crime.html).
 
-- Tenable environments 
-- Deploying agents
-- Verifying agent installation. 
+## Production Infrastructure
 
-This runbook does not cover the finer details of the Terraform bootstrap module.
+Security Center and Nessus Manager run in subscription `HMCTS-SOC-PROD`, resource group `soc-tenable-prod-rg`. Infrastructure is managed in [hmcts/soc](https://github.com/hmcts/soc/tree/master/components/tenable).
 
-## Environments
+| Component | Azure VM | Private IP | Full domain name | UI port |
+| --- | --- | --- | --- | --- |
+| Security Center | `tenable-sc-prod-vm00` | `10.146.5.4` | `tenable-sc.platform.hmcts.net` | HTTPS 443 |
+| Nessus Manager | `nessus-manager-prod-vm00` | `10.146.5.5` | `nessus-manager-prod-vm00.platform.hmcts.net` | HTTPS 8834 |
 
-There are three environments, Prod, Non-Prod and Sbox, the non-prod VM scalesets reside within the prod 
-resource group.
+Production agents use the compatibility name `nessus-scanners-prod000005.platform.hmcts.net:8834`, which resolves to the Manager at `10.146.5.5`.
 
-### Production and Non-Production 
+## Credentials
 
-<b>Subscription:</b> HMCTS-SOC-PROD
+Credentials are stored in Key Vault. Credential details are documented in the [secure-domain KB](https://github.com/hmcts/secure-domain-kb/blob/master/Security/Tennable.md#credential-references).
 
-<b>Resource Group:</b> soc-tenable-prod-rg
+## Access
 
-<b>server:</b> tenable-sc-prod-vm00
+### Prerequisites
 
-<b>VM ScaleSets:</b> nessus-scanners-prod / nessus-scanners-nonprod
+- Connect to the [F5 VPN](https://portal.platform.hmcts.net).
+- For VM SSH, use the matching authorised private key.
 
-### Sbox
+### Security Center UI
 
-<b>Subscription:</b> soc-tenable-sbox-rg
+Open [https://tenable-sc.platform.hmcts.net/](https://tenable-sc.platform.hmcts.net/) on the VPN and sign in with a local Security Center account. The public endpoint [https://nessus.hmcts.net/](https://nessus.hmcts.net/) uses Entra authentication through App Proxy and is not the Manager UI.
 
-<b>Resource Group:</b> HMCTS-SOC-SBOX
+### Nessus Manager UI
 
-<b>server:</b> tenable-sc-sbox-vm00
+Start the tunnel and keep this terminal open:
 
-<b>VM ScaleSets:</b> nessus-scanners-sbox
+```bash
+ssh -F ./sshconfig -N -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:8834:10.146.5.5:8834 bastion-prod-rg-bastion-prod
+```
+
+Open [https://127.0.0.1:8834/](https://127.0.0.1:8834/). The Manager uses its own local account, not your Entra account. Its default certificate can produce a browser certificate warning.
+
+### SSH to Nessus Manager
+
+The Manager uses SSH-key authentication as `adminuser`, not Entra SSH. Password authentication is disabled.
+
+## Relinking Agents
+
+When the Manager is replaced or redeployed, existing agents need to be relinked in place; reusing DNS does not transfer their registrations. Use the [Nessus Agent Operator Tools README](https://github.com/hmcts/soc/blob/master/scripts/tenable/nessus-agent-relink/README.md) for inventory, audit, preview and controlled relinking.
 
 ## Deploying Agents
 
@@ -58,7 +73,7 @@ The agent is deployed using terraform bootstrap module  [terraform-module-vm-boo
 
 #### Steps to setup deployment
 
-- Call the terraform-bootstrap-module from the [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap)
+- Call the terraform-bootstrap-module from the [terraform-module-vm-bootstrap](https://github.com/hmcts/terraform-module-vm-bootstrap).
 
 ```terraform
 module "vm-bootstrap" {
@@ -76,7 +91,7 @@ module "vm-bootstrap" {
 }
 ```
 
-- Add all the required variables 
+- Add all the required variables.
 
 ```terraform
 variable "nessus_install" {
@@ -102,8 +117,8 @@ key_vault_id = data.azurerm_key_vault.soc_vault[0].id
 }
 ```
 
-- Run associated Heritage VM [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=433) on Azure DevOps
 
+- Run the associated Heritage VM [pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=433) on Azure DevOps.
 
 ## Verifying Agent Installation
 
@@ -135,7 +150,7 @@ ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
 
 ### Prerequisites
 
-* Enable JIT access to non-prod or Production Bastion, you can do that [here](https://myaccess.microsoft.com/).
+* Enable JIT access to prod or Production Bastion, you can do that [here](https://myaccess.microsoft.com/).
 * Connect to [F5](https://portal.platform.hmcts.net).
 
 ### Linux Agents 
@@ -143,7 +158,7 @@ ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
 Check if the agent has deployed correctly
 
 ```bash
-systemctl status 
+systemctl status nessusagent
 ```
 
 Remove agent from server
@@ -160,11 +175,11 @@ rpm -e NessusAgent-10.1.3-es7.x86_64
 
 Commands to check Machine connectivity
 ```
-tnc nessus-scanners-nonprod000005.platform.hmcts.net
+tnc nessus-scanners-prod000005.platform.hmcts.net
 ```
 
 ```
-tnc -port 8834 nessus-scanners-nonprod000005.platform.hmcts.net
+tnc -port 8834 nessus-scanners-prod000005.platform.hmcts.net
 ```
 
 Nessus Link commands
@@ -186,8 +201,8 @@ You should see a response similar to output below
 ```
 C:\Program Files\Tenable\Nessus Agent>nessuscli agent status
 Running: Yes
-Linked to: nessus-scanners-nonprod000005.platform.hmcts.net:8834
-Link status: Connected to nessus-scanners-nonprod000005.platform.hmcts.net:8834
+Linked to: nessus-scanners-prod000005.platform.hmcts.net:8834
+Link status: Connected to nessus-scanners-prod000005.platform.hmcts.net:8834
 Last successful connection with controller: 10 secs ago
 Proxy: None
 Plugin set: (null)

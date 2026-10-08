@@ -1,0 +1,47 @@
+---
+title: Jenkins GitHub Apps
+last_reviewed_on: 2026-10-08
+review_in: 12 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+Jenkins uses GitHub App credentials to scan HMCTS repositories, retrieve seed-job configuration, and load shared libraries. Credentials are managed in [CNP Flux](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/jenkins.yaml). Do not include private keys or token values in this runbook.
+
+## Instances
+
+The shared Jenkins configuration is included by both CFT instances:
+
+- CFT PTL: `ptl-intsvc`
+- CFT PTL Sandbox: `sbox-intsvc`
+
+## App usage
+
+| Jenkins credential | Jenkins functionality | Instances |
+| --- | --- | --- |
+| `hmcts-jenkins-a-to-c` | Authenticates the A-C HMCTS organization-folder scans, including the nightly folder. | CFT PTL and CFT Sandbox |
+| `hmcts-jenkins-d-to-i` | Authenticates the D-I HMCTS organization-folder scans, including the nightly folder. | CFT PTL and CFT Sandbox |
+| `hmcts-jenkins-j-to-z` | Authenticates the J-Z HMCTS organization-folder scans, including the nightly folder. | CFT PTL and CFT Sandbox |
+| `hmcts-jenkins-cnp` | Checks out the Jenkins seed-job configuration and retrieves the `Infrastructure`, `Pipeline`, and `Tagged` shared libraries from `cnp-jenkins-library`. | CFT PTL and CFT Sandbox |
+| `hmcts-jenkins-cft` | Authenticates the sandbox-only `Pipeline_Test` organization scan for configured CNP Plum, Rhubarb, and Jenkins-library repositories. | CFT Sandbox |
+| `hmcts-jenkins-rpe` | No consumer is identified in the current Jenkins configuration or organization DSL. Confirm its purpose with the Jenkins or GitHub App owner. | Credential is provisioned, but no consumer is found in the configuration |
+
+The organization-folder scans use GitHub to discover eligible repositories, branches, and pull requests. Repositories are filtered using the approved-repository list and configured topic or name filters.
+
+## Configuration references
+
+- [Jenkins organization-folder DSL](https://github.com/hmcts/cnp-jenkins-config/blob/master/jobdsl/organisations-beta.groovy)
+- [Jenkins seed job](https://github.com/hmcts/cnp-jenkins-config/blob/master/jobdsl/Jenkinsfile_seed)
+- [CFT PTL instance configuration](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml)
+- [CFT PTL Sandbox instance configuration](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/sbox-intsvc/jenkins.yaml)
+
+## GitHub API rate-limit behavior
+
+Jenkins is configured with the GitHub API rate-limit checker mode `ThrottleOnOver`. When GitHub reports that an API rate limit has been exceeded, Jenkins throttles GitHub API activity. This can delay organization-folder scans and repository, branch, or pull-request discovery, which may in turn delay related jobs.
+
+This setting is protective behavior; it does not itself send Slack notifications or provide per-app Grafana alerts.
+
+## Scope to confirm
+
+The Jenkins configuration shows the credentials and their configured consumers; it does not establish each GitHub App's full installation scope, permissions, or owner. Confirm those details with the app owners before treating this page as the authoritative inventory.

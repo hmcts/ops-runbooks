@@ -3,6 +3,7 @@ ACNF
 ACRD
 acrsync
 ACTAP
+adminuser
 aeb
 Afresco
 agentpool
@@ -192,6 +193,7 @@ Qube
 rdp
 recoverypoint
 regitries
+relinking
 replicaset
 Resouce
 resourcegroups

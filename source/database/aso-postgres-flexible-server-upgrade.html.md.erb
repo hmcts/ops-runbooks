@@ -11,6 +11,9 @@ This guide covers how teams select a PostgreSQL engine version and prepare an
 updates the existing server and all its databases, retaining the server name and
 connection endpoint.
 
+**Existing databases and their data are retained on the same server during a
+successful, supported in-place upgrade**
+
 ## Shared default
 
 Check the shared PostgreSQL server manifest in SDS or CNP for the configured default. Teams can explicitly select an engine version using spec.version in their server patch.

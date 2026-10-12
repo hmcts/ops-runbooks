@@ -12,15 +12,17 @@ on the server move to the target engine version.
 
 ## Changing the API version
 
-Use `v20250801`, as shown on
-[line 1 of Toffee's server manifest](https://github.com/hmcts/sds-flux-config/blob/master/apps/toffee/sbox/aso/toffee-postgres.yaml#L1):
+The rendered server should use `v20250801`:
 
 ```yaml
 apiVersion: dbforpostgresql.azure.com/v20250801
 ```
 
-Confirm ASO supports the new API and coordinate matching shared-resource and
-patch APIs to avoid Kustomize failures. Unrelated ASO APIs need no change.
+Confirm ASO supports the new API. Keep the server patch API matching the shared
+resource, then use an application-local JSON patch to replace `/apiVersion`
+after merging.
+This leaves the shared API and other applications unchanged. Build the
+configuration to verify the result. Unrelated ASO APIs need no change.
 Changing the API alone does not upgrade the engine.
 
 ## Select a version
@@ -40,8 +42,15 @@ Test in non-production using a confirmed ASO upgrade method. Afterwards, verify 
 
 ## Toffee example
 
-See [Toffee's upgrade-test PR #9060](https://github.com/hmcts/sds-flux-config/pull/9060/files),
-which changes the existing test server's `spec.version` from `"14"` to `"17"`.
-Toffee already used `v20250801`, so that PR contains no API change.
-This shows the Git change, not confirmed upgrade success; deployed version and
-data-preservation checks are still needed.
+The Toffee server uses this API and engine version:
+
+```yaml
+apiVersion: dbforpostgresql.azure.com/v20250801
+kind: FlexibleServer
+spec:
+  version: "17"
+```
+
+See [PR #9065](https://github.com/hmcts/cnp-flux-config/pull/48175/changes) for this
+documentation-only example showing both versions. It does not change the deployed
+server or verify a successful in-place upgrade.

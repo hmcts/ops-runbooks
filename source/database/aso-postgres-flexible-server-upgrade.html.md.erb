@@ -1,0 +1,53 @@
+---
+title: ASO PostgreSQL version overrides and in-place upgrades
+last_reviewed_on: 2026-10-12
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+This guide covers how teams select a PostgreSQL engine version and prepare an
+**in-place major-version upgrade**, such as PostgreSQL 14 to 17. An in-place upgrade
+updates the existing server and all its databases, retaining the server name and
+connection endpoint.
+
+## Shared default
+
+Check the shared PostgreSQL server manifest in SDS or CNP for the configured default. Teams can explicitly select an engine version using spec.version in their server patch.
+
+
+The shared manifests have been restored to their pre-PR configuration to retain
+compatibility with existing team patches. Teams own engine upgrades. A future
+shared API change requires matching patch APIs in the same validated rollout;
+unrelated ASO APIs do not need updating.
+
+## How to override the default
+
+For a server consuming the shared resource, set `spec.version` in the team server
+patch, typically `apps/<team>/<env>/aso/<team>-postgres.yaml`. For example, after
+the coordinated API rollout:
+
+```yaml
+apiVersion: dbforpostgresql.azure.com/v20250801
+kind: FlexibleServer
+metadata:
+  name: ${NAMESPACE}-${ENVIRONMENT}
+  namespace: ${NAMESPACE}
+spec:
+  version: "16"
+```
+
+Keep other settings unchanged and ensure the patch matches the shared resource
+and is included in the application's Kustomization.
+
+## Preparing an in-place upgrade
+
+Follow Microsoft upgrade guidance [here](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-major-version-upgrade), including compatibility checks, backups and downtime planning. Confirm the ASO upgrade mechanism before applying; changing spec.version alone has not yet been verified. Afterwards, check the server version, preserved data and application connectivity.
+
+## Example
+
+See [Toffee's upgrade-test PR #9060](https://github.com/hmcts/sds-flux-config/pull/9060/files),
+which changes the existing test server's `spec.version` from `"14"` to `"17"`.
+The [upgrade-test manifest](https://github.com/hmcts/sds-flux-config/blob/master/apps/toffee/sbox/aso/toffee-postgres-upgrade.yaml)
+shows the resulting configuration. This demonstrates the Git change; deployed
+version and data-preservation checks are still needed to confirm upgrade success.

@@ -1,0 +1,56 @@
+---
+title: ASO PostgreSQL version overrides and in-place upgrades
+last_reviewed_on: 2026-10-12
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+**A successful, supported in-place upgrade retains existing databases and their
+data on the same server**, keeping its name and connection endpoint. All databases
+on the server move to the target engine version.
+
+## Changing the API version
+
+The rendered server should use `v20250801`:
+
+```yaml
+apiVersion: dbforpostgresql.azure.com/v20250801
+```
+
+Confirm ASO supports the new API. Keep the server patch API matching the shared
+resource, then use an application-local JSON patch to replace `/apiVersion`
+after merging.
+This leaves the shared API and other applications unchanged. Build the
+configuration to verify the result. Unrelated ASO APIs need no change.
+Changing the API alone does not upgrade the engine.
+
+## Select a version
+
+Check the shared manifest in
+[SDS](https://github.com/hmcts/sds-flux-config/blob/master/apps/azureserviceoperator-system/resources/flexibleserver-postgres.yaml)
+or [CNP](https://github.com/hmcts/cnp-flux-config/blob/master/apps/azureserviceoperator-system/resources/flexibleserver-postgres.yaml)
+for the configured default. Override it in the team server patch using
+`spec.version`, for example `"16"` to retain 16 or `"17"` to select 17.
+Keep other settings unchanged; never select a lower version to downgrade a server.
+
+
+## Prepare and verify an upgrade
+
+Follow Microsoft's [upgrade guidance](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-major-version-upgrade):
+Test in non-production using a confirmed ASO upgrade method. Afterwards, verify your database version, data and application connectivity.
+
+## Example
+
+The server uses this API and engine version:
+
+```yaml
+apiVersion: dbforpostgresql.azure.com/v20250801
+kind: FlexibleServer
+spec:
+  version: "17"
+```
+
+See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/48175/files)
+for the Adoption configuration API and desired engine version changes.
+This PR does not verify a successful in-place upgrade.

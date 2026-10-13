@@ -48,7 +48,7 @@ Allowance_Checker () {
     if [[ " ${arr[*]} " =~ " $2 " ]]; then
         echo -e "${GREEN}Tag value in accepted range.${PLAIN}"
     else
-        echo -e "${RED}Tag value was not found, please refer to the tagging dictionary, if you can't find your team here please contact #platops-help. https://hmcts.atlassian.net/wiki/pages/viewpage.action?pageId=1007945237#Taggingv0.4-TaggingDictionary."
+        echo -e "${RED}Tag value was not found, please refer to the tagging dictionary, if you can't find your team here please contact #platops-help. https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1007945237#Taggingv0.4-TaggingDictionary."
         exit 1
     fi
 }
@@ -76,7 +76,7 @@ else
     echo -e "${GREEN}RG in Subscription found! Continuing...${PLAIN}"
 fi
 
-echo -e "\n${YELLOW}For full tagging documentation, naming standards, and to understand the following questions in depth, please visit: \nhttps://hmcts.atlassian.net/wiki/display/DCO/Tagging+v0.4.\n ${PLAIN}"
+echo -e "\n${YELLOW}For full tagging documentation, naming standards, and to understand the following questions in depth, please visit: \nhttps://tools.hmcts.net/confluence/display/DCO/Tagging+v0.4.\n ${PLAIN}"
 # Collect tagging details
 read -p "Application name: " APPLICATION
 Allowance_Checker ALLOWED_APPLICATION_VALUES ${APPLICATION}

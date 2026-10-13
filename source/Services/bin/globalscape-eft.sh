@@ -28,7 +28,7 @@ if [[ ${SELECTED_VM} != "rdo-sftp-eft-1" && ${SELECTED_VM} != "rdo-sftp-eft-0" ]
 fi
 
 # Add bastion host to config file
-echo "If hanging for too long, check your bastion JIT - https://hmcts.atlassian.net/wiki/pages/viewpage.action?pageId=1411089455"
+echo "If hanging for too long, check your bastion JIT - https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1411089455"
 az ssh config --ip \*.platform.hmcts.net --file ~/.ssh/config
 
 # Port forward to Windows VM via bastion

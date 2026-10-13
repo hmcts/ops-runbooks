@@ -143,7 +143,7 @@ Nightly pipelines do not require access to Azure except for publishing metrics t
 
 ### Key Vault access
 
-> **Note:** Key Vault access has already been configured for most active repositories and pipelines — see the [list](https://tools.hmcts.net/jira/browse/DTSPO-29659); additional access to overriden Key Vaults e.g. `Preview MI -> AAT KV` is currently being rolled out.  
+> **Note:** Key Vault access has already been configured for most active repositories and pipelines — see the [list](https://hmcts.atlassian.net/browse/DTSPO-29659); additional access to overriden Key Vaults e.g. `Preview MI -> AAT KV` is currently being rolled out.  
 Any new pipelines must have KV access granted as described below.
 
 Most Jenkins pipelines read secrets from a team's Key Vault during execution, so each agent must have access to the relevant Key Vault in its target environment.  

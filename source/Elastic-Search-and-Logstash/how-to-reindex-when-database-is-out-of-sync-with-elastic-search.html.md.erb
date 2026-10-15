@@ -14,7 +14,7 @@ This will be made as generic as possible with places to enter the values as need
 A change request should be raised for production, which will be scheduled for out of hours. As part of the change get confirmation of case_type_id and the name of the index.
 The requesting service team will need to raise a change request on [Halo](https://hmcts.haloitsm.com/)
 
-[Example implementation plan](https://tools.hmcts.net/confluence/x/57W2c)
+<!-- [Example implementation plan](https://tools.hmcts.net/confluence/x/57W2c) page lost after atlassian migration -->
 
 Example index name: `civil_cases-000001`
 In this runbook where you see <your index name> something similar to this is expected.
@@ -70,7 +70,7 @@ The counts of the Database, index and DLQ are usually good to have for estimatin
 
 2) Also request administrative access to the relevant database (https://myaccess.microsoft.com/)
 
-Documentation for requesting access can be found [here](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
+Documentation for requesting access can be found [here](https://hmcts.atlassian.net/wiki/spaces/DTSPO/pages/277283923/Access+HMCTS+Bastions)
 
 3) Make sure you are connected to the [F5 VPN](https://portal.platform.hmcts.net/)
 
@@ -93,7 +93,7 @@ ssh bastion-prod.platform.hmcts.net
 ```
 
 Additional instructions for accessing the bastions can be found here:
-[Bastion Documentation](https://tools.hmcts.net/confluence/spaces/DTSPO/pages/1482333577/Access+HMCTS+Bastions)
+[Bastion Documentation](https://hmcts.atlassian.net/wiki/spaces/DTSPO/pages/277283923/Access+HMCTS+Bastions)
 
 5) Find the IP address for the service you wish to connect to and connect to Elastic Search node:
 For a list of IP addresses for each env, go to:

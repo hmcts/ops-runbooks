@@ -7,7 +7,7 @@ weight: 45
 
 # <%= current_page.data.title %>
 
-> **Source Document:** This runbook is derived from the original [AKS Failover: steps for kubernetes cluster switchover](https://tools.hmcts.net/confluence/spaces/EI/pages/1700662555/AKS+Failover+steps+for+kubernetes+cluster+switch+over#AKSFailover:stepsforkubernetesclusterswitchover-Prerequisites) Confluence page.
+> **Source Document:** This runbook is derived from the original [AKS Failover: steps for kubernetes cluster switchover](https://hmcts.atlassian.net/wiki/spaces/EI/pages/279160834/AKS+Failover+steps+for+kubernetes+cluster+switch+over#Prerequisites) Confluence page.
 
 This guide provides step-by-step instructions for switching over Crime AKS clusters between environments (e.g., from K8-DEV-CS01-CL01 to K8-DEV-CS01-CL02).
 
@@ -37,7 +37,7 @@ example-service            	ns-dev-ccm-08	2       	2026-04-08 11:07:30.183452632
 
 The `APP VERSION` column indicates the release branch to use (e.g., `dev/2608` means the cpp-pipeline release branch is `dev/2608`).
 
-If you cannot determine the branch this way, ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://tools.hmcts.net/confluence/spaces/HSS/pages/1694702148/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document.
+If you cannot determine the branch this way, ask in the group channel or contact a named person from the [How do I get my DevOps / SRE Changes into release (and into Production)](https://hmcts.atlassian.net/wiki/spaces/HSS/pages/270172309/How+do+I+get+my+DevOps+SRE+Changes+into+release+and+into+Production) document.
 
 <hr class="section-divider">
 
@@ -167,7 +167,7 @@ Before proceeding with the cluster switchover in PROD, request SRE resources to 
 - Web Application Firewall (WAF)
 - Other components that are typically shuttered during production releases
 
-**Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://tools.hmcts.net/confluence/spaces/HSS/pages/1580172783/Run+PGBASEBACKUP+on+Sunday+in+PROD)
+**Reference:** For detailed shuttering steps, see [Run PGBASEBACKUP on Sunday in PROD](https://hmcts.atlassian.net/wiki/spaces/HSS/pages/270159847/Run+PGBASEBACKUP+on+Sunday+in+PROD)
 
 > **Note:** From the referenced document, perform **steps 1 to 7** for shuttering and **steps 10 to 15** for unshuttering. Other steps in that document are related to backups and can be ignored for the cluster switchover process.
 
@@ -351,7 +351,7 @@ Parameters:
 - `Stack:` \<env>amp01 (e.g. sitamp01)
 - `Cluster:` target cluster in full (e.g. K8-SIT-CS01-CL01)
 
-For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://tools.hmcts.net/confluence/spaces/EI/pages/1525460437/Deploy+to+AKS) guide.
+For detailed instructions on deploying to AKS, refer to the [Deploy to AKS](https://hmcts.atlassian.net/wiki/spaces/EI/pages/279160706/Deploy+to+AKS) guide.
 
 
 ---
@@ -450,7 +450,7 @@ Search for any other entries which point to old k8s cluster and update. Search `
 
 > **Applies to:** NFT, PRP, PRD
 
-Follow the [AKS-Dynatrace Integration](https://tools.hmcts.net/confluence/spaces/EI/pages/1549239399/AKS-Dynatrace+Integration) guide.
+Follow the [AKS-Dynatrace Integration](https://hmcts.atlassian.net/wiki/spaces/EI/pages/279162362/AKS-Dynatrace+Integration) guide.
 
 
 ---

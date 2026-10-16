@@ -26,7 +26,7 @@ NATs are a way to get around IP address overlap.
 
 Source NATs were put in place for traffic egressing from the SDS AKS Clusters and Destination NATs put in place for the Application Gateway front end IP addresses in front of the AKS clusters.
 
-The native ranges and the respective NATs put in place can be found below in the [Jira EPIC](https://tools.hmcts.net/jira/browse/DTSPO-16643)
+The native ranges and the respective NATs put in place can be found below in the [Jira EPIC](https://hmcts.atlassian.net/browse/DTSPO-16643)
 
 The NAT rules were implemented on our Hub Palo Alto Firewalls, the specifics can be found in `nat-policy-rules/04-policy-rules-prod.tf` & `nat-policy-rules/03-policy-rules-nonprod.tf` in `hub-panorama-terraform`
 

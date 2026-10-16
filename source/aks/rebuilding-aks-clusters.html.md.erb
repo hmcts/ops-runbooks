@@ -140,7 +140,7 @@ Once the swap over is fully complete then you can delete the old cluster
 
 Rebuilding PTL is very disruptive and must be done in a change request out of hours with enough time to fix issues as they arise. It is not in any HA setup, so causes complete downtime for Jenkins and all developer workflows, as well as ceasing all image automation across the relevant platform whilst it's down.
 
-Announce with plenty of advance notice, and coordinate with [upcoming releases](https://tools.hmcts.net/confluence/spaces/RSTR/pages/299860569/DTS+Release+Management) to minimise disruption and risk.
+Announce with plenty of advance notice, and coordinate with [upcoming releases](https://hmcts.atlassian.net/wiki/spaces/RSTR/overview) to minimise disruption and risk.
 
 It follows this subset of the steps, since there is no Application Gateway in front of the cluster.
 
@@ -171,7 +171,7 @@ If you have to re-run a failed stage for some reason you may see this error in t
 
 ### Dynatrace oneagent pods not deployed or failing to start
 
-**NOTE:** The issue described here need to be validated if still applies when the updated [Dynatrace Operator](https://tools.hmcts.net/jira/browse/DTSPO-6187) is rolled out.
+**NOTE:** The issue described here need to be validated if still applies when the updated [Dynatrace Operator](https://hmcts.atlassian.net/browse/DTSPO-6187) is rolled out.
 
 For a rebuild or newly deployed cluster, Dynatrace oneagent pods are either not deployed by Flux or where deployed, fails with a `CrashLoopBackOff` status.
 

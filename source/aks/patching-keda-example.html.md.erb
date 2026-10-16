@@ -101,7 +101,16 @@ kubectl logs -n keda -l app.kubernetes.io/name=keda-operator -f
 
 Once KEDA itself is healthy, confirm the `ScaledJobs` that depend on it are still reconciling.
 
-<%= warning_text('When checking a <code>ScaledJob</code>, the <code>READY</code> column is the health signal, not <code>ACTIVE</code>. <code>READY=True</code> means KEDA has validated the <code>ScaledJob</code> and it is ready to scale — that is a pass. The <code>ACTIVE</code> column only tells you whether KEDA is scaling <em>right now</em>: <code>ACTIVE=True</code> means there is queued work at that instant, and <code>ACTIVE=False</code> simply means the trigger is idle (no queued jobs/messages). <code>ACTIVE=False</code> is normal and is NOT a failure. Equally, not seeing brand-new pods or recent <code>KEDAJobsCreated</code> events at the moment you check is expected when the queue is idle. Only treat a <code>ScaledJob</code> as failed when <code>READY</code> is not <code>True</code> (or it is missing on a cluster where it is expected).') %>
+> **Note:** When checking a `ScaledJob`, the `READY` column is the health signal, not `ACTIVE`.
+> `READY=True` means KEDA has validated the `ScaledJob` and it is ready to scale; that is a pass.
+>
+> The `ACTIVE` column only tells you whether KEDA is scaling *right now*: `ACTIVE=True` means
+> there is queued work at that instant, and `ACTIVE=False` simply means the trigger is idle
+> (no queued jobs/messages). `ACTIVE=False` is normal and is NOT a failure.
+>
+> Equally, not seeing brand-new pods or recent `KEDAJobsCreated` events at the moment you check
+> is expected when the queue is idle. Only treat a `ScaledJob` as failed when `READY` is not
+> `True` (or it is missing on a cluster where it is expected).
 
 There are three workloads we use for this:
 

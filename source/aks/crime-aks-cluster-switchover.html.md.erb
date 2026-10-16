@@ -369,7 +369,45 @@ Generally use the `main` branch for reporting cronjobs. If unsure, check with th
 
 ---
 
-### 6. Update Global DNS
+### 6. Verify Audit/Fabric Dependencies
+
+> **Applies to:** PRP, PRD
+
+If Audit Reports uses Microsoft Fabric in the environment being switched, confirm the Fabric workspace still has a working route and permission to run against the destination cluster.
+
+This check is required because the standard AKS connectivity tests prove that services are reachable from the cluster, but they do not prove that Fabric can still call CP APIs or start report pipelines after a cluster switchover.
+
+Check the following before declaring the switchover complete:
+
+1. **Fabric managed private endpoint**
+   - Confirm any Fabric managed private endpoint used by Audit points to the destination AKS ingress Private Link Service.
+   - Confirm the managed private endpoint connection is approved.
+   - Failure mode: Fabric notebooks cannot call CP APIs through the expected private route after failover.
+
+2. **Fabric workspace role assignments**
+   - Confirm the destination cluster workload identities have access to the Fabric workspace.
+   - For PRD, the current [audit Terraform configuration](https://github.com/hmcts/cpp-terraform-audit-fabric/blob/main/vars/prd/terraform.tfvars) assigns **Admin** on the existing Fabric workspace to both `ns-prd-ccm-01-springboot-identity` and `ns-prd-ccm-01-wildfly-identity` through `existing_workspace_admin_role_assignments` in [main.tf](https://github.com/hmcts/cpp-terraform-audit-fabric/blob/main/main.tf).
+   - This describes the configured PRD role, not a requirement to grant Admin in every environment. The separate module-managed workspace path assigns **Contributor** when `grant_workspace_contributor_to_aks_identities` is enabled, unless an explicit assignment already exists.
+   - For PRP, confirm the intended workspace and roles with the Audit owner: the current [PRP values](https://github.com/hmcts/cpp-terraform-audit-fabric/blob/main/vars/prp/terraform.tfvars) name the wildfly identity but do not configure an existing workspace ID or a module-managed workspace. Running that configuration alone does not establish a Fabric workspace role assignment.
+   - Verify the service principal **object IDs**, not just display names, against the identities used by the destination cluster. A cluster switch does not necessarily change these IDs.
+   - Failure mode: `auditreports-service` can create the report request row, but Fabric rejects the pipeline start with `403`.
+
+3. **Terraform ownership and when to apply**
+   - **Private endpoint creation and approval:** these belong to [cpp-terraform-azurerm-aks-config](https://github.com/hmcts/cpp-terraform-azurerm-aks-config/blob/main/fabric-managed-private-endpoints.tf). Check the destination cluster's values on the branch used for its deployment, including `fabric_managed_private_endpoints` and `enabled`. This should be covered by the destination cluster's AKS configuration deployment; verify the resulting endpoint target and approval rather than assuming the deployment created them.
+   - **Fabric workspace permissions:** these belong to [cpp-terraform-audit-fabric](https://github.com/hmcts/cpp-terraform-audit-fabric/blob/main/main.tf), not the endpoint resources in `aks-config`. If workload identity object IDs have changed or the required assignments are missing, review the relevant environment's audit Terraform plan and apply the approved changes before report verification.
+   - An additional audit Terraform apply is **not required solely because traffic switched clusters** when the identity IDs and required permissions remain correct. Also check the environment's `env_address` still resolves to the intended CP API route; any required change to that audit configuration needs its own reviewed plan/apply.
+
+4. **Verification**
+   - Submit a small Audit Reports request through the UI.
+   - Confirm the `/auditreports-service/reports` POST succeeds.
+   - Confirm a `reportrequests` row is created.
+   - Confirm `pipelineJobId` is populated.
+   - Confirm the Fabric pipeline starts.
+
+
+---
+
+### 7. Update Global DNS
 
 > **Applies to:** ALL
 
@@ -384,7 +422,7 @@ Additionally check the environment tfvars for the cluster you are working on. En
 
 ---
 
-### 7. Basic Connectivity Testing
+### 8. Basic Connectivity Testing
 
 > **Applies to:** ALL
 

@@ -63,7 +63,7 @@ The Manager uses SSH-key authentication as `adminuser`, not Entra SSH. Password 
 
 ## Relinking Agents
 
-When the Manager is replaced or redeployed, existing agents need to be relinked in place; reusing DNS does not transfer their registrations. Use the [Nessus Agent Operator Tools README](https://github.com/hmcts/soc/blob/master/scripts/tenable/nessus-agent-relink/README.md) for inventory, audit, preview and controlled relinking.
+When the Manager is replaced or redeployed, existing agents need to be relinked in place; reusing DNS does not transfer their registrations. Use the [Nessus Agent Relink Tools README](https://github.com/hmcts/soc/blob/master/scripts/tenable/nessus-agent-relink/README.md) for inventory, audit, preview and controlled relinking.
 
 ## Deploying Agents
 
@@ -174,6 +174,7 @@ rpm -e NessusAgent-10.1.3-es7.x86_64
 ### Windows Agents 
 
 Commands to check Machine connectivity
+
 ```
 tnc nessus-scanners-prod000005.platform.hmcts.net
 ```
@@ -258,6 +259,7 @@ Once you have the .crt and .key files on your machine, you will have to upload t
 The files should be placed in the `/opt/sc/support/conf` directory, use sudo su to gain access.
 
 Option 1 - Update files
+
 ```bash
 # Copy the existing expired cert files
 cd /opt/sc/support/conf/
@@ -268,6 +270,7 @@ cp SecurityCenter.crt SecurityCenter_250424.crt
 ```
 
 Option 2 - Adding new files
+
 ```bash
 # Add the 2 new files to `/opt/sc/support/conf` which should be owned by the `tns` user and group and have 0640 permissions.
 chown tns:tns /opt/sc/support/conf/SecurityCenter.crt

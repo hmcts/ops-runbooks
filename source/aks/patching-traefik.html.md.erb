@@ -1,167 +1,130 @@
 ---
-title: Traefik Patching Example
+title: Traefik Patching (CFT & SDS)
 weight: 30
-last_reviewed_on: 2025-06-26
+last_reviewed_on: 2026-10-16
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
 
-This document covers a high level patching example for Traefik.
+Traefik provides ingress to applications. Upgrade one environment at a time, starting with sandbox on each platform. A successful CFT trial does not certify SDS, or vice versa.
 
-Traefik should be patched per environment because it is crucial for providing network access to our applications.
+This procedure covers ordinary non-live environments only. Production, PTL/Jenkins, management variants such as `sbox-intsvc`, and shared-base cleanup require separate planning and approval. Do not change their configuration as part of a non-live upgrade.
 
-It is important to understand what changes are in the version upgrade, especially if there are any breaking changes.
+## Prerequisites
 
-Usually, there will be a renovate pull request in the flux repo that will contain release notes that show you the breaking changes.
+- Confirm the ticket, assigned operator, maintenance window, communications and rollback owner against the [patching rota](https://github.com/hmcts/bau-patching-rota/blob/main/rota.md).
+- Obtain access to the named non-live AKS clusters and permission to raise PRs in [CFT flux config](https://github.com/hmcts/cnp-flux-config) and [SDS flux config](https://github.com/hmcts/sds-flux-config).
+- Start a task branch from the current remote default branch. Preserve existing local work and do not include unrelated commits.
+- Have Helm, kubectl, Flux, Kustomize, yq and kubeconform available for the existing repository checks.
+- Record the current chart, actual container image, Flux revisions, Service UID, intended IP and working application routes before changing anything.
 
-For [this example](https://github.com/hmcts/cnp-flux-config/pull/27188) concerning Traefik, the latest version was 26.0.0 and our existing version was 23.1.0.
+Inventory active clusters using Azure, not directory presence or saved kube contexts alone. An environment may have only one active instance. Confirm the order with the operator for each change. The agreed ordinary non-live waves are:
 
-The breaking changes in the pull request were reviewed and the [traefik-helm-chart/releases](https://github.com/traefik/traefik-helm-chart/releases) page was cross checked.
+| Platform | Repository | Environment order | Traefik instance patches |
+| --- | --- | --- | --- |
+| CFT | `cnp-flux-config` | sbox, demo, ithc, perftest, aat, preview | `apps/admin/traefik2/<env>/00.yaml` and `01.yaml` |
+| SDS | `sds-flux-config` | sbox, dev, demo, ithc, test, stg | `apps/admin/traefik2/<env>/00-traefik2.yaml` and `01-traefik2.yaml` |
 
-This was necessary to ensure there were no ill effects from the upgrade.
+## 1. Review the Upgrade
 
-For example, in v25 there was a change in the syntax for the use of "redirectTo". 
+Review the Renovate PR, [chart releases](https://github.com/traefik/traefik-helm-chart/releases) and [Traefik migration guide](https://doc.traefik.io/traefik/v3.7/migrate/v3/). Search the affected application configurations and chart templates for changed features. Escalate unresolved compatibility questions to #platform-operations before merging.
 
-After searching GitHub for `redirectTo` we found that we were not using this feature in our configuration so there was no impact.
+Chart version, application image version and CRD pin are separate decisions. For example, chart `42.0.0` declares application `v3.7.14`, while the October 2026 validation candidate explicitly selects image `v3.7.15`. Reassess current security releases and Kubernetes requirements for each future change. Do not treat a historical example as an approved target.
 
-If you are unsure whether a breaking change will affect us or our application teams, shout out on your standup or send a message on slack to #platform-operations.
+Chart41 changes `logs.general` to `log` and `logs.access` to `accessLog`, with further field-name and nesting changes. Remove inherited legacy logging values in the composed output. Migrate additional Service type settings to `service.additionalServices.<name>.spec.type` where required. Check file-provider values and any BasicAuth, StripPrefix, wildcard Host, h2c, CONNECT or Gateway features actually used.
 
-## Check existing configuration
+Both platforms use `hmctsprod.azurecr.io/imported/traefik` through the existing registry cache. The registry name does not mean the target workload is production. An uncached tag may not be listed before its first pull. Confirm the cache rule and upstream image, then verify the actual pull during sandbox acceptance. Do not perform an ad hoc image import or change cache configuration to bypass a failure.
 
-In SDS, check traefik pods are running
-```
-kubectl get pods -n admin | grep traefik
-```
+## 2. Check Existing State
 
-Ensure [Toffee application](https://toffee.sandbox.platform.hmcts.net) is accessible.
+Use an explicit kubeconfig and context for every cluster command. Follow the [AKS connection guide](https://hmcts.github.io/cloud-native-platform/troubleshooting/index.html#connecting-to-aks-clusters). If credentials are stale, obtain permission to refresh user credentials into a private temporary kubeconfig. Do not overwrite the default kubeconfig, request admin credentials, change the Azure current subscription or bypass TLS verification.
 
-Note: check [Plum application](https://plum.sandbox.platform.hmcts.net) for CFT.
+The following read-only commands assume `KUBECONFIG_FILE` and `CONTEXT` identify the approved non-live cluster:
 
-## Updating - start with sandbox
-
-In order to allow patching of sbox only, a new directory was created for the updated crd URLs.
-
-```
-apps/admin/traefik-crds-upgrade-v26/kustomization.yaml
-```
-&
-
-```
-apps/admin/traefik-crds-upgrade-v26/kustomize.yaml
+```bash
+kubectl --kubeconfig "$KUBECONFIG_FILE" --context "$CONTEXT" get kustomizations -n flux-system
+kubectl --kubeconfig "$KUBECONFIG_FILE" --context "$CONTEXT" get helmrelease traefik2 -n admin -o yaml
+kubectl --kubeconfig "$KUBECONFIG_FILE" --context "$CONTEXT" get deployments,pods,services -n admin -l app.kubernetes.io/name=traefik
 ```
 
-[See example PR containing these files](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
+Require the root, admin and Traefik CRD Kustomizations to be Ready at their observed generations and expected source revision. Check HelmRelease readiness and recent events, not only pod health. Record and resolve unrelated failures separately before upgrading that cluster. For example, a strict-substitution failure for `ACTIVE_CRON_CLUSTER` is a root readiness issue, not a Traefik upgrade. Confirm scheduled-job ownership before supplying a missing value.
 
-This enables us to target specific environments at this new crd version.
+Verify sandbox applications before changing anything:
 
-We can do this by pointing the desired cluster at this new directory via a patch in the base kustomization file.
-  
-Eg: `clusters/sbox/base/kustomization.yaml`
+- CFT: [Plum](https://plum.sandbox.platform.hmcts.net/).
+- SDS: [Toffee](https://toffee.sandbox.platform.hmcts.net/).
 
-![](Images/patching_apps_3.png)
+A public homepage may be served by another backend. Check the frontend-to-backend flow and intended routing for each active instance. Discover the real routes for later environments rather than reusing sandbox URLs as evidence. Trace private DNS or proxy aliases according to the actual topology.
 
-With the new crds version now available, a version selector block can be added to the [sbox 00 & 01 config](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
+### Known Issue: Static IP Loss After Rebuild
 
-Example:
+[CFT correction #47871](https://github.com/hmcts/cnp-flux-config/pull/47871) and [SDS correction #8995](https://github.com/hmcts/sds-flux-config/pull/8995) restore the intended fixed IP under Helm values `service.spec.loadBalancerIP`. The incorrect `service.loadBalancerIP` location can be masked by an existing Service retaining its historical address.
 
-```
-chart:
-spec:
-  chart: traefik
-  # update the crd version in traefik-crds when updating this
-  version: 26.0.0
-  sourceRef:
-    kind: HelmRepository
-    name: traefik
-    namespace: admin
-```
+For each cluster, compare all of the following:
 
-Update the cluster kustomization file pointing to the new crd directory created earlier.
+1. Authoritative environment patch and effective HelmRelease `spec.values.service.spec.loadBalancerIP`.
+2. Service `spec.loadBalancerIP` generated by the exact selected chart and fully composed values, including any `valuesFrom` inputs.
+3. Installed Helm manifest, live Service `spec.loadBalancerIP` and allocated `status.loadBalancer.ingress[].ip`.
+4. Intended DNS, alias or proxy routing to that Service.
 
-Raise a pull request to upgrade the version.
+Distinguish the ingress LoadBalancer Service from additional ClusterIP Services. Preserve its internal-LB annotations, ports and recorded UID. Never change the intended IP to an accidental allocation to make checks pass. Pod readiness and an in-place rollout do not demonstrate Service-recreation safety. Do not delete a Service or rebuild a cluster as a routine validation step.
 
-See [Example PR](https://github.com/hmcts/cnp-flux-config/pull/28837/files)
+## 3. Prepare CRDs Separately
 
-There are checks that take place when you raise a PR to validate the kustomization is valid. 
+Keep shared `apps/admin/traefik-crds/kustomization.yaml` unchanged while production and PTL are excluded. Pin the required proxy CRDs to a reviewed chart release in a temporary directory, for example `apps/admin/traefik-crds-v42/kustomization.yaml`. Do not add unrelated Hub or Gateway CRDs.
 
-These can be found in the `tests` folder
+Use the existing environment boundary at `apps/admin/<env>/base/kustomize.yaml` to patch the `traefik-crd` Flux Kustomization path. Confirm `clusters/<env>/base/kustomization.yaml` references that patch. Preserve identity substitutions. The environment admin Kustomization must depend on `traefik-crd`.
 
-Review the pipeline checks for errors. If there are no errors and the PR has been approved, merge the PR.
+Build the actual cluster roots and verify only the selected environment changes path. The existing `tests/dry-run-kustomize.sh` must derive its Traefik schema directory from the composed `traefik-crd.spec.path`, not always from the shared directory. Do not mix old and new schemas with identical filenames or skip missing schemas to manufacture success.
 
-## Checks to see if upgrade worked correctly
+Raise a separate CRD-preparation PR. After required CI passes and approval is obtained, the authorised operator may merge it. Wait for the new source revision and CRD Kustomization generation to be Ready, and verify the selected CRDs are Established on both active sandbox instances. Do not merge the controller upgrade until this gate passes. `dependsOn` alone is not evidence that a simultaneously changed CRD revision has already converged.
 
-Check the pods have come back up:
+## 4. Upgrade Sandbox Controllers
 
-```
-kubectl get pods -n admin | grep traefik
-```
+Change only the sandbox instance patches listed above. Keep shared `apps/admin/traefik2/traefik2.yaml` unchanged. Preserve fixed IPs, certificates, workload identities, Service topology and application-specific settings.
 
-The uptime should be fairly recent, i.e., the pods should have been redeployed in the last few minutes.
+Use environment chart overrides and an explicit image tag where required by the reviewed target. Validate real Kustomize composition, not a hand-merged approximation. For SDS, ensure the internal admin port stays on its ClusterIP Service and is not exposed through the ingress LoadBalancer.
 
-Check pods have the correct chart version:
+Run the existing checks from the correct repository, explicitly asserting that the intended cluster directory exists before invoking the test:
 
-```
-kubectl describe pod {pod-name} -n admin | grep helm.sh/chart=traefik
-
+```bash
+test -d clusters/sbox/00 && ./tests/dry-run-kustomize.sh sbox 00
+test -d clusters/sbox/01 && ./tests/dry-run-kustomize.sh sbox 01
 ```
 
-![](Images/patching_apps_1.png)
+The tests use shared temporary paths. Run the two repositories serially and isolate or preserve previous outputs to avoid stale manifests or schemas contaminating results.
 
-Also, you can check on the Helm release to see if it has got correct version in the log.
+Also render the exact Helm chart with the composed values. Assert the generated fixed IP, Service type, internal annotations, ports, image and logging configuration. Strictly validate the rendered resources. A valid HelmRelease schema does not prove the chart renders the required Service fields. CRD schema conversion alone does not prove Kubernetes structural validity.
 
-```
-kubectl get hr -n admin
-```
-![](Images/patching_apps_2.png)
+Raise separate CFT and SDS sandbox upgrade PRs. If a chart branch is stacked on a CRD-preparation branch, retarget it to the default branch after preparation merges and recheck its final diff and CI. Approval, green required checks and the CRD convergence gate are required before an authorised operator merges the chart upgrade.
 
-Review pods for any new errors:
-```
-kubectl logs {pod-name} -n admin -f
-```
+## 5. Verify Each Sandbox
 
-Traefik does have a UI but it's not usually exposed. 
+Record the deployed source revision, chart and actual image after natural Flux convergence. Do not force reconciliation, directly upgrade Helm, restart workloads or delete HelmReleases as part of this procedure.
 
-However, you should be able to reach other applications on the cluster such as plum or toffee that rely on traefik being operational.
+- Require root/admin/CRD Kustomizations and HelmRelease Ready at the expected revision and generation.
+- Verify all required CRDs Established, desired replicas available, target image pulled successfully and no new critical logs or events.
+- Compare Service UID, rendered/live/allocated fixed IPs, internal annotations, ports, TLS and intended DNS topology with the baseline.
+- Exercise Plum or Toffee frontend-to-backend connectivity through each intended cluster route. A public HTTP200 alone is insufficient.
+- Record any approved exceptions, observation period and rollback owner before considering that platform's sandbox accepted.
 
-Ensure [Toffee application](https://toffee.sandbox.platform.hmcts.net/) is accessible on SDS.
+Stop on image-pull errors, failed reconciliation, incorrect IPs, routing/TLS regression or application failures. Investigate through a separate reviewed change rather than bypassing the gate.
 
-Check [Plum application](https://plum.sandbox.platform.hmcts.net/) on CFT.
+## 6. Promote Through Remaining Non-Live Waves
 
-You could also delete the Toffee or Plum HRs to make sure they come back up and they are reachable via Traefik.
+Only after that platform's sandbox passes, prepare and approve the next environment in its agreed order. Verify every active instance separately. Use environment-specific chart overrides and CRD path patches, leaving shared production-inherited bases unchanged. Do not promote into an environment with unresolved readiness failures without an explicitly approved exception.
 
-The example commands below are for SDS using toffee:
+Keep later waves separate so a failed wave cannot deploy all remaining environments. Stop starting waves when the maintenance window no longer leaves sufficient verification and rollback time. Prepared PRs are not proof that patching is complete.
 
-```
-kubectl get hr -n toffee
-```
+## Stop and Roll Back
 
-```
-kubectl delete hr toffee-recipe-backend -n toffee
-```
+Record the previous chart, effective values, actual image, source revision and Service state before each wave. Use a reviewed Git revert of the environment's controller version and values changes, preserving the corrected `service.spec.loadBalancerIP`. Render the previous chart with the rollback values before merging.
 
-```
-kubectl delete hr toffee-frontend -n toffee
-```
+Retain upgraded CRDs unless downgrade and storage compatibility have been explicitly reviewed. Do not delete CRDs or automatically revert their pin alongside the controller. Observe Flux and Helm recovery and repeat the same IP, TLS, routing and application checks. Escalate unresolved failures to #platform-operations.
 
-Ensure to monitor the status for the HRs and pods to ensure they come back successfully.
+## Completion and Separate Work
 
-Repeat steps in CFT
+Record per-cluster versions, revisions, validation results, application checks and outstanding exceptions on the ticket. Completion requires every confirmed active in-scope cluster to pass and the updated runbook to be published. Branches, PRs or successful local renders alone do not complete patching.
 
-## Non-prod environments
-
-Now you've completed sandbox, move onto the nonprod environments.
-
-## Prod environments
-
-You will want to test the PTL environments on their own before upgrading prod as this cluster hosts Jenkins, Start with SDS then move onto CFT.
-
-PR examples:
-
-- [PTL SDS] (https://github.com/hmcts/sds-flux-config/pull/4200)
-- [PTL CFT] (https://github.com/hmcts/cnp-flux-config/pull/29065)
-
-For Prod you want to remove the previous patches you did for the other environments and just update the application yaml file see the examples below:
-
-- [Prod SDS] (https://github.com/hmcts/sds-flux-config/pull/4201)
-- [Prod CFT] (https://github.com/hmcts/cnp-flux-config/pull/29069)
+PTL/Jenkins, production upgrades and eventual shared-base cleanup are separate changes. Do not remove non-live overrides or update shared bases under a non-live-only approval. The [historical v26 sandbox example](https://github.com/hmcts/cnp-flux-config/pull/28837/files) illustrates staging, not a current version recommendation.

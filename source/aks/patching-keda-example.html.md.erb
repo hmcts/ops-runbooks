@@ -1,11 +1,16 @@
 ---
 title: KEDA Patching Example
 weight: 30
-last_reviewed_on: 2026-06-11
+last_reviewed_on: 2026-10-16
 review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
+
+> **Note:** The end-to-end KEDA patching process is now automated by the `keda-patching` GitHub Copilot
+> skill in the [Platform Operations skills repository](https://github.com/hmcts/platops-agent-skills).
+> It covers version review, rollout PRs and verification; team approval and operator merges remain
+> required. The manual process below is retained for reference and fallback use.
 
 This document covers a high level patching example for the KEDA app patching. Please see [Patching AKS Apps - Traefik](patching-aks-apps.html) for a lower level example with more information.
 
@@ -52,9 +57,9 @@ Create a PR in cnp-flux-config to patch KEDA in CFT: [example PR](https://github
 
 ## Post Patching Checks
 
-All the checks in this section are now automated by keda-patching-checks AI agent skill that is available in
-the [skills repository](https://github.com/hmcts/platops-agent-skills). Please read the README file of the skill
-before first usage.
+> **Note:** All the checks in this section are now automated by the `keda-patching-checks` AI agent
+> skill that is available in the [skills repository](https://github.com/hmcts/platops-agent-skills).
+> Please read the README file of the skill before first usage.
 
 Work through these checks in order: first confirm KEDA itself has upgraded and is healthy, then confirm the
 workloads that depend on it (`ScaledJobs`) are still reconciling.

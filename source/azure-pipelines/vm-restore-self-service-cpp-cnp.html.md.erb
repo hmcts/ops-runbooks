@@ -1,0 +1,165 @@
+---
+title: Self-Service VM Restore from RSV (CPP and CNP)
+last_reviewed_on: 2026-06-22
+review_in: 12 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+This runbook documents the **self-service VM restore procedure** required by [DTSPO-32302](https://tools.hmcts.net/jira/browse/DTSPO-32302) for both CPP and CNP.
+
+It focuses on **how to execute restores safely** for all four restore methods, with approval controls and validation.
+
+## Prerequisites
+
+- Azure DevOps access to:
+  - `hmcts-cpp/cpp-apps` (CPP)
+  - `hmcts/PlatformOperations` (CNP)
+- Azure RBAC access to the source Recovery Services Vault and target resources
+- Existing protected VM item with at least one recovery point
+- Dummy VM test target onboarded with typical OS + data disk setup in an RSV where immutability is enabled but not locked (for pre-policy-change testing)
+- PlatOps approver available to approve the restore stage gate in ADO
+
+## Platform pipelines
+
+| Platform | ADO project | Pipeline name | Definition ID | ADO pipeline link | YAML version link |
+|---|---|---|---:|---|---|
+| CPP | `cpp-apps` | `VM Restore from RSV - CPP` | `765` | [CPP pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=765) | [azure-pipelines-restore-vm-cpp.yaml](https://github.com/hmcts/azure-backup-vault/blob/dtspo-32302-vm-restore-pipeline/azure-pipelines-restore-vm-cpp.yaml) |
+| CNP | `PlatformOperations` | `VM Restore from RSV - CNP` | `1227` | [CNP pipeline](https://dev.azure.com/hmcts/PlatformOperations/_build?definitionId=1227) | [azure-pipelines-restore-vm-cnp.yaml](https://github.com/hmcts/azure-backup-vault/blob/dtspo-32302-vm-restore-pipeline/azure-pipelines-restore-vm-cnp.yaml) |
+
+Both YAML definitions are in [`hmcts/azure-backup-vault`](https://github.com/hmcts/azure-backup-vault) on branch `dtspo-32302-vm-restore-pipeline`.
+
+## Trigger scenario to restore method mapping
+
+Use this mapping when deciding which method to run:
+
+| Trigger scenario | Restore method |
+|---|---|
+| Single file/config loss, VM still healthy | `file-recovery` |
+| VM non-bootable but should keep same VM identity | `replace-existing` |
+| VM deleted and must be recreated | `create-new-vm` |
+| DR drill, cloning, or disk-level restore workflow | `restore-disks-only` |
+
+## Recommended execution order (when testing all 4 methods)
+
+For controlled testing, execute methods in this order:
+
+1. `file-recovery`
+2. `restore-disks-only`
+3. `create-new-vm`
+4. `replace-existing` (**last**, because it is in-place and has the highest operational impact)
+
+## How to run the self-service restore
+
+### 1) Confirm pre-flight safety checks
+
+### Confirm vault mutability state (test phase)
+
+```bash
+az backup vault show \
+  --subscription <subscription-id> \
+  --resource-group <vault-rg> \
+  --name <vault-name> \
+  --query "properties.securitySettings.immutabilitySettings.state" -o tsv
+```
+
+Expected for this phase: `Unlocked`.
+
+### Confirm there is a recovery point
+
+```bash
+az backup recoverypoint list \
+  --subscription <subscription-id> \
+  --vault-name <vault-name> \
+  --resource-group <vault-rg> \
+  --container-name <container-name> \
+  --item-name <item-name> \
+  --backup-management-type AzureIaasVM \
+  --workload-type VM \
+  --query "length([])" -o tsv
+```
+
+Expected: count is `>= 1`.
+
+### 2) Set pipeline parameters
+
+### Core parameters (all methods)
+
+- `environment` (normally `nonlive` for testing)
+- `restoreMethod`
+- `sourceVmName`
+- `sourceResourceGroup`
+- `sourceSubscription`
+- `vaultName`
+- `vaultResourceGroup`
+- `vaultSubscription`
+- `stagingStorageAccount`
+- `stagingStorageAccountResourceGroup`
+- `dryRun=false` (real restore)
+
+### Method-specific parameters
+
+- `file-recovery`
+  - `target*` parameters: set to `none`
+- `restore-disks-only`
+  - set `targetResourceGroup` and `targetSubscription`
+- `create-new-vm`
+  - requires `targetVnetName`, `targetSubnetName`, `targetVnetResourceGroup`
+  - set `targetResourceGroup` and `targetSubscription`
+- `replace-existing`
+  - target parameters usually `none` (in-place restore)
+
+### 3) Queue run and approve gate
+
+Each run follows this structure:
+
+1. **Preflight stage** (input and recovery point checks)
+2. **Approval checkpoint** (`vm-restore-platops-approval`)
+3. **Restore stage**
+4. **Validate stage** (skipped for `file-recovery`, expected behaviour)
+
+If the run is waiting, approve it in the run page under Checks/Approvals.
+
+### 4) Verify restore completion
+
+For each run, confirm:
+- Preflight and Restore stages succeeded
+- Approval checkpoint was completed
+- Validate stage succeeded (or was skipped for `file-recovery`, which is expected)
+- Target outcome matches selected restore method
+
+### 5) Verification and post-restore checks
+
+- Confirm no unexpected impact to source resources
+- Re-check vault mutability state is unchanged
+- Clean up temporary restored resources when applicable (e.g., disk-only artifacts)
+
+## Troubleshooting
+
+### Run is stuck waiting
+
+- Check for a pending approval on the run.
+- Ensure a PlatOps approver is configured for the environment gate.
+
+### `create-new-vm` fails quickly
+
+- Verify `targetVnetName`, `targetSubnetName`, and `targetVnetResourceGroup` are set.
+- Ensure target subscription and RG are correct.
+
+### `restore-disks-only` validates with no disks found
+
+- Check target RG/subscription values used in the run.
+- Confirm restore actually completed in Stage 2 before validation.
+
+### YAML not found when queuing
+
+- Ensure the pipeline is queued from a branch/commit containing the YAML file.
+- Confirm repository defaults in the pipeline definition.
+
+## Additional information
+
+- Main ticket: [DTSPO-32302](https://tools.hmcts.net/jira/browse/DTSPO-32302)
+- Dependency/implementation context: [DTSPO-31522](https://tools.hmcts.net/jira/browse/DTSPO-31522)
+- Similar completed pattern (PostgreSQL): [DTSPO-29339](https://tools.hmcts.net/jira/browse/DTSPO-29339)
+- Pipeline implementation repository: [hmcts/azure-backup-vault](https://github.com/hmcts/azure-backup-vault)

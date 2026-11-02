@@ -1,0 +1,26 @@
+---
+title: Libra GoB and DCS
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 50
+---
+
+# <%= current_page.data.title %>
+
+## Libra GoB
+
+**What it is:** CP's connection to the Libra GoB gateway (`libra-cpp-gob-gateway.prod.internal.hmcts.net`, 10.23.15.72, HMCTS Interim Hosting).
+
+**Current live path (still on the FTPS VM):** APIM's `CppGatewayService` API (`/debtorprofile`) calls `https://mpdimzftps01.cp.cjs.hmcts.net:8443/`. HAProxy on `MPDIMZFTPS01` forwards it through the VPN and Cloud Gateway (rule `LIVE-CRIME-PXY_IH-P-LIBRA-CPP-VIP`) to 10.23.15.72:443.
+
+**Planned change:**
+
+- GoB is moved to a **real-time API service through APIM**.
+- `MPDIMZFTPS01` (the FTPS box) **will be decommissioned soon**.
+
+## DCS (Crown Court Digital Case System)
+
+| Path | Mechanism | Status | Ref |
+|---|---|---|---|
+| CP → DCS | AppGW-OUT `cppinterface-prod.mlv.lv.cjscp.org.uk` → `cppinterface.ccdcs.internal.net` | Live (about 60k requests / 90 days) | EDO-377 / EDO-380 |
+| DCS → CP | AppGW-IN `apim-lv-prod-dcs.mlv.lv.cjscp.org.uk` + private endpoint | 0 requests | EDO-377 / EDO-380 |

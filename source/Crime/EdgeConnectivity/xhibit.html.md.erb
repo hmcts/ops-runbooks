@@ -1,0 +1,82 @@
+---
+title: XHIBIT · MPDIMZXHBT01
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 30
+---
+
+# <%= current_page.data.title %>
+
+## What it is
+
+| Item | Value |
+|---|---|
+| VM | `MPDIMZXHBT01.cp.cjs.hmcts.net` — RHEL 7.4 (2018 image), `Standard_DS2_v2`, no zone |
+| IP / subnet | 10.200.65.36 · `SN-MPD-IMZ-XHBIT-FTP-01` · NSG `NS-MPD-IMZ-FTPS-INNER` |
+| Role | `ccm_libra_gateway` — XHIBIT file gateway (HTTPS for CP; SFTP for BAIS) |
+| XHIBIT side | File transfer through **BAIS** (HMCTS Azure, 10.24.251.12 / .14) over SFTP via Cloud Gateway. The XHIBIT application servers don't connect to CP directly |
+
+## What it's used for
+
+Court list / hearing data exchange between CP (hearing, listing, hearingnows services) and XHIBIT.
+
+## Network flow
+
+`MPDIMZXHBT01` is a file drop between the two sides. CP reads and writes files over HTTPS; BAIS connects in over SFTP to collect and deliver files for XHIBIT.
+
+**A. CP side — CP services ↔ XHIBIT gateway (HTTPS 443)**
+
+```
+┌─ Crime Live tenant (CP) ───────────────────────────────────────────────┐
+│ 1. CP AKS pods — hearing, listing, hearingnows (10.232.x)              │
+│      │  HTTPS 443                                                      │
+│      │  • writes to   /xhibit-gateway/send-to-xhibit/                  │
+│      │  • reads from  /xhibit-gateway/received-from-xhibit/            │
+│      ▼                                                                 │
+│ 2. MPDIMZXHBT01 (10.200.65.36)                                         │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+**B. XHIBIT side — BAIS ↔ XHIBIT gateway (SFTP 22)**
+
+```
+┌─ HMCTS Azure (BAIS) ───────────────────────────────────────────────────┐
+│ 1. BAIS file transfer service (10.24.251.12 / .14)                     │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║
+┌──────▼─ Cloud Gateway (third party) ───────────────────────────────────┐
+│ 2. Firewall rule "BAIS LIVE Outbound AZ-CPP" — NAT to Xhibit DSS VIP   │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  IPsec tunnel (LEG-CGI / LEG-CGI-DR)
+┌──────▼─ Crime Live tenant (CP) ────────────────────────────────────────┐
+│ 3. VG-MPD-OLDAZURE-01 (VPN gateway)                                    │
+│      ▼                                                                 │
+│ 4. MPDIMZXHBT01 :22 (SFTP, user xhbt)                                  │
+│      • collects files from  send-to-xhibit/                            │
+│      • delivers files to    received-from-xhibit/                      │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+## How it's managed
+
+| Item | Detail |
+|---|---|
+| VM IaC | `hmcts/cpp-automation-terraform` → `environments/live/mpd/integration_dmz/60-virtual_machines.tf` |
+| Config | Ansible `sp-ansible/xhbt_sftp_lv_setup.yml` (`automation.ansible`, `rota-automation-ansible`) |
+| Secrets | Vault `secret/mpd/imz/xhbt_gateway_ftpuser_authkeys` |
+| App config | `cpp-aks-deploy` `prd/{hearing,listing,hearingnows}-service_values.yaml.j2`<br>`cpp-automation-ansible` `inventory/group_vars/environment_ccm_prd/all.yml` |
+| Backup | ✅ Daily 02:30, 30-day retention, GRS. Cross-region restore **disabled** |
+| Monitoring | Zabbix, OMS agent |
+
+## Risks
+
+- Single VM, RHEL 7.4.
+- NSG allows 443 / 21 / 990 from `*`.
+- SFTP `Match Group xhbt` allows password auth.
+
+## Improvements / future
+
+- Tighten the NSG.
+- Key-only SFTP.
+- Enable cross-region restore.
+- If XHIBIT is long-lived: consider a managed replacement (e.g. Azure Storage SFTP + private endpoint).

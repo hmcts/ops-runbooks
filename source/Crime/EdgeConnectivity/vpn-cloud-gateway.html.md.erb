@@ -1,0 +1,56 @@
+---
+title: Shared transport – VPN Gateway & Cloud Gateway
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 10
+---
+
+# <%= current_page.data.title %>
+
+Every edge connection that leaves Crime Live for PSN, HMCTS or the MoJ WAN depends on this transport.
+
+## What it is
+
+- **`VG-MPD-OLDAZURE-01`** — the single VPN gateway for Crime Live. `RG-MPD-IMZ-01`, VpnGw3AZ, Gen1, route-based, **not active-active**, gateway-level `enableBgp: false`. Public IP `IP-MPD-OLDAZURE-01` = **51.140.106.116**.
+- **Two IPsec tunnels to Cloud Gateway Ltd** (third-party WAN provider, AS205098):
+
+| Connection | Local network gateway | Peer IP | Cloud Gateway POP | BGP ASN | Status |
+|---|---|---|---|---|---|
+| `VC-MPD-IMZ-LEG-CGI` | `LNG-MPD-LEG-CGI` | 185.230.152.73 | London DX POP (AZ01) | 65021 | Connected |
+| `VC-MPD-IMZ-LEG-CGI-DR` | `LNG-MPD-LEG-CGI-DR` | 185.230.154.73 | Manchester DX POP (AZ02) | 65022 | Connected |
+
+- The **"LEG-CGI" name is historical** (legacy CGI). Both peer IPs are registered to Cloud Gateway Ltd in the public IP address registry, and the Cloud Gateway portal lists our gateway (51.140.106.116) as site **CRIME-LIVE**.
+
+## Network flow
+
+```
+VN-MPD-IMZ-01 (10.200.64.0/20)
+  └─ VG-MPD-OLDAZURE-01 (51.140.106.116)
+       ══IPsec══► Cloud Gateway London (185.230.152.73)  ┐
+       ══IPsec══► Cloud Gateway Manchester (185.230.154.73) ┘─► PSN │ HMCTS SDS │ Interim Hosting │ MoJ WAN
+```
+
+## What it's used for
+
+The transport for PSN (CJSE), DARTS, XHIBIT, Libra GoB and other HMCTS / MoJ paths.
+
+## How it's managed
+
+| Item | Detail |
+|---|---|
+| IaC | `hmcts/cpp-automation-terraform` → `environments/live/mpd/integration_dmz/21-gateways.tf` |
+| Shared keys | HashiCorp Vault — `lv_vpn_cgi_shared_key`, `lv_vpn_cms_shared_key`, `lv_nlv_vpn_shared_key`, `oldAzure_*` |
+| Cloud Gateway side | Portal https://my.cloudgateway.co.uk — firewall rules (Protect), traffic logs (Inspect), tickets. **All changes are chargeable service requests.** |
+| Runbooks | [Cloud Gateway VPN Gateways](../../network/cloudgateway/vpn-gateway-configuration.html), [Cloud Gateway Operations Guide](../../network/cloudgateway/MyCloudGateway_ops.html)<br>`platops-bcdr-runbooks/source/domains/secure/crime-live-vpn-gateway-recovery` (DTSPO-32678) |
+| Confluence | [Cloud Gateway – Service Information](https://hmcts.atlassian.net/wiki/spaces/DTSPO/pages/277283905/Cloud+Gateway+-+Service+Information)<br>[Third Party Contacts SRE](https://hmcts.atlassian.net/wiki/spaces/HSS/pages/270186581/Third+Party+Contacts+SRE) |
+| Slack | `#platform-operations`, `#cpp-devops` |
+
+## Risks
+
+- **Single point of failure** — one gateway, not active-active. If it fails, all Crime Live hybrid connectivity fails.
+- No diagnostic settings or tunnel-down alerting on the gateway. No resource locks on `RG-MPD-IMZ-01`.
+- **The BCDR runbook understates the impact.** It describes LEG-CGI as "Legacy CGI" and says losing it affects only "Libra / Darts legacy". In practice PSN, DARTS, XHIBIT and others depend on it.
+
+## Improvements / future
+
+- Add resource locks on `RG-MPD-IMZ-01` to prevent accidental deletion of the VPN gateway and its connections (**DR gap**).

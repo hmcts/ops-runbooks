@@ -1,0 +1,67 @@
+---
+title: Edge Connectivity (Crime Live)
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 5
+---
+
+# <%= current_page.data.title %>
+
+A single view of Common Platform (Crime Live, MPD) connectivity to external services: PSN / CJSE, Courtstore, DARTS, XHIBIT, GOV.UK Notify, Libra GoB and DCS. These paths are needed to restore Common Platform services, so this page records what each connection is, how traffic flows, how it's managed, and its known risks.
+
+**Scope:** subscription `Strategic Platform - live` (`9ab65d81-930d-4cc0-a93d-367e14676bc0`), tenant `cp.cjs.hmcts.net`. Traffic figures reflect the state as of the last review (2 November 2026).
+
+## Guides
+
+- [Shared transport – VPN Gateway & Cloud Gateway](vpn-cloud-gateway.html)
+- [PSN – CJSE (Police/SPI) and Courtstore · MPDIMZPSNP01](psn-cjse-courtstore.html)
+- [DARTS Connectivity (Crime -> SDS)](../DARTS/index.html)
+- [XHIBIT · MPDIMZXHBT01](xhibit.html)
+- [GOV.UK Notify · MPDIMZOPROXY01](gov-uk-notify.html)
+- [Libra GoB and DCS](libra-gob-dcs.html)
+
+## Summary
+
+| Connection | Edge component | Path | Status | Change in flight |
+|---|---|---|---|---|
+| PSN – CJSE in/out | `MPDIMZPSNP01` (HAProxy VM) | VPN → Cloud Gateway → PSN | Live, in use | Move to AppGW **started, stalled** (DTSPO-25472, DTSPO-27156) |
+| Courtstore | `MPDIMZPSNP01` (HAProxy VM, mTLS) | NGF → Internet → CACI (AWS) | Live, in use | Direct APIM → Courtstore route configured but **not yet in use** (traffic still goes via the VM) |
+| DARTS | `GW-MPD-IMZ-APPGW-OUT` | VPN → Cloud Gateway → HMCTS SDS | Live, migrated | Complete |
+| XHIBIT | `MPDIMZXHBT01` (FTPS/SFTP/HTTPS VM) | VPN → Cloud Gateway → BAIS (HMCTS Azure) | Live, in use | Not found |
+| GOV.UK Notify | `MPDIMZOPROXY01` (squid VM) | Public IP → Internet | Live, in use | Not found |
+| Libra GoB | `MPDIMZFTPS01` (HAProxy VM) | VPN → Cloud Gateway → Interim Hosting | Live, in use | Moved to a **real-time API via APIM**; FTPS box to be **decommissioned soon** |
+
+## High-level network view
+
+```
+CP AKS / CCM app tier / APIM (sp-prd-apim-int 10.202.65.100)
+   │
+   ├─ VM edge — VN-MPD-IMZ-01 (10.200.64.0/20), RG-MPD-IMZ-01
+   │    MPDIMZPSNP01   10.200.65.44  HAProxy  → CJSE (7080/7081), Courtstore (443)
+   │    MPDIMZXHBT01   10.200.65.36  HTTPS/SFTP/FTPS  ↔ XHIBIT
+   │    MPDIMZOPROXY01 10.200.75.28  squid 3128 → GOV.UK Notify (PIP 51.11.187.252)
+   │    MPDIMZIPROXY01 10.200.66.12  squid 3128 (inbound proxy — usage unknown)
+   │
+   ├─ PaaS edge — RG-MPD-IMZ (WAF_v2)
+   │    GW-MPD-IMZ-APPGW-OUT 10.200.65.230 → DARTS, DCS (live); CJSE, Libra GoB (built, never used)
+   │    GW-MPD-IMZ-APPGW-IN  10.200.64.230 ← CJSE, DCS (0 traffic)
+   │
+   ├─ Barracuda NGF pair MPDIMZBNGF001/101 (10.200.76.4 ILB, PIP 51.140.52.246) → Internet egress, Courtstore
+   │
+   └─ VG-MPD-OLDAZURE-01 (VpnGw3AZ) PIP 51.140.106.116
+        ├─ VC-MPD-IMZ-LEG-CGI    → 185.230.152.73  Cloud Gateway London DX POP (AZ01)
+        ├─ VC-MPD-IMZ-LEG-CGI-DR → 185.230.154.73  Cloud Gateway Manchester DX POP (AZ02)
+        │      └─ Cloud Gateway → PSN 51.231.x · HMCTS SDS 10.24.x · Interim Hosting 10.23.x · MoJ WAN
+        └─ Vnet2Vnet: IdAM PRD/PRP, OnlinePlea PRD/PRP, Crime Non-Live (MDV)
+```
+
+## References
+
+| Type | Reference |
+|---|---|
+| Azure (Live) | `RG-MPD-IMZ-01`, `RG-MPD-IMZ`, `rg-mpd-imz-bngf`, `rg-prd-apim-01`<br>Traffic Analytics on `NS-MPD-IMZ-FTPS-INNER` / `NS-MPD-IMZ-OUTBOUND` |
+| Cloud Gateway | [Cloud Gateway portal](https://my.cloudgateway.co.uk) (firewall rules, proxy settings, VPN site connectivity) — see [CloudGateway](../../network/cloudgateway/index.html) |
+| IaC | `hmcts/cpp-automation-terraform`, `hmcts/cpp-terraform-azurerm-imz`, `hmcts/cpp-terraform-network` |
+| Config | `hmcts/automation.ansible`, `hmcts/crime-idam-automation-ansible`, `hmcts/rota-automation-ansible`, `hmcts/cpp-automation-ansible`, `hmcts/cpp-aks-deploy`, `hmcts/cpp-azure-api-management`, `hmcts/cpp-aks-ops` |
+| Runbooks | [Cloud Gateway VPN Gateways](../../network/cloudgateway/vpn-gateway-configuration.html), [DARTS](../DARTS/index.html), [Decommission App Gateway](../AppGW/index.html)<br>`hmcts/platops-bcdr-runbooks` (crime-live-vpn-gateway-recovery, firewall-nva-services-recovery-crime-live) |
+| Other | `hmcts/cpp-ops-daily-monitoring` (certificate report), `hmcts/cp-meta-arch` (GOV.UK Notify change pack) |

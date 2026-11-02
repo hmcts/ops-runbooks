@@ -1,0 +1,146 @@
+---
+title: PSN – CJSE (Police/SPI) and Courtstore · MPDIMZPSNP01
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 20
+---
+
+# <%= current_page.data.title %>
+
+## What it is
+
+| Item | Value |
+|---|---|
+| VM | `MPDIMZPSNP01.cp.cjs.hmcts.net` — RHEL 7.4 (2018 image), `Standard_DS2_v2`, no zone / availability set |
+| IP / subnet | 10.200.65.44 · `SN-MPD-IMZ-PSNP-FTP-01` (10.200.65.40/29) · NSG `NS-MPD-IMZ-FTPS-INNER` · UDR `UR-IMZ-FTPS` |
+| Software | HAProxy (role `psn_proxy`) — 3 services + stats page |
+
+## What it's used for
+
+From the prod HAProxy config and NSG flow analytics:
+
+| Port | Service | Allowed source | Backend | Live traffic |
+|---|---|---|---|---|
+| **7081** | CJSE / Police → CP (SPI case submissions). Forwards only `Host: apigw.cjscp.org.uk` | PSN 51.231.76.64/26 | APIM `sp-prd-apim-int` 10.202.65.100:443 (Host → `sp-prd-apim-int-gw.cp.cjs.hmcts.net`) | ✅ Active (from 51.231.76.85 / .118) |
+| **7080** | CP → CJSE (results / SPI out) | APIM subnet 10.202.65.96/27 | `exchange-integration-services-stream.service.justice.gov.uk:7080` (exiss.q-solution.net, 51.231.76.88) | ✅ Active |
+| **443** | CP → Courtstore (CMS). mTLS client cert `client.cms.court.store.justice.gov.uk.pem`, TLS 1.2, verify required | APIM subnet + function apps 10.202.68.160/28 | `cms.court.store.justice.gov.uk` 35.177.3.3 (CACI, AWS) | ✅ Busiest path (about 1M flows a week) |
+| 8090 | HAProxy stats (basic auth) | — | — | — |
+
+APIM's business APIs reach PSNP01 by **hard-coded IP** in named values (`hmcts/cpp-azure-api-management`, `prd/sp-prd-apim-int`):
+
+| Named value | Value | Used by |
+|---|---|---|
+| `cjse-endpoint-base-url` | `http://10.200.65.44:7080` | `fa-prd-ccp0101-casefilter` → `spiout` |
+| `route-to-cjse-base-url` | `http://10.200.65.44:7080` | `fa-prd-ccp0101-casefilter` → `cjsesubmitcaseapi` (relay) |
+| `courtstore-endpoint-base-url` | `https://10.200.65.44/commonplatform/caseinformation` | `fa-prd-ccp0101-casefilter` → `courtstore` |
+
+## Network flow
+
+**A. CJSE inbound — Police / CJSE → CP (port 7081)**
+
+```
+┌─ PSN / CJSE (third party) ─────────────────────────────────────────────┐
+│ 1. CJSE Exchange (51.231.76.85 / .118)                                 │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  PSN
+┌──────▼─ Cloud Gateway (third party) ───────────────────────────────────┐
+│ 2. Firewall rule LIVE-GRP-PSN-POL-CJSE-SPI-IN — NAT to CP proxy VIP    │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  IPsec tunnel (LEG-CGI / LEG-CGI-DR)
+┌──────▼─ Crime Live tenant (CP) ────────────────────────────────────────┐
+│ 3. VG-MPD-OLDAZURE-01 (VPN gateway)                                    │
+│      ▼                                                                 │
+│ 4. MPDIMZPSNP01 :7081 (HAProxy)                                        │
+│      │  only Host: apigw.cjscp.org.uk is forwarded                     │
+│      │  HTTPS 443, Host → sp-prd-apim-int-gw.cp.cjs.hmcts.net          │
+│      ▼                                                                 │
+│ 5. APIM sp-prd-apim-int (10.202.65.100) → CP services                  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+**B. CJSE outbound — CP → Police / CJSE (port 7080)**
+
+```
+┌─ Crime Live tenant (CP) ───────────────────────────────────────────────┐
+│ 1. APIM sp-prd-apim-int — casefilter APIs (spiout, cjsesubmitcaseapi)  │
+│      │  HTTP 7080 → http://10.200.65.44:7080 (APIM named value)        │
+│      ▼                                                                 │
+│ 2. MPDIMZPSNP01 :7080 (HAProxy)                                        │
+│      │  only accepts the APIM subnet 10.202.65.96/27                   │
+│      ▼                                                                 │
+│ 3. VG-MPD-OLDAZURE-01 (VPN gateway)                                    │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  IPsec tunnel (LEG-CGI / LEG-CGI-DR)
+┌──────▼─ Cloud Gateway (third party) ───────────────────────────────────┐
+│ 4. Firewall rule LIVE-HMCTS-CRIME-PROXY-PSN-OUT-44                     │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  PSN
+┌──────▼─ PSN / CJSE (third party) ──────────────────────────────────────┐
+│ 5. CJSE Exchange                                                       │
+│    exchange-integration-services-stream.service.justice.gov.uk:7080    │
+│    (51.231.76.88)                                                      │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+**C. Courtstore — CP → Courtstore (port 443, mutual TLS)**
+
+```
+┌─ Crime Live tenant (CP) ───────────────────────────────────────────────┐
+│ 1. casefilter function apps → APIM sp-prd-apim-int (courtstore API)    │
+│      │  HTTPS → https://10.200.65.44/commonplatform/caseinformation    │
+│      ▼                                                                 │
+│ 2. MPDIMZPSNP01 :443 (HAProxy)                                         │
+│      │  TLS ends here; new TLS 1.2 session using the Courtstore        │
+│      │  client certificate (mutual TLS)                                │
+│      ▼                                                                 │
+│ 3. Route table UR-IMZ-FTPS: 35.177.3.3/32 → 10.200.76.4                │
+│      ▼                                                                 │
+│ 4. Barracuda NGF firewall pair (MPDIMZBNGF001/101) → Internet          │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  Internet
+┌──────▼─ Courtstore (CACI, AWS) ────────────────────────────────────────┐
+│ 5. cms.court.store.justice.gov.uk (35.177.3.3:443)                     │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+## How it's managed
+
+| Item | Detail |
+|---|---|
+| VM IaC | `hmcts/cpp-automation-terraform` → `environments/live/mpd/integration_dmz/60-virtual_machines.tf` |
+| Config | Ansible `sp-ansible/templates/haproxy-psn.cfg.j2`<br>Prod vars: `sp-ansible/group_vars/70_environment_mpd/psn.yml` (`crime-idam-automation-ansible` / `rota-automation-ansible`)<br>Role vars: `sp-ansible/group_vars/50_role_psn_proxy/*` |
+| Recent config changes | APIM backend IP, Courtstore cert · DTSPO-230444 (Courtstore backend) · DTSPO-22246 (CJSE backend) |
+| APIM config | `hmcts/cpp-azure-api-management` (extracted from APIM via ADO) |
+| Secrets | Vault (certificates, keys) |
+| Monitoring | Dynatrace OneAgent (installed on the VM and running) |
+| Third parties | CJSE Exchange (Sopra Steria / Q-Solution) · Courtstore (CACI) · Cloud Gateway (PSN routing) — see [Third Party Contacts SRE](https://hmcts.atlassian.net/wiki/spaces/HSS/pages/270186581/Third+Party+Contacts+SRE) |
+| Backup | ❌ **None.** No Azure Backup in any vault, no disk backup, no snapshots or restore points. Single 32 GB Standard HDD (LRS) OS disk |
+
+## Status / planned change
+
+**Migration to AppGW / APIM-direct: started, stalled — not cut over in any environment.**
+
+| Step | Live (prd) | Non-live (SIT) | Ref |
+|---|---|---|---|
+| AppGW listeners built | ✅ `cjse.mlv.lv.cjscp.org.uk` (OUT)<br>✅ `apigw.cjscp.org.uk:7081` (IN) | ✅ `cjse.mnl.nl.cjscp.org.uk` (OUT)<br>✅ `apigw.sit.cjscp.org.uk` (IN) | DTSPO-25472, DTSPO-26195/26196, DTSPO-27129/27130 |
+| APIM backends created | ✅ `cjse` → AppGW<br>✅ `cms-courtstore` → direct | ✅ same pattern | DTSPO-27156 |
+| Connectivity tested | — | ✅ `cjse-connection-test`, `courtstore-connection-test-mtls` APIs only | — |
+| Business APIs cut over | ❌ named values → 10.200.65.44 | ❌ named values → 10.88.145.44 (non-live PSN proxy) | — |
+| Traffic on new path | ❌ AppGW-OUT CJSE pool 0 requests in 90 days; AppGW-IN 0 requests | ⚠️ not checked (non-live tenant) | — |
+
+- Courtstore direct from APIM: intent stated in DTSPO-26284 ("Courtstore will be called by APIM directly"); that PR changed the non-live AppGW config only.
+
+## Risks
+
+- **No backup of any kind** (VM, disk or snapshot).
+- RHEL 7 is out of maintenance; single VM with no zone.
+
+## Improvements / future
+
+- **Immediate**
+  - Enable Azure Backup (**DR gap** — no backup of any kind today).
+- **Near term — finish the stalled migration**
+  1. Repoint the prd APIM named values (`cjse-endpoint-base-url`, `route-to-cjse-base-url`) to the `cjse` backend (AppGW).
+  2. Repoint `courtstore-endpoint-base-url` to `cms-courtstore` (direct mTLS).
+  3. Cut CJSE inbound 7081 over to AppGW-IN.
+- **Future:** decommission `MPDIMZPSNP01` and its non-live equivalent, and remove the related Cloud Gateway rules (`*-CRIME-PROXY-PSN-*`, `*-CRIME-PROXY-SPI-*`).

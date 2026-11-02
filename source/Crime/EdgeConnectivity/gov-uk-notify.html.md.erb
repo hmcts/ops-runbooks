@@ -1,0 +1,80 @@
+---
+title: GOV.UK Notify · MPDIMZOPROXY01
+last_reviewed_on: 2026-11-02
+review_in: 6 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+> Naming: **I**PROXY = **inbound** proxy, **O**PROXY = **outbound** proxy. GOV.UK Notify uses **OPROXY**.
+
+## What it is
+
+| Item | Value |
+|---|---|
+| VM | `MPDIMZOPROXY01.cp.cjs.hmcts.net` — RHEL 7.4 (2018 image), `Standard_E4s_v3`, no zone |
+| IP / subnet | 10.200.75.28 · `SN-MPD-IMZ-VPN-OUTBOUND-PROXY-01` · NSG `NS-MPD-IMZ-OUTBOUND` |
+| Public IP | `IP-MPD-IMZ-OPROXY-01` = **51.11.187.252** (only edge VM with a public IP) |
+| Egress | Direct to the internet from the VM's own public IP. **Not via the Barracuda NGF**: no route table or NAT gateway on the subnet, squid has no parent proxy, and no traffic to the NGF in 30 days |
+| Software | squid 3128 (role `sdlc_outproxy`), HTTP disabled, allowlist `api.notifications.service.gov.uk` |
+
+## What it's used for
+
+- Outbound HTTPS from CP (legacy `cpp-context-notification-notify`) to GOV.UK Notify.
+- General `outgoing.proxy` for CP services.
+
+## Network flow
+
+```
+┌─ Crime Live tenant (CP) ───────────────────────────────────────────────┐
+│ 1. CP AKS pods — notification-notify (10.232.x)                        │
+│      │  HTTP proxy → MPDIMZOPROXY01.cp.cjs.hmcts.net:3128              │
+│      ▼                                                                 │
+│ 2. MPDIMZOPROXY01 (10.200.75.28) — squid                               │
+│      │  allowlist: api.notifications.service.gov.uk only               │
+│      ▼                                                                 │
+│ 3. Public IP 51.11.187.252                                             │
+└──────┼─────────────────────────────────────────────────────────────────┘
+       ║  Internet (HTTPS 443)
+┌──────▼─ GOV.UK Notify ─────────────────────────────────────────────────┐
+│ 4. api.notifications.service.gov.uk (CloudFront)                       │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+## How it's managed
+
+| Item | Detail |
+|---|---|
+| VM IaC | `cpp-automation-terraform` `60-virtual_machines.tf` (`vm_outbound_proxy`) |
+| Squid config | Ansible `sp-ansible/group_vars/50_role_sdlc_outproxy.yml`, role `roles/squid` |
+| App toggle | `cpp-aks-deploy` `prd/common.yaml.j2`: `outgoing.proxy.host = MPDIMZOPROXY01.cp.cjs.hmcts.net`, port 3128; `gov.notify.proxy.enabled=true` (prp / prd / prx) |
+| Backup | ✅ Daily, 30-day retention |
+| Monitoring | Dynatrace OneAgent (installed on the VM and running) |
+
+## Risks
+
+- No edge-infra plan found for replacing it.
+
+## Planned change
+
+Not found.
+
+## Improvements / future
+
+- Longer term, move egress to NGF / Azure Firewall / NAT Gateway with FQDN filtering, and retire the squid VM.
+
+## MPDIMZIPROXY01 (inbound proxy)
+
+| Item | Value |
+|---|---|
+| VM | RHEL 7.4, `Standard_DS2_v2`, 10.200.66.12, `SN-MPD-IMZ-VPN-INBOUND-PROXY-01`, NSG `NS-MPD-IMZ-INBOUND` |
+| Role | `sdlc_inproxy` (Terraform `vm_inbound_proxy`), squid 3128 |
+| Allowed callers | 3128 from CCM app VM subnets only (prd 10.202.65.32/27, prp 10.201.65.32/27) — not AKS |
+| Consumers | **None found in code** |
+| Traffic | **Unverified.** No flow logs on `NS-MPD-IMZ-INBOUND`. VM NIC metrics (about 2 GB/day) include agent / monitoring / syslog traffic, so they don't prove proxy use |
+| Backup | ❌ **None.** No Azure Backup in any vault, no disk backup, no snapshots or restore points. Single 32 GB Standard HDD (LRS) OS disk |
+
+⚠️ **Possible decommission candidate.** Enable Traffic Analytics on `NS-MPD-IMZ-INBOUND`, or review the squid access logs, before deciding.
+
+**Improvement:** if it's kept, enable Azure Backup (**DR gap** — no backup of any kind today).

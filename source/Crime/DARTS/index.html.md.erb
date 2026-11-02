@@ -61,3 +61,10 @@ Monitoring has been configured within Dynatrace to trigger alerts when the backe
 
 - [Crime - DARTS - PROD - Strategic Platform - Live](https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.settings/#settings/azuremonitoring;gf=all) - Dynatrace Connection
 - [DARTS - Azure Application Gateway unhealthy hosts](https://ebe20728.apps.dynatrace.com/ui/apps/dynatrace.classic.settings/ui/settings/builtin:anomaly-detection.metric-events?gtf=-2h&gf=all&filter=summary%3Adarts&id=3ee731c9-fa17-396d-98c0-b2f7051af855) - DARTS Metric Event
+
+## Risks and improvements
+
+- The App Gateway → SDS hop is **plaintext HTTP** (port 80) across Cloud Gateway. Moving the backend to HTTPS would remove this.
+- DARTS depends on the Crime Live VPN gateway and Cloud Gateway tunnels — see [Shared transport – VPN Gateway & Cloud Gateway](../EdgeConnectivity/vpn-cloud-gateway.html).
+
+For all Crime Live edge connections, see [Edge Connectivity (Crime Live)](../EdgeConnectivity/index.html).

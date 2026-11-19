@@ -1,0 +1,94 @@
+---
+title: Crime Resource Locks
+last_reviewed_on: 2026-11-19
+review_in: 6 months
+weight: 40
+---
+
+# <%= current_page.data.title %>
+
+Crime production resource groups have a `CanNotDelete` lock called `crime-auto-lock`. It stops resources in the group being deleted by mistake or by automation. Updates still work as normal.
+
+The lock doesn't protect data inside a resource. Soft delete and immutable backups cover that.
+
+Code and selection rules: [hmcts/cpp-azure-resource-locks](https://github.com/hmcts/cpp-azure-resource-locks).
+
+## What's locked
+
+Every 3 hours the [enable pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=400) locks production resource groups in these subscriptions:
+
+- Strategic Platform - live
+- MoJ-HMCTS-Crime-IdAM-Live
+
+These groups are never locked:
+
+- PRX and PRP groups
+- Azure-managed groups, such as AKS `MC_*` groups
+- Groups holding an AKS cluster, a VM scale set or VM restore points
+- Groups with nothing stateful in them
+- Groups tagged `exemptFromAutoLock=true` or listed in the repo's exclusions
+
+The [README](https://github.com/hmcts/cpp-azure-resource-locks#what-gets-locked) has the full rules.
+
+To check whether a group is locked:
+
+```shell
+az lock list -g <resource group> --subscription "<subscription>" -o table
+```
+
+## What a lock blocks
+
+Any delete inside a locked group fails with `ScopeLocked`:
+
+```text
+The scope '...' cannot perform delete operation because following scope(s) are locked: '/subscriptions/.../resourceGroups/<group>'. Please remove the lock and try again.
+```
+
+This includes Terraform removing or replacing a child resource, not only deleting a whole resource. Common cases:
+
+- a subnet, NSG rule, route or private endpoint
+- a NIC, disk or DNS record
+- a role assignment
+
+A Terraform plan that shows `destroy` or `-/+ replace` for anything in a locked group will fail at apply.
+
+## Unlock a group
+
+Use this when a change needs to delete something in a locked group.
+
+1. Run the [unlock pipeline](https://dev.azure.com/hmcts-cpp/cpp-apps/_build?definitionId=822) from `main`:
+    - **Subscription**: Strategic Platform - live or MoJ-HMCTS-Crime-IdAM-Live
+    - **Resource groups**: comma separated, for example `RG-PRD-XXX-01,RG-PRD-YYY-01`
+1. Ask someone else in **CPP DevOps SC** to approve it. You can't approve your own run.
+1. Once it's finished, apply your change straight away.
+1. Do nothing else. The lock comes back on the next scheduled run, within 3 hours.
+
+Unlock just before you apply. The next run can come sooner than you expect and lock the group again.
+
+The unlock pipeline only removes `crime-auto-lock`. It leaves other locks alone, such as Postgres server locks and `AzureBackupLock-DoNotDelete`.
+
+## Stop a group being locked
+
+If a group should never be locked, for example because it's rebuilt or cleaned up regularly:
+
+1. Add the tag `exemptFromAutoLock=true` to the group in the Terraform that manages it. Say why in the PR.
+1. If the group is already locked, run the unlock pipeline once. The tag stops new locks but doesn't remove an existing one.
+
+## Lock a group that's skipped
+
+To lock a group the rules skip, raise a PR in [cpp-azure-resource-locks](https://github.com/hmcts/cpp-azure-resource-locks) adding it to `config/included-resource-groups.txt`. PRX and PRP groups can't be locked this way.
+
+## Who can remove a lock
+
+The unlock pipeline is the expected route. Anyone with Owner or User Access Administrator on the subscription can also delete a lock directly, through the portal or CLI. Don't do this: it bypasses the approval, and the next scheduled run puts the lock back anyway.
+
+## Troubleshooting
+
+| Problem | What to do |
+|---|---|
+| Apply fails with `ScopeLocked` | [Unlock the group](#unlock-a-group), then apply again. |
+| Group locked again before you applied | The scheduled run re-locked it. Unlock again and apply straight after approval. |
+| Unlock run is waiting | It needs approval from someone else in CPP DevOps SC. |
+| Group still locked after an unlock | Check the run's log for the group. Only `crime-auto-lock` is removed, so another lock may still be there: `az lock list -g <group>`. |
+| Tagged group still locked | The tag only stops new locks. Run the unlock pipeline once. |
+| Enable run failed | Check the run log. It fails rather than guess when a config file is empty or Azure returns nothing. The next run retries. |

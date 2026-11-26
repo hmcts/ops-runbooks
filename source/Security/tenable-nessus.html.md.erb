@@ -1,6 +1,6 @@
 ---
 title: Tenable Nessus
-last_reviewed_on: 2026-10-05
+last_reviewed_on: 2026-11-26
 review_in: 12 months
 weight: 200
 ---
@@ -40,7 +40,8 @@ Credentials are stored in Key Vault. Credential details are documented in the [s
 ### Prerequisites
 
 - Connect to the [F5 VPN](https://portal.platform.hmcts.net).
-- For VM SSH, use the matching authorised private key.
+- For the Manager UI tunnel, activate `DTS Production Bastion Access for Users (DevOps)` in My Access, then refresh your Azure CLI session with `az login`.
+- For SSH directly to the Manager, use the matching authorised private key.
 
 ### Security Center UI
 
@@ -48,14 +49,15 @@ Open [https://tenable-sc.platform.hmcts.net/](https://tenable-sc.platform.hmcts.
 
 ### Nessus Manager UI
 
-Start the tunnel and keep this terminal open:
+Start an SSH session to the production bastion with local port forwarding. No custom SSH configuration is required:
 
 ```bash
-ssh -F ./sshconfig -N -o ExitOnForwardFailure=yes \
-  -L 127.0.0.1:8834:10.146.5.5:8834 bastion-prod-rg-bastion-prod
+az ssh vm -n bastion-prod -g bastion-prod-rg \
+  --subscription DTS-MANAGEMENT-PROD-INTSVC --prefer-private-ip \
+  -- -L 127.0.0.1:8834:10.146.5.5:8834
 ```
 
-Open [https://127.0.0.1:8834/](https://127.0.0.1:8834/). The Manager uses its own local account, not your Entra account. Its default certificate can produce a browser certificate warning.
+Keep the SSH session open, then open [https://127.0.0.1:8834/](https://127.0.0.1:8834/). The Manager uses its own local account, not your Entra account. Its default certificate can produce a browser certificate warning.
 
 ### SSH to Nessus Manager
 
@@ -131,20 +133,7 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 
 #### Connect to the Tenable Server 
 
-- Ensure you have JIT access and you are connected to the VPN 
-- Get the SSH config from Azure (valid for 1 hour)
-
-```bash
-az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
-```
-
-- Start port-forwarding/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
-
-```bash
-ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
-```
-
-- Go to browser https://localhost:5000
+Follow the [Nessus Manager UI access steps](#nessus-manager-ui) to connect through the production bastion and open the console.
 
 ## Troubleshooting Agents
 

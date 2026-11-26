@@ -40,8 +40,6 @@ Credentials are stored in Key Vault. Credential details are documented in the [s
 ### Prerequisites
 
 - Connect to the [F5 VPN](https://portal.platform.hmcts.net).
-- For the Manager UI tunnel, activate `DTS Production Bastion Access for Users (DevOps)` in My Access, then refresh your Azure CLI session with `az login`.
-- For SSH directly to the Manager, use the matching authorised private key.
 
 ### Security Center UI
 
@@ -49,7 +47,7 @@ Open [https://tenable-sc.platform.hmcts.net/](https://tenable-sc.platform.hmcts.
 
 ### Nessus Manager UI
 
-Start an SSH session to the production bastion with local port forwarding. No custom SSH configuration is required:
+Start the tunnel and keep this terminal open:
 
 ```bash
 az ssh vm -n bastion-prod -g bastion-prod-rg \
@@ -133,7 +131,20 @@ After deployment of the Nessus agent, it will register with the Nessus Manager h
 
 #### Connect to the Tenable Server 
 
-Follow the [Nessus Manager UI access steps](#nessus-manager-ui) to connect through the production bastion and open the console.
+- Ensure you have JIT access and you are connected to the VPN 
+- Get the SSH config from Azure (valid for 1 hour)
+
+```bash
+az ssh config --resource-group bastion-prod-rg --vm-name bastion-prod --prefer-private-ip --file ./sshconfig Paste into ~/.ssh/config
+```
+
+- Start port-forwarding/SSH tunnel to Nessus host. To port forward to the Tenable Server, run the following command replacing the variable with the intended IP. 
+
+```bash
+ssh -L 5000:<VM-PRIVATE-IP>:8834 bastion-prod-rg-bastion-prod
+```
+
+- Go to browser https://localhost:5000
 
 ## Troubleshooting Agents
 

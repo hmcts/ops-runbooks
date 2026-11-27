@@ -29,6 +29,13 @@ guidance follow below.
   CRDs support the selected resource API and intended upgrade.
 - A supported PostgreSQL upgrade path, application and extension compatibility
   checks, and a non-production test before rollout.
+- For PostgreSQL 18, confirm the server is running PostgreSQL 15, 16 or 17;
+  Azure's in-place upgrade support does not support upgrading PostgreSQL 14
+  directly to PostgreSQL 18. If the server is on PostgreSQL 14, upgrade it to
+  PostgreSQL 15, 16 or 17 first, then upgrade to PostgreSQL 18.
+- Check the current Azure-supported versions and the [PostgreSQL 18 release
+  notes](https://www.postgresql.org/docs/18/release-18.html) before planning the
+  change.
 
 <%= warning_text('A PostgreSQL major-version upgrade causes downtime and affects every database on the server. Follow the Change Request process for production. A completed upgrade cannot be reversed by reverting the pull request or lowering the version in Git.') %>
 
@@ -132,8 +139,13 @@ The shared server and team patches use
 `dbforpostgresql.azure.com/v20250801`. The team patch overrides the inherited
 engine version for that team's server. For example, Adoption's patch currently
 specifies `"14"`; a planned upgrade changes that existing field to the approved
-target, such as `"17"`. The API version remains aligned with the shared
+target, such as `"17"` or `"18"`. The API version remains aligned with the shared
 resource.
+
+PostgreSQL 18 is supported by the `v20250801` API. However, the target engine
+version and the API version are separate settings: changing the API to
+`v20250801` does not upgrade a server. For a PostgreSQL 14 server, use a staged
+upgrade to a supported intermediate version before selecting `"18"`.
 
 The shared engine default is currently `"17"`, independently of its 2025 API.
 Do not confuse an API year with an engine version. A consumer without an engine
@@ -176,7 +188,8 @@ spec:
 ```
  
 Confirm that the environment Kustomization already references the team patch, and that the chosen engine
-version is supported. (v2025 supports up to postgresql v18)
+version is supported. PostgreSQL 18 is a valid `v20250801` target. If the current server is PostgreSQL 14,
+complete a supported intermediate upgrade before changing the patch to `"18"`.
 
 ### 3. Validate and roll out
 
@@ -251,12 +264,13 @@ kubectl get flexibleserver rpe-preview -n rpe -o yaml
 kubectl describe flexibleserver rpe-preview -n rpe > out.txt
 ```
 
-While the upgrade runs, the desired version may be `"17"` while the
-Azure-reported `status.version` remains `"14"`. A `Ready=False` condition with
+While the upgrade runs, the desired version may be the selected target (for
+example, `"17"` or `"18"`) while the Azure-reported `status.version` remains
+`"14"` or the supported intermediate version. A `Ready=False` condition with
 reason `Reconciling` and a message that the resource is being reconciled means
 ASO is still processing the Azure operation. Wait and check again; do not start
 a second upgrade. Completion is indicated when the resource is Ready and the
-reported version is `"17"`. Confirm the database version with
+reported version matches the selected target. Confirm the database version with
 `SHOW server_version;` as well.
 
 If reconciliation reports failure, inspect the Kustomization and ASO controller

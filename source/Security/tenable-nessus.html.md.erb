@@ -1,6 +1,6 @@
 ---
 title: Tenable Nessus
-last_reviewed_on: 2026-10-05
+last_reviewed_on: 2026-11-26
 review_in: 12 months
 weight: 200
 ---
@@ -51,11 +51,12 @@ Open [https://tenable-sc.platform.hmcts.net/](https://tenable-sc.platform.hmcts.
 Start the tunnel and keep this terminal open:
 
 ```bash
-ssh -F ./sshconfig -N -o ExitOnForwardFailure=yes \
-  -L 127.0.0.1:8834:10.146.5.5:8834 bastion-prod-rg-bastion-prod
+az ssh vm -n bastion-prod -g bastion-prod-rg \
+  --subscription DTS-MANAGEMENT-PROD-INTSVC --prefer-private-ip \
+  -- -L 127.0.0.1:8834:10.146.5.5:8834
 ```
 
-Open [https://127.0.0.1:8834/](https://127.0.0.1:8834/). The Manager uses its own local account, not your Entra account. Its default certificate can produce a browser certificate warning.
+Keep the SSH session open, then open [https://127.0.0.1:8834/](https://127.0.0.1:8834/). The Manager uses its own local account, not your Entra account. Its default certificate can produce a browser certificate warning.
 
 ### SSH to Nessus Manager
 

@@ -1,7 +1,7 @@
 ---
 title: Pact-Broker Patching Example
 weight: 30
-last_reviewed_on: 2026-05-01
+last_reviewed_on: 2026-10-13
 review_in: 12 months
 ---
 
@@ -12,6 +12,8 @@ This document covers a high level patching example for the pact-broker app patch
 pact-broker is patched globally, rather than starting in sbox and working up through the environments, due to its limited use.
 
 pact-broker is only needed to patch on CFT environment as its only setup there for ptl and ptlsbox environments.
+
+The current CFT deployment is represented by the `pact-broker` HelmRelease in [`cnp-flux-config`](https://github.com/hmcts/cnp-flux-config/tree/master/apps/pact-broker). The shared chart version applies to both the PTL and PTLSBOX releases; confirm the target chart version before raising a patching PR.
 
 ## Patching
 
